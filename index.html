@@ -102,7 +102,7 @@ a{color:var(--blu)}
 
 <section class="scr" id="s-setup">
   <h1>Set up</h1>
-  <div class="note">This page makes two keys on this phone: an <b>emergency key</b> you add as a signer to the bot accounts (from the PC), and a <b>Personal</b> wallet key. Both are encrypted with your PIN and never leave this device.</div>
+  <div class="note"><span>This page makes two keys on this phone: an <b>emergency key</b> you add as a signer to the bot accounts (from the PC), and a <b>Personal</b> wallet key. Both are encrypted with your PIN and never leave this device.</span></div>
   <label>PIN (6 to 12 digits)<input id="su1" type="password" inputmode="numeric" autocomplete="new-password"></label>
   <label>PIN again<input id="su2" type="password" inputmode="numeric" autocomplete="new-password"></label>
   <label>Personal wallet<select id="suMode"><option value="new">Create a new Personal wallet</option><option value="import">Import a secret key I already have</option></select></label>
@@ -2834,6 +2834,8 @@ let idleT = null;
 function bumpIdle() { clearTimeout(idleT); if (K) idleT = setTimeout(lock, 120000); }
 ['pointerdown', 'keydown'].forEach((e) => document.addEventListener(e, bumpIdle, { passive: true }));
 function lock() { K = null; PIN = null; closeSheet(); go('lock'); }
+// screens still loading when the wallet locks find K gone; drop those leftovers quietly
+window.addEventListener('unhandledrejection', (e) => { if (!K) e.preventDefault(); });
 
 /* ---------- horizon ---------- */
 async function H(path, opt) {
@@ -3276,7 +3278,8 @@ async function loadPer(per) {
   P.busy[per] = false; if (cur === 'pnl') paintPnl();
 }
 function drawPnl() {
-  if (!P.at || Date.now() - P.at > 120000 || P.net !== S.net) { pnlReset(); P.net = S.net; }   // fresh numbers after 2 min or a network switch
+  const sig = tradeAccts().map((b) => b.name + ':' + b.addr).join('|');
+  if (!P.at || Date.now() - P.at > 120000 || P.net !== S.net || P.sig !== sig) { pnlReset(); P.net = S.net; P.sig = sig; }   // fresh numbers after 2 min, a network switch or an account change
   paintPnl();
   if (!P.res[P.sel] && !P.busy[P.sel]) loadPer(P.sel);
 }
