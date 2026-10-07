@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0E13">
+<meta name="application-name" content="Liquidfi">
+<meta name="apple-mobile-web-app-title" content="Liquidfi">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Liquidfi</title>
+<style>
+:root{--buy:#60A5FA;--sell:#F472B6;--bg:#0B0E13;--s1:#151A22;--s2:#1D2430;--bd:#2A3240;--bd2:#4A5566;--tx:#E9EDF2;--mu:#9AA4B2;--red:#C9302C;--red2:#9E2420;--redt:#FF8A80;--grn:#3FB87F;--grnf:#1F6B47;--amb:#F0A030;--blu:#6EA8FF}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.buy{color:var(--buy)}.sell{color:var(--sell)}
+body.gr{--buy:#3FB87F;--sell:#FF8A80}
+.mu{color:var(--mu)}.grn{color:var(--grn)}.red{color:var(--redt)}.amb{color:var(--amb)}.blu{color:var(--blu)}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.scr{display:none;flex:1;flex-direction:column;gap:14px;padding:16px 16px 96px}
+.scr.on{display:flex}
+h1{margin:0;font-size:24px}h2{margin:0;font-size:20px}
+.top{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.top .l{display:flex;align-items:center;gap:6px}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.card.danger{border-color:var(--red)}
+.rows>div{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.rows>div:last-child{border-bottom:none}
+.lbl{font-size:12px;color:var(--mu);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+button,.btn{font:inherit;font-weight:700;border-radius:14px;border:none;min-height:48px;padding:0 16px;cursor:pointer;color:var(--tx);background:var(--s2)}
+button:disabled{opacity:.45}
+.b-red{background:var(--red);color:#fff}.b-out{background:transparent;border:1px solid var(--bd2)}.b-redout{background:transparent;border:2px solid var(--red)}
+.b-light{background:var(--tx);color:var(--bg)}.b-grn{background:#2563EB;color:#fff}.b-pur{background:#7C3AED;color:#fff}
+#tSide button.on[data-v=buy]{background:#2563EB;color:#fff}#tSide button.on[data-v=sell]{background:#7C3AED;color:#fff}
+.hold.b-grn i{background:#1E4FC0}.hold.b-pur i{background:#5B21B6}
+.big{min-height:64px;font-size:17px}
+.sm{min-height:40px;font-size:13px;padding:0 12px;border-radius:10px}
+.ico{width:44px;height:44px;min-height:44px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--s1);border:1px solid var(--bd)}
+.back{background:transparent;border:none}
+input,select,textarea{font:inherit;width:100%;min-height:50px;border-radius:12px;border:1px solid var(--bd);background:var(--s1);color:var(--tx);padding:0 14px}
+textarea{padding:12px 14px;min-height:80px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mu);font-weight:600}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:4px}
+.seg button{min-height:42px;border-radius:9px;background:transparent;color:var(--mu)}
+.seg button.on{background:var(--tx);color:var(--bg)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.t-red{background:var(--red);color:#fff}.t-grn{background:#17402D;color:var(--grn)}.t-amb{background:#3d2c10;color:var(--amb)}
+.acct{text-align:left;display:flex;flex-direction:column;gap:6px;padding:14px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;font-weight:400;min-height:auto}
+.acct .r{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
+.note{display:flex;gap:10px;align-items:flex-start;background:var(--s1);border-radius:12px;padding:12px;font-size:13px;color:var(--mu)}
+.rows>div.pr{flex-direction:column;align-items:stretch;gap:6px}
+.pr .top2{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.qs,.rows>div.qh{display:grid;grid-template-columns:1fr 74px 74px 58px;gap:6px;align-items:center}
+.qs{background:#0F131A;border-radius:8px;padding:6px 8px;font-size:12px}
+.qs .v{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;text-align:right}
+.rows>div.qh{font-size:10.5px;color:var(--mu);font-weight:600;letter-spacing:.04em;padding:8px 0 4px}
+.chip{min-height:44px;padding:0 14px;border-radius:22px;border:1px solid var(--bd);background:var(--s1);font-weight:500;font-size:14px}
+.chip.on{background:var(--tx);color:var(--bg);border-color:var(--tx);font-weight:600}
+nav{position:fixed;bottom:0;left:0;right:0;display:none;grid-template-columns:repeat(3,1fr);background:#0F131A;border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
+nav.on{display:grid}
+nav button{background:transparent;border-radius:0;min-height:62px;font-size:12px;color:var(--mu);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+nav button.on{color:var(--tx)}nav button.k{color:var(--redt)}
+.pin{display:flex;gap:16px;justify-content:center;margin:8px 0}
+.pin span{width:14px;height:14px;border-radius:50%;border:2px solid var(--bd2)}.pin span.f{background:var(--tx);border-color:var(--tx)}
+.pad{display:grid;grid-template-columns:repeat(3,80px);gap:14px 26px;justify-content:center}
+.pad button{height:72px;border-radius:50%;font-size:26px;font-weight:500}
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:9}
+#sheet.on{display:flex}
+#sheet>div{background:var(--s1);border-top:1px solid var(--bd);border-radius:22px 22px 0 0;width:100%;max-width:480px;max-height:92vh;overflow:auto;padding:14px 16px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.ops{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ops li{background:var(--bg);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.ops li.hl{border:1px solid var(--red)}
+.ops small{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--mu);font-size:12px;word-break:break-all}
+.hold{position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--red2)}
+.hold span{position:relative}
+#toast{position:fixed;left:16px;right:16px;bottom:84px;max-width:448px;margin:0 auto;background:var(--s2);border:1px solid var(--bd2);border-radius:12px;padding:12px 14px;display:none;z-index:10;font-size:14px}
+#toast.on{display:block}
+.netb{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;border:1px solid var(--bd)}
+.addr{font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all;font-size:13px}
+.book{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.qr{align-self:center;background:#fff;border-radius:16px;padding:14px;line-height:0}
+.list>button{width:100%}
+a{color:var(--blu)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- LOCK / SETUP -->
+<section class="scr" id="s-lock" style="align-items:center;padding-top:48px;gap:20px">
+  <span class="netb" id="lockNet"></span>
+  <div style="width:64px;height:64px;border-radius:18px;background:var(--red);display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.3 7.5a8 8 0 1 0 11.4 0"/></svg></div>
+  <h1>Liquidfi</h1>
+  <p class="mu" id="lockMsg" style="margin:0;text-align:center">Enter PIN</p>
+  <div class="pin" id="pinDots"></div>
+  <div class="pad" id="pad"></div>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto">Keys are encrypted on this device. No server. Talks straight to Stellar.<br>v1.3</p>
+</section>
+
+<section class="scr" id="s-setup">
+  <h1>Set up</h1>
+  <div class="note">This page makes two keys on this phone: an <b>emergency key</b> you add as a signer to the bot accounts (from the PC), and a <b>Personal</b> wallet key. Both are encrypted with your PIN and never leave this device.</div>
+  <label>PIN (6 to 12 digits)<input id="su1" type="password" inputmode="numeric" autocomplete="new-password"></label>
+  <label>PIN again<input id="su2" type="password" inputmode="numeric" autocomplete="new-password"></label>
+  <label>Personal wallet<select id="suMode"><option value="new">Create a new Personal wallet</option><option value="import">Import a secret key I already have</option></select></label>
+  <label id="suImpW" style="display:none">Secret key (S…), typed here only<input id="suImp" type="password" autocomplete="off"></label>
+  <label>Or restore an encrypted backup file<input id="suFile" type="file" accept=".json,application/json" style="padding-top:12px"></label>
+  <button class="b-light big" data-act="setup">Create</button>
+</section>
+
+<section class="scr" id="s-backup">
+  <h1>Back up your Personal key</h1>
+  <div class="note amb">If this phone is lost or its browser data is cleared, this secret is the only way to get the Personal funds back. Write it on paper. Never type it into a website or chat.</div>
+  <div class="card"><span class="lbl">Personal secret key</span><div class="addr" id="bkSec">tap Show</div><button class="b-out sm" data-act="bkShow">Show</button></div>
+  <button class="b-out" data-act="exportVault">Also save an encrypted backup file</button>
+  <button class="b-light big" data-act="bkDone">I wrote it down</button>
+</section>
+
+<!-- WALLET HOME -->
+<section class="scr" id="s-home">
+  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back to accounts">‹</button><button class="b-out" data-act="pickAcct" id="hAcct" style="min-height:44px">Personal ▾</button></div><span class="netb" id="hNet"></span></div>
+  <div style="display:flex;flex-direction:column;gap:2px;padding:4px"><span class="mu" style="font-size:13px">Total value (USD est.)</span><span class="mono" style="font-size:34px;font-weight:600" id="hTot">–</span><span class="mu" style="font-size:12px" id="hPx"></span></div>
+  <div class="g4" style="text-align:center">
+    <button class="b-out" data-go="trade" style="font-size:13px">Trade</button>
+    <button class="b-out" data-go="send" style="font-size:13px">Send</button>
+    <button class="b-out" data-go="receive" style="font-size:13px">Receive</button>
+    <button class="b-out" data-go="trust" style="font-size:13px">Assets</button>
+  </div>
+  <div id="hFund"></div>
+  <span class="lbl">Balances</span>
+  <div class="card rows" id="hBal" style="padding:4px 14px"></div>
+  <div id="hOff"></div>
+  <span class="lbl">Recent</span>
+  <div class="card rows" id="hRec" style="padding:4px 14px;font-size:14px"></div>
+  <div class="mu" style="font-size:12px" id="hAddr"></div>
+</section>
+
+<!-- BOTS / KILL -->
+<section class="scr" id="s-bots">
+  <div class="top"><div><h1>Accounts</h1><span class="mu" style="font-size:12px" id="bUpd"></span></div><button class="ico" data-act="refreshBots" aria-label="Refresh">↻</button></div>
+  <span class="lbl">Personal</span>
+  <div class="list" id="bPers" style="display:flex;flex-direction:column;gap:10px"></div>
+  <span class="lbl">Trading</span>
+  <div class="list" id="bList" style="display:flex;flex-direction:column;gap:10px"></div>
+  <button class="b-out" data-act="addAcct">+ Add account (import key)</button>
+  <div class="card"><div class="top"><span class="lbl">XLM/USDC · Stellar DEX</span><span class="grn" style="font-size:11px;font-weight:700" id="mLive">connecting…</span></div><div class="g3" id="mTop"></div><div class="mu" style="font-size:12px" id="mTop2"></div></div>
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <p class="mu" style="font-size:12px;margin:0 4px">Flatten closes the open trade on each trader account at market (live quote + cap). Market-maker inventory is kept. If a bot is still running on the PC it can post new orders: stop it there too.</p>
+    <div class="g2">
+      <button class="b-redout big" data-act="killAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span>Cancel all</span><span style="font-size:11px;font-weight:500" class="mu">orders · all bots</span></button>
+      <button class="b-red big" data-act="flatAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span>Flatten</span><span style="font-size:11px;font-weight:500">cancel all + close trades</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ACTIVITY: recent buys and sells on every account -->
+<section class="scr" id="s-act">
+  <div class="top"><div><h1>Activity</h1><span class="mu" style="font-size:12px" id="aUpd">Buys and sells · all accounts</span></div><button class="ico" data-act="actRefresh" aria-label="Refresh">↻</button></div>
+  <div id="aFil" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px"></div>
+  <div id="aList" style="display:flex;flex-direction:column;gap:8px"></div>
+  <button class="b-out" data-act="actMore" id="aMore" style="display:none">Load more</button>
+</section>
+
+<!-- P/L (first screen after unlock) -->
+<section class="scr" id="s-pnl">
+  <div class="top"><div><h1>P/L <span class="mu" style="font-weight:400;font-size:17px">· bots</span></h1><span class="mu" style="font-size:12px" id="pUpd"></span></div><div style="display:flex;gap:6px"><button class="ico" data-act="pnlRefresh" aria-label="Refresh">↻</button><button class="ico" data-go="set" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div></div>
+  <div class="card" id="pHero" style="gap:4px"></div>
+  <span class="lbl" id="pByL">By bot</span>
+  <div class="card rows" id="pBots" style="padding:2px 14px"></div>
+  <p class="mu" style="font-size:12px;margin:0 4px;line-height:1.4">Only Today loads on open. Tap a period to load it. P/L = each bot's value at the end of the period minus its value at the start (all balances priced in USDC at that moment), with deposits and withdrawals backed out. Prices are the last trade of each hour on Stellar. Days start at midnight Pacific.</p>
+  <div id="pPer" style="margin-top:auto;display:flex;flex-wrap:wrap;gap:6px"></div>
+</section>
+
+<section class="scr" id="s-bot">
+  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back">‹</button><div><h2 id="dName"></h2><div class="mono mu" style="font-size:12px" id="dAddr"></div></div></div><span id="dSig"></span></div>
+  <div class="g4" id="dAct"><button class="b-out sm" data-act="acctGo" data-to="trade">Trade</button><button class="b-out sm" data-act="acctGo" data-to="send">Send</button><button class="b-out sm" data-act="acctGo" data-to="receive">Receive</button><button class="b-out sm" data-act="acctGo" data-to="trust">Assets</button></div>
+  <div id="dPos"></div>
+  <div class="card"><div class="top"><span class="lbl">XLM/USDC</span><span class="grn" style="font-size:11px;font-weight:700">streaming · every ledger</span></div><div class="g3" id="dMkt"></div><div class="mu" style="font-size:12px" id="dCost"></div></div>
+  <span class="lbl">Resting orders on Stellar</span>
+  <div id="dOff" style="display:flex;flex-direction:column;gap:8px"></div>
+  <span class="lbl">Balances</span>
+  <div class="card rows" id="dBal" style="padding:4px 14px"></div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
+    <button class="b-red big" data-act="flatOne" id="dFlat">Cancel all + close position</button>
+    <button class="b-out" data-act="killOne">Cancel orders only</button>
+  </div>
+</section>
+
+<section class="scr" id="s-result">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:40px"><div id="rIco"></div><h1 id="rTitle" style="text-align:center"></h1></div>
+  <div id="rBody" style="display:flex;flex-direction:column;gap:10px"></div>
+  <button class="b-light big" data-act="resultBack" style="margin-top:auto">Done</button>
+</section>
+
+<!-- TRADE -->
+<section class="scr" id="s-trade">
+  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Trade</h2></div><span class="mu" style="font-size:12px" id="tFrom"></span></div>
+  <div class="seg" id="tMode"><button class="on" data-v="lim">Limit</button><button data-v="mkt">Market</button></div>
+  <div class="seg" id="tSide"><button class="on" data-v="buy">Buy XLM</button><button data-v="sell">Sell XLM</button></div>
+  <div class="card"><div class="book" id="tBook"></div></div>
+  <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="grn" style="font-size:11px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
+  <label>Amount (XLM)<input id="tAmt" inputmode="decimal" placeholder="0"></label>
+  <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
+  <div class="mu" id="tMktNote" style="font-size:12px;display:none">Market fills right away at the best price Stellar finds: the order book or the AMM pools, whichever is better, all in one step. Capped by your slippage.</div>
+  <label id="tPxW" style="display:none">Limit price (USDC per XLM)<input id="tPx" inputmode="decimal"></label>
+  <div class="card rows" id="tEst" style="padding:4px 14px;font-size:14px"></div>
+  <button class="b-grn big" data-act="tradeReview" id="tGo">Review buy</button>
+  <span class="lbl">Open orders</span>
+  <div id="tOpen" style="display:flex;flex-direction:column;gap:8px"></div>
+</section>
+
+<!-- SEND -->
+<section class="scr" id="s-send">
+  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Send</h2></div></div>
+  <label>From<select id="sFrom"></select></label>
+  <label>To<select id="sTo"></select></label>
+  <div id="sNew" style="display:none;flex-direction:column;gap:10px">
+    <label>Name for this address<input id="sNName" placeholder="e.g. Coinbase"></label>
+    <label>Address (G…)<input id="sNAddr" autocomplete="off" spellcheck="false"></label>
+    <label>Memo this address needs (exchanges), optional<input id="sNMemo" autocomplete="off"></label>
+    <button class="b-out" data-act="saveAddr">Check and save address</button>
+  </div>
+  <div class="g2"><label>Asset<select id="sAsset"></select></label><label>Amount<input id="sAmt" inputmode="decimal" placeholder="0"></label></div>
+  <label id="sMemoW">Memo<input id="sMemo" autocomplete="off"></label>
+  <div class="note"><span>Only saved, confirmed addresses can be sent to. Sends from bot accounts are off unless you turn them on in Settings.</span></div>
+  <button class="b-light big" data-act="sendReview">Review send</button>
+</section>
+
+<!-- RECEIVE -->
+<section class="scr" id="s-receive">
+  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Receive</h2></div></div>
+  <label>Account<select id="rAcct"></select></label>
+  <div class="qr" id="rQr"></div>
+  <div class="card"><span class="lbl">Address</span><div class="addr" id="rAddr"></div><div class="g2"><button class="b-light" data-act="copyAddr">Copy</button><button class="b-out" data-act="shareAddr">Share</button></div></div>
+  <div class="mu" style="font-size:13px" id="rCan"></div>
+</section>
+
+<!-- TRUST -->
+<section class="scr" id="s-trust">
+  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Assets (trustlines)</h2></div></div>
+  <span class="lbl">Known assets</span>
+  <div id="trKnown" style="display:flex;flex-direction:column;gap:8px"></div>
+  <span class="lbl">Other asset</span>
+  <div class="g2"><label>Code<input id="trCode" autocomplete="off"></label><label>Issuer (G…)<input id="trIss" autocomplete="off" spellcheck="false"></label></div>
+  <button class="b-out" data-act="trCheck">Check issuer</button>
+  <div id="trRes"></div>
+  <div class="note">Each trustline locks 0.5 XLM. You can remove one only at a 0 balance; that returns the 0.5 XLM.</div>
+</section>
+
+<!-- SETTINGS -->
+<section class="scr" id="s-set">
+  <div class="top"><div class="l"><button class="ico back" data-go="pnl" aria-label="Back to P/L">‹</button><h1>Settings</h1></div></div>
+  <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
+  <div class="card"><span class="lbl">Emergency key (this phone)</span><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">On the PC run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div>
+  <div class="card"><span class="lbl">Imported accounts (keys on this phone)</span><div class="rows" id="setX" style="font-size:14px"></div></div>
+  <div class="card"><span class="lbl">Bot accounts (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">Accounts your PC bots run, reached with this phone's emergency signer. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Add bot account</button><button class="b-out sm" data-act="saveBots">Save bot list</button></div></div>
+  <div class="card"><span class="lbl">Buy / sell and gain / loss colors</span><div class="seg" id="setCol"><button data-v="bp"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#60A5FA;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F472B6;margin:0 3px"></i> Blue / pink</button><button data-v="gr"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3FB87F;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF8A80;margin:0 3px"></i> Green / red</button></div><div class="mu" style="font-size:12px">Order book, last sales, Activity and P/L gains / losses. The Trade screen's Buy / Sell buttons keep their own colors.</div></div>
+  <div class="card"><span class="lbl">Close slippage cap</span><div class="seg" id="setSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
+  <div class="card"><div class="top"><span>Allow sends from bot accounts</span><input type="checkbox" id="setBotSend" style="width:28px;min-height:28px"></div></div>
+  <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader with an open short and two exit orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel all and Flatten. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
+  <div class="card"><div class="g2"><button class="b-out sm" data-act="exportVault">Encrypted backup</button><button class="b-out sm" data-act="bkShowSet">Show Personal secret</button></div><button class="b-out sm" data-act="lock">Lock now</button></div>
+  <div class="mu" style="font-size:12px">Liquidfi v1.3 · auto-locks after 2 min idle</div>
+</section>
+
+</div>
+
+<nav id="nav"><button data-go="pnl">P/L</button><button data-go="bots">Accounts</button><button data-go="act">Activity</button></nav>
+<div id="sheet"><div id="sheetIn"></div></div>
+<div id="toast"></div>
+
+<script>/*SDK*/</script>
+<script>/*QR*/</script>
+<script>
+'use strict';
+const SDK = window.StellarSdk;
+const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const short = (a) => a ? a.slice(0, 4) + '…' + a.slice(-4) : '';
+const fx = (n, d = 2) => (+n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const NETS = {
+  testnet: { name: 'TESTNET', horizon: 'https://horizon-testnet.stellar.org', pass: SDK.Networks.TESTNET, expert: 'https://stellar.expert/explorer/testnet' },
+  public: { name: 'MAINNET', horizon: 'https://horizon.stellar.org', pass: SDK.Networks.PUBLIC, expert: 'https://stellar.expert/explorer/public' },
+};
+const KNOWN = {
+  public: [
+    { code: 'USDC', issuer: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN', who: 'centre.io (Circle)' },
+    { code: 'EURC', issuer: 'GDHU6WRG4IEQXM5NZ4BMPKOXHW76MZM4Y2IEMFDVXBSDP6SJY4ITNPP2', who: 'circle.com' },
+    { code: 'PYUSD', issuer: 'GDQE7IXJ4HUHV6RQHIUPRJSEZE4DRS5WY577O2FY6YQ5LVWZ7JZTU2V5', who: 'PayPal' },
+  ],
+  testnet: [],
+};
+const DEFAULT_BOTS = {
+  public: [],   // no accounts are built in: add yours in Settings → Bot accounts (saved on this device only)
+  testnet: [],
+};
+
+/* ---------- storage ---------- */
+const SKEY = 'ksw1';
+let S;
+function loadS() {
+  let j = null;
+  try { j = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) { j = null; }
+  S = j || { v: 1, net: 'testnet', slip: 1, botSend: false, vault: null, fails: 0, lockUntil: 0, nets: {} };
+  for (const n of ['testnet', 'public']) {
+    S.nets[n] = S.nets[n] || {};
+    const N = S.nets[n];
+    if (!N.bots) N.bots = JSON.parse(JSON.stringify(DEFAULT_BOTS[n]));
+    if (!N.saved) N.saved = [];
+    if (!N.usdc) N.usdc = n === 'public' ? { code: 'USDC', issuer: KNOWN.public[0].issuer } : { code: 'USDC', issuer: 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5' };
+    if (!N.extraKnown) N.extraKnown = [];
+  }
+}
+function saveS() { try { localStorage.setItem(SKEY, JSON.stringify(S)); return true; } catch (e) { toast('This browser will not save data here. Open the page another way (see notes).'); return false; } }
+const NET = () => NETS[S.net], NS = () => S.nets[S.net];
+const USDC = () => new SDK.Asset(NS().usdc.code, NS().usdc.issuer);
+
+/* ---------- crypto vault ---------- */
+const te = new TextEncoder(), td = new TextDecoder();
+const b64 = (u) => btoa(String.fromCharCode(...new Uint8Array(u)));
+const ub64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function kdf(pin, salt, iter) {
+  const base = await crypto.subtle.importKey('raw', te.encode(pin), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function seal(pin, obj) {
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)), iter = 600000;
+  const k = await kdf(pin, salt, iter);
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, te.encode(JSON.stringify(obj)));
+  return { kdf: 'PBKDF2-SHA256', iter, salt: b64(salt), iv: b64(iv), ct: b64(ct) };
+}
+async function unseal(pin, v) {
+  const k = await kdf(pin, ub64(v.salt), v.iter);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: ub64(v.iv) }, k, ub64(v.ct));
+  return JSON.parse(td.decode(pt));
+}
+let K = null;      // {em: Keypair, pe: Keypair} while unlocked
+let PIN = null;    // kept only while unlocked, to re-seal
+let idleT = null;
+function bumpIdle() { clearTimeout(idleT); if (K) idleT = setTimeout(lock, 120000); }
+['pointerdown', 'keydown'].forEach((e) => document.addEventListener(e, bumpIdle, { passive: true }));
+function lock() { K = null; PIN = null; closeSheet(); go('lock'); }
+
+/* ---------- horizon ---------- */
+async function H(path, opt) {
+  const r = await fetch(NET().horizon + path, opt);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.title || ('HTTP ' + r.status)); e.status = r.status; e.j = j; throw e; }
+  return j;
+}
+async function acct(addr) {
+  try { return await H('/accounts/' + addr); } catch (e) { if (e.status === 404) return null; throw e; }
+}
+async function offersOf(addr) {
+  let out = [], url = '/accounts/' + addr + '/offers?limit=200';
+  for (let i = 0; i < 10; i++) {
+    const j = await H(url); const rs = j._embedded.records; out = out.concat(rs);
+    if (rs.length < 200) break; url = j._links.next.href.replace(NET().horizon, '');
+  }
+  return out;
+}
+const hAsset = (o) => o.asset_type === 'native' ? SDK.Asset.native() : new SDK.Asset(o.asset_code, o.asset_issuer);
+const aKey = (a) => a.asset_type === 'native' ? 'XLM' : a.asset_code + ':' + a.asset_issuer;
+const aName = (a) => a.asset_type === 'native' ? 'XLM' : a.asset_code;
+const isUSDC = (a) => a.asset_type !== 'native' && a.asset_code === NS().usdc.code && a.asset_issuer === NS().usdc.issuer;
+async function feeNow() {
+  try { const f = await H('/fee_stats'); return String(Math.min(200000, Math.max(1000, 2 * +f.fee_charged.p95))); } catch (e) { return '5000'; }
+}
+async function buildTx(src, ops, memo) {
+  const a = await H('/accounts/' + src);
+  const b = new SDK.TransactionBuilder(new SDK.Account(src, a.sequence), { fee: await feeNow(), networkPassphrase: NET().pass });
+  ops.forEach((o) => b.addOperation(o));
+  if (memo) b.addMemo(memo);
+  return b.setTimeout(90).build();
+}
+const CODES = {
+  tx_bad_auth: 'This key is not allowed to sign for that account (emergency signer not added?).',
+  op_underfunded: 'Not enough funds.', op_over_source_max: 'Price moved past your cap. Nothing traded. Try again.',
+  op_under_dest_min: 'Price moved past your cap. Nothing traded. Try again.', op_too_few_offers: 'Not enough orders on the book to fill this.',
+  op_no_trust: 'The receiver has no trustline for this asset.', op_no_destination: 'That account does not exist yet.',
+  op_low_reserve: 'Not enough XLM for the reserve.', tx_insufficient_balance: 'Not enough XLM to pay the fee.', op_line_full: 'The receiver\'s trustline limit is full.',
+  op_cross_self: 'This would trade against your own order.', tx_bad_seq: 'Account sequence changed (a bot sent something). Try again.',
+};
+function niceErr(e) {
+  const rc = e.j && e.j.extras && e.j.extras.result_codes;
+  if (rc) { const all = [rc.transaction, ...(rc.operations || [])].filter((c) => c && c !== 'op_success' && c !== 'tx_failed'); return all.map((c) => CODES[c] || c).join(' ') || 'Stellar refused it.'; }
+  return e.message || String(e);
+}
+async function submit(tx) {
+  return H('/transactions', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'tx=' + encodeURIComponent(tx.toXDR()) });
+}
+
+/* ---------- live market (XLM/USDC) ---------- */
+const MK = { bids: [], asks: [], last: null, lastT: null, at: 0, tr: [] };
+let esB = null, esT = null;
+function startMarket() {
+  if (esB) esB.close(); if (esT) esT.close();
+  const u = NS().usdc;
+  const ob = `${NET().horizon}/order_book?selling_asset_type=native&buying_asset_type=${u.code.length > 4 ? 'credit_alphanum12' : 'credit_alphanum4'}&buying_asset_code=${u.code}&buying_asset_issuer=${u.issuer}&limit=20&cursor=now`;
+  const tr = `${NET().horizon}/trades?base_asset_type=native&counter_asset_type=${u.code.length > 4 ? 'credit_alphanum12' : 'credit_alphanum4'}&counter_asset_code=${u.code}&counter_asset_issuer=${u.issuer}&cursor=now`;
+  MK.bids = []; MK.asks = []; MK.last = null;
+  MK.tr = [];
+  fetch(tr.replace('cursor=now', 'order=desc&limit=10')).then((r) => r.json()).then((j) => { const rs = (j._embedded && j._embedded.records) || []; const t = rs[0]; if (t && !MK.last) { MK.last = t.price.n / t.price.d; MK.lastT = t.ledger_close_time; } if (!MK.tr.length) MK.tr = rs.map(trRow); drawMarket(); }).catch(() => {});
+  try {
+    esB = new EventSource(ob);
+    esB.onmessage = (m) => { try { const d = JSON.parse(m.data); MK.bids = d.bids.map((b) => [+b.price, +b.amount / +b.price]); MK.asks = d.asks.map((a) => [+a.price, +a.amount]); MK.at = Date.now(); drawMarket(); } catch (e) {} };
+    esT = new EventSource(tr);
+    esT.onmessage = (m) => { try { const d = JSON.parse(m.data); MK.last = d.price.n / d.price.d; MK.lastT = d.ledger_close_time; MK.tr.unshift(trRow(d)); MK.tr = MK.tr.slice(0, 10); drawMarket(); } catch (e) {} };
+    esB.onerror = () => { $('#mLive').textContent = 'reconnecting…'; };
+  } catch (e) { pollMarket(); }
+}
+// a trade row (XLM amount, USDC per XLM); colour by tick (up = green, down = red, same = as before)
+const trRow = (t) => ({ t: t.ledger_close_time, px: t.price.n / t.price.d, x: +t.base_amount });
+function tick(L) { let c = true; for (let i = L.length - 1; i >= 0; i--) { if (i < L.length - 1 && L[i].px !== L[i + 1].px) c = L[i].px > L[i + 1].px; L[i].buy = c; } return L; }
+async function pollMarket() {   // fallback if EventSource is blocked
+  for (;;) { try { const u = NS().usdc; const d = await H(`/order_book?selling_asset_type=native&buying_asset_type=credit_alphanum4&buying_asset_code=${u.code}&buying_asset_issuer=${u.issuer}&limit=20`); MK.bids = d.bids.map((b) => [+b.price, +b.amount / +b.price]); MK.asks = d.asks.map((a) => [+a.price, +a.amount]); MK.at = Date.now(); drawMarket(); } catch (e) {} await sleep(2000); }
+}
+function walk(side, qty) {   // cost in USDC to buy (asks) or proceeds to sell (bids) qty XLM, from the streamed book
+  const lv = side === 'buy' ? MK.asks : MK.bids; let left = qty, usd = 0;
+  for (const [p, a] of lv) { const t = Math.min(left, a); usd += t * p; left -= t; if (left <= 1e-9) break; }
+  return left > 1e-7 ? null : usd;
+}
+const mid = () => (MK.bids[0] && MK.asks[0]) ? (MK.bids[0][0] + MK.asks[0][0]) / 2 : (MK.last || 0);
+function mktCells() {
+  const b = MK.bids[0], a = MK.asks[0];
+  return `<div><div class="mu" style="font-size:12px">Bid</div><div class="mono buy" style="font-weight:600">${b ? b[0].toFixed(6) : '–'}</div><div class="mono mu" style="font-size:12px">${b ? fx(b[1], 0) : ''}</div></div>
+  <div><div class="mu" style="font-size:12px">Ask</div><div class="mono sell" style="font-weight:600">${a ? a[0].toFixed(6) : '–'}</div><div class="mono mu" style="font-size:12px">${a ? fx(a[1], 0) : ''}</div></div>
+  <div><div class="mu" style="font-size:12px">Last sale</div><div class="mono" style="font-weight:600">${MK.last ? MK.last.toFixed(6) : '–'}</div><div class="mu" style="font-size:12px">${MK.lastT ? MK.lastT.slice(11, 19) + 'Z' : ''}</div></div>`;
+}
+function drawMarket() {
+  const b = MK.bids[0], a = MK.asks[0];
+  if ($('#mTop')) { $('#mTop').innerHTML = mktCells(); $('#mLive').textContent = 'streaming · ' + (MK.at ? new Date(MK.at).toLocaleTimeString() : ''); $('#mTop2').textContent = b && a ? `Spread ${((a[0] - b[0]) / mid() * 1e4).toFixed(0)} bps` : ''; }
+  if (cur === 'bot') drawBotMarket();
+  if (cur === 'trade') drawTradeBook();
+  if (cur === 'home') { const m = mid(); $('#hPx').textContent = m ? 'XLM ' + m.toFixed(6) + ' · streaming' : ''; }
+}
+
+/* ---------- navigation ---------- */
+let cur = 'lock';
+function go(name) {
+  if (name !== 'lock' && name !== 'setup' && name !== 'backup' && !K) name = S.vault ? 'lock' : 'setup';
+  cur = name;
+  $$('.scr').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
+  $('#nav').classList.toggle('on', !['lock', 'setup', 'backup'].includes(name));
+  $$('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.go === name || (['bot', 'home', 'trade', 'send', 'receive', 'trust'].includes(name) && b.dataset.go === 'bots') || (name === 'set' && b.dataset.go === 'pnl')));
+  window.scrollTo(0, 0);
+  const f = { lock: drawLock, pnl: drawPnl, act: drawAct, home: drawHome, bots: drawBots, bot: drawBot, trade: drawTrade, send: drawSend, receive: drawReceive, trust: drawTrust, set: drawSet }[name];
+  if (f) f();
+}
+function toast(msg, ms = 4000) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), ms); }
+function netBadge(el) { el.textContent = NET().name; el.style.color = S.net === 'public' ? 'var(--redt)' : 'var(--amb)'; }
+
+/* ---------- lock screen ---------- */
+let pinBuf = '';
+function drawLock() {
+  netBadge($('#lockNet'));
+  $('#pinDots').innerHTML = Array.from({ length: Math.max(6, pinBuf.length) }, (_, i) => `<span class="${i < pinBuf.length ? 'f' : ''}"></span>`).join('');
+  if (!$('#pad').children.length) {
+    $('#pad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button data-pin="${n}">${n}</button>`).join('') + `<button data-pin="del" class="b-out" style="font-size:16px" aria-label="Delete">⌫</button><button data-pin="0">0</button><button data-pin="ok" class="b-light" style="font-size:16px">OK</button>`;
+  }
+}
+async function tryUnlock() {
+  const now = Date.now();
+  if (S.lockUntil > now) { $('#lockMsg').textContent = `Too many tries. Wait ${Math.ceil((S.lockUntil - now) / 1000)} s`; pinBuf = ''; drawLock(); return; }
+  $('#lockMsg').textContent = 'Unlocking…';
+  try {
+    const v = await unseal(pinBuf, S.vault);
+    K = { em: SDK.Keypair.fromSecret(v.em), pe: SDK.Keypair.fromSecret(v.pe), x: loadX(v.x) }; PIN = pinBuf;
+    S.fails = 0; S.lockUntil = 0; saveS(); pinBuf = ''; bumpIdle(); startMarket(); go('pnl');
+    $('#lockMsg').textContent = 'Enter PIN';
+  } catch (e) {
+    S.fails = (S.fails || 0) + 1; if (S.fails >= 3) S.lockUntil = Date.now() + Math.min(300, 2 ** (S.fails - 3) * 5) * 1000; saveS();
+    pinBuf = ''; $('#lockMsg').textContent = 'Wrong PIN'; drawLock();
+  }
+}
+
+/* ---------- setup ---------- */
+async function doSetup() {
+  if (!window.crypto || !crypto.subtle) return toast('This browser blocks encryption on this page. Open it in Chrome or Safari.');
+  const p1 = $('#su1').value, p2 = $('#su2').value;
+  if (!/^\d{6,12}$/.test(p1)) return toast('PIN must be 6 to 12 digits.');
+  if (p1 !== p2) return toast('The two PINs do not match.');
+  const f = $('#suFile').files[0];
+  if (f) {
+    try { const j = JSON.parse(await f.text()); const v = await unseal(p1, j.vault); S.vault = j.vault; if (j.nets) S.nets = j.nets; saveS(); K = { em: SDK.Keypair.fromSecret(v.em), pe: SDK.Keypair.fromSecret(v.pe), x: loadX(v.x) }; PIN = p1; bumpIdle(); startMarket(); toast('Backup restored.'); return go('pnl'); }
+    catch (e) { return toast('Could not open that backup with this PIN.'); }
+  }
+  let pe;
+  if ($('#suMode').value === 'import') { try { pe = SDK.Keypair.fromSecret($('#suImp').value.trim()); } catch (e) { return toast('That is not a valid secret key.'); } }
+  else pe = SDK.Keypair.random();
+  const em = SDK.Keypair.random();
+  S.vault = await seal(p1, { em: em.secret(), pe: pe.secret() });
+  if (!saveS()) return;
+  K = { em, pe, x: [] }; PIN = p1; $('#su1').value = $('#su2').value = $('#suImp').value = ''; bumpIdle(); startMarket();
+  if ($('#suMode').value === 'import') go('pnl'); else go('backup');
+}
+function exportVault() {
+  const blob = new Blob([JSON.stringify({ app: 'kill-switch-wallet', v: 1, vault: S.vault, nets: S.nets }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'liquidfi-backup-encrypted.json'; a.click();
+  toast('Saved. It is encrypted with your PIN; keep it somewhere safe.');
+}
+
+/* ---------- accounts / balances ---------- */
+const ACC = {};   // cache addr -> account json
+async function refreshAcct(addr) { const a = await acct(addr); ACC[addr] = a; return a; }
+function balRows(a) {
+  if (!a) return '<div><span class="mu">Account not funded yet</span></div>';
+  return a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares').map((b) => {
+    const nm = b.asset_type === 'native' ? 'XLM' : b.asset_code;
+    const sub = b.asset_type === 'native' ? `${fx(+b.selling_liabilities, 2)} in orders · min reserve ${fx(1 + 0.5 * (a.subentry_count + (a.num_sponsoring || 0) - (a.num_sponsored || 0)), 1)}` : `${short(b.asset_issuer)}${+b.selling_liabilities ? ' · ' + fx(+b.selling_liabilities) + ' in orders' : ''}`;
+    return `<div><div><div style="font-weight:600">${esc(nm)}</div><div class="mu" style="font-size:12px">${esc(sub)}</div></div><div class="mono" style="font-weight:600;text-align:right">${fx(+b.balance, b.asset_type === 'native' ? 2 : 2)}</div></div>`;
+  }).join('');
+}
+function usdVal(a) {
+  if (!a) return 0; const m = mid(); let t = 0;
+  for (const b of a.balances) { if (b.asset_type === 'native') t += +b.balance * m; else if (['USDC', 'PYUSD', 'USDT'].includes(b.asset_code)) t += +b.balance; else if (b.asset_code === 'EURC') t += +b.balance * 1.17; }
+  return t;
+}
+let homeAddr = null;
+/* every account: Personal (own key), imported (own key, Personal or Trading), bots (emergency signer, Trading) */
+const loadX = (x) => (x || []).map((o) => ({ name: o.name, type: o.type, kind: o.kind, kp: SDK.Keypair.fromSecret(o.sec) }));
+async function resealVault() { S.vault = await seal(PIN, { em: K.em.secret(), pe: K.pe.secret(), x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, sec: o.kp.secret() })) }); return saveS(); }
+const OWN = () => [{ name: 'Personal', tag: 'your wallet', addr: K.pe.publicKey(), type: 'personal', kp: K.pe }, ...K.x.map((o) => ({ name: o.name, tag: o.type === 'personal' ? 'imported' : (o.kind === 'dir' ? 'trader' : 'market maker') + ' · own key', addr: o.kp.publicKey(), type: o.type, kind: o.kind || 'mm', kp: o.kp, own: true }))];
+const persAccts = () => OWN().filter((a) => a.type === 'personal');
+const tradeAccts = () => [...NS().bots, ...OWN().filter((a) => a.type === 'trading')];
+const allAccts = () => [...persAccts(), ...tradeAccts().filter((b) => b.addr)];
+const sameAcct = (a, b) => a.addr === b.addr && a.name === b.name;
+function walletAccts() {
+  const L = persAccts().map((a) => ({ name: a.name, addr: a.addr }));
+  if (S.botSend) tradeAccts().filter((b) => b.addr).forEach((b) => L.push({ name: b.name, addr: b.addr }));
+  return L;
+}
+const kpFor = (addr) => (OWN().find((a) => a.addr === addr) || {}).kp || K.em;
+async function drawHome() {
+  netBadge($('#hNet'));
+  homeAddr = homeAddr || K.pe.publicKey();
+  const nm = (allAccts().find((x) => x.addr === homeAddr) || { name: 'Personal' }).name;
+  $('#hAcct').textContent = nm + ' ▾';
+  $('#hAddr').textContent = homeAddr;
+  $('#hBal').innerHTML = '<div><span class="mu">Loading…</span></div>';
+  try {
+    const a = await refreshAcct(homeAddr);
+    $('#hBal').innerHTML = balRows(a);
+    $('#hTot').textContent = a ? '$' + fx(usdVal(a)) : '$0.00';
+    $('#hFund').innerHTML = a ? '' : (S.net === 'testnet' ? `<div class="card"><span>This account is not on Testnet yet.</span><button class="b-light" data-act="friendbot">Get free test XLM</button></div>` : `<div class="note amb">Not funded yet. Send at least 2 XLM to this address from an exchange or another wallet.</div>`);
+    const ops = a ? (await H(`/accounts/${homeAddr}/operations?order=desc&limit=8`))._embedded.records : [];
+    $('#hRec').innerHTML = ops.length ? ops.map((o) => `<div><span>${esc(opText(o, homeAddr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(o.created_at))}</span></div>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
+  } catch (e) { $('#hBal').innerHTML = `<div><span class="red">${esc(niceErr(e))}</span></div>`; }
+}
+function ago(t) { const s = (Date.now() - Date.parse(t)) / 1000; return s < 90 ? Math.round(s) + 's' : s < 5400 ? Math.round(s / 60) + 'm' : s < 129600 ? Math.round(s / 3600) + 'h' : Math.round(s / 86400) + 'd'; }
+function opText(o, me) {
+  const an = (t, c) => t === 'native' ? 'XLM' : c;
+  switch (o.type) {
+    case 'create_account': return o.account === me ? `Account created with ${fx(o.starting_balance)} XLM` : `Created ${short(o.account)}`;
+    case 'payment': return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
+    case 'path_payment_strict_send': case 'path_payment_strict_receive': return `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
+    case 'manage_sell_offer': case 'manage_buy_offer': return +o.amount === 0 ? 'Cancelled an order' : 'Placed/updated an order';
+    case 'change_trust': return (+o.limit === 0 ? 'Removed ' : 'Added ') + 'trustline ' + o.asset_code;
+    case 'set_options': return 'Changed account options/signers';
+    default: return o.type.replace(/_/g, ' ');
+  }
+}
+
+/* ---------- bots ---------- */
+const BOT = {};   // addr -> {a, offers, err}
+let botSel = null;
+function sigState(a) {
+  if (!a) return { ok: false, txt: 'not funded' };
+  if (OWN().some((o) => o.addr === a.account_id)) return { ok: true, txt: 'own key on this phone' };
+  const s = a.signers.find((x) => x.key === K.em.publicKey());
+  if (!s) return { ok: false, txt: 'signer not added' };
+  if (s.weight < a.thresholds.med_threshold) return { ok: false, txt: 'signer weight too low' };
+  return { ok: true, txt: 'signer ready' };
+}
+function position(b, offers) {   // from the bot's own exit orders on XLM/USDC
+  if (b.kind !== 'dir') return null;
+  let short = 0, long = 0;
+  for (const o of offers) {
+    if (isUSDC(o.selling) && o.buying.asset_type === 'native') short += +o.amount * +o.price;   // buy XLM with USDC = cover orders
+    if (o.selling.asset_type === 'native' && isUSDC(o.buying)) long += +o.amount;             // sell XLM for USDC = exit orders
+  }
+  if (short > long) return { side: 'short', qty: short - long };
+  if (long > short) return { side: 'long', qty: long - short };
+  return null;
+}
+async function loadBot(b) {
+  try { const [a, off] = await Promise.all([refreshAcct(b.addr), offersOf(b.addr).catch(() => [])]); BOT[b.addr] = { a, offers: off, at: Date.now() }; }
+  catch (e) { BOT[b.addr] = { err: niceErr(e) }; }
+  return BOT[b.addr];
+}
+async function drawBots(reload = true) {
+  const bots = tradeAccts();
+  $('#bList').innerHTML = bots.length ? '' : `<div class="note">No bot accounts on ${NET().name}. ${S.net === 'testnet' ? 'Settings → Create practice bots.' : 'Add them in Settings.'}</div>`;
+  const draw = () => {
+    $('#bList').innerHTML = bots.map((b, i) => {
+      if (!b.addr) return `<div class="acct"><div class="r"><span style="font-size:17px;font-weight:600">${esc(b.name)} <span class="mu" style="font-weight:400">· ${esc(b.tag || '')}</span></span><span class="mu" style="font-size:12px">no address set</span></div></div>`;
+      const d = BOT[b.addr] || {}; const sg = d.a ? sigState(d.a) : { txt: d.err ? 'error' : 'loading…' };
+      const pos = d.offers ? position(b, d.offers) : null;
+      return `<button class="acct${pos ? ' card danger' : ''}" data-bot="${i}">
+        <div class="r"><span style="font-size:17px;font-weight:600">${esc(b.name)} <span class="mu" style="font-weight:400">· ${esc(b.tag || '')}</span></span>${pos ? `<span class="tag t-red">${pos.side.toUpperCase()} ${fx(pos.qty, 0)} XLM</span>` : ''}</div>
+        <div class="r"><span class="mono mu" style="font-size:12px">${short(b.addr)}</span><span class="mono" style="font-weight:600">${d.offers ? d.offers.length + ' orders' : ''}</span></div>
+        <div class="r"><span style="font-size:12px" class="${sg.ok ? 'grn' : 'amb'}">${esc(sg.txt)}</span><span class="mu" style="font-size:12px">${d.err ? esc(d.err) : ''}</span></div></button>`;
+    }).join('');
+    $('#bUpd').textContent = 'Updated ' + new Date().toLocaleTimeString() + ' · ' + NET().name;
+  };
+  const PA = persAccts();
+  const drawPers = () => { $('#bPers').innerHTML = PA.map((p) => { const a = ACC[p.addr]; return `<button class="acct" data-act="openPersonal" data-addr="${p.addr}"><div class="r"><span style="font-size:17px;font-weight:600">${esc(p.name)} <span class="mu" style="font-weight:400">· ${esc(p.tag)}</span></span><span class="mono" style="font-weight:600">${a ? '$' + fx(usdVal(a)) : a === null ? 'not funded' : ''}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${short(p.addr)}</span><span class="mu" style="font-size:12px">trade · send · receive</span></div></button>`; }).join(''); };
+  drawPers(); if (reload) Promise.all(PA.map((p) => refreshAcct(p.addr).catch(() => null))).then(drawPers);
+  draw(); drawMarket();
+  if (reload) { await Promise.all(bots.filter((b) => b.addr).map(loadBot)); if (cur === 'bots') draw(); }
+}
+async function drawBot() {
+  const b = tradeAccts()[botSel]; if (!b) return go('bots');
+  $('#dName').textContent = b.name + (b.tag ? ' · ' + b.tag : ''); $('#dAddr').textContent = short(b.addr) + ' · ' + NET().name;
+  $('#dFlat').style.display = b.kind === 'dir' ? '' : 'none';
+  const paint = () => {
+    const d = BOT[b.addr] || {};
+    const sg = d.a ? sigState(d.a) : { txt: '…' };
+    $('#dSig').innerHTML = `<span class="tag ${sg.ok ? 't-grn' : 't-amb'}">${esc(sg.txt)}</span>`;
+    $('#dBal').innerHTML = balRows(d.a);
+    $('#dOff').innerHTML = (d.offers || []).length ? d.offers.map((o) => offerCard(o)).join('') : '<div class="note">No resting orders.</div>';
+    const pos = d.offers ? position(b, d.offers) : null;
+    $('#dPos').innerHTML = b.kind !== 'dir' ? '' : pos ? `<div class="card"><div class="top"><span class="lbl">Position (from its exit orders)</span><span class="tag t-red">${pos.side.toUpperCase()}</span></div><div class="mono" style="font-size:28px;font-weight:600">${pos.side === 'short' ? '−' : ''}${fx(pos.qty, 2)} XLM</div><div class="note amb" style="padding:8px 0;background:none">Stop lives on the PC only. Stellar has no stop orders.</div></div>`
+      : `<div class="card"><span class="lbl">Position</span><div>No open trade orders found. If the bot holds a trade without orders, Flatten will ask for the amount.</div></div>`;
+    drawBotMarket();
+  };
+  paint(); await loadBot(b); if (cur === 'bot') paint();
+}
+function offerCard(o, extra = '') {
+  const sellXLM = o.selling.asset_type === 'native';
+  let txt;
+  if (sellXLM) txt = `Sell ${fx(+o.amount, 2)} XLM @ ${(+o.price).toFixed(6)} ${aName(o.buying)}`;
+  else if (o.buying.asset_type === 'native') txt = `Buy ${fx(+o.amount * +o.price, 2)} XLM @ ${(1 / +o.price).toFixed(6)} ${aName(o.selling)}`;
+  else txt = `Sell ${fx(+o.amount, 2)} ${aName(o.selling)} for ${aName(o.buying)} @ ${(+o.price).toFixed(5)}`;
+  return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center"><div><div style="font-weight:600;font-size:14px">${esc(txt)}</div><div class="mono mu" style="font-size:12px">offer #${esc(o.id)}</div></div>${extra}</div>`;
+}
+function drawBotMarket() {
+  if (!$('#dMkt')) return; $('#dMkt').innerHTML = mktCells();
+  const b = tradeAccts()[botSel]; const d = b && BOT[b.addr]; const pos = d && d.offers ? position(b, d.offers) : null;
+  if (pos) { const c = walk(pos.side === 'short' ? 'buy' : 'sell', pos.qty); $('#dCost').innerHTML = c == null ? 'Book too thin to show the full close cost' : `${pos.side === 'short' ? 'Buy back' : 'Sell'} ${fx(pos.qty, 0)} XLM now ≈ <span class="mono" style="color:var(--tx)">${fx(c)} USDC</span> (avg ${(c / pos.qty).toFixed(6)})`; }
+  else $('#dCost').textContent = '';
+}
+
+/* ---------- P/L (bots only, value change in USDC) ---------- */
+// P/L = value at end − value at start − net deposits. Balances in the past are rebuilt by walking
+// Horizon effects back from the current balances. A swap (path payment to self) shows up as
+// account_debited + account_credited AND as trade effects, so trades are skipped in any operation
+// where this account has a debit/credit. Network fees are not effects and are ignored (tiny).
+const TZ = 'America/Los_Angeles', HR = 3600000;
+function ptParts(t) {
+  const o = {}; new Intl.DateTimeFormat('en-US', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', weekday: 'short' }).formatToParts(new Date(t)).forEach((p) => { o[p.type] = p.value; });
+  return o;
+}
+function ptMid(y, m, d) {   // instant of 00:00 Pacific on y-m-d (month/day may overflow)
+  const want = Date.UTC(y, m - 1, d); let g = want;
+  for (let i = 0; i < 3; i++) { const o = ptParts(g); g += want - Date.UTC(+o.year, +o.month - 1, +o.day, +o.hour, +o.minute, +o.second); }
+  return g;
+}
+const ptDay = (t, opt = { month: 'short', day: 'numeric' }) => new Date(t).toLocaleDateString('en-US', { timeZone: TZ, ...opt });
+const PERS = [['today', 'Today'], ['yday', 'Yesterday'], ['week', 'This week'], ['lweek', 'Last week'], ['month', 'This month'], ['lmonth', 'Last month'], ['m6', '6 months']];
+function perWindow(per, now = Date.now()) {
+  const o = ptParts(now), y = +o.year, m = +o.month, d = +o.day;
+  const dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday), back = (dow + 6) % 7;
+  const W = {
+    today: [ptMid(y, m, d), now, () => ptDay(now)],
+    yday: [ptMid(y, m, d - 1), ptMid(y, m, d), (a) => ptDay(a)],
+    week: [ptMid(y, m, d - back), now, (a) => 'since ' + ptDay(a, { weekday: 'short', month: 'short', day: 'numeric' })],
+    lweek: [ptMid(y, m, d - back - 7), ptMid(y, m, d - back), (a, b) => ptDay(a) + '–' + ptDay(b - 1)],
+    month: [ptMid(y, m, 1), now, (a) => 'since ' + ptDay(a)],
+    lmonth: [ptMid(y, m - 1, 1), ptMid(y, m, 1), (a) => ptDay(a, { month: 'long' })],
+    m6: [ptMid(y, m - 6, d), now, (a) => 'since ' + ptDay(a)],
+  }[per];
+  return { t0: W[0], t1: W[1], isNow: W[1] === now, label: W[2](W[0], W[1]) };
+}
+const P = { sel: 'today', res: {}, busy: {}, prog: {}, at: 0 };
+const EF = {};    // addr -> { a, lastT, recs (desc), next, end, ev }
+const PX = {};    // asset key -> { from, bk: [[ts, close], ...] ascending }
+function pnlReset() { for (const k in EF) delete EF[k]; for (const k in PX) delete PX[k]; P.res = {}; P.busy = {}; P.prog = {}; P.at = Date.now(); }
+async function fetchBack(addr, t0, prog) {
+  let C = EF[addr];
+  if (!C) { const a = await acct(addr); C = EF[addr] = { a, lastT: a ? Date.parse(a.last_modified_time) : 0, recs: [], next: `/accounts/${addr}/effects?order=desc&limit=200`, end: !a, ev: null }; }
+  while (!C.end && (!C.recs.length || Date.parse(C.recs[C.recs.length - 1].created_at) > t0)) {
+    const j = await H(C.next); const rs = j._embedded.records;
+    C.recs.push(...rs.filter((r) => Date.parse(r.created_at) <= C.lastT)); C.ev = null;   // drop effects newer than the balance snapshot
+    if (rs.length < 200) C.end = true; else C.next = j._links.next.href.replace(NET().horizon, '');
+    prog(C.recs.length);
+  }
+  return C;
+}
+const effKey = (e, pre = '') => e[pre + 'asset_type'] === 'native' ? 'XLM' : e[pre + 'asset_code'] + ':' + e[pre + 'asset_issuer'];
+function buildEvents(C, addr) {   // one event per operation: { t, d: {asset: delta}, flow, created }
+  if (C.ev) return C.ev;
+  const groups = []; let g = null;
+  for (const e of C.recs) { const op = e.paging_token.split('-')[0]; if (!g || g.op !== op) { g = { op, t: Date.parse(e.created_at), es: [] }; groups.push(g); } g.es.push(e); }
+  C.ev = groups.map((G) => {
+    const mine = G.es.filter((e) => e.account === addr), d = {}, add = (k, x) => { d[k] = (d[k] || 0) + x; };
+    const cd = mine.filter((e) => e.type === 'account_credited' || e.type === 'account_debited');
+    const cr = new Set(), db = new Set(); let created = false;
+    for (const e of cd) { const k = effKey(e); if (e.type === 'account_credited') { add(k, +e.amount); cr.add(k); } else { add(k, -e.amount); db.add(k); } }
+    for (const e of mine) {
+      if (e.type === 'account_created') { add('XLM', +e.starting_balance); created = true; }
+      if (!cd.length && e.type === 'trade') { add(effKey(e, 'bought_'), +e.bought_amount); add(effKey(e, 'sold_'), -e.sold_amount); }
+      if (!cd.length && e.type === 'claimable_balance_claimed') add(e.asset === 'native' ? 'XLM' : e.asset, +e.amount);
+    }
+    const swap = cr.size && db.size && [...cr].some((k) => !db.has(k));
+    return { t: G.t, d, flow: created || (cd.length > 0 && !swap), created };
+  });
+  return C.ev;
+}
+const usdcKey = () => NS().usdc.code + ':' + NS().usdc.issuer;
+function aggQS(key) {
+  const u = NS().usdc, q = (p, k) => { if (k === 'XLM') return `${p}_asset_type=native`; const [c, i] = k.split(':'); return `${p}_asset_type=${c.length > 4 ? 'credit_alphanum12' : 'credit_alphanum4'}&${p}_asset_code=${c}&${p}_asset_issuer=${i}`; };
+  return q('base', key) + '&' + q('counter', u.code + ':' + u.issuer);
+}
+async function ensurePrices(key, from) {   // hourly closes of key/USDC from `from` to now
+  if (key === usdcKey()) return;
+  const X = PX[key] || (PX[key] = { from: Infinity, bk: [] });
+  const want = Math.floor((from - 86400000) / HR) * HR;
+  if (X.from <= want) return;
+  const end = X.from === Infinity ? Math.ceil(Date.now() / HR) * HR + HR : X.from;
+  let url = `/trade_aggregations?${aggQS(key)}&resolution=${HR}&start_time=${want}&end_time=${end}&order=asc&limit=200`;
+  const got = [];
+  for (let i = 0; i < 60; i++) {
+    const j = await H(url); const rs = j._embedded.records; rs.forEach((r) => got.push([+r.timestamp, +r.close]));
+    if (rs.length < 200) break; url = j._links.next.href.replace(NET().horizon, '');
+  }
+  X.bk = got.concat(X.bk).sort((a, b) => a[0] - b[0]); X.from = want;
+}
+function priceAt(key, t, isNow) {
+  if (key === usdcKey()) return 1;
+  if (isNow && key === 'XLM' && mid()) return mid();
+  const bk = (PX[key] || {}).bk || []; let p = null;
+  for (let i = bk.length - 1; i >= 0; i--) if (bk[i][0] < t || (isNow && bk[i][0] <= t)) { p = bk[i][1]; break; }
+  if (p != null) return p;
+  if (key === 'XLM') return mid() || MK.last || 0;
+  const code = key.split(':')[0];
+  return ['USDC', 'PYUSD', 'USDT'].includes(code) ? 1 : 0;   // unknown tokens (spam airdrops) count as 0
+}
+function quoteKey(C, addr, B) {
+  const n = {};
+  for (const e of C.recs) if (e.type === 'trade' && e.account === addr) for (const k of [effKey(e, 'bought_'), effKey(e, 'sold_')]) if (k !== usdcKey()) n[k] = (n[k] || 0) + 1;
+  const best = Object.entries(n).sort((x, y) => y[1] - x[1])[0];
+  if (best) return best[0];
+  return Object.keys(B).find((k) => k !== 'XLM' && k !== usdcKey() && B[k] > 1) || 'XLM';
+}
+async function pnlFor(b, t0, t1, isNow, prog) {
+  const C = await fetchBack(b.addr, t0, prog);
+  if (!C.a) return { bot: b, pnl: 0, base: 0, v0: 0, v1: 0, flow: 0, note: 'not funded' };
+  const ev = buildEvents(C, b.addr);
+  const B1 = {}; C.a.balances.filter((x) => x.asset_type !== 'liquidity_pool_shares').forEach((x) => { B1[aKey(x)] = +x.balance; });
+  for (const e of ev) if (e.t > t1) for (const k in e.d) B1[k] = (B1[k] || 0) - e.d[k];
+  const born = C.end && ev.length && ev[ev.length - 1].created ? ev[ev.length - 1].t : null;
+  if (born && born > t1) return { bot: b, pnl: 0, base: 0, v0: 0, v1: 0, flow: 0, note: 'started ' + ptDay(born), none: true };
+  let B0 = { ...B1 }; const inP = ev.filter((e) => e.t > t0 && e.t <= t1);
+  for (const e of inP) for (const k in e.d) B0[k] = (B0[k] || 0) - e.d[k];
+  if (born && born > t0) B0 = {};   // started inside the period: it began at $0 (fees paid since then count against P/L)
+  const keys = new Set([...Object.keys(B0), ...Object.keys(B1)]);
+  inP.filter((e) => e.flow).forEach((e) => Object.keys(e.d).forEach((k) => keys.add(k)));
+  const qk = quoteKey(C, b.addr, B1); keys.add(qk);
+  const first = inP.length ? inP[inP.length - 1].t : t1;
+  await Promise.all([...keys].map((k) => ensurePrices(k, Math.min(t0, first)).catch(() => {})));
+  const val = (B, t, now) => Object.entries(B).reduce((s, [k, q]) => s + (Math.abs(q) < 1e-7 ? 0 : q * priceAt(k, t, now)), 0);
+  const v0 = val(B0, t0, false), v1 = val(B1, t1, isNow);
+  let flow = 0, fin = 0;
+  for (const e of inP) if (e.flow) { const v = Object.entries(e.d).reduce((s, [k, q]) => s + q * priceAt(k, e.t, false), 0); flow += v; if (v > 0) fin += v; }
+  const pnl = v1 - v0 - flow, base = v0 + fin;
+  const note = born && born > t0 ? 'since start ' + ptDay(born) + (Math.abs(flow) >= 0.005 ? ' · funded ' + money(flow) : '')
+    : Math.abs(flow) >= 0.005 ? (flow > 0 ? 'excl. deposits ' : 'excl. withdrawals ') + money(flow) : '';
+  const q0 = priceAt(qk, t0, false), q1 = priceAt(qk, t1, isNow);
+  const quote = { code: qk.split(':')[0], last: q1, chg: q1 - q0, pct: q0 ? (q1 - q0) / q0 * 100 : null };
+  return { bot: b, pnl, base, v0, v1, flow, note, quote };
+}
+const money = (x) => (x >= 0 ? '+' : '−') + '$' + fx(Math.abs(x));
+const pctTx = (p, base) => base > 0.005 ? (p >= 0 ? '+' : '−') + (Math.abs(p) / base * 100).toFixed(2) + '%' : '';
+async function loadPer(per) {
+  if (P.busy[per]) return; P.busy[per] = true; P.prog[per] = ''; if (cur === 'pnl') paintPnl();
+  const W = perWindow(per), bots = tradeAccts().filter((b) => b.addr), cnt = {};
+  const prog = (n, name) => { cnt[name] = n; P.prog[per] = Object.entries(cnt).map(([k, v]) => `${k} ${fx(v, 0)}`).join(' · ') + ' records'; if (cur === 'pnl' && P.sel === per) paintPnl(); };
+  const rows = await Promise.all(bots.map((b) => pnlFor(b, W.t0, W.t1, W.isNow, (n) => prog(n, b.name)).catch((e) => ({ bot: b, err: niceErr(e) }))));
+  const ok = rows.filter((r) => !r.err);
+  P.res[per] = { W, rows, at: Date.now(), pnl: ok.reduce((s, r) => s + r.pnl, 0), base: ok.reduce((s, r) => s + r.base, 0), v0: ok.reduce((s, r) => s + r.v0, 0), v1: ok.reduce((s, r) => s + r.v1, 0), flow: ok.reduce((s, r) => s + r.flow, 0) };
+  P.busy[per] = false; if (cur === 'pnl') paintPnl();
+}
+function drawPnl() {
+  if (!P.at || Date.now() - P.at > 120000 || P.net !== S.net) { pnlReset(); P.net = S.net; }   // fresh numbers after 2 min or a network switch
+  paintPnl();
+  if (!P.res[P.sel] && !P.busy[P.sel]) loadPer(P.sel);
+}
+function paintPnl() {
+  $('#pUpd').innerHTML = `${P.at ? 'Updated ' + new Date(P.at).toLocaleTimeString() + ' · ' : ''}<span style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'};font-weight:700">${NET().name}</span>`;
+  $('#pPer').innerHTML = PERS.map(([k, l]) => `<button class="chip${k === P.sel ? ' on' : ''}" data-per="${k}" aria-pressed="${k === P.sel}">${l}</button>`).join('');
+  const R = P.res[P.sel], nm = PERS.find((x) => x[0] === P.sel)[1], W = R ? R.W : perWindow(P.sel);
+  $('#pByL').textContent = 'By bot · ' + nm;
+  if (!tradeAccts().some((b) => b.addr)) { $('#pHero').innerHTML = `<span class="mu">No bot accounts on ${NET().name}. ${S.net === 'testnet' ? 'Settings → Create practice bots.' : 'Add them in Settings.'}</span>`; $('#pBots').innerHTML = ''; return; }
+  if (!R) {
+    $('#pHero').innerHTML = `<span class="mu" style="font-size:13px">${esc(nm)} · ${esc(W.label)} · all bots</span><span class="mono" style="font-size:34px;font-weight:600">…</span><span class="mu" style="font-size:12.5px">Loading history${P.prog[P.sel] ? ': ' + esc(P.prog[P.sel]) : '…'}</span>`;
+    $('#pBots').innerHTML = tradeAccts().map((b) => `<div><span style="font-weight:600">${esc(b.name)} <span class="mu" style="font-weight:400">· ${esc(b.tag || '')}</span></span><span class="mu">${b.addr ? '…' : 'no address yet'}</span></div>`).join('');
+    return;
+  }
+  const c = (x) => x >= 0 ? 'buy' : 'sell';   // gains/losses follow the Buy / sell color setting
+  $('#pHero').innerHTML = `<span class="mu" style="font-size:13px">${esc(nm)} · ${esc(W.label)} · all bots</span>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="mono ${c(R.pnl)}" style="font-size:34px;font-weight:600">${money(R.pnl)}</span><span class="mono ${c(R.pnl)}" style="font-size:16px;font-weight:600">${pctTx(R.pnl, R.base)}</span></div>
+    <span class="mono mu" style="font-size:12.5px">$${fx(R.v0)} → $${fx(R.v1)}${Math.abs(R.flow) >= 0.005 ? ' · flows ' + money(R.flow) : ''}</span>`;
+  const sg = (x, d) => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(d);
+  const HDR = '<div class="qh"><span>WALLET P/L · ASSET QUOTE</span><span style="text-align:right">LAST</span><span style="text-align:right">CHG</span><span style="text-align:right">% CHG</span></div>';
+  $('#pBots').innerHTML = HDR + tradeAccts().map((b) => {
+    const r = R.rows.find((x) => sameAcct(x.bot, b));
+    const name = `<div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-weight:600">${esc(b.name)}${b.tag ? ` <span class="mu" style="font-weight:400">· ${esc(b.tag)}</span>` : ''}</span>`;
+    const one = (sub, right) => `<div class="pr"><div class="top2">${name}${sub}</div>${right}</div></div>`;
+    if (!b.addr) return one('<span class="amb" style="font-size:12px">no address yet</span>', '<span class="mono mu" style="font-weight:600">—</span>');
+    if (!r) return one('<span class="mu" style="font-size:12px">added after this loaded · tap ↻</span>', '');
+    if (r.err) return one(`<span class="red" style="font-size:12px">${esc(r.err)}</span>`, '<span class="mono mu">—</span>');
+    if (r.none) return one(`<span class="mu" style="font-size:12px">${esc(r.note)}</span>`, '<span class="mono mu">—</span>');
+    const q = r.quote, qc = q.chg >= 0 ? 'buy' : 'sell';
+    const strip = q && q.last ? `<div class="qs"><span class="mu" style="font-weight:600">${esc(q.code)}/USDC</span><span class="v">${q.last.toFixed(5)}</span><span class="v ${qc}">${sg(q.chg, 5)}</span><span class="v ${qc}">${q.pct == null ? '—' : sg(q.pct, 2) + '%'}</span></div>` : '';
+    return `<div class="pr"><div class="top2">${name}<span class="mu" style="font-size:12px">${esc(r.note)}</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px"><span class="mono ${c(r.pnl)}" style="font-size:15px;font-weight:600">${money(r.pnl)}</span><span class="mono ${c(r.pnl)}" style="font-size:12px">${pctTx(r.pnl, r.base)}</span></div></div>${strip}</div>`;
+  }).join('');
+}
+
+/* ---------- activity: recent fills on every account ---------- */
+// Horizon lists either asset of a pair as "base", so each fill is turned into what THIS account got and gave.
+// Checked on a real mainnet cover (path payment strict receive): the account is base, gives USDC, gets XLM = BUY.
+const ACT = { at: 0, net: null, fil: 'all', recs: {}, next: {}, busy: false };
+function fillFor(r, addr) {
+  const ba = r.base_asset_type === 'native' ? 'XLM' : r.base_asset_code, ca = r.counter_asset_type === 'native' ? 'XLM' : r.counter_asset_code;
+  const gaveBase = r.base_account === addr;   // each side always gives its own asset; base_is_seller only says whose order was resting
+  const got = gaveBase ? [ca, +r.counter_amount] : [ba, +r.base_amount], gave = gaveBase ? [ba, +r.base_amount] : [ca, +r.counter_amount];
+  const quote = [got[0], gave[0]].includes('USDC') ? 'USDC' : [got[0], gave[0]].includes('XLM') ? 'XLM' : gave[0];
+  const buy = gave[0] === quote;
+  const thing = buy ? got : gave, q = buy ? gave : got;
+  return { t: Date.parse(r.ledger_close_time), op: r.id.split('-')[0], side: buy ? 'BUY' : 'SELL', asset: thing[0], qty: thing[1], quote, qamt: q[1], pool: r.trade_type === 'liquidity_pool', n: 1 };
+}
+async function actLoad(more) {
+  if (ACT.busy) return; ACT.busy = true; $('#aMore').textContent = 'Loading…';
+  const L = allAccts();
+  await Promise.all(L.map(async (a) => {
+    if (more && !ACT.next[a.addr]) return;
+    try {
+      const j = await H(more ? ACT.next[a.addr] : `/accounts/${a.addr}/trades?order=desc&limit=100`);
+      const rs = j._embedded.records; ACT.recs[a.addr] = (more ? ACT.recs[a.addr] || [] : []).concat(rs);
+      ACT.next[a.addr] = rs.length < 100 ? null : j._links.next.href.replace(NET().horizon, '');
+    } catch (e) { if (!more) { ACT.recs[a.addr] = []; ACT.next[a.addr] = null; } }
+  }));
+  ACT.at = Date.now(); ACT.net = S.net; ACT.busy = false; $('#aMore').textContent = 'Load more';
+  if (cur === 'act') paintAct();
+}
+function drawAct() {
+  if (!ACT.at || ACT.net !== S.net || Date.now() - ACT.at > 60000) { ACT.recs = {}; ACT.next = {}; paintAct(); actLoad(false); } else paintAct();
+}
+function paintAct() {
+  const L = allAccts();
+  if (ACT.fil !== 'all' && !L.some((a) => a.addr === ACT.fil)) ACT.fil = 'all';
+  $('#aFil').innerHTML = [['all', 'All'], ...L.map((a) => [a.addr, a.name])].map(([k, n]) => `<button class="chip${k === ACT.fil ? ' on' : ''}" style="white-space:nowrap" data-afil="${k}">${esc(n)}</button>`).join('');
+  $('#aUpd').innerHTML = `Buys and sells · ${ACT.at ? 'updated ' + new Date(ACT.at).toLocaleTimeString() + ' · ' : ''}<span style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'};font-weight:700">${NET().name}</span>`;
+  if (!ACT.at) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
+  // group fills of one operation on one account into a single line
+  const rows = [];
+  for (const a of L) {
+    if (ACT.fil !== 'all' && a.addr !== ACT.fil) continue;
+    let g = null;
+    for (const r of ACT.recs[a.addr] || []) {
+      const f = fillFor(r, a.addr);
+      if (g && g.op === f.op && g.side === f.side && g.asset === f.asset && g.quote === f.quote) { g.qty += f.qty; g.qamt += f.qamt; g.n++; g.pool = g.pool || f.pool; continue; }
+      g = { ...f, acct: a.name }; rows.push(g);
+    }
+  }
+  rows.sort((x, y) => y.t - x.t);
+  const shown = rows.slice(0, 80);
+  if (!shown.length) { $('#aList').innerHTML = '<div class="note">No buys or sells yet.</div>'; $('#aMore').style.display = 'none'; return; }
+  const today = ptDay(Date.now(), { year: 'numeric', month: 'short', day: 'numeric' }), yday = ptDay(Date.now() - 86400000, { year: 'numeric', month: 'short', day: 'numeric' });
+  let html = '', day = null, open = false;
+  for (const r of shown) {
+    const d = ptDay(r.t, { year: 'numeric', month: 'short', day: 'numeric' });
+    if (d !== day) { if (open) html += '</div>'; day = d; html += `<span class="lbl" style="margin-top:6px">${d === today ? 'Today' : d === yday ? 'Yesterday' : esc(ptDay(r.t, { weekday: 'short', month: 'short', day: 'numeric' }))}</span><div class="card" style="padding:0 14px;gap:0">`; open = true; }
+    const px = r.qamt / r.qty, dp = r.quote === 'USDC' && r.asset === 'XLM' ? 5 : 4;
+    const extra = [r.n > 1 ? r.n + ' fills' : '', r.pool ? 'pool' : ''].filter(Boolean).join(' · ');
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : '--sell'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:14px">${fx(r.qty, 2)} ${esc(r.asset)} @ ${px.toFixed(dp)}</span><span class="mu" style="font-size:12px">${esc(r.acct)} · ${fx(r.qamt, 2)} ${esc(r.quote)}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:12px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></div>`;
+  }
+  if (open) html += '</div>';
+  $('#aList').innerHTML = html;
+  $('#aMore').style.display = L.some((a) => ACT.next[a.addr]) ? '' : 'none';
+}
+
+/* ---------- kill plans ---------- */
+const cancelOp = (o) => SDK.Operation.manageSellOffer({ selling: hAsset(o.selling), buying: hAsset(o.buying), amount: '0', price: o.price, offerId: o.id });
+const amt7 = (x) => (Math.floor(x * 1e7) / 1e7).toFixed(7);
+async function quote(side, qty) {   // side 'buy' = buy qty XLM paying USDC; 'sell' = sell qty XLM for USDC
+  const u = NS().usdc;
+  if (side === 'buy') {
+    const j = await H(`/paths/strict-receive?source_assets=${u.code}:${u.issuer}&destination_asset_type=native&destination_amount=${amt7(qty)}`);
+    const r = j._embedded.records.sort((a, b) => +a.source_amount - +b.source_amount)[0]; if (!r) throw new Error('No route on the book to buy that much XLM.');
+    return { usd: +r.source_amount, path: r.path.map(hAsset) };
+  } else {
+    const j = await H(`/paths/strict-send?source_asset_type=native&source_amount=${amt7(qty)}&destination_assets=${u.code}:${u.issuer}`);
+    const r = j._embedded.records.sort((a, b) => +b.destination_amount - +a.destination_amount)[0]; if (!r) throw new Error('No route on the book to sell that much XLM.');
+    return { usd: +r.destination_amount, path: r.path.map(hAsset) };
+  }
+}
+async function planCancel(b) {
+  const d = await loadBot(b); if (d.err) throw new Error(d.err);
+  if (!sigState(d.a).ok) throw new Error(`${b.name}: ${sigState(d.a).txt}`);
+  return { bot: b, kind: 'cancel', offers: d.offers, lines: d.offers.map((o) => ({ t: 'Cancel order #' + o.id, s: offerTextShort(o) })) };
+}
+function offerTextShort(o) { return o.selling.asset_type === 'native' ? `sell ${fx(+o.amount, 2)} XLM` : o.buying.asset_type === 'native' ? `buy ${fx(+o.amount * +o.price, 2)} XLM` : `sell ${fx(+o.amount, 2)} ${aName(o.selling)}`; }
+async function planFlat(b, manualQty) {
+  const p = await planCancel(b);
+  const d = BOT[b.addr]; let pos = position(b, d.offers);
+  if (!pos && manualQty) pos = manualQty;
+  if (!pos || pos.qty <= 0) { p.note = 'No open trade orders found, so only cancels.'; return p; }
+  const q = await quote(pos.side === 'short' ? 'buy' : 'sell', pos.qty);
+  const slip = S.slip / 100;
+  p.kind = 'flat'; p.pos = pos; p.q = q;
+  if (pos.side === 'short') {
+    p.cap = q.usd * (1 + slip);
+    const usdBal = +((d.a.balances.find(isUSDC) || {}).balance || 0);
+    if (usdBal < q.usd) throw new Error(`${b.name}: holds ${fx(usdBal)} USDC, needs ${fx(q.usd)} to buy back ${fx(pos.qty)} XLM.`);
+    if (usdBal < p.cap) p.cap = usdBal;
+    p.lines.push({ t: `Buy back ${fx(pos.qty, 2)} XLM at market`, s: `book quote ${fx(q.usd)} USDC (avg ${(q.usd / pos.qty).toFixed(6)}) · pay at most ${fx(p.cap)} USDC`, hl: 1 });
+  } else {
+    p.cap = q.usd * (1 - slip);
+    p.lines.push({ t: `Sell ${fx(pos.qty, 2)} XLM at market`, s: `book quote ${fx(q.usd)} USDC (avg ${(q.usd / pos.qty).toFixed(6)}) · receive at least ${fx(p.cap)} USDC`, hl: 1 });
+  }
+  return p;
+}
+function opsFor(p) {
+  const ops = p.offers.map(cancelOp);
+  if (p.kind === 'flat') {
+    const me = p.bot.addr;
+    if (p.pos.side === 'short') ops.push(SDK.Operation.pathPaymentStrictReceive({ sendAsset: USDC(), sendMax: amt7(p.cap), destination: me, destAsset: SDK.Asset.native(), destAmount: amt7(p.pos.qty), path: p.q.path }));
+    else ops.push(SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: amt7(p.pos.qty), destination: me, destAsset: USDC(), destMin: amt7(p.cap), path: p.q.path }));
+  }
+  return ops;
+}
+async function runPlans(plans) {
+  const out = [];
+  await Promise.all(plans.map(async (p) => {
+    const ops = opsFor(p);
+    if (!ops.length) { out.push({ p, ok: true, nothing: true }); return; }
+    try {
+      const chunks = []; for (let i = 0; i < ops.length; i += 100) chunks.push(ops.slice(i, i + 100));
+      if (chunks.length > 1 && p.kind === 'flat') { const last = chunks.pop(); for (const c of chunks) { const t = await buildTx(p.bot.addr, c); t.sign(kpFor(p.bot.addr)); await submit(t); } chunks.push(last); }
+      let res;
+      for (const c of chunks) { const t = await buildTx(p.bot.addr, c); t.sign(kpFor(p.bot.addr)); res = await submit(t); }
+      out.push({ p, ok: true, hash: res.hash, ledger: res.ledger });
+    } catch (e) { out.push({ p, ok: false, err: niceErr(e) }); }
+  }));
+  return out;
+}
+async function fillResult(r) {
+  if (!r.ok || r.p.kind !== 'flat' || !r.hash) return '';
+  try {
+    const ops = (await H(`/transactions/${r.hash}/operations?limit=200`))._embedded.records;
+    const pp = ops.find((o) => o.type.startsWith('path_payment'));
+    if (!pp) return '';
+    const x = r.p.pos.side === 'short' ? +pp.amount : +pp.source_amount, u = r.p.pos.side === 'short' ? +pp.source_amount : +pp.amount;
+    return `${r.p.pos.side === 'short' ? 'Bought' : 'Sold'} ${fx(x)} XLM for ${fx(u)} USDC · avg ${(u / x).toFixed(6)}`;
+  } catch (e) { return ''; }
+}
+
+/* ---------- confirm sheet ---------- */
+function sheet(html) { $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
+function closeSheet() { $('#sheet').classList.remove('on'); }
+let pending = null;
+function confirmSheet(title, sub, items, btn, run, danger = true, cls = null) {
+  pending = run;
+  sheet(`<div><h2>${esc(title)}</h2><div class="mu" style="font-size:14px">${sub}</div></div>
+    <ol class="ops">${items.map((it, i) => `<li class="${it.hl ? 'hl' : ''}"><b>${i + 1}. ${esc(it.t)}</b>${it.s ? `<small>${esc(it.s)}</small>` : ''}</li>`).join('')}</ol>
+    <button class="${cls || (danger ? 'b-red' : 'b-light')} big hold" id="holdBtn"><i></i><span>${esc(btn)}</span></button>
+    <button class="b-out" data-act="closeSheet">Cancel</button>`);
+  armHold();
+}
+function armHold() {
+  const b = $('#holdBtn'); let t0 = 0, iv = 0;
+  const bar = b.querySelector('i');
+  const stop = () => { clearInterval(iv); iv = 0; t0 = 0; bar.style.width = '0'; };
+  const tick = () => { const p = Math.min(1, (performance.now() - t0) / 1200); bar.style.width = (p * 100) + '%'; if (p >= 1) { stop(); const f = pending; pending = null; if (f) { b.disabled = true; b.querySelector('span').textContent = 'Sending…'; f(); } } };
+  b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (iv) return; t0 = performance.now(); iv = setInterval(tick, 30); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => b.addEventListener(ev, () => { if (t0) stop(); }));
+  b.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+function showResult(ok, title, rows, back = 'bots') {
+  closeSheet();
+  $('#rIco').innerHTML = ok ? `<div style="width:72px;height:72px;border-radius:50%;background:#17402D;display:flex;align-items:center;justify-content:center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3FB87F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>`
+    : `<div style="width:72px;height:72px;border-radius:50%;background:#4a1715;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--redt);font-weight:700">!</div>`;
+  $('#rTitle').textContent = title; $('#rBody').innerHTML = rows.join(''); resultBack = back; go('result');
+}
+let resultBack = 'bots';
+async function killFlow(plansP, title, verb) {
+  let plans;
+  try { plans = await plansP; } catch (e) { return toast(niceErr(e), 6000); }
+  const items = []; plans.forEach((p) => { items.push({ t: `— ${p.bot.name} —` }); p.lines.forEach((l) => items.push(l)); if (!p.lines.length) items.push({ t: 'Nothing to cancel', s: p.note || '' }); });
+  const age = MK.at ? Math.round((Date.now() - MK.at) / 1000) + 's ago' : '';
+  const sub = `${plans.length > 1 ? 'One transaction per account' : 'One transaction · all or nothing'} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${NET().name}</b><br>Bid ${MK.bids[0] ? MK.bids[0][0].toFixed(6) : '–'} · Ask ${MK.asks[0] ? MK.asks[0][0].toFixed(6) : '–'} · Last ${MK.last ? MK.last.toFixed(6) : '–'} · book ${age} · cap ${S.slip}%`;
+  confirmSheet(title, sub, items, 'Hold to ' + verb, async () => {
+    const res = await runPlans(plans);
+    const rows = await Promise.all(res.map(async (r) => {
+      const fill = await fillResult(r);
+      return `<div class="card"><div class="top"><b>${esc(r.p.bot.name)}</b><span class="tag ${r.ok ? 't-grn' : 't-red'}">${r.ok ? (r.nothing ? 'nothing to do' : 'done') : 'failed'}</span></div>
+        ${r.ok && !r.nothing ? `<div class="mu" style="font-size:13px">${r.p.offers.length} order(s) cancelled${fill ? '<br>' + esc(fill) : ''}</div><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a>` : ''}
+        ${!r.ok ? `<div class="red" style="font-size:13px">${esc(r.err)}</div>` : ''}</div>`;
+    }));
+    if (res.some((r) => r.ok && r.p.kind === 'flat')) rows.push(`<div class="note">When the PC comes back, a bot that tracks its own exit orders will find them gone. Make sure it treats the trade as closed by hand and does not re-enter.</div>`);
+    const allOk = res.every((r) => r.ok);
+    showResult(allOk, allOk ? (plans.some((p) => p.kind === 'flat') ? 'Flat' : 'Orders cancelled') : 'Some actions failed', rows);
+    tradeAccts().forEach((b) => { if (b.addr) delete BOT[b.addr]; });
+  });
+}
+function readyBots() { return tradeAccts().filter((b) => b.addr && BOT[b.addr] && BOT[b.addr].a && sigState(BOT[b.addr].a).ok); }
+async function allPlans(flat) {
+  await Promise.all(tradeAccts().filter((b) => b.addr).map(loadBot));
+  const bots = readyBots(); if (!bots.length) throw new Error('No bot accounts have this phone\'s key as a signer yet.');
+  return Promise.all(bots.map((b) => (flat && b.kind === 'dir') ? planFlat(b) : planCancel(b)));
+}
+
+/* ---------- trade (Personal) ---------- */
+const T = { mode: 'lim', side: 'buy' };   // Limit is the default
+let tradeAddr = null;
+async function drawTrade() {
+  tradeAddr = homeAddr || K.pe.publicKey();
+  $('#tFrom').textContent = (allAccts().find((x) => x.addr === tradeAddr) || {}).name || '';
+  $$('#tMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.mode));
+  $$('#tSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.side));
+  $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none';
+  const g = $('#tGo'); g.textContent = 'Review ' + T.side; g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
+  drawTradeBook(); tradeEst();
+  const a = await refreshAcct(tradeAddr).catch(() => null);
+  const off = a ? await offersOf(tradeAddr).catch(() => []) : [];
+  $('#tOpen').innerHTML = off.length ? off.map((o) => offerCard(o, `<button class="b-out sm" data-cancel="${o.id}">Cancel</button>`)).join('') : '<div class="note">No open orders.</div>';
+  TRADE_OFF = off;
+}
+let TRADE_OFF = [];
+function drawTradeBook() {
+  if (!$('#tBook')) return;
+  const n = 6, rows = [`<span class="mu" style="font-family:inherit;font-weight:600">Bids</span><span class="mu" style="text-align:right;font-weight:600">Asks</span>`];
+  for (let i = 0; i < n; i++) { const b = MK.bids[i], a = MK.asks[i]; rows.push(`<span class="buy">${b ? b[0].toFixed(6) + ' · ' + fx(b[1], 0) : ''}</span><span class="sell" style="text-align:right">${a ? a[0].toFixed(6) + ' · ' + fx(a[1], 0) : ''}</span>`); }
+  $('#tBook').innerHTML = rows.join('');
+  const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
+  $('#tLast').innerHTML = H3('Time (PT)') + H3('Price', 1) + H3('XLM', 1) + (MK.tr.length ? tick(MK.tr).map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(6)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('') : '<span class="mu">waiting…</span><span></span><span></span>');
+  if (T.mode === 'lim' && !$('#tPx').value) { const b = T.side === 'buy' ? MK.bids[0] : MK.asks[0]; if (b) { $('#tPx').value = b[0].toFixed(7); tradeEst(); } }
+  tradeEst();
+}
+function tradeEst() {
+  const q = +$('#tAmt').value || 0, el = $('#tEst'); if (!el) return;
+  if (!q) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; return; }
+  if (T.mode === 'lim') { const p = +$('#tPx').value || 0; el.innerHTML = `<div><span class="mu">${T.side === 'buy' ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p)} USDC</span></div>`; return; }
+  const c = walk(T.side, q);
+  el.innerHTML = c == null ? '<div><span class="amb">Book too thin for this size</span></div>' : `<div><span class="mu">Est. ${T.side === 'buy' ? 'cost' : 'proceeds'}</span><span class="mono">${fx(c)} USDC</span></div><div><span class="mu">Avg price</span><span class="mono">${(c / q).toFixed(6)}</span></div><div><span class="mu">${T.side === 'buy' ? 'Max' : 'Min'} with ${S.slip}% cap</span><span class="mono">${fx(T.side === 'buy' ? c * (1 + S.slip / 100) : c * (1 - S.slip / 100))} USDC</span></div>`;
+}
+function spendable(a, isXLM) {
+  if (!a) return 0;
+  if (isXLM) { const b = a.balances.find((x) => x.asset_type === 'native'); const res = 1 + 0.5 * (a.subentry_count + (a.num_sponsoring || 0) - (a.num_sponsored || 0)); return Math.max(0, +b.balance - +b.selling_liabilities - res - 0.5); }
+  const b = a.balances.find(isUSDC); return b ? Math.max(0, +b.balance - +b.selling_liabilities) : 0;
+}
+async function tradeReview() {
+  const q = +$('#tAmt').value; if (!(q > 0)) return toast('Enter an amount.');
+  const a = ACC[tradeAddr]; if (!a) return toast('Account not funded.');
+  if (!a.balances.find(isUSDC)) return toast('Add the USDC trustline first (Assets).');
+  const kp = kpFor(tradeAddr);
+  if (T.mode === 'lim') {
+    const p = +$('#tPx').value; if (!(p > 0)) return toast('Enter a limit price.');
+    const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: USDC(), buying: SDK.Asset.native(), buyAmount: amt7(q), price: p.toFixed(7) })
+      : SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: USDC(), amount: amt7(q), price: p.toFixed(7) });
+    return confirmSheet(`Limit ${T.side} ${fx(q)} XLM`, `${NET().name} · rests on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)} USDC`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} USDC` }], 'Hold to place order', () => personalTx(kp, tradeAddr, [op], 'Order placed', 'trade'), false, T.side === 'buy' ? 'b-grn' : 'b-pur');
+  }
+  let qt; try { qt = await quote(T.side, q); } catch (e) { return toast(niceErr(e)); }
+  const cap = T.side === 'buy' ? qt.usd * (1 + S.slip / 100) : qt.usd * (1 - S.slip / 100);
+  if (T.side === 'buy' && spendable(a, false) < qt.usd) return toast(`Not enough USDC (have ${fx(spendable(a, false))}).`);
+  if (T.side === 'sell' && spendable(a, true) < q) return toast(`Not enough spendable XLM (have ${fx(spendable(a, true))}).`);
+  const capU = T.side === 'buy' ? Math.min(cap, spendable(a, false)) : cap;
+  const op = T.side === 'buy' ? SDK.Operation.pathPaymentStrictReceive({ sendAsset: USDC(), sendMax: amt7(capU), destination: tradeAddr, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: qt.path })
+    : SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: amt7(q), destination: tradeAddr, destAsset: USDC(), destMin: amt7(capU), path: qt.path });
+  confirmSheet(`Market ${T.side} ${fx(q)} XLM`, `${NET().name} · fills now or not at all`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM`, s: `quote ${fx(qt.usd)} USDC (avg ${(qt.usd / q).toFixed(6)}) · ${T.side === 'buy' ? 'pay at most' : 'receive at least'} ${fx(capU)} USDC`, hl: 1 }], 'Hold to ' + T.side, () => personalTx(kp, tradeAddr, [op], T.side === 'buy' ? 'Bought' : 'Sold', 'trade'), false, T.side === 'buy' ? 'b-grn' : 'b-pur');
+}
+async function personalTx(kp, src, ops, okTitle, back, memo) {
+  try {
+    const t = await buildTx(src, ops, memo); t.sign(kp); const r = await submit(t);
+    showResult(true, okTitle, [`<div class="card"><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a></div>`], back);
+  } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], back); }
+}
+
+/* ---------- send ---------- */
+function drawSend() {
+  const A = walletAccts();
+  $('#sFrom').innerHTML = A.map((x) => `<option value="${x.addr}">${esc(x.name)} · ${short(x.addr)}</option>`).join('');
+  $('#sFrom').value = homeAddr || K.pe.publicKey();
+  const sv = NS().saved;
+  $('#sTo').innerHTML = `<option value="">Choose…</option>` + sv.map((x, i) => `<option value="${i}">${esc(x.name)} · ${short(x.addr)}</option>`).join('') + `<option value="new">+ New address</option>`;
+  $('#sNew').style.display = 'none';
+  sendAssets();
+}
+async function sendAssets() {
+  const a = await refreshAcct($('#sFrom').value).catch(() => null);
+  $('#sAsset').innerHTML = a ? a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares').map((b) => `<option value="${esc(aKey(b))}">${esc(aName(b))} (${fx(+b.balance)})</option>`).join('') : '<option>not funded</option>';
+}
+async function saveAddr() {
+  const name = $('#sNName').value.trim(), addr = $('#sNAddr').value.trim(), memo = $('#sNMemo').value.trim();
+  if (!name) return toast('Give the address a name.');
+  if (!SDK.StrKey.isValidEd25519PublicKey(addr)) return toast('That is not a valid Stellar address (G…).');
+  let a = null; try { a = await acct(addr); } catch (e) {}
+  const memoReq = a && a.data && a.data['config.memo_required'] === 'MQ==';
+  if (memoReq && !memo) return toast('This account says a memo is required. Add the memo first.');
+  const chunks = addr.match(/.{1,4}/g).join(' ');
+  pending = null;
+  sheet(`<h2>Check the address</h2><div class="mu" style="font-size:14px">Compare every group with the source (exchange page, QR). Then type the last 4 characters.</div>
+    <div class="card"><div class="addr" style="font-size:15px;line-height:1.7">${esc(chunks)}</div><div class="mu" style="font-size:13px">${a ? 'Exists on ' + NET().name + (memoReq ? ' · memo required' : '') : '<span class="amb">Not on ' + NET().name + ' yet (XLM sends will create it, min 1 XLM)</span>'}</div></div>
+    <label>Last 4 characters<input id="chk4" autocomplete="off" autocapitalize="characters"></label>
+    <button class="b-light big" data-act="saveAddrOk">Save address</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  window._newAddr = { name, addr, memo };
+}
+function saveAddrOk() {
+  const n = window._newAddr; if (!n) return;
+  if (($('#chk4').value || '').trim().toUpperCase() !== n.addr.slice(-4)) return toast('Last 4 do not match.');
+  NS().saved.push(n); saveS(); closeSheet(); drawSend(); $('#sTo').value = String(NS().saved.length - 1); sendToChanged(); toast('Saved.');
+}
+function sendToChanged() {
+  const v = $('#sTo').value; $('#sNew').style.display = v === 'new' ? 'flex' : 'none';
+  const s = NS().saved[+v]; $('#sMemo').value = s && s.memo ? s.memo : '';
+}
+async function sendReview() {
+  const from = $('#sFrom').value, v = $('#sTo').value, to = NS().saved[+v];
+  if (!to || v === 'new' || v === '') return toast('Choose a saved address.');
+  const amt = +$('#sAmt').value; if (!(amt > 0)) return toast('Enter an amount.');
+  const key = $('#sAsset').value, asset = key === 'XLM' ? SDK.Asset.native() : new SDK.Asset(key.split(':')[0], key.split(':')[1]);
+  const memoS = $('#sMemo').value.trim();
+  let dest = null; try { dest = await acct(to.addr); } catch (e) {}
+  if (dest && dest.data && dest.data['config.memo_required'] === 'MQ==' && !memoS) return toast('This receiver requires a memo.');
+  let op;
+  if (!dest) { if (key !== 'XLM') return toast('That account does not exist yet; only XLM (1+) can create it.'); if (amt < 1) return toast('Creating an account needs at least 1 XLM.'); op = SDK.Operation.createAccount({ destination: to.addr, startingBalance: amt7(amt) }); }
+  else { if (key !== 'XLM' && !dest.balances.some((b) => aKey(b) === key)) return toast('The receiver has no trustline for this asset.'); op = SDK.Operation.payment({ destination: to.addr, asset, amount: amt7(amt) }); }
+  const memo = memoS ? (/^\d{1,19}$/.test(memoS) ? SDK.Memo.id(memoS) : SDK.Memo.text(memoS.slice(0, 28))) : null;
+  confirmSheet(`Send ${fx(amt, 2)} ${key.split(':')[0]}`, `${NET().name} · cannot be undone`, [{ t: `To ${to.name}`, s: to.addr }, { t: 'Memo', s: memoS || '(none)' }, { t: 'From', s: from }], 'Hold to send', () => personalTx(kpFor(from), from, [op], 'Sent', 'home', memo), true);
+}
+
+/* ---------- receive ---------- */
+function drawReceive() {
+  const A = allAccts().map((b) => ({ name: b.name, addr: b.addr }));
+  const sel = $('#rAcct'); const keep = sel.value;
+  sel.innerHTML = A.map((x) => `<option value="${x.addr}">${esc(x.name)}</option>`).join(''); if (keep && A.some((x) => x.addr === keep)) sel.value = keep;
+  const addr = sel.value; $('#rAddr').textContent = addr;
+  try { const q = qrcode(0, 'M'); q.addData(addr); q.make(); $('#rQr').innerHTML = q.createSvgTag({ cellSize: 6, margin: 0, scalable: false }); } catch (e) { $('#rQr').textContent = ''; }
+  refreshAcct(addr).then((a) => { $('#rCan').textContent = a ? 'Can receive: ' + a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares').map(aName).join(', ') + '. Other assets need a trustline first.' : 'Not funded yet: the first deposit must be at least 1 XLM.'; }).catch(() => {});
+}
+
+/* ---------- trust ---------- */
+async function drawTrust() {
+  const addr = homeAddr || K.pe.publicKey(); const a = await refreshAcct(addr).catch(() => null);
+  const have = (k) => a && a.balances.find((b) => aKey(b) === k);
+  const known = [...(S.net === 'public' ? KNOWN.public : [{ code: NS().usdc.code, issuer: NS().usdc.issuer, who: 'test USDC' }]), ...NS().extraKnown];
+  $('#trKnown').innerHTML = known.map((k, i) => { const h = have(k.code + ':' + k.issuer); return `<div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 14px"><div><b>${esc(k.code)}</b> <span class="mu">· ${esc(k.who || '')}</span><div class="mono mu" style="font-size:12px">${short(k.issuer)}${h ? ' · balance ' + fx(+h.balance) : ''}</div></div>${h ? (+h.balance === 0 && +h.buying_liabilities === 0 ? `<button class="b-out sm" data-untrust="${i}">Remove</button>` : '<span class="tag t-grn">added</span>') : `<button class="b-light sm" data-trust="${i}">Add</button>`}</div>`; }).join('') || '<div class="note">None listed.</div>';
+  window._known = known;
+}
+async function trustOp(k, remove) {
+  const addr = homeAddr || K.pe.publicKey();
+  const op = SDK.Operation.changeTrust({ asset: new SDK.Asset(k.code, k.issuer), ...(remove ? { limit: '0' } : {}) });
+  confirmSheet(`${remove ? 'Remove' : 'Add'} ${k.code} trustline`, `${NET().name} · ${remove ? 'returns' : 'locks'} 0.5 XLM`, [{ t: `${k.code} issued by ${k.who || 'issuer'}`, s: k.issuer }], remove ? 'Hold to remove' : 'Hold to add', () => personalTx(kpFor(addr), addr, [op], remove ? 'Trustline removed' : 'Trustline added', 'trust'), false);
+}
+async function trCheck() {
+  const code = $('#trCode').value.trim(), iss = $('#trIss').value.trim(), out = $('#trRes');
+  if (!/^[A-Za-z0-9]{1,12}$/.test(code)) return toast('Asset code: 1 to 12 letters/digits.');
+  if (!SDK.StrKey.isValidEd25519PublicKey(iss)) return toast('Issuer must be a G… address.');
+  out.innerHTML = '<div class="note">Checking…</div>';
+  let verdict = 'Unverified issuer', ok = false, dom = '';
+  const kn = (KNOWN[S.net] || []).find((k) => k.code === code && k.issuer === iss);
+  if (kn) { ok = true; verdict = 'Known asset: ' + kn.who; dom = kn.who; }
+  else try {
+    const a = await acct(iss); if (!a) throw new Error('Issuer account does not exist.');
+    dom = a.home_domain || '';
+    if (dom) {
+      const t = await (await fetch(`https://${dom}/.well-known/stellar.toml`)).text();
+      const blocks = t.split(/\[\[CURRENCIES\]\]/).slice(1);
+      ok = blocks.some((b) => new RegExp(`code\\s*=\\s*"${code}"`).test(b) && b.includes(iss));
+      verdict = ok ? `Verified: ${dom} lists ${code} from this issuer` : `${dom} does not list ${code} from this issuer · likely fake`;
+    } else verdict = 'Issuer has no home domain · likely fake';
+  } catch (e) { verdict = 'Could not reach the issuer\'s website to verify (' + e.message + '). Treat as unverified.'; }
+  out.innerHTML = `<div class="card ${ok ? '' : 'danger'}"><b>${esc(code)}</b> <span class="mono mu" style="font-size:12px">${short(iss)}</span><span class="${ok ? 'grn' : 'red'}" style="font-size:13px">${esc(verdict)}</span><button class="${ok ? 'b-light' : 'b-out'} sm" data-act="trAddCustom">${ok ? 'Add' : 'Add anyway'}</button></div>`;
+  window._custom = { code, issuer: iss, who: dom || 'unverified' };
+}
+
+/* ---------- settings ---------- */
+function drawSet() {
+  $$('#setNet button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.net));
+  $$('#setSlip button').forEach((b) => b.classList.toggle('on', +b.dataset.v === +S.slip));
+  $$('#setCol button').forEach((b) => b.classList.toggle('on', b.dataset.v === (S.col || 'bp')));
+  $('#setEm').textContent = K.em.publicKey(); $('#setBotSend').checked = !!S.botSend;
+  $('#setBNet').textContent = NET().name; $('#setSand').style.display = S.net === 'testnet' ? '' : 'none';
+  $('#setBots').innerHTML = NS().bots.map((b, i) => `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(b.name)}${b.tag ? ` <span class="mu" style="font-weight:400">· ${esc(b.tag)}</span>` : ''}</b><span style="display:flex;gap:8px;align-items:center"><span class="mu" style="font-size:12px">${b.kind === 'dir' ? 'trader' : 'market maker'}</span><button class="b-out sm" style="min-height:34px" data-act="rmBot" data-i="${i}">Remove</button></span></div><input data-baddr="${i}" value="${esc(b.addr)}" placeholder="G… public address" spellcheck="false" autocomplete="off"></div>`).join('') || '<div class="mu">None yet. Tap + Add bot account.</div>';
+  $('#setSig').innerHTML = '';
+  $('#setX').innerHTML = K.x.length ? K.x.map((o, i) => `<div><div><b>${esc(o.name)}</b><div class="mu" style="font-size:12px">${o.type === 'personal' ? 'Personal' : 'Trading · ' + (o.kind === 'dir' ? 'trader' : 'market maker')} · ${short(o.kp.publicKey())}</div></div><button class="b-out sm" data-act="rmAcct" data-i="${i}">Remove</button></div>`).join('') : '<div><span class="mu">None. Add one on the Accounts screen.</span></div>';
+}
+async function checkSig() {
+  const el = $('#setSig'); el.innerHTML = '<div><span class="mu">Checking…</span></div>';
+  const rows = await Promise.all(NS().bots.filter((b) => b.addr).map(async (b) => { try { const a = await refreshAcct(b.addr); const s = sigState(a); return `<div><span>${esc(b.name)}</span><span class="${s.ok ? 'grn' : 'amb'}">${esc(s.txt)}</span></div>`; } catch (e) { return `<div><span>${esc(b.name)}</span><span class="red">${esc(niceErr(e))}</span></div>`; } }));
+  el.innerHTML = rows.join('') || '<div><span class="mu">No bot addresses set.</span></div>';
+}
+function setNet(n) {
+  if (n === S.net) return;
+  if (n === 'public') {
+    pending = null;
+    sheet(`<h2>Switch to Mainnet?</h2><div class="note amb">Mainnet uses real money. Buttons will act on the real bot accounts.</div><label>Type MAINNET<input id="mnConf" autocomplete="off" autocapitalize="characters"></label><button class="b-red big" data-act="mnOk">Switch</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+    return;
+  }
+  S.net = n; saveS(); homeAddr = null; startMarket(); drawSet();
+}
+
+/* ---------- testnet practice bots ---------- */
+async function friendbot(a) { const r = await fetch('https://friendbot.stellar.org?addr=' + a); if (!r.ok) { const j = await r.json().catch(() => ({})); if (!(j.detail || '').includes('already funded')) throw new Error('friendbot: ' + (j.detail || r.status)); } }
+async function sandbox() {
+  if (S.net !== 'testnet') return;
+  let step = ''; const st = (m) => { step = m; $('#setSand').querySelector('button').textContent = m; };
+  try {
+    st('Creating accounts…');
+    const iss = SDK.Keypair.random(), mm = SDK.Keypair.random(), momo = SDK.Keypair.random(), sw = SDK.Keypair.random();
+    await Promise.all([iss, mm, momo, sw].map((k) => friendbot(k.publicKey())));
+    const pers = await acct(K.pe.publicKey()); if (!pers) await friendbot(K.pe.publicKey());
+    const U = new SDK.Asset('USDC', iss.publicKey());
+    NS().usdc = { code: 'USDC', issuer: iss.publicKey() }; saveS();
+    const send = async (kp, ops) => { const t = await buildTx(kp.publicKey(), ops); t.sign(kp); return submit(t); };
+    st('Trustlines…');
+    await Promise.all([mm, momo, sw, K.pe].map((k) => send(k, [SDK.Operation.changeTrust({ asset: U })])));
+    st('Test USDC…');
+    await send(iss, [SDK.Operation.payment({ destination: mm.publicKey(), asset: U, amount: '200000' }), SDK.Operation.payment({ destination: momo.publicKey(), asset: U, amount: '150' }), SDK.Operation.payment({ destination: sw.publicKey(), asset: U, amount: '1000' }), SDK.Operation.payment({ destination: K.pe.publicKey(), asset: U, amount: '500' })]);
+    st('Market maker book…');
+    const asks = [[0.2255, 1500], [0.2257, 2000], [0.2260, 2500], [0.2266, 3000]], bids = [[0.2252, 2000], [0.2250, 3000], [0.2246, 5000], [0.2240, 8000]];
+    await send(mm, [...asks.map(([p, q]) => SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: U, amount: String(q), price: String(p) })), ...bids.map(([p, q]) => SDK.Operation.manageBuyOffer({ selling: U, buying: SDK.Asset.native(), buyAmount: String(q), price: String(p) }))]);
+    st('Test trader short…');
+    const sig = SDK.Operation.setOptions({ signer: { ed25519PublicKey: K.em.publicKey(), weight: 1 }, masterWeight: 2, lowThreshold: 1, medThreshold: 1, highThreshold: 2 });
+    await send(momo, [SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: '1500', destination: momo.publicKey(), destAsset: U, destMin: '300', path: [] }),
+      SDK.Operation.manageBuyOffer({ selling: U, buying: SDK.Asset.native(), buyAmount: '750', price: '0.2230' }),
+      SDK.Operation.manageBuyOffer({ selling: U, buying: SDK.Asset.native(), buyAmount: '750', price: '0.2215' }), sig]);
+    st('Test maker quotes…');
+    await send(sw, [SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: U, amount: '500', price: '0.2272' }), SDK.Operation.manageBuyOffer({ selling: U, buying: SDK.Asset.native(), buyAmount: '500', price: '0.2232' }), SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: U, amount: '400', price: '0.2290' }), sig]);
+    NS().bots = [{ name: 'Test trader', tag: 'testnet', addr: momo.publicKey(), kind: 'dir' }, { name: 'Test maker', tag: 'testnet', addr: sw.publicKey(), kind: 'mm' }];
+    saveS(); startMarket(); st('Create practice bots'); toast('Practice bots ready. Open Accounts.', 5000); drawSet();
+  } catch (e) { st('Create practice bots'); toast('Practice setup failed at "' + step + '": ' + niceErr(e), 8000); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async (e) => {
+  const t = e.target.closest('button, [data-go], [data-act]'); if (!t) return;
+  if (t.dataset.pin) { const v = t.dataset.pin; if (v === 'del') pinBuf = pinBuf.slice(0, -1); else if (v === 'ok') { if (pinBuf.length >= 6) tryUnlock(); return; } else if (pinBuf.length < 12) pinBuf += v; drawLock(); return; }
+  if (t.dataset.afil) { ACT.fil = t.dataset.afil; return paintAct(); }
+  if (t.dataset.per) { P.sel = t.dataset.per; paintPnl(); if (!P.res[P.sel] && !P.busy[P.sel]) loadPer(P.sel); return; }
+  if (t.dataset.go) return go(t.dataset.go);
+  if (t.dataset.bot) { botSel = +t.dataset.bot; return go('bot'); }
+  if (t.parentElement && t.parentElement.classList.contains('seg')) {
+    const seg = t.parentElement.id, v = t.dataset.v;
+    if (seg === 'tMode') T.mode = v; if (seg === 'tSide' && T.side !== v) { T.side = v; $('#tPx').value = ''; }   // limit price restarts at the best bid (buy) / best ask (sell)
+    if (seg === 'tMode' || seg === 'tSide') return drawTrade();
+    if (seg === 'setSlip') { S.slip = +v; saveS(); return drawSet(); }
+    if (seg === 'setCol') { S.col = v; saveS(); applyCol(); return drawSet(); }
+    if (seg === 'setNet') return setNet(v);
+  }
+  if (t.dataset.pct) { const a = ACC[tradeAddr]; if (!a) return; const p = +t.dataset.pct / 100; const m = mid() || 1; const x = T.side === 'sell' ? spendable(a, true) * p : spendable(a, false) * p / (m * (1 + S.slip / 100)); $('#tAmt').value = (Math.floor(x * 100) / 100).toString(); return tradeEst(); }
+  if (t.dataset.cancel) { const o = TRADE_OFF.find((x) => x.id === t.dataset.cancel); if (o) confirmSheet('Cancel order', NET().name, [{ t: offerTextShort(o), s: '#' + o.id }], 'Hold to cancel', () => personalTx(kpFor(tradeAddr), tradeAddr, [cancelOp(o)], 'Order cancelled', 'trade'), false); return; }
+  if (t.dataset.trust) return trustOp(window._known[+t.dataset.trust], false);
+  if (t.dataset.untrust) return trustOp(window._known[+t.dataset.untrust], true);
+  const act = t.dataset.act; if (!act) return;
+  const A = {
+    setup: doSetup, exportVault, lock,
+    bkShow: () => { $('#bkSec').textContent = K.pe.secret(); },
+    bkDone: () => go('pnl'),
+    bkShowSet: () => { pending = null; sheet(`<h2>Personal secret key</h2><div class="note amb">Anyone with this can take the Personal funds. Never paste it into a website or chat.</div><div class="card addr">${esc(K.pe.secret())}</div><button class="b-out" data-act="closeSheet">Close</button>`); },
+    closeSheet,
+    friendbot: async () => { try { await friendbot(homeAddr); toast('Funded with test XLM.'); drawHome(); } catch (err) { toast(niceErr(err)); } },
+    pickAcct: () => { const L = walletAccts(); pending = null; sheet(`<h2>Account</h2>${L.map((x) => `<button class="b-out" data-pickaddr="${x.addr}" style="text-align:left">${esc(x.name)} · <span class="mono">${short(x.addr)}</span></button>`).join('')}<button class="b-out" data-act="closeSheet">Close</button>`); },
+    refreshBots: () => drawBots(true),
+    openPersonal: () => { homeAddr = t.dataset.addr || K.pe.publicKey(); go('home'); },
+    acctGo: () => { const b = tradeAccts()[botSel]; const to = t.dataset.to; if (to === 'send' && !walletAccts().some((x) => x.addr === b.addr)) return toast('Sends from trading accounts are off. Turn them on in Settings.'); homeAddr = b.addr; go(to); },
+    addAcct: () => { pending = null; sheet(`<h2>Add account</h2><div class="mu" style="font-size:14px">Import a Stellar secret key (S…). It is encrypted with your PIN and stays on this phone.</div>
+      <label>Name<input id="xName" placeholder="e.g. Savings" autocomplete="off"></label>
+      <label>Type<select id="xType"><option value="personal">Personal · not in kill switch or P/L</option><option value="dir">Trading · trader (Flatten closes its trade)</option><option value="mm">Trading · market maker (cancel only)</option></select></label>
+      <label>Secret key (S…), typed here only<input id="xSec" type="password" autocomplete="off" spellcheck="false"></label>
+      <div class="note amb">A Trading account imported here gives this phone full control of it, including its signers. Your bots use the safer emergency signer instead (Settings).</div>
+      <button class="b-light big" data-act="addAcctOk">Add account</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
+    addAcctOk: async () => {
+      const name = $('#xName').value.trim(), ty = $('#xType').value; let kp;
+      if (!name) return toast('Give the account a name.');
+      try { kp = SDK.Keypair.fromSecret($('#xSec').value.trim()); } catch (err) { return toast('That is not a valid secret key.'); }
+      if (allAccts().some((a) => a.addr === kp.publicKey()) || K.em.publicKey() === kp.publicKey()) return toast('That account is already here.');
+      K.x.push({ name, type: ty === 'personal' ? 'personal' : 'trading', kind: ty === 'personal' ? undefined : ty, kp });
+      $('#xSec').value = ''; if (!(await resealVault())) { K.x.pop(); return; }
+      closeSheet(); toast(name + ' added.'); P.res = {}; drawBots(true);
+    },
+    rmAcct: () => { const o = K.x[+t.dataset.i]; if (!o) return; pending = null; sheet(`<h2>Remove ${esc(o.name)} from this phone?</h2><div class="note amb">The account and its funds stay on Stellar. To add it back you need its secret key again.</div><div class="addr">${esc(o.kp.publicKey())}</div><button class="b-red big" data-act="rmAcctOk" data-i="${t.dataset.i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
+    rmAcctOk: async () => { const i = +t.dataset.i; const o = K.x.splice(i, 1)[0]; if (!(await resealVault())) { K.x.splice(i, 0, o); return; } closeSheet(); toast('Removed.'); P.res = {}; drawSet(); },
+    actRefresh: () => { ACT.at = 0; drawAct(); },
+    actMore: () => actLoad(true),
+    pnlRefresh: () => { pnlReset(); paintPnl(); loadPer(P.sel); },
+    killAll: () => killFlow(allPlans(false), 'Cancel all orders?', 'cancel all'),
+    flatAll: () => killFlow(allPlans(true), 'Flatten everything?', 'flatten'),
+    killOne: () => killFlow(planCancel(tradeAccts()[botSel]).then((p) => [p]), `Cancel ${tradeAccts()[botSel].name} orders?`, 'cancel'),
+    flatOne: async () => {
+      const b = tradeAccts()[botSel]; const d = await loadBot(b);
+      if (!position(b, d.offers || [])) {
+        pending = null;
+        sheet(`<h2>No trade orders found</h2><div class="mu" style="font-size:14px">${esc(b.name)} has no T1/T3 exit orders, so the position size is unknown. Enter it to close it, or just cancel.</div><div class="seg" id="mSide"><button class="on" data-v="short">Short (buy back)</button><button data-v="long">Long (sell)</button></div><label>XLM amount<input id="mQty" inputmode="decimal"></label><button class="b-red big" data-act="flatManual">Continue</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+        return;
+      }
+      killFlow(planFlat(b).then((p) => [p]), `Close ${b.name} position?`, 'confirm');
+    },
+    flatManual: () => { const q = +$('#mQty').value; if (!(q > 0)) return toast('Enter the XLM amount.'); const side = $('#mSide .on').dataset.v; closeSheet(); const b = tradeAccts()[botSel]; killFlow(planFlat(b, { side, qty: q }).then((p) => [p]), `Close ${b.name} position?`, 'confirm'); },
+    resultBack: () => go(resultBack),
+    tradeReview, sendReview, saveAddr, saveAddrOk, trCheck,
+    trAddCustom: () => { const c = window._custom; if (!c) return; if (!NS().extraKnown.some((k) => k.code === c.code && k.issuer === c.issuer)) { NS().extraKnown.push(c); saveS(); } trustOp(c, false); },
+    copyAddr: () => copy($('#rAddr').textContent), copyEm: () => copy(K.em.publicKey()),
+    shareAddr: () => { const a = $('#rAddr').textContent; if (navigator.share) navigator.share({ text: a }).catch(() => {}); else copy(a); },
+    checkSig, sandbox,
+    addBot: () => { pending = null; sheet(`<h2>Add bot account</h2><div class="mu" style="font-size:14px">A trading account your PC bot runs. Add this phone's emergency key to it as a signer from the PC so Cancel all and Flatten can act on it.</div>
+      <label>Name<input id="nbName" placeholder="e.g. Scalper" autocomplete="off"></label>
+      <label>Short note (optional)<input id="nbTag" placeholder="e.g. strategy name" autocomplete="off"></label>
+      <label>Type<select id="nbKind"><option value="dir">Trader · Flatten closes its open trade</option><option value="mm">Market maker · cancel orders only</option></select></label>
+      <label>Public address (G…)<input id="nbAddr" placeholder="G…" spellcheck="false" autocomplete="off"></label>
+      <button class="b-light big" data-act="addBotOk">Add</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
+    addBotOk: () => {
+      const name = $('#nbName').value.trim(), tag = $('#nbTag').value.trim(), kind = $('#nbKind').value, addr = $('#nbAddr').value.trim();
+      if (!name) return toast('Give the account a name.');
+      if (addr && !SDK.StrKey.isValidEd25519PublicKey(addr)) return toast('That is not a valid Stellar address (G…).');
+      if (addr && allAccts().some((a) => a.addr === addr)) return toast('That account is already here.');
+      NS().bots.push({ name, tag, addr, kind }); saveS(); closeSheet(); P.res = {}; drawSet(); toast(name + ' added.');
+    },
+    rmBot: () => { const i = +t.dataset.i, b = NS().bots[i]; if (!b) return; pending = null; sheet(`<h2>Remove ${esc(b.name)}?</h2><div class="mu" style="font-size:14px">Only removes it from this phone's list. The account and the emergency signer on it stay as they are (remove the signer from the PC with Remove-Emergency-Signer.bat).</div><button class="b-red big" data-act="rmBotOk" data-i="${i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
+    rmBotOk: () => { NS().bots.splice(+t.dataset.i, 1); saveS(); closeSheet(); P.res = {}; drawSet(); toast('Removed.'); },
+    saveBots: () => { const bad = []; $$('[data-baddr]').forEach((i) => { const v = i.value.trim(); if (v && !SDK.StrKey.isValidEd25519PublicKey(v)) bad.push(NS().bots[+i.dataset.baddr].name); else NS().bots[+i.dataset.baddr].addr = v; }); saveS(); toast(bad.length ? 'Not valid: ' + bad.join(', ') : 'Saved.'); },
+    mnOk: () => { if (($('#mnConf').value || '').trim().toUpperCase() !== 'MAINNET') return toast('Type MAINNET to switch.'); closeSheet(); S.net = 'public'; saveS(); homeAddr = null; startMarket(); drawSet(); },
+  };
+  if (A[act]) A[act]();
+});
+document.addEventListener('click', (e) => { const t = e.target.closest('[data-pickaddr]'); if (t) { homeAddr = t.dataset.pickaddr; closeSheet(); drawHome(); } });
+document.addEventListener('click', (e) => { const t = e.target.closest('#mSide button'); if (t) { $$('#mSide button').forEach((b) => b.classList.toggle('on', b === t)); } });
+$('#sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
+$('#suMode').addEventListener('change', () => { $('#suImpW').style.display = $('#suMode').value === 'import' ? '' : 'none'; });
+$('#tAmt').addEventListener('input', tradeEst); $('#tPx').addEventListener('input', tradeEst);
+$('#sTo').addEventListener('change', sendToChanged); $('#sFrom').addEventListener('change', sendAssets);
+$('#rAcct').addEventListener('change', drawReceive);
+$('#setBotSend').addEventListener('change', (e) => { S.botSend = e.target.checked; saveS(); });
+async function copy(t) { try { await navigator.clipboard.writeText(t); toast('Copied.'); } catch (e) { toast(t, 8000); } }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && K && cur === 'bots') drawBots(true); });
+
+/* ---------- boot ---------- */
+function applyCol() { document.body.classList.toggle('gr', S.col === 'gr'); }
+loadS(); applyCol();
+if (!SDK) document.body.innerHTML = '<p style="padding:20px">Stellar library failed to load.</p>';
+else go(S.vault ? 'lock' : 'setup');
+</script>
+</body>
+</html>

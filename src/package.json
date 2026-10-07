@@ -1,0 +1,5 @@
+{
+  "name": "killswitch-wallet-build",
+  "private": true,
+  "dependencies": { "@stellar/stellar-sdk": "17.2.1", "qrcode-generator": "2.0.4" }
+}
