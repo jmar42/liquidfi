@@ -10,6 +10,7 @@ Liquidfi is a phone web wallet for Stellar trading bots, in one self-contained H
 - **Accounts:** Personal wallets and trading accounts in one list. Trade XLM/USDC (limit or market), send to saved addresses, receive by QR, add trustlines.
 - **Kill switch:** Cancel all orders, or Flatten (cancel and close open trades at market), on every trading account, from your phone, when the PC that runs the bots is off.
 - **Activity:** recent buys and sells across all accounts.
+- **Wallets:** create a wallet from a 24-word recovery phrase (BIP39, Stellar SEP-5, the same as LOBSTR, Freighter and Stellar Laboratory) or import a secret key or phrase. The phrase and each secret key can be shown or copied after re-entering the PIN.
 - **Server choice:** Settings → Server. Stellar (SDF) is the default; LOBSTR's public Horizon (Mainnet) or any custom Horizon address can be picked instead. A custom server is checked before it is saved (it must use https, allow browser access (CORS), be on the selected network and be up to date). If the chosen server is down or rate-limited, Liquidfi falls back automatically: your choice → LOBSTR → SDF.
 
 ## Security model

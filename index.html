@@ -83,6 +83,8 @@ nav button.on{color:var(--tx)}nav button.k{color:var(--redt)}
 #toast.on{display:block}
 .netb{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;border:1px solid var(--bd)}
 .addr{font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all;font-size:13px}
+.words{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;margin:0;padding:0;list-style:none;counter-reset:w;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
+.words li{counter-increment:w;white-space:nowrap}.words li::before{content:counter(w) '.';color:var(--mu);display:inline-block;width:2.2em;font-size:12px}
 .book{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
 .qr{align-self:center;background:#fff;border-radius:16px;padding:14px;line-height:0}
 .list>button{width:100%}
@@ -164,7 +166,8 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <p class="mu" id="lockMsg" style="margin:0;text-align:center">Enter your PIN</p>
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v1.6</p>
+  <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v1.7</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -174,9 +177,9 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <label>Choose a PIN · 6 to 12 digits<input id="su1" type="password" inputmode="numeric" autocomplete="new-password" placeholder="••••••"></label>
     <label>Repeat PIN<input id="su2" type="password" inputmode="numeric" autocomplete="new-password" placeholder="••••••"></label>
     <details class="more"><summary>Use a wallet I already have</summary><div>
-      <label>Personal wallet<select id="suMode"><option value="new">Create a new Personal wallet</option><option value="import">Import a secret key I already have</option></select></label>
-      <label id="suImpW" style="display:none">Secret key (S…), typed here only<input id="suImp" type="password" autocomplete="off"></label>
+      <label>Secret key (S…) or recovery phrase (12 or 24 words), typed here only<textarea id="suImp" rows="2" autocomplete="off" spellcheck="false" autocapitalize="off" style="-webkit-text-security:disc"></textarea></label>
       <label>Or restore an encrypted backup file<input id="suFile" type="file" accept=".json,application/json"></label>
+      <div class="mu" style="font-size:12px">Leave both empty to start with no wallet. You can create or import wallets later in Accounts.</div>
     </div></details>
     <button class="b-acc big" data-act="setup">Set up</button>
   </div>
@@ -188,11 +191,11 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 </section>
 
 <section class="scr" id="s-backup">
-  <h1>Back up your Personal key</h1>
-  <div class="note amb">If this phone is lost or its browser data is cleared, this secret is the only way to get the Personal funds back. Write it on paper. Never type it into a website or chat.</div>
-  <div class="card"><span class="lbl">Personal secret key</span><div class="addr" id="bkSec">tap Show</div><button class="b-out sm" data-act="bkShow">Show</button></div>
-  <button class="b-out" data-act="exportVault">Also save an encrypted backup file</button>
-  <button class="b-light big" data-act="bkDone">I wrote it down</button>
+  <div class="top"><div class="l"><button class="ico back" data-act="bkBack" aria-label="Back">‹</button><h1>Back up your keys</h1></div></div>
+  <div class="mu" id="bkWhy" style="font-size:14px">Your keys live only on this phone. If the phone is lost or its browser data is cleared, these get you back in.</div>
+  <div class="card"><span class="lbl">1 · Backup file</span><div style="font-size:14px">Restores everything on a new phone with your PIN: your accounts and this phone's emergency key for the bots.</div><button class="b-acc" data-act="bkFile">Save backup file</button><div class="mu" style="font-size:12px">Keep it private (PC or USB stick). It is locked with your PIN, but a short PIN can be guessed by someone who has the file.</div><div class="grn" id="bkFileOk" style="font-size:13px;display:none">Saved.</div></div>
+  <div class="card"><span class="lbl">2 · Secret keys (on paper or a password manager)</span><div style="font-size:14px">Each wallet's secret key. With it, any Stellar wallet can reach those funds, even without Liquidfi. Never type it into a website or chat.</div><div id="bkKeys" style="display:flex;flex-direction:column;gap:12px"></div></div>
+  <button class="b-light big" data-act="bkDone" id="bkDoneB">Done</button>
 </section>
 
 <!-- WALLET HOME -->
@@ -221,7 +224,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="list" id="bPers" style="display:flex;flex-direction:column;gap:10px"></div>
   <span class="lbl">Trading</span>
   <div class="list" id="bList" style="display:flex;flex-direction:column;gap:10px"></div>
-  <button class="b-out" data-act="addAcct">+ Add account (import key)</button>
+  <button class="b-out" data-act="addAcct">+ Add account</button>
   <div class="card"><div class="top"><span class="lbl">XLM/USDC · Stellar DEX</span><span class="grn" style="font-size:11px;font-weight:700" id="mLive">connecting…</span></div><div class="g3" id="mTop"></div><div class="mu" style="font-size:12px" id="mTop2"></div></div>
   <div class="killbar">
     <p class="mu" style="font-size:11.5px;margin:0 2px">Trading accounts only · Flatten closes trader positions at market within your cap · market makers keep inventory</p>
@@ -330,16 +333,18 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <section class="scr" id="s-set">
   <div class="top"><div class="l"><button class="ico back" data-go="pnl" aria-label="Back to P/L">‹</button><h1>Settings</h1></div></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
-  <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck">Check &amp; save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
+  <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Emergency key (this phone)</span><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">On the PC run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div>
-  <div class="card"><span class="lbl">Imported accounts (keys on this phone)</span><div class="rows" id="setX" style="font-size:14px"></div></div>
+  <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Bot accounts (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">Accounts your PC bots run, reached with this phone's emergency signer. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Add bot account</button><button class="b-out sm" data-act="saveBots">Save bot list</button></div></div>
   <div class="card"><span class="lbl">Buy / sell and gain / loss colors</span><div class="seg" id="setCol"><button data-v="bp"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#60A5FA;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F472B6;margin:0 3px"></i> Blue / pink</button><button data-v="gr"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3FB87F;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF8A80;margin:0 3px"></i> Green / red</button></div><div class="mu" style="font-size:12px">Order book, last sales, Activity and P/L gains / losses. The Trade screen's Buy / Sell buttons keep their own colors.</div></div>
   <div class="card"><span class="lbl">Close slippage cap</span><div class="seg" id="setSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
   <div class="card"><div class="top"><span>Allow sends from bot accounts</span><input type="checkbox" id="setBotSend" style="width:28px;min-height:28px"></div></div>
   <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader with an open short and two exit orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel all and Flatten. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
-  <div class="card"><div class="g2"><button class="b-out sm" data-act="exportVault">Encrypted backup</button><button class="b-out sm" data-act="bkShowSet">Show Personal secret</button></div><button class="b-out sm" data-act="lock">Lock now</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v1.6 · auto-locks after 2 min idle</div>
+  <div class="card"><span class="lbl">Backup</span><div id="setBk" style="font-size:13px"></div><button class="b-out sm" data-act="bkOpen">Back up keys</button></div>
+  <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
+  <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
+  <div class="mu" style="font-size:12px">Liquidfi v1.7 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -2892,6 +2897,46 @@ function saveS() { try { localStorage.setItem(SKEY, JSON.stringify(S)); return t
 const NET = () => NETS[S.net], NS = () => S.nets[S.net];
 const USDC = () => new SDK.Asset(NS().usdc.code, NS().usdc.issuer);
 
+/* ---------- recovery phrase: BIP39 words, SEP-5 path m/44'/148'/n' (same as LOBSTR, Freighter, Stellar Laboratory) ---------- */
+const WL = 'abandon ability able about above absent absorb abstract absurd abuse access accident account accuse achieve acid acoustic acquire across act action actor actress actual adapt add addict address adjust admit adult advance advice aerobic affair afford afraid again age agent agree ahead aim air airport aisle alarm album alcohol alert alien all alley allow almost alone alpha already also alter always amateur amazing among amount amused analyst anchor ancient anger angle angry animal ankle announce annual another answer antenna antique anxiety any apart apology appear apple approve april arch arctic area arena argue arm armed armor army around arrange arrest arrive arrow art artefact artist artwork ask aspect assault asset assist assume asthma athlete atom attack attend attitude attract auction audit august aunt author auto autumn average avocado avoid awake aware away awesome awful awkward axis baby bachelor bacon badge bag balance balcony ball bamboo banana banner bar barely bargain barrel base basic basket battle beach bean beauty because become beef before begin behave behind believe below belt bench benefit best betray better between beyond bicycle bid bike bind biology bird birth bitter black blade blame blanket blast bleak bless blind blood blossom blouse blue blur blush board boat body boil bomb bone bonus book boost border boring borrow boss bottom bounce box boy bracket brain brand brass brave bread breeze brick bridge brief bright bring brisk broccoli broken bronze broom brother brown brush bubble buddy budget buffalo build bulb bulk bullet bundle bunker burden burger burst bus business busy butter buyer buzz cabbage cabin cable cactus cage cake call calm camera camp can canal cancel candy cannon canoe canvas canyon capable capital captain car carbon card cargo carpet carry cart case cash casino castle casual cat catalog catch category cattle caught cause caution cave ceiling celery cement census century cereal certain chair chalk champion change chaos chapter charge chase chat cheap check cheese chef cherry chest chicken chief child chimney choice choose chronic chuckle chunk churn cigar cinnamon circle citizen city civil claim clap clarify claw clay clean clerk clever click client cliff climb clinic clip clock clog close cloth cloud clown club clump cluster clutch coach coast coconut code coffee coil coin collect color column combine come comfort comic common company concert conduct confirm congress connect consider control convince cook cool copper copy coral core corn correct cost cotton couch country couple course cousin cover coyote crack cradle craft cram crane crash crater crawl crazy cream credit creek crew cricket crime crisp critic crop cross crouch crowd crucial cruel cruise crumble crunch crush cry crystal cube culture cup cupboard curious current curtain curve cushion custom cute cycle dad damage damp dance danger daring dash daughter dawn day deal debate debris decade december decide decline decorate decrease deer defense define defy degree delay deliver demand demise denial dentist deny depart depend deposit depth deputy derive describe desert design desk despair destroy detail detect develop device devote diagram dial diamond diary dice diesel diet differ digital dignity dilemma dinner dinosaur direct dirt disagree discover disease dish dismiss disorder display distance divert divide divorce dizzy doctor document dog doll dolphin domain donate donkey donor door dose double dove draft dragon drama drastic draw dream dress drift drill drink drip drive drop drum dry duck dumb dune during dust dutch duty dwarf dynamic eager eagle early earn earth easily east easy echo ecology economy edge edit educate effort egg eight either elbow elder electric elegant element elephant elevator elite else embark embody embrace emerge emotion employ empower empty enable enact end endless endorse enemy energy enforce engage engine enhance enjoy enlist enough enrich enroll ensure enter entire entry envelope episode equal equip era erase erode erosion error erupt escape essay essence estate eternal ethics evidence evil evoke evolve exact example excess exchange excite exclude excuse execute exercise exhaust exhibit exile exist exit exotic expand expect expire explain expose express extend extra eye eyebrow fabric face faculty fade faint faith fall false fame family famous fan fancy fantasy farm fashion fat fatal father fatigue fault favorite feature february federal fee feed feel female fence festival fetch fever few fiber fiction field figure file film filter final find fine finger finish fire firm first fiscal fish fit fitness fix flag flame flash flat flavor flee flight flip float flock floor flower fluid flush fly foam focus fog foil fold follow food foot force forest forget fork fortune forum forward fossil foster found fox fragile frame frequent fresh friend fringe frog front frost frown frozen fruit fuel fun funny furnace fury future gadget gain galaxy gallery game gap garage garbage garden garlic garment gas gasp gate gather gauge gaze general genius genre gentle genuine gesture ghost giant gift giggle ginger giraffe girl give glad glance glare glass glide glimpse globe gloom glory glove glow glue goat goddess gold good goose gorilla gospel gossip govern gown grab grace grain grant grape grass gravity great green grid grief grit grocery group grow grunt guard guess guide guilt guitar gun gym habit hair half hammer hamster hand happy harbor hard harsh harvest hat have hawk hazard head health heart heavy hedgehog height hello helmet help hen hero hidden high hill hint hip hire history hobby hockey hold hole holiday hollow home honey hood hope horn horror horse hospital host hotel hour hover hub huge human humble humor hundred hungry hunt hurdle hurry hurt husband hybrid ice icon idea identify idle ignore ill illegal illness image imitate immense immune impact impose improve impulse inch include income increase index indicate indoor industry infant inflict inform inhale inherit initial inject injury inmate inner innocent input inquiry insane insect inside inspire install intact interest into invest invite involve iron island isolate issue item ivory jacket jaguar jar jazz jealous jeans jelly jewel job join joke journey joy judge juice jump jungle junior junk just kangaroo keen keep ketchup key kick kid kidney kind kingdom kiss kit kitchen kite kitten kiwi knee knife knock know lab label labor ladder lady lake lamp language laptop large later latin laugh laundry lava law lawn lawsuit layer lazy leader leaf learn leave lecture left leg legal legend leisure lemon lend length lens leopard lesson letter level liar liberty library license life lift light like limb limit link lion liquid list little live lizard load loan lobster local lock logic lonely long loop lottery loud lounge love loyal lucky luggage lumber lunar lunch luxury lyrics machine mad magic magnet maid mail main major make mammal man manage mandate mango mansion manual maple marble march margin marine market marriage mask mass master match material math matrix matter maximum maze meadow mean measure meat mechanic medal media melody melt member memory mention menu mercy merge merit merry mesh message metal method middle midnight milk million mimic mind minimum minor minute miracle mirror misery miss mistake mix mixed mixture mobile model modify mom moment monitor monkey monster month moon moral more morning mosquito mother motion motor mountain mouse move movie much muffin mule multiply muscle museum mushroom music must mutual myself mystery myth naive name napkin narrow nasty nation nature near neck need negative neglect neither nephew nerve nest net network neutral never news next nice night noble noise nominee noodle normal north nose notable note nothing notice novel now nuclear number nurse nut oak obey object oblige obscure observe obtain obvious occur ocean october odor off offer office often oil okay old olive olympic omit once one onion online only open opera opinion oppose option orange orbit orchard order ordinary organ orient original orphan ostrich other outdoor outer output outside oval oven over own owner oxygen oyster ozone pact paddle page pair palace palm panda panel panic panther paper parade parent park parrot party pass patch path patient patrol pattern pause pave payment peace peanut pear peasant pelican pen penalty pencil people pepper perfect permit person pet phone photo phrase physical piano picnic picture piece pig pigeon pill pilot pink pioneer pipe pistol pitch pizza place planet plastic plate play please pledge pluck plug plunge poem poet point polar pole police pond pony pool popular portion position possible post potato pottery poverty powder power practice praise predict prefer prepare present pretty prevent price pride primary print priority prison private prize problem process produce profit program project promote proof property prosper protect proud provide public pudding pull pulp pulse pumpkin punch pupil puppy purchase purity purpose purse push put puzzle pyramid quality quantum quarter question quick quit quiz quote rabbit raccoon race rack radar radio rail rain raise rally ramp ranch random range rapid rare rate rather raven raw razor ready real reason rebel rebuild recall receive recipe record recycle reduce reflect reform refuse region regret regular reject relax release relief rely remain remember remind remove render renew rent reopen repair repeat replace report require rescue resemble resist resource response result retire retreat return reunion reveal review reward rhythm rib ribbon rice rich ride ridge rifle right rigid ring riot ripple risk ritual rival river road roast robot robust rocket romance roof rookie room rose rotate rough round route royal rubber rude rug rule run runway rural sad saddle sadness safe sail salad salmon salon salt salute same sample sand satisfy satoshi sauce sausage save say scale scan scare scatter scene scheme school science scissors scorpion scout scrap screen script scrub sea search season seat second secret section security seed seek segment select sell seminar senior sense sentence series service session settle setup seven shadow shaft shallow share shed shell sheriff shield shift shine ship shiver shock shoe shoot shop short shoulder shove shrimp shrug shuffle shy sibling sick side siege sight sign silent silk silly silver similar simple since sing siren sister situate six size skate sketch ski skill skin skirt skull slab slam sleep slender slice slide slight slim slogan slot slow slush small smart smile smoke smooth snack snake snap sniff snow soap soccer social sock soda soft solar soldier solid solution solve someone song soon sorry sort soul sound soup source south space spare spatial spawn speak special speed spell spend sphere spice spider spike spin spirit split spoil sponsor spoon sport spot spray spread spring spy square squeeze squirrel stable stadium staff stage stairs stamp stand start state stay steak steel stem step stereo stick still sting stock stomach stone stool story stove strategy street strike strong struggle student stuff stumble style subject submit subway success such sudden suffer sugar suggest suit summer sun sunny sunset super supply supreme sure surface surge surprise surround survey suspect sustain swallow swamp swap swarm swear sweet swift swim swing switch sword symbol symptom syrup system table tackle tag tail talent talk tank tape target task taste tattoo taxi teach team tell ten tenant tennis tent term test text thank that theme then theory there they thing this thought three thrive throw thumb thunder ticket tide tiger tilt timber time tiny tip tired tissue title toast tobacco today toddler toe together toilet token tomato tomorrow tone tongue tonight tool tooth top topic topple torch tornado tortoise toss total tourist toward tower town toy track trade traffic tragic train transfer trap trash travel tray treat tree trend trial tribe trick trigger trim trip trophy trouble truck true truly trumpet trust truth try tube tuition tumble tuna tunnel turkey turn turtle twelve twenty twice twin twist two type typical ugly umbrella unable unaware uncle uncover under undo unfair unfold unhappy uniform unique unit universe unknown unlock until unusual unveil update upgrade uphold upon upper upset urban urge usage use used useful useless usual utility vacant vacuum vague valid valley valve van vanish vapor various vast vault vehicle velvet vendor venture venue verb verify version very vessel veteran viable vibrant vicious victory video view village vintage violin virtual virus visa visit visual vital vivid vocal voice void volcano volume vote voyage wage wagon wait walk wall walnut want warfare warm warrior wash wasp waste water wave way wealth weapon wear weasel weather web wedding weekend weird welcome west wet whale what wheat wheel when where whip whisper wide width wife wild will win window wine wing wink winner winter wire wisdom wise wish witness wolf woman wonder wood wool word work world worry worth wrap wreck wrestle wrist write wrong yard year yellow you young youth zebra zero zone zoo'.split(' ');
+// SEP-5 / BIP39 + SLIP-10 (ed25519) with WebCrypto. WL = 2048-word English list.
+const HD = (() => {
+  const te = new TextEncoder();
+  const sha256 = async (b) => new Uint8Array(await crypto.subtle.digest('SHA-256', b));
+  const hmac512 = async (key, data) => { const k = await crypto.subtle.importKey('raw', key, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']); return new Uint8Array(await crypto.subtle.sign('HMAC', k, data)); };
+  const bits = (u8) => [...u8].map((b) => b.toString(2).padStart(8, '0')).join('');
+  async function generate(words = 24) {
+    const ent = crypto.getRandomValues(new Uint8Array(words === 12 ? 16 : 32));
+    const cs = bits(await sha256(ent)).slice(0, ent.length / 4);
+    const b = bits(ent) + cs;
+    return Array.from({ length: words }, (_, i) => WL[parseInt(b.slice(i * 11, i * 11 + 11), 2)]).join(' ');
+  }
+  const clean = (m) => (m || '').normalize('NFKD').trim().toLowerCase().split(/\s+/).join(' ');
+  async function valid(m) {
+    const w = clean(m).split(' '); if (![12, 15, 18, 21, 24].includes(w.length)) return false;
+    const idx = w.map((x) => WL.indexOf(x)); if (idx.some((i) => i < 0)) return false;
+    const b = idx.map((i) => i.toString(2).padStart(11, '0')).join('');
+    const entBits = b.length * 32 / 33, ent = new Uint8Array(entBits / 8);
+    for (let i = 0; i < ent.length; i++) ent[i] = parseInt(b.slice(i * 8, i * 8 + 8), 2);
+    return bits(await sha256(ent)).slice(0, b.length - entBits) === b.slice(entBits);
+  }
+  async function seed(m, pass = '') {
+    const k = await crypto.subtle.importKey('raw', te.encode(clean(m)), 'PBKDF2', false, ['deriveBits']);
+    return new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: te.encode(('mnemonic' + pass).normalize('NFKD')), iterations: 2048, hash: 'SHA-512' }, k, 512));
+  }
+  async function derive(sd, index) {   // m/44'/148'/index'
+    let I = await hmac512(te.encode('ed25519 seed'), sd), k = I.slice(0, 32), c = I.slice(32);
+    for (const n of [44, 148, index]) {
+      const d = new Uint8Array(37); d[0] = 0; d.set(k, 1); const v = (n | 0x80000000) >>> 0; d[33] = v >>> 24; d[34] = (v >>> 16) & 255; d[35] = (v >>> 8) & 255; d[36] = v & 255;
+      I = await hmac512(c, d); k = I.slice(0, 32); c = I.slice(32);
+    }
+    return k;   // raw ed25519 seed -> SDK.Keypair.fromRawEd25519Seed(k)
+  }
+  return { generate, valid, seed, derive, clean };
+})();
+
+async function hdKeypair(phrase, n) { return SDK.Keypair.fromRawEd25519Seed(await HD.derive(await HD.seed(phrase), n)); }
+
 /* ---------- crypto vault ---------- */
 const te = new TextEncoder(), td = new TextDecoder();
 const b64 = (u) => btoa(String.fromCharCode(...new Uint8Array(u)));
@@ -2916,7 +2961,7 @@ let PIN = null;    // kept only while unlocked, to re-seal
 let idleT = null;
 function bumpIdle() { clearTimeout(idleT); if (K) idleT = setTimeout(lock, 120000); }
 ['pointerdown', 'keydown'].forEach((e) => document.addEventListener(e, bumpIdle, { passive: true }));
-function lock() { K = null; PIN = null; closeSheet(); go('lock'); }
+function lock() { if (clipT) clearClip(); pinOkAt = 0; K = null; PIN = null; closeSheet(); go('lock'); }
 // screens still loading when the wallet locks find K gone; drop those leftovers quietly
 window.addEventListener('unhandledrejection', (e) => { if (!K) e.preventDefault(); });
 
@@ -3061,12 +3106,13 @@ function go(name) {
   if (f) f();
 }
 function toast(msg, ms = 4000) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), ms); }
-function netBadge(el) { el.textContent = NET().name; el.style.color = S.net === 'public' ? 'var(--redt)' : 'var(--amb)'; }
+// Mainnet is the normal state: gray inside the app, hidden on the unlock screen. Testnet stands out in amber.
+function netBadge(el, hideOnMain = false) { const main = S.net === 'public'; el.textContent = NET().name; el.style.color = main ? 'var(--mu)' : 'var(--amb)'; el.style.display = main && hideOnMain ? 'none' : ''; }
 
 /* ---------- lock screen ---------- */
 let pinBuf = '';
 function drawLock() {
-  netBadge($('#lockNet'));
+  netBadge($('#lockNet'), true);
   $('#pinDots').innerHTML = Array.from({ length: Math.max(6, pinBuf.length) }, (_, i) => `<span class="${i < pinBuf.length ? 'f' : ''}"></span>`).join('');
   if (!$('#pad').children.length) {
     $('#pad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button data-pin="${n}">${n}</button>`).join('') + `<button data-pin="del" class="b-out" style="font-size:16px" aria-label="Delete">⌫</button><button data-pin="0">0</button><button data-pin="ok" class="b-light" style="font-size:16px">OK</button>`;
@@ -3078,7 +3124,7 @@ async function tryUnlock() {
   $('#lockMsg').textContent = 'Unlocking…';
   try {
     const v = await unseal(pinBuf, S.vault);
-    K = { em: SDK.Keypair.fromSecret(v.em), pe: SDK.Keypair.fromSecret(v.pe), x: loadX(v.x) }; PIN = pinBuf;
+    K = unpackVault(v); PIN = pinBuf;
     S.fails = 0; S.lockUntil = 0; saveS(); pinBuf = ''; bumpIdle(); startMarket(); go('pnl');
     $('#lockMsg').textContent = 'Enter PIN';
   } catch (e) {
@@ -3095,22 +3141,81 @@ async function doSetup() {
   if (p1 !== p2) return toast('The two PINs do not match.');
   const f = $('#suFile').files[0];
   if (f) {
-    try { const j = JSON.parse(await f.text()); const v = await unseal(p1, j.vault); S.vault = j.vault; if (j.nets) S.nets = j.nets; saveS(); K = { em: SDK.Keypair.fromSecret(v.em), pe: SDK.Keypair.fromSecret(v.pe), x: loadX(v.x) }; PIN = p1; bumpIdle(); startMarket(); toast('Backup restored.'); return go('pnl'); }
+    try { const j = JSON.parse(await f.text()); const v = await unseal(p1, j.vault); S.vault = j.vault; if (j.nets) S.nets = j.nets; saveS(); K = unpackVault(v); PIN = p1; bumpIdle(); startMarket(); S.bk = Date.now(); S.keysAt = S.bk; saveS(); toast('Backup restored.'); return go('pnl'); }
     catch (e) { return toast('Could not open that backup with this PIN.'); }
   }
-  let pe;
-  if ($('#suMode').value === 'import') { try { pe = SDK.Keypair.fromSecret($('#suImp').value.trim()); } catch (e) { return toast('That is not a valid secret key.'); } }
-  else pe = SDK.Keypair.random();
+  let imp = null, ph = null; const sec = $('#suImp').value.trim();
+  if (sec) {
+    if (/^S[A-Z2-7]{55}$/.test(sec)) { try { imp = SDK.Keypair.fromSecret(sec); } catch (e) { return toast('That is not a valid secret key.'); } }
+    else if (await HD.valid(sec)) { ph = HD.clean(sec); imp = await hdKeypair(ph, 0); }
+    else return toast('That is not a valid secret key or recovery phrase.');
+  }
   const em = SDK.Keypair.random();
-  S.vault = await seal(p1, { em: em.secret(), pe: pe.secret() });
+  const x = imp ? [{ name: 'Personal', type: 'personal', kp: imp, hd: ph ? 0 : undefined }] : [];
+  S.vault = await seal(p1, { em: em.secret(), pe: null, ph, phN: ph ? 1 : 0, x: x.map((o) => ({ name: o.name, type: o.type, hd: o.hd, sec: o.kp.secret() })) });
   if (!saveS()) return;
-  K = { em, pe, x: [] }; PIN = p1; $('#su1').value = $('#su2').value = $('#suImp').value = ''; bumpIdle(); startMarket();
-  if ($('#suMode').value === 'import') go('pnl'); else go('backup');
+  K = { em, pe: null, x, ph, phN: ph ? 1 : 0 }; PIN = p1; $('#su1').value = $('#su2').value = $('#suImp').value = ''; bumpIdle(); startMarket();
+  go('pnl');
 }
 function exportVault() {
   const blob = new Blob([JSON.stringify({ app: 'kill-switch-wallet', v: 1, vault: S.vault, nets: S.nets }, null, 1)], { type: 'application/json' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'liquidfi-backup-encrypted.json'; a.click();
+  S.bk = Date.now(); saveS();
   toast('Saved. It is encrypted with your PIN; keep it somewhere safe.');
+}
+const bkOk = () => !!S.bk && !(S.keysAt > S.bk);   // a backup exists and no keys were added since
+let bkNext = null;   // what Done does: 'mainnet' (continue the switch) or 'set'
+function openBackup(next) {
+  bkNext = next; go('backup');
+  $('#bkFileOk').style.display = bkOk() ? '' : 'none';
+  $('#bkWhy').innerHTML = next === 'mainnet' ? '<b style="color:var(--tx)">Before Mainnet:</b> Mainnet uses real money. Your keys live only on this phone, so save a backup first.' : 'Your keys live only on this phone. If the phone is lost or its browser data is cleared, these get you back in.';
+  $('#bkDoneB').textContent = next === 'mainnet' ? 'Continue to Mainnet' : 'Done';
+  drawBkKeys();
+}
+function switchMainnet() { closeSheet(); S.net = 'public'; hzPick = null; saveS(); homeAddr = null; startMarket(); drawSet(); toast('Switched to Mainnet.'); }
+const keyRow = (i) => { const o = K.x[i]; return `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(o.name)}</b><span class="mu" style="font-size:12px">${o.hd != null && K.ph ? 'phrase #' + (o.hd + 1) + ' · ' : ''}${short(o.kp.publicKey())}</span></div><div class="addr" id="sec${i}" style="display:none"></div><div class="amb" id="cw${i}" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="secShow" data-i="${i}">Show key</button><button class="b-out sm" data-act="secCopy" data-i="${i}">Copy key</button></div></div>`; };
+const phraseRow = (open) => `<div style="display:flex;flex-direction:column;gap:8px"><ol class="words" id="phW" style="display:${open ? '' : 'none'}">${open ? K.ph.split(' ').map((w) => `<li>${esc(w)}</li>`).join('') : ''}</ol><div class="amb" id="cwP" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="phShow">${open ? 'Hide phrase' : 'Show phrase'}</button><button class="b-out sm" data-act="phCopy">Copy phrase</button></div></div>`;
+let pinOkAt = 0, pinCb = null, pinBad = 0;
+function needPin(cb) {   // re-enter the PIN before showing or copying keys (good for 2 minutes)
+  if (Date.now() - pinOkAt < 120000) return cb();
+  pinCb = cb; pending = null;
+  sheet(`<h2>Enter your PIN</h2><div class="mu" style="font-size:14px">Needed to show or copy secret keys and the recovery phrase.</div><input id="pinChk" type="password" inputmode="numeric" autocomplete="off"><button class="b-acc big" data-act="pinChkOk">OK</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  setTimeout(() => { const e = $('#pinChk'); if (e) e.focus(); }, 50);
+}
+async function copySecret(text, btn, warnId) {   // first tap arms (shows the warning), second tap copies
+  if (btn.dataset.armed !== '1') { btn.dataset.armed = '1'; btn.textContent = 'Tap again to copy'; const w = $('#' + warnId); if (w) w.style.display = ''; setTimeout(() => { if (btn.isConnected) { btn.dataset.armed = ''; btn.textContent = btn.dataset.label; if (w) w.style.display = 'none'; } }, 8000); return; }
+  btn.dataset.armed = ''; btn.textContent = btn.dataset.label;
+  try { await navigator.clipboard.writeText(text); } catch (e) { return toast('This browser blocked copying. Use Show and write it down.'); }
+  clearTimeout(clipT); clipT = setTimeout(clearClip, 300000);
+  toast('Copied. Paste it into your password manager. The clipboard clears in 5 minutes or when you lock.', 6000);
+}
+function drawBkKeys() {
+  const el = $('#bkKeys'); if (!el) return;
+  const ph = K.ph ? `<div style="display:flex;flex-direction:column;gap:6px"><b>Recovery phrase (${K.ph.split(' ').length} words)</b><div class="mu" style="font-size:12px">Restores every wallet marked "phrase #" below, here or in LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(false)}</div>` : '';
+  el.innerHTML = ph + (K.x.length ? K.x.map((o, i) => keyRow(i)).join('') : '<div class="mu" style="font-size:13px">No wallet keys on this phone. The backup file covers the emergency key.</div>');
+}
+let clipT = 0;
+function clearClip() { clearTimeout(clipT); clipT = 0; try { navigator.clipboard.writeText(' '); } catch (e) {} }
+function newWalletSheet(i, freshPh) {
+  const o = K.x[i]; pending = null;
+  sheet(`<h2>${esc(o.name)} is ready</h2><div class="mu" style="font-size:14px">Address (safe to share): <span class="addr">${esc(o.kp.publicKey())}</span></div>
+    ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this wallet and every wallet you create later on this phone, in Liquidfi or LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(true)}` : `<div class="note amb">Save the secret key now${o.hd != null && K.ph ? ', or rely on your recovery phrase (this is wallet #' + (o.hd + 1) + ' in it)' : ''}. Without it, a lost phone means a lost wallet.</div>`}
+    ${keyRow(i)}
+    <div class="mu" style="font-size:12px">${S.net === 'public' ? 'Send it at least 2 XLM to activate it on Mainnet.' : 'On Testnet, open it in Accounts and tap "Get free test XLM".'}</div>
+    <button class="b-light big" data-act="newWalletDone">I saved it</button>`);
+}
+function eraseAll() { try { localStorage.removeItem(SKEY); } catch (e) {} K = null; PIN = null; location.reload(); }
+function resetSheet() {
+  pending = eraseAll;
+  sheet(`<h2>Erase Liquidfi from this phone?</h2><div class="note amb">This deletes your PIN, every wallet key, the emergency key, the bot list and settings from this phone. Funds stay on Stellar, but you can only reach them again with their secret keys or a backup file.</div>
+    <div class="mu" style="font-size:13px">The emergency key changes too. If you already added it to your bots, run Remove-Emergency-Signer.bat and then Add-Emergency-Signer.bat with the new one.</div>
+    <button class="b-red big hold" id="holdBtn"><i></i><span>Hold to erase this phone</span></button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  armHold();
+}
+function mainnetSheet() {   // hold to confirm (same as sending a transaction) instead of typing MAINNET
+  pending = switchMainnet;
+  sheet(`<h2>Switch to Mainnet?</h2><div class="note amb">Mainnet uses real money. Buttons will act on the real bot accounts.</div><button class="b-red big hold" id="holdBtn"><i></i><span>Hold to switch to Mainnet</span></button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  armHold();
 }
 
 /* ---------- accounts / balances ---------- */
@@ -3131,9 +3236,12 @@ function usdVal(a) {
 }
 let homeAddr = null;
 /* every account: Personal (own key), imported (own key, Personal or Trading), bots (emergency signer, Trading) */
-const loadX = (x) => (x || []).map((o) => ({ name: o.name, type: o.type, kind: o.kind, kp: SDK.Keypair.fromSecret(o.sec) }));
-async function resealVault() { S.vault = await seal(PIN, { em: K.em.secret(), pe: K.pe.secret(), x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, sec: o.kp.secret() })) }); return saveS(); }
-const OWN = () => [{ name: 'Personal', tag: 'your wallet', addr: K.pe.publicKey(), type: 'personal', kp: K.pe }, ...K.x.map((o) => ({ name: o.name, tag: o.type === 'personal' ? 'imported' : (o.kind === 'dir' ? 'trader' : 'market maker') + ' · own key', addr: o.kp.publicKey(), type: o.type, kind: o.kind || 'mm', kp: o.kp, own: true }))];
+const loadX = (x) => (x || []).map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, kp: SDK.Keypair.fromSecret(o.sec) }));
+// older vaults kept the Personal key apart (v.pe); it now sits in the account list like any other wallet
+function unpackVault(v) { const x = loadX(v.x); if (v.pe) x.unshift({ name: 'Personal', type: 'personal', kp: SDK.Keypair.fromSecret(v.pe) }); return { em: SDK.Keypair.fromSecret(v.em), pe: null, x, ph: v.ph || null, phN: v.phN || 0 }; }
+const firstWallet = () => (persAccts()[0] || OWN()[0] || {}).addr;
+async function resealVault() { S.vault = await seal(PIN, { em: K.em.secret(), pe: null, ph: K.ph || null, phN: K.phN || 0, x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, sec: o.kp.secret() })) }); S.keysAt = Date.now(); return saveS(); }
+const OWN = () => K.x.map((o) => ({ name: o.name, tag: o.type === 'personal' ? 'wallet' : (o.kind === 'dir' ? 'trader' : 'market maker') + ' · own key', addr: o.kp.publicKey(), type: o.type, kind: o.kind || 'mm', kp: o.kp, own: true }));
 const persAccts = () => OWN().filter((a) => a.type === 'personal');
 const tradeAccts = () => [...NS().bots, ...OWN().filter((a) => a.type === 'trading')];
 const allAccts = () => [...persAccts(), ...tradeAccts().filter((b) => b.addr)];
@@ -3146,7 +3254,8 @@ function walletAccts() {
 const kpFor = (addr) => (OWN().find((a) => a.addr === addr) || {}).kp || K.em;
 async function drawHome() {
   netBadge($('#hNet'));
-  homeAddr = homeAddr || K.pe.publicKey();
+  homeAddr = homeAddr || firstWallet();
+  if (!homeAddr) { toast('No wallet on this phone yet. Accounts → + Add account.'); return go('bots'); }
   const nm = (allAccts().find((x) => x.addr === homeAddr) || { name: 'Personal' }).name;
   $('#hAcct').textContent = nm + ' ▾';
   $('#hAddr').textContent = homeAddr;
@@ -3217,7 +3326,7 @@ async function drawBots(reload = true) {
     $('#bUpd').textContent = 'Updated ' + new Date().toLocaleTimeString() + ' · ' + NET().name;
   };
   const PA = persAccts();
-  const drawPers = () => { $('#bPers').innerHTML = PA.map((p) => { const a = ACC[p.addr]; return `<button class="acct" data-act="openPersonal" data-addr="${p.addr}"><div class="r"><span style="font-size:17px;font-weight:600">${esc(p.name)} <span class="mu" style="font-weight:400">· ${esc(p.tag)}</span></span><span class="mono" style="font-weight:600">${a ? '$' + fx(usdVal(a)) : a === null ? 'not funded' : ''}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${short(p.addr)}</span><span class="mu" style="font-size:12px">trade · send · receive</span></div></button>`; }).join(''); };
+  const drawPers = () => { $('#bPers').innerHTML = PA.length ? '' : '<div class="note">No wallets yet. Tap + Add account to create a new one or import one you have.</div>'; if (!PA.length) return; $('#bPers').innerHTML = PA.map((p) => { const a = ACC[p.addr]; return `<button class="acct" data-act="openPersonal" data-addr="${p.addr}"><div class="r"><span style="font-size:17px;font-weight:600">${esc(p.name)} <span class="mu" style="font-weight:400">· ${esc(p.tag)}</span></span><span class="mono" style="font-weight:600">${a ? '$' + fx(usdVal(a)) : a === null ? 'not funded' : ''}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${short(p.addr)}</span><span class="mu" style="font-size:12px">trade · send · receive</span></div></button>`; }).join(''); };
   drawPers(); if (reload) Promise.all(PA.map((p) => refreshAcct(p.addr).catch(() => null))).then(drawPers);
   draw(); drawMarket();
   if (reload) { await Promise.all(bots.filter((b) => b.addr).map(loadBot)); if (cur === 'bots') draw(); }
@@ -3401,7 +3510,7 @@ function drawPnl() {
   if (!P.res[P.sel] && !P.busy[P.sel]) loadPer(P.sel);
 }
 function paintPnl() {
-  $('#pUpd').innerHTML = `${P.at ? 'Updated ' + new Date(P.at).toLocaleTimeString() + ' · ' : ''}<span style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'};font-weight:700">${NET().name}</span>`;
+  $('#pUpd').innerHTML = `${P.at ? 'Updated ' + new Date(P.at).toLocaleTimeString() + ' · ' : ''}<span style="color:${S.net === 'public' ? 'var(--mu)' : 'var(--amb)'};font-weight:700">${NET().name}</span>`;
   $('#pPer').innerHTML = PERS.map(([k, l]) => `<button class="chip${k === P.sel ? ' on' : ''}" data-per="${k}" aria-pressed="${k === P.sel}">${l}</button>`).join('');
   const R = P.res[P.sel], nm = PERS.find((x) => x[0] === P.sel)[1], W = R ? R.W : perWindow(P.sel);
   $('#pByL').textContent = 'By bot · ' + nm;
@@ -3425,7 +3534,7 @@ function paintPnl() {
     if (!r) return one('<span class="mu" style="font-size:12px">added after this loaded · tap ↻</span>', '');
     if (r.err) return one(`<span class="red" style="font-size:12px">${esc(r.err)}</span>`, '<span class="mono mu">—</span>');
     if (r.none) return one(`<span class="mu" style="font-size:12px">${esc(r.note)}</span>`, '<span class="mono mu">—</span>');
-    const q = r.quote, qc = q.chg >= 0 ? 'buy' : 'sell';
+    const q = r.quote, qc = q && q.chg >= 0 ? 'buy' : 'sell';
     const strip = q && q.last ? `<div class="qs"><span class="mu" style="font-weight:600">${esc(q.code)}/USDC</span><span class="v">${q.last.toFixed(5)}</span><span class="v ${qc}">${sg(q.chg, 5)}</span><span class="v ${qc}">${q.pct == null ? '—' : sg(q.pct, 2) + '%'}</span></div>` : '';
     return `<div class="pr"><div class="top2">${name}<span class="mu" style="font-size:12px">${esc(r.note)}</span></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px"><span class="mono ${c(r.pnl)}" style="font-size:15px;font-weight:600">${money(r.pnl)}</span><span class="mono ${c(r.pnl)}" style="font-size:12px">${pctTx(r.pnl, r.base)}</span></div></div>${strip}</div>`;
   }).join('');
@@ -3465,7 +3574,7 @@ function paintAct() {
   const L = allAccts();
   if (ACT.fil !== 'all' && !L.some((a) => a.addr === ACT.fil)) ACT.fil = 'all';
   $('#aFil').innerHTML = [['all', 'All'], ...L.map((a) => [a.addr, a.name])].map(([k, n]) => `<button class="chip${k === ACT.fil ? ' on' : ''}" style="white-space:nowrap" data-afil="${k}">${esc(n)}</button>`).join('');
-  $('#aUpd').innerHTML = `Buys and sells · ${ACT.at ? 'updated ' + new Date(ACT.at).toLocaleTimeString() + ' · ' : ''}<span style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'};font-weight:700">${NET().name}</span>`;
+  $('#aUpd').innerHTML = `Buys and sells · ${ACT.at ? 'updated ' + new Date(ACT.at).toLocaleTimeString() + ' · ' : ''}<span style="color:${S.net === 'public' ? 'var(--mu)' : 'var(--amb)'};font-weight:700">${NET().name}</span>`;
   if (!ACT.at) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
   // group fills of one operation on one account into a single line
   const rows = [];
@@ -3587,7 +3696,7 @@ function armHold() {
   const b = $('#holdBtn'); let t0 = 0, iv = 0;
   const bar = b.querySelector('i');
   const stop = () => { clearInterval(iv); iv = 0; t0 = 0; bar.style.width = '0'; };
-  const tick = () => { const p = Math.min(1, (performance.now() - t0) / 1200); bar.style.width = (p * 100) + '%'; if (p >= 1) { stop(); const f = pending; pending = null; if (f) { b.disabled = true; b.querySelector('span').textContent = 'Sending…'; f(); } } };
+  const tick = () => { const p = Math.min(1, (performance.now() - t0) / 1200); bar.style.width = (p * 100) + '%'; if (p >= 1) { stop(); const f = pending; pending = null; if (f) { b.disabled = true; b.querySelector('span').textContent = f === switchMainnet ? 'Switching…' : f === eraseAll ? 'Erasing…' : 'Sending…'; f(); } } };
   b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (iv) return; t0 = performance.now(); iv = setInterval(tick, 30); });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => b.addEventListener(ev, () => { if (t0) stop(); }));
   b.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -3630,7 +3739,7 @@ async function allPlans(flat) {
 const T = { mode: 'lim', side: 'buy' };   // Limit is the default
 let tradeAddr = null;
 async function drawTrade() {
-  tradeAddr = homeAddr || K.pe.publicKey();
+  tradeAddr = homeAddr || firstWallet();
   $('#tFrom').textContent = (allAccts().find((x) => x.addr === tradeAddr) || {}).name || '';
   $$('#tMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.mode));
   $$('#tSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.side));
@@ -3696,7 +3805,7 @@ async function personalTx(kp, src, ops, okTitle, back, memo) {
 function drawSend() {
   const A = walletAccts();
   $('#sFrom').innerHTML = A.map((x) => `<option value="${x.addr}">${esc(x.name)} · ${short(x.addr)}</option>`).join('');
-  $('#sFrom').value = homeAddr || K.pe.publicKey();
+  $('#sFrom').value = homeAddr || firstWallet();
   const sv = NS().saved;
   $('#sTo').innerHTML = `<option value="">Choose…</option>` + sv.map((x, i) => `<option value="${i}">${esc(x.name)} · ${short(x.addr)}</option>`).join('') + `<option value="new">+ New address</option>`;
   $('#sNew').style.display = 'none';
@@ -3757,14 +3866,14 @@ function drawReceive() {
 
 /* ---------- trust ---------- */
 async function drawTrust() {
-  const addr = homeAddr || K.pe.publicKey(); const a = await refreshAcct(addr).catch(() => null);
+  const addr = homeAddr || firstWallet(); const a = await refreshAcct(addr).catch(() => null);
   const have = (k) => a && a.balances.find((b) => aKey(b) === k);
   const known = [...(S.net === 'public' ? KNOWN.public : [{ code: NS().usdc.code, issuer: NS().usdc.issuer, who: 'test USDC' }]), ...NS().extraKnown];
   $('#trKnown').innerHTML = known.map((k, i) => { const h = have(k.code + ':' + k.issuer); return `<div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 14px"><div><b>${esc(k.code)}</b> <span class="mu">· ${esc(k.who || '')}</span><div class="mono mu" style="font-size:12px">${short(k.issuer)}${h ? ' · balance ' + fx(+h.balance) : ''}</div></div>${h ? (+h.balance === 0 && +h.buying_liabilities === 0 ? `<button class="b-out sm" data-untrust="${i}">Remove</button>` : '<span class="tag t-grn">added</span>') : `<button class="b-light sm" data-trust="${i}">Add</button>`}</div>`; }).join('') || '<div class="note">None listed.</div>';
   window._known = known;
 }
 async function trustOp(k, remove) {
-  const addr = homeAddr || K.pe.publicKey();
+  const addr = homeAddr || firstWallet();
   const op = SDK.Operation.changeTrust({ asset: new SDK.Asset(k.code, k.issuer), ...(remove ? { limit: '0' } : {}) });
   confirmSheet(`${remove ? 'Remove' : 'Add'} ${k.code} trustline`, `${NET().name} · ${remove ? 'returns' : 'locks'} 0.5 XLM`, [{ t: `${k.code} issued by ${k.who || 'issuer'}`, s: k.issuer }], remove ? 'Hold to remove' : 'Hold to add', () => personalTx(kpFor(addr), addr, [op], remove ? 'Trustline removed' : 'Trustline added', 'trust'), false);
 }
@@ -3796,6 +3905,7 @@ function drawSet() {
   $$('#setSlip button').forEach((b) => b.classList.toggle('on', +b.dataset.v === +S.slip));
   $$('#setCol button').forEach((b) => b.classList.toggle('on', b.dataset.v === (S.col || 'bp')));
   drawHz();
+  $('#setBk').innerHTML = !S.bk ? '<span class="amb">Not backed up yet. Needed before Mainnet.</span>' : bkOk() ? `<span class="grn">Backed up ${new Date(S.bk).toLocaleDateString()}</span>` : '<span class="amb">Accounts added since your last backup. Save a new file.</span>';
   $('#setEm').textContent = K.em.publicKey(); $('#setBotSend').checked = !!S.botSend;
   $('#setBNet').textContent = NET().name; $('#setSand').style.display = S.net === 'testnet' ? '' : 'none';
   $('#setBots').innerHTML = NS().bots.map((b, i) => `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(b.name)}${b.tag ? ` <span class="mu" style="font-weight:400">· ${esc(b.tag)}</span>` : ''}</b><span style="display:flex;gap:8px;align-items:center"><span class="mu" style="font-size:12px">${b.kind === 'dir' ? 'trader' : 'market maker'}</span><button class="b-out sm" style="min-height:34px" data-act="rmBot" data-i="${i}">Remove</button></span></div><input data-baddr="${i}" value="${esc(b.addr)}" placeholder="G… public address" spellcheck="false" autocomplete="off"></div>`).join('') || '<div class="mu">None yet. Tap + Add bot account.</div>';
@@ -3812,8 +3922,18 @@ function drawHz() {
   const L = hzList(), cur = hzCur(), host = (u) => u.replace(/^https?:\/\//, '');
   $('#setHzSt').innerHTML = `Using <b style="color:var(--tx)">${esc(cur.name)}</b> · ${esc(host(cur.url))}` + (cur.url !== L[0].url ? ` <span class="amb">(backup: ${esc(L[0].name)} is not answering)</span>` : '') +
     (L.length > 1 ? `<br>If it is down or busy: ${L.filter((x) => x.url !== cur.url).map((x) => esc(x.name)).join(' → ')}` : '') +
-    (mode === 'custom' && hz.mode !== 'custom' ? '<br>Paste the address of a Horizon server and tap Check &amp; save.' : '');
+    (mode === 'custom' && hz.mode !== 'custom' ? '<br>Paste the address of a Horizon server and tap Save.' : '');
+  hzBtn();
 }
+const hzNorm = (v) => { let u = (v || '').trim().replace(/\/+$/, ''); if (u && !/^https?:\/\//i.test(u)) u = 'https://' + u; try { const x = new URL(u); return x.origin + x.pathname.replace(/\/+$/, ''); } catch (e) { return u; } };
+function hzBtn(state) {   // Save / Saving… / Saved ✓
+  const b = $('#hzSave'); if (!b) return; const hz = hzCfg();
+  const saved = hz.mode === 'custom' && hz.url && hzNorm($('#setHzUrl').value) === hz.url;
+  const st = state || (saved ? 'saved' : 'save');
+  b.disabled = st === 'saving'; b.textContent = st === 'saving' ? 'Saving…' : st === 'saved' ? 'Saved ✓' : 'Save';
+  b.style.color = st === 'saved' ? '#3FB87F' : ''; b.style.borderColor = st === 'saved' ? '#3FB87F' : '';
+}
+document.addEventListener('input', (e) => { if (e.target && e.target.id === 'setHzUrl') hzBtn(); });
 function hzSet(mode) {
   if (mode === 'custom') { hzPick = 'custom'; return drawHz(); }
   hzPick = null; NS().hz = { mode, url: hzCfg().url || '' }; saveS(); delete HZ_BAD[hzList()[0].url]; startMarket(); drawHz(); toast('Server: ' + hzList()[0].name);
@@ -3824,19 +3944,19 @@ async function hzCheck() {
   let url; try { url = new URL(u); } catch (e) { return toast('That is not a web address.'); }
   if (url.protocol !== 'https:') return toast('The address must start with https://. A phone page can’t reach plain http servers.');
   u = url.origin + url.pathname.replace(/\/+$/, '');
-  const st = $('#setHzSt'); st.textContent = 'Checking ' + u + ' …';
+  const st = $('#setHzSt'); st.textContent = 'Checking ' + u + ' …'; hzBtn('saving');
   try {
     const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 10000);
     const r = await fetch(u + '/', { signal: ctl.signal }); clearTimeout(tm);
     const j = await r.json();
     if (!j.network_passphrase) throw new Error('not a Horizon server');
-    if (j.network_passphrase !== NET().pass) { st.innerHTML = `<span class="red">That server is on a different network, not ${NET().name}. Not saved.</span>`; return; }
+    if (j.network_passphrase !== NET().pass) { const other = j.network_passphrase === NETS.public.pass ? 'Mainnet' : j.network_passphrase === NETS.testnet.pass ? 'Testnet' : 'another network'; st.innerHTML = `<span class="red">That server is on ${other}, and the app is on ${S.net === 'public' ? 'Mainnet' : 'Testnet'}. ${other === 'Mainnet' ? 'Switch to Mainnet first, then save it.' : 'Not saved.'}</span>`; hzBtn('save'); return; }
     const age = j.history_latest_ledger_closed_at ? Math.round((Date.now() - Date.parse(j.history_latest_ledger_closed_at)) / 1000) : null;
-    if (age !== null && age > 120) { st.innerHTML = `<span class="amb">That server is ${Math.round(age / 60)} min behind the network. Not saved.</span>`; return; }
+    if (age !== null && age > 120) { st.innerHTML = `<span class="amb">That server is ${Math.round(age / 60)} min behind the network. Not saved.</span>`; hzBtn('save'); return; }
     hzPick = null; NS().hz = { mode: 'custom', url: u }; saveS(); delete HZ_BAD[u]; startMarket(); drawHz();
     toast(`Saved. ${NET().name} · ledger ${j.history_latest_ledger}${age !== null ? ' · ' + age + ' s old' : ''}`);
   } catch (e) {
-    st.innerHTML = `<span class="red">Could not reach that server (${esc(e.name === 'AbortError' ? 'no answer in 10 s' : e.message)}). It needs https and must allow web pages to read it (CORS). Not saved.</span>`;
+    st.innerHTML = `<span class="red">Could not reach that server (${esc(e.name === 'AbortError' ? 'no answer in 10 s' : e.message)}). It needs https and must allow web pages to read it (CORS). Not saved.</span>`; hzBtn('save');
   }
 }
 async function checkSig() {
@@ -3846,11 +3966,7 @@ async function checkSig() {
 }
 function setNet(n) {
   if (n === S.net) return;
-  if (n === 'public') {
-    pending = null;
-    sheet(`<h2>Switch to Mainnet?</h2><div class="note amb">Mainnet uses real money. Buttons will act on the real bot accounts.</div><label>Type MAINNET<input id="mnConf" autocomplete="off" autocapitalize="characters"></label><button class="b-red big" data-act="mnOk">Switch</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
-    return;
-  }
+  if (n === 'public') return bkOk() ? mainnetSheet() : openBackup('mainnet');
   S.net = n; hzPick = null; saveS(); homeAddr = null; startMarket(); drawSet();
 }
 
@@ -3863,14 +3979,14 @@ async function sandbox() {
     st('Creating accounts…');
     const iss = SDK.Keypair.random(), mm = SDK.Keypair.random(), momo = SDK.Keypair.random(), sw = SDK.Keypair.random();
     await Promise.all([iss, mm, momo, sw].map((k) => friendbot(k.publicKey())));
-    const pers = await acct(K.pe.publicKey()); if (!pers) await friendbot(K.pe.publicKey());
+    const PK = (persAccts()[0] || {}).kp; if (PK && !(await acct(PK.publicKey()))) await friendbot(PK.publicKey());
     const U = new SDK.Asset('USDC', iss.publicKey());
     NS().usdc = { code: 'USDC', issuer: iss.publicKey() }; saveS();
     const send = async (kp, ops) => { const t = await buildTx(kp.publicKey(), ops); t.sign(kp); return submit(t); };
     st('Trustlines…');
-    await Promise.all([mm, momo, sw, K.pe].map((k) => send(k, [SDK.Operation.changeTrust({ asset: U })])));
+    await Promise.all([mm, momo, sw, ...(PK ? [PK] : [])].map((k) => send(k, [SDK.Operation.changeTrust({ asset: U })])));
     st('Test USDC…');
-    await send(iss, [SDK.Operation.payment({ destination: mm.publicKey(), asset: U, amount: '200000' }), SDK.Operation.payment({ destination: momo.publicKey(), asset: U, amount: '150' }), SDK.Operation.payment({ destination: sw.publicKey(), asset: U, amount: '1000' }), SDK.Operation.payment({ destination: K.pe.publicKey(), asset: U, amount: '500' })]);
+    await send(iss, [SDK.Operation.payment({ destination: mm.publicKey(), asset: U, amount: '200000' }), SDK.Operation.payment({ destination: momo.publicKey(), asset: U, amount: '150' }), SDK.Operation.payment({ destination: sw.publicKey(), asset: U, amount: '1000' }), ...(PK ? [SDK.Operation.payment({ destination: PK.publicKey(), asset: U, amount: '500' })] : [])]);
     st('Market maker book…');
     const asks = [[0.2255, 1500], [0.2257, 2000], [0.2260, 2500], [0.2266, 3000]], bids = [[0.2252, 2000], [0.2250, 3000], [0.2246, 5000], [0.2240, 8000]];
     await send(mm, [...asks.map(([p, q]) => SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: U, amount: String(q), price: String(p) })), ...bids.map(([p, q]) => SDK.Operation.manageBuyOffer({ selling: U, buying: SDK.Asset.native(), buyAmount: String(q), price: String(p) }))]);
@@ -3910,31 +4026,63 @@ document.addEventListener('click', async (e) => {
   const act = t.dataset.act; if (!act) return;
   const A = {
     setup: doSetup, exportVault, lock,
-    bkShow: () => { $('#bkSec').textContent = K.pe.secret(); },
-    bkDone: () => go('pnl'),
-    bkShowSet: () => { pending = null; sheet(`<h2>Personal secret key</h2><div class="note amb">Anyone with this can take the Personal funds. Never paste it into a website or chat.</div><div class="card addr">${esc(K.pe.secret())}</div><button class="b-out" data-act="closeSheet">Close</button>`); },
+    secShow: () => { const i = +t.dataset.i, o = K.x[i]; if (!o) return; needPin(() => { const e = $('#sec' + i), b = document.querySelector(`[data-act=secShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? o.kp.secret() : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide key' : 'Show key'; }); },
+    secCopy: () => { const i = +t.dataset.i, o = K.x[i], b = t; if (!o) return; b.dataset.label = 'Copy key'; if (b.dataset.armed === '1') return copySecret(o.kp.secret(), b, 'cw' + i); needPin(() => copySecret(o.kp.secret(), document.querySelector(`[data-act=secCopy][data-i="${i}"]`) || b, 'cw' + i)); },
+    phShow: () => { if (!K.ph) return; needPin(() => { const e = $('#phW'), b = document.querySelector('[data-act=phShow]'); if (!e) return; const on = e.style.display === 'none'; e.innerHTML = on ? K.ph.split(' ').map((w) => `<li>${esc(w)}</li>`).join('') : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide phrase' : 'Show phrase'; }); },
+    phCopy: () => { if (!K.ph) return; const b = t; b.dataset.label = 'Copy phrase'; if (b.dataset.armed === '1') return copySecret(K.ph, b, 'cwP'); needPin(() => copySecret(K.ph, document.querySelector('[data-act=phCopy]') || b, 'cwP')); },
+    pinChkOk: () => { const v = ($('#pinChk') || {}).value || ''; if (v !== PIN) { $('#pinChk').value = ''; if (++pinBad >= 3) { pinBad = 0; toast('Wrong PIN 3 times. Locked.'); return lock(); } return toast('Wrong PIN.'); } pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); },
+    newWalletDone: () => { closeSheet(); toast((K.x.at(-1) || {}).name + ' added. Back it up in Settings → Back up keys.'); },
+    bkFile: () => { exportVault(); $('#bkFileOk').style.display = ''; },
+    bkBack: () => go('set'),
+    bkDone: () => { if (bkNext === 'mainnet') { if (!bkOk()) return toast('Save the backup file first.'); go('set'); return mainnetSheet(); } go('set'); },
+    bkOpen: () => openBackup('set'),
     closeSheet,
     friendbot: async () => { try { await friendbot(homeAddr); toast('Funded with test XLM.'); drawHome(); } catch (err) { toast(niceErr(err)); } },
     pickAcct: () => { const L = walletAccts(); pending = null; sheet(`<h2>Account</h2>${L.map((x) => `<button class="b-out" data-pickaddr="${x.addr}" style="text-align:left">${esc(x.name)} · <span class="mono">${short(x.addr)}</span></button>`).join('')}<button class="b-out" data-act="closeSheet">Close</button>`); },
     refreshBots: () => drawBots(true),
-    openPersonal: () => { homeAddr = t.dataset.addr || K.pe.publicKey(); go('home'); },
+    openPersonal: () => { homeAddr = t.dataset.addr || firstWallet(); go('home'); },
     acctGo: () => { const b = tradeAccts()[botSel]; const to = t.dataset.to; if (to === 'send' && !walletAccts().some((x) => x.addr === b.addr)) return toast('Sends from trading accounts are off. Turn them on in Settings.'); homeAddr = b.addr; go(to); },
-    addAcct: () => { pending = null; sheet(`<h2>Add account</h2><div class="mu" style="font-size:14px">Import a Stellar secret key (S…). It is encrypted with your PIN and stays on this phone.</div>
+    addAcct: () => { pending = null; sheet(`<h2>Add account</h2>
+      <div class="seg" id="xHow"><button data-v="new" class="on">Create new</button><button data-v="imp">Import key</button></div>
       <label>Name<input id="xName" placeholder="e.g. Savings" autocomplete="off"></label>
       <label>Type<select id="xType"><option value="personal">Personal · not in kill switch or P/L</option><option value="dir">Trading · trader (Flatten closes its trade)</option><option value="mm">Trading · market maker (cancel only)</option></select></label>
-      <label>Secret key (S…), typed here only<input id="xSec" type="password" autocomplete="off" spellcheck="false"></label>
-      <div class="note amb">A Trading account imported here gives this phone full control of it, including its signers. Your bots use the safer emergency signer instead (Settings).</div>
-      <button class="b-light big" data-act="addAcctOk">Add account</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
+      <label id="xSecW" style="display:none">Secret key (S…) or recovery phrase (12 or 24 words)<textarea id="xSec" rows="2" autocomplete="off" spellcheck="false" autocapitalize="off" style="-webkit-text-security:disc"></textarea></label>
+      <label id="xNumW" style="display:none">Which wallet in that phrase<input id="xNum" type="number" min="1" value="1" inputmode="numeric"></label>
+      <div class="mu" id="xHowNote" style="font-size:13px"></div>
+      <div class="note amb" id="xTradeNote" style="display:none">A Trading account with its own key here gives this phone full control of it, including its signers. Your bots use the safer emergency signer instead (Settings).</div>
+      <button class="b-light big" data-act="addAcctOk">Add account</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+      const how = () => ($('#xHow .on') || {}).dataset ? $('#xHow .on').dataset.v : 'new';
+      const upd = () => { const imp = how() === 'imp'; $('#xSecW').style.display = imp ? '' : 'none'; $('#xNumW').style.display = imp && /\s/.test($('#xSec').value.trim()) ? '' : 'none';
+        $('#xHowNote').textContent = imp ? 'It is encrypted with your PIN and stays on this phone. A phrase from LOBSTR, Freighter or Stellar Laboratory works too.' : K.ph ? 'Makes the next wallet from your recovery phrase. You\'ll see its secret key next, to save.' : 'Makes a 24-word recovery phrase and your first wallet from it. You\'ll see both next, to save.';
+        $('#xTradeNote').style.display = $('#xType').value === 'personal' ? 'none' : ''; };
+      $('#xSec').addEventListener('input', upd);
+      $('#xHow').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); $$('#xHow button').forEach((x) => x.classList.toggle('on', x === b)); upd(); });
+      $('#xType').addEventListener('change', upd); upd(); },
     addAcctOk: async () => {
       const name = $('#xName').value.trim(), ty = $('#xType').value; let kp;
       if (!name) return toast('Give the account a name.');
-      try { kp = SDK.Keypair.fromSecret($('#xSec').value.trim()); } catch (err) { return toast('That is not a valid secret key.'); }
+      const isNew = ($('#xHow .on') || { dataset: { v: 'new' } }).dataset.v === 'new';
+      let hd, freshPh = false, adoptPh = null;
+      if (isNew) {
+        if (!K.ph) { K.ph = await HD.generate(24); K.phN = 0; freshPh = true; }
+        hd = K.phN; kp = await hdKeypair(K.ph, hd); K.phN = hd + 1;
+      } else {
+        const v = $('#xSec').value.trim();
+        if (/^S[A-Z2-7]{55}$/.test(v)) { try { kp = SDK.Keypair.fromSecret(v); } catch (err) { return toast('That is not a valid secret key.'); } }
+        else if (await HD.valid(v)) { const n = Math.max(1, parseInt($('#xNum').value, 10) || 1) - 1; const ph = HD.clean(v); kp = await hdKeypair(ph, n);
+          if (!K.ph) { adoptPh = ph; hd = n; } else if (K.ph === ph) hd = n; }
+        else return toast('That is not a valid secret key or recovery phrase.');
+      }
       if (allAccts().some((a) => a.addr === kp.publicKey()) || K.em.publicKey() === kp.publicKey()) return toast('That account is already here.');
-      K.x.push({ name, type: ty === 'personal' ? 'personal' : 'trading', kind: ty === 'personal' ? undefined : ty, kp });
-      $('#xSec').value = ''; if (!(await resealVault())) { K.x.pop(); return; }
-      closeSheet(); toast(name + ' added.'); P.res = {}; drawBots(true);
+      if (adoptPh) { K.ph = adoptPh; K.phN = Math.max(K.phN || 0, hd + 1); }   // first phrase on this phone: Create new continues from it
+      K.x.push({ name, type: ty === 'personal' ? 'personal' : 'trading', kind: ty === 'personal' ? undefined : ty, kp, hd });
+      $('#xSec').value = ''; if (!(await resealVault())) { K.x.pop(); if (freshPh) { K.ph = null; K.phN = 0; } return; }
+      pinOkAt = Date.now();
+      P.res = {}; drawBots(true);
+      if (isNew) return newWalletSheet(K.x.length - 1, freshPh);
+      closeSheet(); toast(name + ' added.');
     },
-    rmAcct: () => { const o = K.x[+t.dataset.i]; if (!o) return; pending = null; sheet(`<h2>Remove ${esc(o.name)} from this phone?</h2><div class="note amb">The account and its funds stay on Stellar. To add it back you need its secret key again.</div><div class="addr">${esc(o.kp.publicKey())}</div><button class="b-red big" data-act="rmAcctOk" data-i="${t.dataset.i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
+    rmAcct: () => { const o = K.x[+t.dataset.i]; if (!o) return; pending = null; sheet(`<h2>Remove ${esc(o.name)} from this phone?</h2><div class="note amb">The account and its funds stay on Stellar, but this phone forgets its key. Without the secret key (or a backup file) you can't reach those funds again. Make sure you saved it: Settings → Back up keys.</div><div class="addr">${esc(o.kp.publicKey())}</div><button class="b-red big" data-act="rmAcctOk" data-i="${t.dataset.i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     rmAcctOk: async () => { const i = +t.dataset.i; const o = K.x.splice(i, 1)[0]; if (!(await resealVault())) { K.x.splice(i, 0, o); return; } closeSheet(); toast('Removed.'); P.res = {}; drawSet(); },
     actRefresh: () => { ACT.at = 0; drawAct(); },
     actMore: () => actLoad(true),
@@ -3974,15 +4122,15 @@ document.addEventListener('click', async (e) => {
     rmBot: () => { const i = +t.dataset.i, b = NS().bots[i]; if (!b) return; pending = null; sheet(`<h2>Remove ${esc(b.name)}?</h2><div class="mu" style="font-size:14px">Only removes it from this phone's list. The account and the emergency signer on it stay as they are (remove the signer from the PC with Remove-Emergency-Signer.bat).</div><button class="b-red big" data-act="rmBotOk" data-i="${i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     rmBotOk: () => { NS().bots.splice(+t.dataset.i, 1); saveS(); closeSheet(); P.res = {}; drawSet(); toast('Removed.'); },
     hzCheck: () => hzCheck(),
+    resetAsk: () => resetSheet(),
     saveBots: () => { const bad = []; $$('[data-baddr]').forEach((i) => { const v = i.value.trim(); if (v && !SDK.StrKey.isValidEd25519PublicKey(v)) bad.push(NS().bots[+i.dataset.baddr].name); else NS().bots[+i.dataset.baddr].addr = v; }); saveS(); toast(bad.length ? 'Not valid: ' + bad.join(', ') : 'Saved.'); },
-    mnOk: () => { if (($('#mnConf').value || '').trim().toUpperCase() !== 'MAINNET') return toast('Type MAINNET to switch.'); closeSheet(); S.net = 'public'; hzPick = null; saveS(); homeAddr = null; startMarket(); drawSet(); },
+    mnOk: () => switchMainnet(),
   };
   if (A[act]) A[act]();
 });
 document.addEventListener('click', (e) => { const t = e.target.closest('[data-pickaddr]'); if (t) { homeAddr = t.dataset.pickaddr; closeSheet(); drawHome(); } });
 document.addEventListener('click', (e) => { const t = e.target.closest('#mSide button'); if (t) { $$('#mSide button').forEach((b) => b.classList.toggle('on', b === t)); } });
 $('#sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
-$('#suMode').addEventListener('change', () => { $('#suImpW').style.display = $('#suMode').value === 'import' ? '' : 'none'; });
 $('#tAmt').addEventListener('input', tradeEst); $('#tPx').addEventListener('input', tradeEst);
 $('#sTo').addEventListener('change', sendToChanged); $('#sFrom').addEventListener('change', sendAssets);
 $('#rAcct').addEventListener('change', drawReceive);
