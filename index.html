@@ -129,9 +129,10 @@ details.more>div{display:flex;flex-direction:column;gap:14px;padding-top:14px}
 .feats li b{color:var(--tx);font-weight:600}
 .feats svg{flex:none;color:var(--blu);margin-top:2px}
 /* unlock */
-#s-lock{align-items:center;padding-top:44px;gap:18px}
+#s-lock{align-items:center;padding-top:16px;gap:12px;position:relative}
+#lockNet{position:absolute;top:10px;right:14px;font-size:11px;padding:3px 8px}
 .logoimg{height:64px;width:auto;flex:none;filter:drop-shadow(0 6px 18px rgba(37,99,235,.35))}
-#s-lock .logoimg{height:92px}
+#s-lock .logoimg{height:64px}
 .pin{gap:14px;margin:4px 0 6px}
 .pin span{width:13px;height:13px;border-width:2px}
 .pin span.f{background:var(--acc);border-color:var(--acc)}
@@ -224,7 +225,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="list" id="bPers" style="display:flex;flex-direction:column;gap:10px"></div>
   <span class="lbl">Trading</span>
   <div class="list" id="bList" style="display:flex;flex-direction:column;gap:10px"></div>
-  <button class="b-out" data-act="addAcct">+ Add account</button>
+  <button class="b-out" data-act="addAcct">+ Add wallet</button>
   <div class="card"><div class="top"><span class="lbl">XLM/USDC · Stellar DEX</span><span class="grn" style="font-size:11px;font-weight:700" id="mLive">connecting…</span></div><div class="g3" id="mTop"></div><div class="mu" style="font-size:12px" id="mTop2"></div></div>
   <div class="killbar">
     <p class="mu" style="font-size:11.5px;margin:0 2px">Trading accounts only · Flatten closes trader positions at market within your cap · market makers keep inventory</p>
@@ -245,7 +246,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- P/L (first screen after unlock) -->
 <section class="scr" id="s-pnl">
-  <div class="top"><div><h1>P/L <span class="mu" style="font-weight:400;font-size:17px">· bots</span></h1><span class="mu" style="font-size:12px" id="pUpd"></span></div><div style="display:flex;gap:6px"><button class="ico" data-act="pnlRefresh" aria-label="Refresh">↻</button><button class="ico" data-go="set" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div></div>
+  <div class="top"><div><h1>P/L</h1><span class="mu" style="font-size:12px" id="pUpd"></span></div><div style="display:flex;gap:6px"><button class="ico" data-act="addAcct" aria-label="Add wallet" style="font-size:24px;font-weight:400">+</button><button class="ico" data-act="pnlRefresh" aria-label="Refresh">↻</button><button class="ico" data-go="set" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div></div>
   <div class="card" id="pHero" style="gap:4px"></div>
   <span class="lbl" id="pByL">By bot</span>
   <div class="card rows" id="pBots" style="padding:2px 14px"></div>
@@ -3097,6 +3098,9 @@ function drawMarket() {
 let cur = 'lock';
 function go(name) {
   if (name !== 'lock' && name !== 'setup' && name !== 'backup' && !K) name = S.vault ? 'lock' : 'setup';
+  const NOH = ['lock', 'setup'];
+  if (NOH.includes(name)) NAV.length = 0;
+  else if (!navHold && name !== cur && !NOH.includes(cur)) { if ($('#sheet').classList.contains('on')) closeSheet(); navPush({ t: 'scr', prev: cur }); }
   cur = name;
   $$('.scr').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
   $('#nav').classList.toggle('on', !['lock', 'setup', 'backup'].includes(name));
@@ -3106,7 +3110,7 @@ function go(name) {
   if (f) f();
 }
 function toast(msg, ms = 4000) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), ms); }
-// Mainnet is the normal state: gray inside the app, hidden on the unlock screen. Testnet stands out in amber.
+// Mainnet is the normal state: gray inside the app, never shown on the unlock screen. On the unlock screen Testnet is a small corner tag that takes no space, so the keypad stays high.
 function netBadge(el, hideOnMain = false) { const main = S.net === 'public'; el.textContent = NET().name; el.style.color = main ? 'var(--mu)' : 'var(--amb)'; el.style.display = main && hideOnMain ? 'none' : ''; }
 
 /* ---------- lock screen ---------- */
@@ -3312,7 +3316,7 @@ async function loadBot(b) {
 }
 async function drawBots(reload = true) {
   const bots = tradeAccts();
-  $('#bList').innerHTML = bots.length ? '' : `<div class="note">No bot accounts on ${NET().name}. ${S.net === 'testnet' ? 'Settings → Create practice bots.' : 'Add them in Settings.'}</div>`;
+  $('#bList').innerHTML = bots.length ? '' : `<div class="note">No trading accounts yet.${S.net === 'testnet' ? ' Or Settings → Create practice bots.' : ''}</div>`;
   const draw = () => {
     $('#bList').innerHTML = bots.map((b, i) => {
       if (!b.addr) return `<div class="acct"><div class="r"><span style="font-size:17px;font-weight:600">${esc(b.name)} <span class="mu" style="font-weight:400">· ${esc(b.tag || '')}</span></span><span class="mu" style="font-size:12px">no address set</span></div></div>`;
@@ -3514,7 +3518,8 @@ function paintPnl() {
   $('#pPer').innerHTML = PERS.map(([k, l]) => `<button class="chip${k === P.sel ? ' on' : ''}" data-per="${k}" aria-pressed="${k === P.sel}">${l}</button>`).join('');
   const R = P.res[P.sel], nm = PERS.find((x) => x[0] === P.sel)[1], W = R ? R.W : perWindow(P.sel);
   $('#pByL').textContent = 'By bot · ' + nm;
-  if (!tradeAccts().some((b) => b.addr)) { $('#pHero').innerHTML = `<span class="mu">No bot accounts on ${NET().name}. ${S.net === 'testnet' ? 'Settings → Create practice bots.' : 'Add them in Settings.'}</span>`; $('#pBots').innerHTML = ''; return; }
+  const noBots = !tradeAccts().some((b) => b.addr); $('#pBots').style.display = $('#pByL').style.display = noBots ? 'none' : '';
+  if (noBots) { $('#pHero').innerHTML = `<span class="mu" style="font-size:14px">Add a wallet to get started.</span><button class="b-light" style="margin-top:8px" data-act="addWallet">+ Add wallet</button>${S.net === 'testnet' ? '<span class="mu" style="font-size:12px">Or Settings → Create practice bots.</span>' : ''}`; $('#pBots').innerHTML = ''; return; }
   if (!R) {
     $('#pHero').innerHTML = `<span class="mu" style="font-size:13px">${esc(nm)} · ${esc(W.label)} · all bots</span><span class="mono" style="font-size:34px;font-weight:600">…</span><span class="mu" style="font-size:12.5px">Loading history${P.prog[P.sel] ? ': ' + esc(P.prog[P.sel]) : '…'}</span>`;
     $('#pBots').innerHTML = tradeAccts().map((b) => `<div><span style="font-weight:600">${esc(b.name)} <span class="mu" style="font-weight:400">· ${esc(b.tag || '')}</span></span><span class="mu">${b.addr ? '…' : 'no address yet'}</span></div>`).join('');
@@ -3681,8 +3686,17 @@ async function fillResult(r) {
 }
 
 /* ---------- confirm sheet ---------- */
-function sheet(html) { $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
-function closeSheet() { $('#sheet').classList.remove('on'); }
+/* Phone back button: steps back inside the app (closes a sheet, or returns to the previous screen) instead of leaving the page. */
+const NAV = []; let navHold = false;
+function navPush(e) { const top = NAV[NAV.length - 1]; if (top && top.t === 'dead') { Object.assign(top, e); return; } NAV.push(e); try { history.pushState({ ks: NAV.length }, ''); } catch (er) {} }
+window.addEventListener('popstate', () => {
+  const e = NAV.pop(); if (!e || !K) return;
+  if (e.t === 'dead') { try { history.back(); } catch (er) {} return; }   // a sheet closed by its own button: skip to the next real step
+  if ($('#sheet').classList.contains('on')) closeSheet(true);
+  if (e.t === 'scr' && e.prev && e.prev !== cur) { navHold = true; go(e.prev); navHold = false; }
+});
+function sheet(html) { if (!$('#sheet').classList.contains('on')) navPush({ t: 'sheet' }); $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
+function closeSheet(fromBack) { const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
 let pending = null;
 function confirmSheet(title, sub, items, btn, run, danger = true, cls = null) {
   pending = run;
@@ -4042,15 +4056,17 @@ document.addEventListener('click', async (e) => {
     refreshBots: () => drawBots(true),
     openPersonal: () => { homeAddr = t.dataset.addr || firstWallet(); go('home'); },
     acctGo: () => { const b = tradeAccts()[botSel]; const to = t.dataset.to; if (to === 'send' && !walletAccts().some((x) => x.addr === b.addr)) return toast('Sends from trading accounts are off. Turn them on in Settings.'); homeAddr = b.addr; go(to); },
-    addAcct: () => { pending = null; sheet(`<h2>Add account</h2>
+    addAcct: () => A.addWallet(),
+    addWallet: () => { pending = null; sheet(`<h2>Add a wallet</h2>
       <div class="seg" id="xHow"><button data-v="new" class="on">Create new</button><button data-v="imp">Import key</button></div>
       <label>Name<input id="xName" placeholder="e.g. Savings" autocomplete="off"></label>
-      <label>Type<select id="xType"><option value="personal">Personal · not in kill switch or P/L</option><option value="dir">Trading · trader (Flatten closes its trade)</option><option value="mm">Trading · market maker (cancel only)</option></select></label>
+      <details class="more"><summary>Advanced: a wallet I trade from by hand</summary><div><label>Use<select id="xType"><option value="personal">Regular wallet (most people)</option><option value="dir">Trading wallet · Flatten closes its trade</option><option value="mm">Trading wallet · market maker, cancel only</option></select></label><div class="mu" style="font-size:12px">A trading wallet shows in P/L, Cancel all and Flatten. Your PC bots don't go here: add those as "A bot".</div></div></details>
       <label id="xSecW" style="display:none">Secret key (S…) or recovery phrase (12 or 24 words)<textarea id="xSec" rows="2" autocomplete="off" spellcheck="false" autocapitalize="off" style="-webkit-text-security:disc"></textarea></label>
       <label id="xNumW" style="display:none">Which wallet in that phrase<input id="xNum" type="number" min="1" value="1" inputmode="numeric"></label>
       <div class="mu" id="xHowNote" style="font-size:13px"></div>
       <div class="note amb" id="xTradeNote" style="display:none">A Trading account with its own key here gives this phone full control of it, including its signers. Your bots use the safer emergency signer instead (Settings).</div>
-      <button class="b-light big" data-act="addAcctOk">Add account</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+      <button class="b-light big" data-act="addAcctOk">Add wallet</button><button class="b-out" data-act="closeSheet">Cancel</button>
+      <button class="b-out sm" data-act="addBot" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Run trading bots on a PC? Add a bot instead</button>`);
       const how = () => ($('#xHow .on') || {}).dataset ? $('#xHow .on').dataset.v : 'new';
       const upd = () => { const imp = how() === 'imp'; $('#xSecW').style.display = imp ? '' : 'none'; $('#xNumW').style.display = imp && /\s/.test($('#xSec').value.trim()) ? '' : 'none';
         $('#xHowNote').textContent = imp ? 'It is encrypted with your PIN and stays on this phone. A phrase from LOBSTR, Freighter or Stellar Laboratory works too.' : K.ph ? 'Makes the next wallet from your recovery phrase. You\'ll see its secret key next, to save.' : 'Makes a 24-word recovery phrase and your first wallet from it. You\'ll see both next, to save.';
@@ -4060,7 +4076,7 @@ document.addEventListener('click', async (e) => {
       $('#xType').addEventListener('change', upd); upd(); },
     addAcctOk: async () => {
       const name = $('#xName').value.trim(), ty = $('#xType').value; let kp;
-      if (!name) return toast('Give the account a name.');
+      if (!name) return toast('Give the wallet a name.');
       const isNew = ($('#xHow .on') || { dataset: { v: 'new' } }).dataset.v === 'new';
       let hd, freshPh = false, adoptPh = null;
       if (isNew) {
@@ -4106,18 +4122,18 @@ document.addEventListener('click', async (e) => {
     copyAddr: () => copy($('#rAddr').textContent), copyEm: () => copy(K.em.publicKey()),
     shareAddr: () => { const a = $('#rAddr').textContent; if (navigator.share) navigator.share({ text: a }).catch(() => {}); else copy(a); },
     checkSig, sandbox,
-    addBot: () => { pending = null; sheet(`<h2>Add bot account</h2><div class="mu" style="font-size:14px">A trading account your PC bot runs. Add this phone's emergency key to it as a signer from the PC so Cancel all and Flatten can act on it.</div>
-      <label>Name<input id="nbName" placeholder="e.g. Scalper" autocomplete="off"></label>
-      <label>Short note (optional)<input id="nbTag" placeholder="e.g. strategy name" autocomplete="off"></label>
-      <label>Type<select id="nbKind"><option value="dir">Trader · Flatten closes its open trade</option><option value="mm">Market maker · cancel orders only</option></select></label>
+    addBot: () => { pending = null; sheet(`<h2>Add a bot</h2><div class="mu" style="font-size:14px">An account your PC bot runs. Only its public address goes here, no key. To let Cancel all and Flatten stop it, run Add-Emergency-Signer.bat on the PC (Settings shows how).</div>
+      <label>Name<input id="nbName" placeholder="e.g. Sweepr" autocomplete="off"></label>
       <label>Public address (G…)<input id="nbAddr" placeholder="G…" spellcheck="false" autocomplete="off"></label>
+      <label>When you press Flatten<select id="nbKind"><option value="dir">Close its open trade (most bots)</option><option value="mm">Only cancel its orders (market maker)</option></select></label>
       <button class="b-light big" data-act="addBotOk">Add</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     addBotOk: () => {
-      const name = $('#nbName').value.trim(), tag = $('#nbTag').value.trim(), kind = $('#nbKind').value, addr = $('#nbAddr').value.trim();
+      const name = $('#nbName').value.trim(), tag = $('#nbTag') ? $('#nbTag').value.trim() : '', kind = $('#nbKind').value, addr = $('#nbAddr').value.trim();
       if (!name) return toast('Give the account a name.');
       if (addr && !SDK.StrKey.isValidEd25519PublicKey(addr)) return toast('That is not a valid Stellar address (G…).');
       if (addr && allAccts().some((a) => a.addr === addr)) return toast('That account is already here.');
-      NS().bots.push({ name, tag, addr, kind }); saveS(); closeSheet(); P.res = {}; drawSet(); toast(name + ' added.');
+      if (!addr) return toast('Paste the bot\'s public address (G…).');
+      NS().bots.push({ name, tag, addr, kind }); saveS(); closeSheet(); P.res = {}; if (cur === 'set') drawSet(); else if (cur === 'bots') drawBots(true); else if (cur === 'pnl') drawPnl(); toast(name + ' added.');
     },
     rmBot: () => { const i = +t.dataset.i, b = NS().bots[i]; if (!b) return; pending = null; sheet(`<h2>Remove ${esc(b.name)}?</h2><div class="mu" style="font-size:14px">Only removes it from this phone's list. The account and the emergency signer on it stay as they are (remove the signer from the PC with Remove-Emergency-Signer.bat).</div><button class="b-red big" data-act="rmBotOk" data-i="${i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     rmBotOk: () => { NS().bots.splice(+t.dataset.i, 1); saveS(); closeSheet(); P.res = {}; drawSet(); toast('Removed.'); },
