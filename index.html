@@ -329,10 +329,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <!-- TRADE -->
 <section class="scr" id="s-trade">
   <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Trade</h2></div><span class="mu" style="font-size:12px" id="tFrom"></span></div>
-  <div class="seg" id="tMode"><button class="on" data-v="lim">Limit</button><button data-v="mkt">Market</button></div>
-  <div class="seg" id="tSide"><button class="on" data-v="buy">Buy XLM</button><button data-v="sell">Sell XLM</button></div>
   <div class="card"><div class="book" id="tBook"></div></div>
   <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="grn" style="font-size:11px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
+  <div class="seg" id="tSide"><button class="on" data-v="buy">Buy XLM</button><button data-v="sell">Sell XLM</button></div>
+  <div class="seg" id="tMode"><button class="on" data-v="lim">Limit</button><button data-v="mkt">Market</button></div>
   <label>Amount (XLM)<input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
   <div class="mu" id="tMktNote" style="font-size:12px;display:none">Market fills right away at the best price Stellar finds: the order book or the AMM pools, whichever is better, all in one step. Capped by your slippage.</div>
@@ -4002,17 +4002,18 @@ window.addEventListener('popstate', () => {
 function sheet(html) { if (!$('#sheet').classList.contains('on')) navPush({ t: 'sheet' }); $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
 function closeSheet(fromBack) { const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
 let pending = null;
-let pendingBusy = null;   // what the hold button says while it waits for the ledger
-function confirmSheet(title, sub, items, btn, run, danger = true, cls = null, busy = null) {
-  pending = run; pendingBusy = busy;
+let pendingBusy = null, pendingTap = false;   // tap = one press sends (trades); otherwise press and hold   // what the hold button says while it waits for the ledger
+function confirmSheet(title, sub, items, btn, run, danger = true, cls = null, busy = null, tap = false) {
+  pending = run; pendingBusy = busy; pendingTap = tap;
   sheet(`<div><h2>${esc(title)}</h2><div class="mu" style="font-size:14px">${sub}</div></div>
     <ol class="ops">${items.map((it, i) => `<li class="${it.hl ? 'hl' : ''}"><b>${i + 1}. ${esc(it.t)}</b>${it.s ? `<small>${esc(it.s)}</small>` : ''}</li>`).join('')}</ol>
-    <button class="${cls || (danger ? 'b-red' : 'b-light')} big hold" id="holdBtn"><i></i><span>${esc(btn)}</span></button>
+    <button class="${cls || (danger ? 'b-red' : 'b-light')} big hold" id="holdBtn"${pendingTap ? ' data-tap="1"' : ''}><i></i><span>${esc(btn)}</span></button>
     <button class="b-out" data-act="closeSheet">Cancel</button>`);
   armHold();
 }
 function armHold() {
   const b = $('#holdBtn'); let t0 = 0, iv = 0;
+  if (b.dataset.tap) { b.addEventListener('click', () => { const f = pending; pending = null; if (!f || b.disabled) return; b.disabled = true; b.querySelector('span').textContent = pendingBusy || 'Sending…'; f(); }); return; }
   const bar = b.querySelector('i');
   const stop = () => { clearInterval(iv); iv = 0; t0 = 0; bar.style.width = '0'; };
   const tick = () => { const p = Math.min(1, (performance.now() - t0) / 1200); bar.style.width = (p * 100) + '%'; if (p >= 1) { stop(); const f = pending; pending = null; if (f) { b.disabled = true; b.querySelector('span').textContent = f === switchMainnet ? 'Switching…' : f === eraseAll ? 'Erasing…' : pendingBusy || 'Sending…'; f(); } } };
@@ -4104,7 +4105,7 @@ async function tradeReview() {
     const p = +$('#tPx').value; if (!(p > 0)) return toast('Enter a limit price.');
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: USDC(), buying: SDK.Asset.native(), buyAmount: amt7(q), price: p.toFixed(7) })
       : SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: USDC(), amount: amt7(q), price: p.toFixed(7) });
-    return confirmSheet(`Limit ${T.side} ${fx(q)} XLM`, `${NET().name} · stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)} USDC`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} USDC` }], 'Hold to place order', () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur');
+    return confirmSheet(`Limit ${T.side} ${fx(q)} XLM`, `${NET().name} · stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)} USDC`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} USDC` }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
   }
   let qt; try { qt = await quote(T.side, q); } catch (e) { return toast(niceErr(e)); }
   const cap = T.side === 'buy' ? qt.usd * (1 + S.slip / 100) : qt.usd * (1 - S.slip / 100);
@@ -4113,7 +4114,7 @@ async function tradeReview() {
   const capU = T.side === 'buy' ? Math.min(cap, spendable(a, false)) : cap;
   const op = T.side === 'buy' ? SDK.Operation.pathPaymentStrictReceive({ sendAsset: USDC(), sendMax: amt7(capU), destination: tradeAddr, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: qt.path })
     : SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: amt7(q), destination: tradeAddr, destAsset: USDC(), destMin: amt7(capU), path: qt.path });
-  confirmSheet(`Market ${T.side} ${fx(q)} XLM`, `${NET().name} · fills now or not at all`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM`, s: `quote ${fx(qt.usd)} USDC (avg ${(qt.usd / q).toFixed(6)}) · ${T.side === 'buy' ? 'pay at most' : 'receive at least'} ${fx(capU)} USDC`, hl: 1 }], 'Hold to ' + T.side, () => personalTx(kp, tradeAddr, [op], 'Sent', 'trade', null, `${T.side === 'buy' ? 'Bought' : 'Sold'} ${fx(q, 2)} XLM at market`), false, T.side === 'buy' ? 'b-grn' : 'b-pur');
+  confirmSheet(`Market ${T.side} ${fx(q)} XLM`, `${NET().name} · fills now or not at all`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM`, s: `quote ${fx(qt.usd)} USDC (avg ${(qt.usd / q).toFixed(6)}) · ${T.side === 'buy' ? 'pay at most' : 'receive at least'} ${fx(capU)} USDC`, hl: 1 }], `Send market ${T.side}`, () => personalTx(kp, tradeAddr, [op], 'Sent', 'trade', null, `${T.side === 'buy' ? 'Bought' : 'Sold'} ${fx(q, 2)} XLM at market`), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
 }
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   try {
@@ -4184,7 +4185,7 @@ function editOk(id) {
   const op = i.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: hAsset(o.selling), buying: SDK.Asset.native(), buyAmount: amt7(q), price: p.toFixed(7), offerId: o.id })
     : SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: hAsset(o.buying), amount: amt7(q), price: p.toFixed(7), offerId: o.id });
   const st = ordStore(); st[o.id] = { ...(st[o.id] || {}), orig: (FILLED[o.id] || 0) + q, px: p }; saveS();
-  confirmSheet(`Change order #${o.id}`, NET().name, [{ t: `Was: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(i.left, 2)} XLM @ ${i.px.toFixed(6)}`, s: 'open now' }, { t: `New: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)}`, s: 'if the new price crosses the book it fills right away', hl: 1 }], 'Hold to edit', () => orderTx(kpFor(tradeAddr), tradeAddr, op, i.side, 'Edited'), false, i.side === 'buy' ? 'b-grn' : 'b-pur', 'Editing…');
+  confirmSheet(`Change order #${o.id}`, NET().name, [{ t: `Was: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(i.left, 2)} XLM @ ${i.px.toFixed(6)}`, s: 'open now' }, { t: `New: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)}`, s: 'if the new price crosses the book it fills right away', hl: 1 }], 'Send edit', () => orderTx(kpFor(tradeAddr), tradeAddr, op, i.side, 'Edited'), false, i.side === 'buy' ? 'b-grn' : 'b-pur', 'Editing…', true);
 }
 // send an order and say plainly what happened
 async function orderTx(kp, src, op, side, title, orig) {
