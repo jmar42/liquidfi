@@ -329,10 +329,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <!-- TRADE -->
 <section class="scr" id="s-trade">
   <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Trade</h2></div><span class="mu" style="font-size:12px" id="tFrom"></span></div>
-  <div class="seg" id="tMode"><button class="on" data-v="lim">Limit</button><button data-v="mkt">Market</button></div>
-  <div class="seg" id="tSide"><button class="on" data-v="buy">Buy XLM</button><button data-v="sell">Sell XLM</button></div>
   <div class="card"><div class="book" id="tBook"></div></div>
   <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="grn" style="font-size:11px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
+  <div class="seg" id="tSide"><button class="on" data-v="buy">Buy XLM</button><button data-v="sell">Sell XLM</button></div>
+  <div class="seg" id="tMode"><button class="on" data-v="lim">Limit</button><button data-v="mkt">Market</button></div>
   <label>Amount (XLM)<input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
   <div class="mu" id="tMktNote" style="font-size:12px;display:none">Market fills right away at the best price Stellar finds: the order book or the AMM pools, whichever is better, all in one step. Capped by your slippage.</div>
@@ -616,11 +616,12 @@ async function submit(tx) {
    Tap a row for Level 2: book depth and last sales from every market that lists it (public feeds, no account or keys). ---------- */
 const VN = {
   st: { name: 'Stellar DEX', tag: 'SX', col: '#60A5FA' },
+  sp: { name: 'Stellar PYUSD', tag: 'PY', col: '#FB923C' },   // Stellar DEX XLM/PYUSD book, shown with any XLM/dollar symbol (PayPal dollar ≈ $1)
   cb: { name: 'Coinbase', tag: 'CB', col: '#A78BFA' },
   kr: { name: 'Kraken', tag: 'KR', col: '#FBBF24' },
   bn: { name: 'Binance', tag: 'BU', col: '#34D399' },   // Binance global, market data from data-api.binance.vision (works from the US; view only)
 };
-const VALL = ['st', 'cb', 'kr', 'bn'];   // spot markets only (Jeff, Oct 14: no perps)
+const VALL = ['st', 'sp', 'cb', 'kr', 'bn'];   // spot markets only (Jeff, Oct 14: no perps)
 const USDQ = ['USD', 'USDC', 'USDT', 'PYUSD'];
 function stAsset(code) {
   if (code === 'XLM') return { native: true, code: 'XLM' };
@@ -631,6 +632,7 @@ const aQ = (pre, a) => (a.native ? `${pre}_asset_type=native` : `${pre}_asset_ty
 // how each market names a symbol (null = not listed there)
 function vSym(k, b, q) {
   if (k === 'st') { const A = stAsset(b), Q = stAsset(q); return A && Q ? { A, Q } : null; }
+  if (k === 'sp') { if (b !== 'XLM' || q === 'PYUSD' || !USDQ.includes(q)) return null; const Q = stAsset('PYUSD'); return Q ? { A: stAsset('XLM'), Q, pair: 'XLM/PYUSD' } : null; }
   const qq = USDQ.includes(q) ? 'USD' : q === 'EUR' || q === 'EURC' ? 'EUR' : null;
   if (!qq || USDQ.includes(b) || b === 'EURC' || b === 'EUR') return null;
   if (k === 'cb') return { id: `${b}-${qq}`, pair: `${b}/${qq}` };
@@ -640,6 +642,7 @@ function vSym(k, b, q) {
 const symKey = (w) => w.b + '/' + w.q;
 const isMain = (w) => w.b === 'XLM' && w.q === 'USDC';   // streamed all the time (MK)
 const vUrls = (k, s) => ({
+  sp: { book: () => HZ() + `/order_book?${aQ('selling', s.A)}&${aQ('buying', s.Q)}&limit=25`, tr: () => HZ() + `/trades?${aQ('base', s.A)}&${aQ('counter', s.Q)}&order=desc&limit=30` },
   st: { book: () => HZ() + `/order_book?${aQ('selling', s.A)}&${aQ('buying', s.Q)}&limit=25`, tr: () => HZ() + `/trades?${aQ('base', s.A)}&${aQ('counter', s.Q)}&order=desc&limit=30` },
   cb: { book: () => `https://api.exchange.coinbase.com/products/${s.id}/book?level=2`, tr: () => `https://api.exchange.coinbase.com/products/${s.id}/trades?limit=30`, tk: () => `https://api.exchange.coinbase.com/products/${s.id}/ticker` },
   kr: { book: () => `https://api.kraken.com/0/public/Depth?pair=${s.id}&count=25`, tr: () => `https://api.kraken.com/0/public/Trades?pair=${s.id}&count=30`, tk: () => `https://api.kraken.com/0/public/Ticker?pair=${s.id}` },
@@ -647,6 +650,7 @@ const vUrls = (k, s) => ({
 }[k]);
 const krRes = (j) => { if (j.error && j.error.length) throw new Error(j.error[0]); return Object.entries(j.result).find(([x]) => x !== 'last')[1]; };
 const PARSE = {
+  get sp() { return PARSE.st; },
   st: { pb: (j) => [j.bids.map((b) => [+b.price, +b.amount / +b.price]), j.asks.map((a) => [+a.price, +a.amount])], pt: (j) => tick(((j._embedded && j._embedded.records) || []).map((t) => ({ t: Date.parse(t.ledger_close_time), px: t.price.n / t.price.d, x: +t.base_amount }))) },
   cb: { pb: (j) => [j.bids.slice(0, 25).map((x) => [+x[0], +x[1]]), j.asks.slice(0, 25).map((x) => [+x[0], +x[1]])], pt: (j) => j.map((t) => ({ t: Date.parse(t.time), px: +t.price, x: +t.size, buy: t.side === 'sell' })), pk: (j) => ({ b: +j.bid, a: +j.ask, l: +j.price, lt: Date.parse(j.time) }) },   // Coinbase "side" is the maker's side
   kr: { pb: (j) => { const r = krRes(j); return [r.bids.map((x) => [+x[0], +x[1]]), r.asks.map((x) => [+x[0], +x[1]])]; }, pt: (j) => krRes(j).map((t) => ({ t: t[2] * 1000, px: +t[0], x: +t[1], buy: t[3] === 'b' })).reverse(), pk: (j) => { const r = krRes(j); return { b: +r.b[0], a: +r.a[0], l: +r.c[0], lt: 0 }; } },
@@ -694,8 +698,8 @@ async function loadL2() {
   await Promise.all(VALL.map(async (k) => {
     const s = vSym(k, w.b, w.q); if (!s) { delete L2.d[k]; return; }
     if (k === 'st' && isMain(w)) { L2.d.st = { bids: MK.bids, asks: MK.asks, tr: tick(MK.tr.map((r) => ({ t: Date.parse(r.t), px: r.px, x: r.x }))), at: MK.at, pair: w.b + '/' + w.q }; return; }
-    if (k === 'st' && (vTick % 2) && L2.d.st) return;   // Horizon rate limit: every 6 s
-    const u = vUrls(k, s), get = k === 'st' ? (x) => H(x.replace(HZ(), '')) : getJ;
+    if ((k === 'st' || k === 'sp') && (vTick % 2) && L2.d[k]) return;   // Horizon rate limit: every 6 s
+    const u = vUrls(k, s), get = k === 'st' || k === 'sp' ? (x) => H(x.replace(HZ(), '')) : getJ;
     try { const [b, t] = await Promise.all([get(u.book()), get(u.tr())]); const [bids, asks] = PARSE[k].pb(b); L2.d[k] = { bids, asks, tr: PARSE[k].pt(t), at: Date.now(), pair: s.pair || w.b + '/' + w.q }; }
     catch (e) { L2.d[k] = { bids: [], asks: [], tr: [], err: 'no data', pair: s.pair || '' }; }
   }));
@@ -1508,17 +1512,18 @@ window.addEventListener('popstate', () => {
 function sheet(html) { if (!$('#sheet').classList.contains('on')) navPush({ t: 'sheet' }); $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
 function closeSheet(fromBack) { const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
 let pending = null;
-let pendingBusy = null;   // what the hold button says while it waits for the ledger
-function confirmSheet(title, sub, items, btn, run, danger = true, cls = null, busy = null) {
-  pending = run; pendingBusy = busy;
+let pendingBusy = null, pendingTap = false;   // tap = one press sends (trades); otherwise press and hold   // what the hold button says while it waits for the ledger
+function confirmSheet(title, sub, items, btn, run, danger = true, cls = null, busy = null, tap = false) {
+  pending = run; pendingBusy = busy; pendingTap = tap;
   sheet(`<div><h2>${esc(title)}</h2><div class="mu" style="font-size:14px">${sub}</div></div>
     <ol class="ops">${items.map((it, i) => `<li class="${it.hl ? 'hl' : ''}"><b>${i + 1}. ${esc(it.t)}</b>${it.s ? `<small>${esc(it.s)}</small>` : ''}</li>`).join('')}</ol>
-    <button class="${cls || (danger ? 'b-red' : 'b-light')} big hold" id="holdBtn"><i></i><span>${esc(btn)}</span></button>
+    <button class="${cls || (danger ? 'b-red' : 'b-light')} big hold" id="holdBtn"${pendingTap ? ' data-tap="1"' : ''}><i></i><span>${esc(btn)}</span></button>
     <button class="b-out" data-act="closeSheet">Cancel</button>`);
   armHold();
 }
 function armHold() {
   const b = $('#holdBtn'); let t0 = 0, iv = 0;
+  if (b.dataset.tap) { b.addEventListener('click', () => { const f = pending; pending = null; if (!f || b.disabled) return; b.disabled = true; b.querySelector('span').textContent = pendingBusy || 'Sending…'; f(); }); return; }
   const bar = b.querySelector('i');
   const stop = () => { clearInterval(iv); iv = 0; t0 = 0; bar.style.width = '0'; };
   const tick = () => { const p = Math.min(1, (performance.now() - t0) / 1200); bar.style.width = (p * 100) + '%'; if (p >= 1) { stop(); const f = pending; pending = null; if (f) { b.disabled = true; b.querySelector('span').textContent = f === switchMainnet ? 'Switching…' : f === eraseAll ? 'Erasing…' : pendingBusy || 'Sending…'; f(); } } };
@@ -1575,7 +1580,7 @@ async function drawTrade() {
   const off = a ? await offersOf(tradeAddr).catch(() => []) : [];
   TRADE_OFF = off;
   const paintOpen = () => { if (cur === 'trade') $('#tOpen').innerHTML = off.length ? off.map(orderCard).join('') : '<div class="note">No open orders.</div>'; };
-  paintOpen(); drawFills(tradeAddr);
+  paintOpen(); drawFills(tradeAddr, off);
   Promise.all(off.map(async (o) => { const f = await offerFilled(o); if (f != null) FILLED[o.id] = f; })).then(paintOpen);
 }
 let TRADE_OFF = [];
@@ -1610,7 +1615,7 @@ async function tradeReview() {
     const p = +$('#tPx').value; if (!(p > 0)) return toast('Enter a limit price.');
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: USDC(), buying: SDK.Asset.native(), buyAmount: amt7(q), price: p.toFixed(7) })
       : SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: USDC(), amount: amt7(q), price: p.toFixed(7) });
-    return confirmSheet(`Limit ${T.side} ${fx(q)} XLM`, `${NET().name} · stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)} USDC`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} USDC` }], 'Hold to place order', () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur');
+    return confirmSheet(`Limit ${T.side} ${fx(q)} XLM`, `${NET().name} · stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)} USDC`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} USDC` }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
   }
   let qt; try { qt = await quote(T.side, q); } catch (e) { return toast(niceErr(e)); }
   const cap = T.side === 'buy' ? qt.usd * (1 + S.slip / 100) : qt.usd * (1 - S.slip / 100);
@@ -1619,7 +1624,7 @@ async function tradeReview() {
   const capU = T.side === 'buy' ? Math.min(cap, spendable(a, false)) : cap;
   const op = T.side === 'buy' ? SDK.Operation.pathPaymentStrictReceive({ sendAsset: USDC(), sendMax: amt7(capU), destination: tradeAddr, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: qt.path })
     : SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: amt7(q), destination: tradeAddr, destAsset: USDC(), destMin: amt7(capU), path: qt.path });
-  confirmSheet(`Market ${T.side} ${fx(q)} XLM`, `${NET().name} · fills now or not at all`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM`, s: `quote ${fx(qt.usd)} USDC (avg ${(qt.usd / q).toFixed(6)}) · ${T.side === 'buy' ? 'pay at most' : 'receive at least'} ${fx(capU)} USDC`, hl: 1 }], 'Hold to ' + T.side, () => personalTx(kp, tradeAddr, [op], 'Sent', 'trade', null, `${T.side === 'buy' ? 'Bought' : 'Sold'} ${fx(q, 2)} XLM at market`), false, T.side === 'buy' ? 'b-grn' : 'b-pur');
+  confirmSheet(`Market ${T.side} ${fx(q)} XLM`, `${NET().name} · fills now or not at all`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM`, s: `quote ${fx(qt.usd)} USDC (avg ${(qt.usd / q).toFixed(6)}) · ${T.side === 'buy' ? 'pay at most' : 'receive at least'} ${fx(capU)} USDC`, hl: 1 }], `Send market ${T.side}`, () => personalTx(kp, tradeAddr, [op], 'Sent', 'trade', null, `${T.side === 'buy' ? 'Bought' : 'Sold'} ${fx(q, 2)} XLM at market`), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
 }
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   try {
@@ -1690,7 +1695,7 @@ function editOk(id) {
   const op = i.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: hAsset(o.selling), buying: SDK.Asset.native(), buyAmount: amt7(q), price: p.toFixed(7), offerId: o.id })
     : SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: hAsset(o.buying), amount: amt7(q), price: p.toFixed(7), offerId: o.id });
   const st = ordStore(); st[o.id] = { ...(st[o.id] || {}), orig: (FILLED[o.id] || 0) + q, px: p }; saveS();
-  confirmSheet(`Change order #${o.id}`, NET().name, [{ t: `Was: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(i.left, 2)} XLM @ ${i.px.toFixed(6)}`, s: 'open now' }, { t: `New: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)}`, s: 'if the new price crosses the book it fills right away', hl: 1 }], 'Hold to edit', () => orderTx(kpFor(tradeAddr), tradeAddr, op, i.side, 'Edited'), false, i.side === 'buy' ? 'b-grn' : 'b-pur', 'Editing…');
+  confirmSheet(`Change order #${o.id}`, NET().name, [{ t: `Was: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(i.left, 2)} XLM @ ${i.px.toFixed(6)}`, s: 'open now' }, { t: `New: ${i.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)}`, s: 'if the new price crosses the book it fills right away', hl: 1 }], 'Send edit', () => orderTx(kpFor(tradeAddr), tradeAddr, op, i.side, 'Edited'), false, i.side === 'buy' ? 'b-grn' : 'b-pur', 'Editing…', true);
 }
 // send an order and say plainly what happened
 async function orderTx(kp, src, op, side, title, orig) {
@@ -1708,13 +1713,31 @@ async function orderTx(kp, src, op, side, title, orig) {
   } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], 'trade'); }
 }
 // Trade screen activity: orders placed, edited, cancelled, market orders, and fills, newest first
-async function drawFills(addr) {
+// which order number a new order got: read it from its transaction result (Horizon's operation record shows offer_id 0 for new orders)
+function createdOfferId(xdr, k) {
+  try { const R = SDK.xdr.TransactionResult.fromXDR(xdr, 'base64'); const opr = xF(xF(R, 'result'), 'results')[k]; const tr = xV(opr); if (!/manage(Sell|Buy)Offer/.test(xT(tr))) return null;
+    const o = xF(xV(xV(tr)), 'offer'); return xT(o) === 'manageOfferDeleted' ? null : xF(xV(o), 'offerId').toString(); } catch (e) { return null; }
+}
+async function drawFills(addr, openOff) {
   try {
-    const [oj, tj] = await Promise.all([H(`/accounts/${addr}/operations?order=desc&limit=25`), H(`/accounts/${addr}/trades?order=desc&limit=25`)]);
+    const [oj, tj, xj] = await Promise.all([H(`/accounts/${addr}/operations?order=desc&limit=25`), H(`/accounts/${addr}/trades?order=desc&limit=25`), H(`/accounts/${addr}/transactions?order=desc&limit=25`).catch(() => null)]);
+    const txr = {}; ((xj && xj._embedded && xj._embedded.records) || []).forEach((t) => (txr[t.hash] = t.result_xdr));
+    const openIds = new Set((openOff || TRADE_OFF || []).map((o) => String(o.id)));
     const ops = ((oj._embedded && oj._embedded.records) || []).filter((o) => o.source_account === addr || o.from === addr);
     const trades = ((tj._embedded && tj._embedded.records) || []).map((r) => fillFor(r, addr)).filter((f) => f.asset === 'XLM');
     const byOp = {}; trades.forEach((f) => { (byOp[f.op] = byOp[f.op] || []).push(f); });
     const isX = (t) => t === 'native', rows = [], mine = new Set();
+    const asc = ops.filter((o) => o.type === 'manage_sell_offer' || o.type === 'manage_buy_offer').slice().reverse();
+    const inTx = {}; ops.slice().reverse().forEach((o) => { inTx[o.transaction_hash] = inTx[o.transaction_hash] || []; inTx[o.transaction_hash].push(o.id); });
+    asc.forEach((o) => { o._id = o.offer_id && o.offer_id !== '0' ? String(o.offer_id) : txr[o.transaction_hash] ? createdOfferId(txr[o.transaction_hash], Math.max(0, (inTx[o.transaction_hash] || []).indexOf(o.id))) : null; });
+    const pxOf = (o) => (o.type === 'manage_sell_offer' ? (isX(o.selling_asset_type) ? +o.price : 1 / +o.price) : (isX(o.buying_asset_type) ? +o.price : 1 / +o.price));
+    const statusOf = (o) => {   // what became of this version of the order
+      const i = asc.indexOf(o), nx = o._id ? asc.slice(i + 1).find((x) => x._id === o._id) : null;
+      if (nx) return +nx.amount > 0 ? `replaced → ${pxOf(nx).toFixed(6)}` : 'cancelled';
+      if (!(+o.amount > 0)) return '';
+      if (o._id && openIds.has(o._id)) return 'open';
+      return o._id || (byOp[o.id] || []).length ? 'done' : 'open';
+    };
     for (const o of ops) {
       const t = Date.parse(o.created_at), fl = byOp[o.id] || [], fq = fl.reduce((s, f) => s + f.qty, 0), fu = fl.reduce((s, f) => s + f.qamt, 0);
       const filled = fq > 0 ? ` · filled ${fx(fq, 2)} @ ${(fu / fq).toFixed(6)}` : '';
@@ -1724,9 +1747,10 @@ async function drawFills(addr) {
         if (o.type === 'manage_sell_offer') { if (isX(o.selling_asset_type)) { side = 'SELL'; q = +o.amount; px = +o.price; } else if (isX(o.buying_asset_type)) { side = 'BUY'; q = +o.amount * +o.price; px = 1 / +o.price; } else continue; }
         else { if (isX(o.buying_asset_type)) { side = 'BUY'; q = +o.amount; px = +o.price; } else if (isX(o.selling_asset_type)) { side = 'SELL'; q = +o.amount * +o.price; px = 1 / +o.price; } else continue; }
         const id = o.offer_id && o.offer_id !== '0' ? o.offer_id : null;
+        const st = statusOf(o), stTxt = st === 'done' ? (filled ? '' : ' · filled') : st ? ' · ' + st : '';
         if (!(+o.amount > 0)) rows.push({ t, tag: 'CXL', cls: 't-cxl', txt: `Cancelled ${side.toLowerCase()} order${id ? ' #' + id : ''}` });
-        else if (id) rows.push({ t, tag: 'EDIT', cls: 't-edit', txt: `${side === 'BUY' ? 'Buy' : 'Sell'} #${id} → ${fx(q, 2)} @ ${px.toFixed(6)}${filled}` });
-        else rows.push({ t, tag: side, cls: side === 'BUY' ? 't-buy' : 't-sell', txt: `Limit ${fx(q, 2)} @ ${px.toFixed(6)}${filled || ' · open'}` });
+        else if (id) rows.push({ t, tag: 'EDIT', cls: 't-edit', txt: `${side === 'BUY' ? 'Buy' : 'Sell'} #${id} → ${fx(q, 2)} @ ${px.toFixed(6)}${filled}${stTxt}` });
+        else rows.push({ t, tag: side, cls: side === 'BUY' ? 't-buy' : 't-sell', txt: `Limit ${fx(q, 2)} @ ${px.toFixed(6)}${o._id ? ' #' + o._id : ''}${filled}${stTxt}` });
       } else if (/^path_payment/.test(o.type) && o.from === o.to) {
         mine.add(o.id);
         const buy = isX(o.asset_type), q = buy ? +o.amount : +o.source_amount, u = buy ? +o.source_amount : +o.amount;
