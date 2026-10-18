@@ -170,6 +170,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 .pg-num,#pHero .mono,.pr .top2 .mono,#hTot,#aList .mono,.acct .mono{font-family:'IBM Plex Sans',system-ui,sans-serif!important;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 #pPer{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:2px 18px}
 #pPer::-webkit-scrollbar{display:none}
+#pPer[hidden]{display:none!important}
 #lVen::-webkit-scrollbar{display:none}
 .mrow{display:grid;grid-template-columns:1.25fr 1.1fr 1fr;gap:6px;align-items:center;width:100%;border-bottom:1px solid var(--bd);padding:12px 0;color:var(--tx);text-align:right;background:var(--s1);position:relative;transition:transform .12s}
 .mrow.drag{transition:none;z-index:2;box-shadow:0 6px 18px rgba(0,0,0,.5);border-radius:8px}
@@ -266,7 +267,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- BOTS / KILL -->
 <section class="scr" id="s-bots">
-  <div class="tothero" id="bTot" data-go="port" style="cursor:pointer"><div class="r"><span class="mu" style="font-size:13px">Total balance</span><span id="bNet"></span></div><div style="display:flex;align-items:center;gap:10px"><span class="mono" id="bTotV">–</span><span class="mu" style="font-size:26px;line-height:1" aria-hidden="true">›</span></div><div id="bPnl" class="tpnl"></div><span class="mu" id="bTotSub" style="font-size:12.5px"></span><div id="pPer" style="display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;margin:8px -22px 0;padding:2px 22px;scrollbar-width:none"></div></div>
+  <div class="tothero" id="bTot" data-go="port" style="cursor:pointer"><div class="r"><span class="mu" style="font-size:13px">Total balance</span><span id="bNet"></span></div><div style="display:flex;align-items:center;gap:10px"><span class="mono" id="bTotV">–</span><span class="mu" style="font-size:26px;line-height:1" aria-hidden="true">›</span></div><div id="bPnl" class="tpnl"></div><span class="mu" id="bTotSub" style="font-size:12.5px"></span><div id="pPer" hidden></div><div class="g3" id="bActs" style="margin-top:10px"><button class="b-out" data-act="accSend">Send</button><button class="b-out" data-act="accRcv">Receive</button><button class="b-out" data-act="accTrade">Trade</button></div></div>
   <span class="lbl">Wallets</span>
   <div class="list" id="bPers" style="display:flex;flex-direction:column;gap:10px"></div>
   <button class="b-out" data-act="addAcct">+ Add wallet</button>
@@ -355,7 +356,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- TRADE -->
 <section class="scr" id="s-trade">
-  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Trade</h2></div><span class="mu" style="font-size:12px" id="tFrom"></span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Trade</h2></div><span class="mu" style="font-size:12px" id="tFrom"></span></div>
   <div class="card"><div class="book" id="tBook"></div></div>
   <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="grn" style="font-size:11px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
   <div class="seg" id="tSide"><button class="on" data-v="buy">Buy XLM</button><button data-v="sell">Sell XLM</button></div>
@@ -374,7 +375,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SEND -->
 <section class="scr" id="s-send">
-  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Send</h2></div></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Send</h2></div></div>
   <label>From<select id="sFrom"></select></label>
   <label>To<select id="sTo"></select></label>
   <div id="sNew" style="display:none;flex-direction:column;gap:10px">
@@ -391,7 +392,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- RECEIVE -->
 <section class="scr" id="s-receive">
-  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Receive</h2></div></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Receive</h2></div></div>
   <label>Account<select id="rAcct"></select></label>
   <div class="qr" id="rQr"></div>
   <div class="card"><span class="lbl">Address</span><div class="addr" id="rAddr"></div><div class="g2"><button class="b-light" data-act="copyAddr">Copy</button><button class="b-out" data-act="shareAddr">Share</button></div></div>
@@ -400,7 +401,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- TRUST -->
 <section class="scr" id="s-trust">
-  <div class="top"><div class="l"><button class="ico back" data-go="home" aria-label="Back">‹</button><h2>Assets (trustlines)</h2></div></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Assets (trustlines)</h2></div></div>
   <span class="lbl">Known assets</span>
   <div id="trKnown" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl">Other asset</span>
@@ -3385,13 +3386,14 @@ function drawMarket() {
 
 /* ---------- navigation ---------- */
 let cur = 'lock';
-let setFrom = 'mkt';
+let setFrom = 'mkt'; const backTo = {};
 function go(name) {
   if (name === 'pnl') name = 'bots';   // P/L now lives on Accounts
   if (name !== 'lock' && name !== 'setup' && name !== 'backup' && !K) name = S.vault ? 'lock' : 'setup';
   const NOH = ['lock', 'setup'];
   if (NOH.includes(name)) NAV.length = 0;
   else if (!navHold && name !== cur && !NOH.includes(cur)) { if ($('#sheet').classList.contains('on')) closeSheet(); navPush({ t: 'scr', prev: cur }); }
+  if (['trade', 'send', 'receive', 'trust'].includes(name) && name !== cur) backTo[name] = ['bots', 'home', 'bot', 'port'].includes(cur) ? cur : (backTo[name] || 'home');
   if (name === 'set' && cur !== 'set') setFrom = ['bots', 'bot', 'home', 'trade', 'send', 'receive', 'trust', 'port'].includes(cur) ? 'bots' : cur === 'act' ? 'act' : 'mkt';
   cur = name;
   $$('.scr').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
@@ -4733,6 +4735,15 @@ document.addEventListener('click', async (e) => {
   const A = {
     setup: doSetup, exportVault, lock,
     setBack: () => go(setFrom || 'mkt'),
+    scrBack: () => go(backTo[cur] || 'home'),
+    accSend: () => { if (!OWN().length) return toast('Add a wallet first.'); if (!OWN().some((o) => o.addr === homeAddr)) homeAddr = firstWallet(); go('send'); },
+    accRcv: () => { if (!allAccts().length) return toast('Add a wallet first.'); rcvWant = OWN().some((o) => o.addr === homeAddr) ? homeAddr : firstWallet(); go('receive'); },
+    accTrade: () => {
+      const L = OWN(); if (!L.length) return toast('Add a wallet first.');
+      if (L.length === 1) { homeAddr = L[0].addr; return go('trade'); }
+      pending = null; sheet(`<h2>Trade from</h2>${L.map((x) => { const a = ACC[x.addr]; return `<button class="b-out" data-act="accTradeGo" data-addr="${x.addr}" style="text-align:left;display:flex;justify-content:space-between"><span>${esc(x.name)}</span><span class="mu mono" style="font-size:13px">${a ? '$' + fx(usdVal(a)) : a === null ? 'not funded' : ''}</span></button>`; }).join('')}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+    },
+    accTradeGo: () => { homeAddr = t.dataset.addr; closeSheet(); go('trade'); },
     fundOpen: () => fundSheet(), fundReview: () => fundReview(),
     pinChange: () => pinChangeSheet(), pinChangeOk: () => pinChangeOk(),
     pinChkBio: async () => { try { const p = await bioPin(); if (p !== PIN) throw 0; pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); } catch (e) { toast('Use your PIN.'); } },
