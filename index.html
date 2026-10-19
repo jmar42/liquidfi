@@ -159,6 +159,7 @@ details.more>div{display:flex;flex-direction:column;gap:14px;padding-top:14px}
 .swrow input::-webkit-inner-spin-button,.swrow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.swrow input{-moz-appearance:textfield}
 .swrow{display:flex;gap:10px;align-items:center}.swrow input{flex:1;min-width:0;font-size:22px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600}.swrow select{flex:none;width:auto;min-width:104px;font-weight:600}
 .secw{position:relative}.secw textarea{padding-right:48px;width:100%}textarea.sec:not(.show){-webkit-text-security:disc}.eyeb{position:absolute;right:6px;top:6px;width:38px;height:38px;min-height:0;padding:0;border:none;background:transparent;color:var(--mu);display:flex;align-items:center;justify-content:center}.eyeb.on{color:var(--acc)}
+.actrow{border-bottom:1px solid var(--bd)}.actrow:last-child{border-bottom:none}.actrow summary{list-style:none;cursor:pointer}.actrow summary::-webkit-details-marker{display:none}.actd{display:flex;flex-direction:column;gap:6px;padding:0 0 12px 54px;font-size:12.5px;color:var(--mu)}.actd>div{display:flex;justify-content:space-between;gap:10px}.actd>div>:last-child{white-space:nowrap;flex:none}.actd a{color:var(--acc);white-space:nowrap}
 .tag.ks{background:transparent;color:var(--blu);border:1px solid var(--blu);font-size:10.5px;padding:1px 6px}
 .pad button[data-pin=ok].bio{background:var(--s1);border-color:var(--bd);color:var(--acc);display:flex;align-items:center;justify-content:center}
 .pad button[data-pin=del]{background:transparent;border-color:transparent;font-size:20px}
@@ -14455,7 +14456,7 @@ function fillFor(r, addr) {
   const quote = [got[0], gave[0]].includes('USDC') ? 'USDC' : [got[0], gave[0]].includes('XLM') ? 'XLM' : gave[0];
   const buy = gave[0] === quote;
   const thing = buy ? got : gave, q = buy ? gave : got;
-  return { t: Date.parse(r.ledger_close_time), op: r.id.split('-')[0], side: buy ? 'BUY' : 'SELL', asset: thing[0], qty: thing[1], quote, qamt: q[1], pool: r.trade_type === 'liquidity_pool', n: 1 };
+  return { t: Date.parse(r.ledger_close_time), op: r.id.split('-')[0], side: buy ? 'BUY' : 'SELL', asset: thing[0], qty: thing[1], quote, qamt: q[1], pool: r.trade_type === 'liquidity_pool', n: 1, got, gave };
 }
 async function actLoad(more) {
   if (ACT.busy) return; ACT.busy = true; $('#aMore').textContent = 'Loading…';
@@ -14487,10 +14488,21 @@ function paintAct() {
     let g = null;
     for (const r of ACT.recs[a.addr] || []) {
       const f = fillFor(r, a.addr);
-      if (g && g.op === f.op && g.side === f.side && g.asset === f.asset && g.quote === f.quote) { g.qty += f.qty; g.qamt += f.qamt; g.n++; g.pool = g.pool || f.pool; continue; }
-      g = { ...f, acct: a.name }; rows.push(g);
+      if (g && g.op === f.op && g.side === f.side && g.asset === f.asset && g.quote === f.quote) { g.qty += f.qty; g.qamt += f.qamt; g.n++; g.pool = g.pool || f.pool; g.fills.push(f); continue; }
+      g = { ...f, acct: a.name, fills: [f] }; rows.push(g);
     }
   }
+  // one operation that traded through more than one pair is a swap with steps (e.g. XLM → USDC → EURC): show it as one SWAP line
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i], same = rows.filter((x) => x !== r && x.acct === r.acct && x.op === r.op && !x.merged);
+    if (r.merged || !same.length) continue;
+    const legs = [r, ...same].flatMap((x) => x.fills).sort((x, y) => x.t - y.t);
+    const giv = {}, gotm = {}; legs.forEach((f) => { giv[f.gave[0]] = (giv[f.gave[0]] || 0) + f.gave[1]; gotm[f.got[0]] = (gotm[f.got[0]] || 0) + f.got[1]; });
+    const inA = Object.keys(giv).find((k) => !(k in gotm)), outA = Object.keys(gotm).find((k) => !(k in giv));
+    if (!inA || !outA) continue;
+    same.forEach((x) => { x.merged = true; }); Object.assign(r, { side: 'SWAP', asset: outA, qty: gotm[outA], quote: inA, qamt: giv[inA], fills: legs, swap: true });
+  }
+  for (let i = rows.length - 1; i >= 0; i--) if (rows[i].merged) rows.splice(i, 1);
   rows.sort((x, y) => y.t - x.t);
   const shown = rows.slice(0, 80);
   if (!shown.length) { $('#aList').innerHTML = '<div class="note">No buys or sells yet.</div>'; $('#aMore').style.display = 'none'; return; }
@@ -14501,7 +14513,11 @@ function paintAct() {
     if (d !== day) { if (open) html += '</div>'; day = d; html += `<span class="lbl" style="margin-top:6px">${d === today ? 'Today' : d === yday ? 'Yesterday' : esc(ptDay(r.t, { weekday: 'short', month: 'short', day: 'numeric' }))}</span><div class="card" style="padding:0 14px;gap:0">`; open = true; }
     const px = r.qamt / r.qty, dp = r.quote === 'USDC' && r.asset === 'XLM' ? 5 : 4;
     const extra = [r.n > 1 ? r.n + ' fills' : '', r.pool ? 'pool' : ''].filter(Boolean).join(' · ');
-    html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : '--sell'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:14px">${fx(r.qty, 2)} ${esc(r.asset)} @ ${px.toFixed(dp)}</span><span class="mu" style="font-size:12px">${esc(r.acct)} · ${fx(r.qamt, 2)} ${esc(r.quote)}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:12px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></div>`;
+    const steps = [];   // details: each step and where it filled (order book or AMM pool)
+    for (const f of r.fills) { const k = f.gave[0] + '→' + f.got[0] + (f.pool ? 'P' : 'B'), l = steps.find((x) => x.k === k); if (l) { l.g += f.gave[1]; l.o += f.got[1]; l.n++; } else steps.push({ k, a: f.gave[0], b: f.got[0], g: f.gave[1], o: f.got[1], pool: f.pool, n: 1 }); }
+    const det = `<div class="actd">${steps.map((x) => `<div><span>${esc(x.a)} → ${esc(x.b)} · <b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}</b>${x.n > 1 ? ` · ${x.n} fills` : ''}</span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' })}</span><a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a></div></div>`;
+    const head = r.swap ? `${amtFmt(r.qamt)} ${esc(r.quote)} → ${amtFmt(r.qty)} ${esc(r.asset)}` : `${fx(r.qty, 2)} ${esc(r.asset)} @ ${px.toFixed(dp)}`;
+    html += `<details class="actrow"><summary style="display:flex;align-items:center;gap:10px;padding:10px 0"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : r.side === 'SELL' ? '--sell' : '--blu'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:14px">${head}</span><span class="mu" style="font-size:12px">${esc(r.acct)}${r.swap ? ` · ${steps.length} steps` : ` · ${fx(r.qamt, 2)} ${esc(r.quote)}`}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:12px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></summary>${det}</details>`;
   }
   if (open) html += '</div>';
   $('#aList').innerHTML = html;
