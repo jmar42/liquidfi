@@ -158,8 +158,9 @@ details.more>div{display:flex;flex-direction:column;gap:14px;padding-top:14px}
 .qrbox{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1;max-height:320px}.qrbox video{width:100%;height:100%;object-fit:cover;display:block}.qrbox i{position:absolute;inset:16%;border:2px solid rgba(255,255,255,.85);border-radius:12px}
 .swrow input::-webkit-inner-spin-button,.swrow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.swrow input{-moz-appearance:textfield}
 .swrow{display:flex;gap:10px;align-items:center}.swrow input{flex:1;min-width:0;font-size:22px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600}.swrow select{flex:none;width:auto;min-width:104px;font-weight:600}
-.secw{position:relative}.secw textarea{padding-right:48px;width:100%}textarea.sec:not(.show){-webkit-text-security:disc}.eyeb{position:absolute;right:6px;top:6px;width:38px;height:38px;min-height:0;padding:0;border:none;background:transparent;color:var(--mu);display:flex;align-items:center;justify-content:center}.eyeb.on{color:var(--acc)}
+.secw{position:relative}.secw textarea{padding-right:48px;width:100%}textarea.sec,.secmask{font:500 15px/1.5 'IBM Plex Mono',ui-monospace,Menlo,monospace;letter-spacing:0;white-space:pre-wrap;word-break:break-all;overflow-wrap:anywhere;font-variant-ligatures:none}textarea.sec{resize:none;overflow:hidden}textarea.sec:not(.show){color:transparent;caret-color:var(--tx)}.secmask{position:absolute;inset:0;padding:12px 48px 12px 14px;border:1px solid transparent;pointer-events:none;color:var(--tx);overflow:hidden}textarea.sec.show+.eyeb,textarea.sec.show~.eyeb{}.secw:has(textarea.sec.show) .secmask{display:none}.eyeb{position:absolute;right:6px;top:6px;width:38px;height:38px;min-height:0;padding:0;border:none;background:transparent;color:var(--mu);display:flex;align-items:center;justify-content:center}.eyeb.on{color:var(--acc)}
 .actrow{border-bottom:1px solid var(--bd)}.actrow:last-child{border-bottom:none}.actrow summary{list-style:none;cursor:pointer}.actrow summary::-webkit-details-marker{display:none}.actd{display:flex;flex-direction:column;gap:6px;padding:0 0 12px 54px;font-size:12.5px;color:var(--mu)}.actd>div{display:flex;justify-content:space-between;gap:10px}.actd>div>:last-child{white-space:nowrap;flex:none}.actd a{color:var(--acc);white-space:nowrap}
+.recrow summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;cursor:pointer}.recrow summary::-webkit-details-marker{display:none}.recrow+.recrow{border-top:1px solid var(--bd)}.recd{display:flex;flex-direction:column;gap:6px;padding:0 0 12px;font-size:12.5px;color:var(--mu)}.recd>div{display:flex;justify-content:space-between;gap:12px}.recd a{color:var(--acc);white-space:nowrap}
 .tag.ks{background:transparent;color:var(--blu);border:1px solid var(--blu);font-size:10.5px;padding:1px 6px}
 .pad button[data-pin=ok].bio{background:var(--s1);border-color:var(--bd);color:var(--acc);display:flex;align-items:center;justify-content:center}
 .pad button[data-pin=del]{background:transparent;border-color:transparent;font-size:20px}
@@ -231,7 +232,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <label>Choose a PIN<input id="su1" type="password" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="••••••"></label>
     <label>Repeat PIN<input id="su2" type="password" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="••••••"></label>
     <details class="more"><summary>Use a wallet I already have</summary><div>
-      <label>Secret key (S…) or recovery phrase (12 or 24 words), typed here only<div class="secw"><textarea id="suImp" class="sec" rows="2" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" data-hint="suImpH"></textarea><button type="button" class="eyeb" data-act="secEye" data-for="suImp" aria-label="Show what you typed"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><span class="mu" id="suImpH" style="font-size:12px"></span></label>
+      <label>Secret key (S…) or recovery phrase (12 or 24 words), typed here only<div class="secw"><div class="secmask" aria-hidden="true"></div><textarea id="suImp" class="sec" rows="2" autocomplete="off" spellcheck="false" autocapitalize="characters" autocorrect="off" data-hint="suImpH"></textarea><button type="button" class="eyeb" data-act="secEye" data-for="suImp" aria-label="Show what you typed"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><span class="mu" id="suImpH" style="font-size:12px"></span></label>
       <label>Or restore an encrypted backup file<input id="suFile" type="file" accept=".json,application/json"></label>
       <div class="mu" style="font-size:12px">Leave both empty to start with no wallet. You can create or import wallets later in Accounts.</div>
     </div></details>
@@ -239,7 +240,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   </div>
   <ul class="feats">
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span><b>Your keys stay on this phone.</b> They are encrypted with your PIN. No server, no sign-up.</span></li>
-    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span><b>A kill switch for your bots.</b> This phone gets an emergency key. Add it to your bot accounts as a signer from your PC, then Cancel all or Flatten from here.</span></li>
+    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span><b>A kill switch for your bots.</b> This phone gets an emergency key. Add it to your bot accounts as a signer from your PC, then Cancel Orders or Cancel + Close Positions from here.</span></li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7.5 14h9"/></svg><span><b>Starts on Testnet.</b> Practise with free test coins, then switch to Mainnet in Settings.</span></li>
   </ul>
 </section>
@@ -287,10 +288,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <span class="lbl">Bots</span>
   <div class="list" id="bList" style="display:flex;flex-direction:column;gap:10px"></div>
   <div class="killbar">
-    <p class="mu" style="font-size:11.5px;margin:0 2px">Kill switch · for wallets with this phone's emergency key · Flatten closes open trades at market within your cap</p>
+    <p class="mu" id="kbNote" style="font-size:11.5px;margin:0 2px"></p>
     <div class="g2">
-      <button class="b-redout big" data-act="killAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span>Cancel all</span><span style="font-size:11px;font-weight:500" class="mu">all open orders</span></button>
-      <button class="b-red big" data-act="flatAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span>Flatten</span><span style="font-size:11px;font-weight:500">cancel all + close trades</span></button>
+      <button class="b-redout big" data-act="killAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span>Cancel Orders</span><span style="font-size:11px;font-weight:500" class="mu">positions stay open</span></button>
+      <button class="b-red big" data-act="flatAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span style="line-height:1.15">Cancel + Close Positions</span></button>
     </div>
   </div>
   </div>
@@ -349,8 +350,8 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <span class="lbl">Balances</span>
   <div class="card rows" id="dBal" style="padding:4px 14px"></div>
   <div id="dKill" style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
-    <button class="b-red big" data-act="flatOne" id="dFlat">Cancel all + close position</button>
-    <button class="b-out" data-act="killOne">Cancel orders only</button>
+    <button class="b-red big" data-act="flatOne" id="dFlat">Cancel + Close Positions</button>
+    <button class="b-out" data-act="killOne">Cancel Orders</button>
   </div>
 </section>
 
@@ -386,7 +387,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <label>To<select id="sTo"></select></label>
   <div id="sNew" style="display:none;flex-direction:column;gap:10px">
     <label>Name for this address<input id="sNName" placeholder="e.g. Coinbase"></label>
-    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">Address (G…)</span><div class="scanrow"><input id="sNAddr" autocomplete="off" spellcheck="false" aria-label="Address"><button class="b-out" data-act="scanSend"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Scan</button></div><div id="sScan"></div></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">Address (G…)</span><div class="scanrow"><input id="sNAddr" autocomplete="off" spellcheck="false" autocapitalize="characters" autocorrect="off" aria-label="Address"><button class="b-out" data-act="scanSend"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Scan</button></div><div id="sScan"></div></div>
     <label>Memo this address needs (exchanges), optional<input id="sNMemo" autocomplete="off"></label>
     <button class="b-out" data-act="saveAddr">Check and save address</button>
   </div>
@@ -442,9 +443,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card"><span class="lbl">Watched wallets (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">Wallets you watch by address, like bots your PC runs. No key here. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Watch an address</button><button class="b-out sm" data-act="saveBots">Save list</button></div></div>
   <div class="card"><span class="lbl">Buy / sell and gain / loss colors</span><div class="seg" id="setCol"><button data-v="bp"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#60A5FA;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F472B6;margin:0 3px"></i> Blue / pink</button><button data-v="gr"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3FB87F;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF8A80;margin:0 3px"></i> Green / red</button></div><div class="mu" style="font-size:12px">Order book, last sales, Activity and P/L gains / losses. The Trade screen's Buy / Sell buttons keep their own colors.</div></div>
   <div class="card"><span class="lbl">Swap slippage cap</span><div class="mu" style="font-size:12px">If the price moves more than this before your swap goes through, nothing trades.</div><div class="seg" id="setSwSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
-  <div class="card"><span class="lbl">Trade slippage cap</span><div class="mu" style="font-size:12px">Market orders on Trade, and Flatten (kill switch).</div><div class="seg" id="setSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
+  <div class="card"><span class="lbl">Close positions into</span><div class="mu" style="font-size:12px">What Cancel + Close Positions turns XLM and stablecoins into: your "flat" currency.</div><div class="seg" id="setFlat"></div></div>
+  <div class="card"><span class="lbl">Trade slippage cap</span><div class="mu" style="font-size:12px">Market orders on Trade, and Cancel + Close Positions (kill switch).</div><div class="seg" id="setSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
 
-  <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader with an open short and two exit orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel all and Flatten. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
+  <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader holding XLM and USDC with open orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel Orders and Cancel + Close Positions. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
   <div class="card"><span class="lbl">Backup</span><div id="setBk" style="font-size:13px"></div><button class="b-out sm" data-act="bkOpen">Back up keys</button></div>
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
@@ -13846,7 +13848,7 @@ async function swapReview() {
   if (need) ops.push(SDK.Operation.changeTrust({ asset: asOf(q.to) }));
   ops.push(SDK.Operation.pathPaymentStrictSend({ sendAsset: asOf(q.from), sendAmount: amt7(q.sw), destination: homeAddr, destAsset: asOf(q.to), destMin: amt7(q.min), path: q.path.map(hAsset) }));
   if (q.fee && q.feeTo) ops.push(q.fee.direct ? SDK.Operation.payment({ destination: q.feeTo, asset: asOf(q.from), amount: amt7(q.fee.amt) })
-    : SDK.Operation.pathPaymentStrictSend({ sendAsset: asOf(q.from), sendAmount: amt7(q.fee.amt), destination: q.feeTo, destAsset: SDK.Asset.native(), destMin: amt7(Math.max(0.0000001, q.fee.min)), path: q.fee.path.map(hAsset) }));
+    : SDK.Operation.pathPaymentStrictSend({ sendAsset: asOf(q.from), sendAmount: amt7(q.fee.amt), destination: q.feeTo, destAsset: SDK.Asset.native(), destMin: '0.0000001', path: q.fee.path.map(hAsset) }));
   const nm = (OWN().find((o) => o.addr === homeAddr) || {}).name || 'wallet', from = kName(q.from), to = kName(q.to);
   confirmSheet(`Swap ${m2(q.amt)} ${from} → ${to}`, `${NET().name} · ${esc(nm)}`, [{ t: `Pay ${m2(q.amt)} ${from}`, hl: true, s: q.fee ? `${m2(q.sw)} swap + ${m2(q.fee.amt)} fee (${SWAP_FEE.bps / 100}%)` : '' }, { t: `Get about ${m2(q.out)} ${to}`, s: `at least ${m2(q.min)} ${to} or nothing trades` }, ...(need ? [{ t: `Start holding ${to}`, s: 'adds a trustline · 0.5 XLM reserve' }] : [])], 'Swap', async () => {
     try {
@@ -13867,6 +13869,11 @@ async function secHint(el) {
   const t = normSecret(el.value); if (!t) { h.textContent = ''; return; }
   if (!/\s/.test(t)) {
     if (SDK.StrKey.isValidEd25519SecretSeed(t)) { h.innerHTML = '<span class="grn">✓ Valid secret key</span>'; return; }
+    if (/[0189]/.test(t)) {
+      const fixed = t.replace(/0/g, 'O').replace(/1/g, 'I').replace(/8/g, 'B'), ok = !/9/.test(t) && fixed.length === 56 && SDK.StrKey.isValidEd25519SecretSeed(fixed);
+      h.innerHTML = `<span class="amb">Stellar keys never use the numbers 0, 1, 8 or 9. A 0 (zero) is the letter O (as in Oscar), a 1 is the letter I.</span>${ok ? ` <button type="button" class="b-out sm" data-act="secFixDigits" data-for="${el.id}" style="width:auto;min-height:30px;padding:0 10px;margin-top:4px">Change them to letters</button>` : ''}`;
+      return;
+    }
     h.innerHTML = t[0] !== 'S' ? '<span class="amb">A secret key starts with S. Or type the recovery phrase words with spaces.</span>' : `<span class="amb">${t.length < 56 ? `${t.length} of 56 characters` : t.length > 56 ? `${t.length} characters, a key has 56` : 'Not a valid key: check each letter (only A–Z and 2–7)'}</span>`;
     return;
   }
@@ -13874,15 +13881,27 @@ async function secHint(el) {
   if (![12, 15, 18, 21, 24].includes(n)) { h.innerHTML = `<span class="amb">${n} word${n === 1 ? '' : 's'} · a phrase has 12 or 24</span>`; return; }
   h.innerHTML = (await HD.valid(t)) ? `<span class="grn">✓ Valid ${n}-word phrase</span>` : '<span class="amb">A word is misspelled or out of order (the phrase check failed)</span>';
 }
+function secMask(el, peek) {   // bullets for what you typed, the last character shown for a moment (like a phone password box)
+  const m = el.parentElement && el.parentElement.querySelector('.secmask'); if (!m) return;
+  el.style.height = 'auto'; el.style.height = Math.max(80, el.scrollHeight + 2) + 'px';   // grow instead of scrolling, so the mask lines up
+  if (el.classList.contains('show')) { m.textContent = ''; return; }
+  const v = el.value, k = peek == null ? -1 : peek;
+  m.textContent = [...v].map((c, i) => (c === ' ' || c === '\n' ? c : i === k ? c : '•')).join('');
+}
+const secPeekT = new WeakMap();
+// tapping the eye or the fix button keeps the keyboard and the text box as they are (no blur that would redraw the hint under your finger)
+document.addEventListener('mousedown', (e) => { if (e.target.closest && e.target.closest('[data-act=secFixDigits],[data-act=secEye]')) e.preventDefault(); });
 function secFix(el) {
   const v = el.value, t = v.trim();
   const want = !t ? v : /\s/.test(t) ? v.toLowerCase() : v.toUpperCase();   // a key (no spaces) in capitals; phrase words (with spaces) in lower case
   if (want !== v) { const p0 = el.selectionStart; el.value = want; try { el.setSelectionRange(p0, p0); } catch (er) {} }
 }
 const isSec = (el) => el && el.classList && el.classList.contains('sec');
-document.addEventListener('input', (e) => { if (!isSec(e.target)) return; if (!e.isComposing) secFix(e.target); secHint(e.target); });
-document.addEventListener('compositionend', (e) => { if (isSec(e.target)) { secFix(e.target); secHint(e.target); } });
-document.addEventListener('focusout', (e) => { if (isSec(e.target)) { secFix(e.target); secHint(e.target); } });
+document.addEventListener('input', (e) => { const el = e.target; if (!isSec(el)) return; if (!e.isComposing) secFix(el); secHint(el);
+  const k = (el.selectionStart || el.value.length) - 1; secMask(el, e.inputType && e.inputType.startsWith('insert') && !(e.inputType === 'insertFromPaste') ? k : null);
+  clearTimeout(secPeekT.get(el)); secPeekT.set(el, setTimeout(() => secMask(el), 1200)); });
+document.addEventListener('compositionend', (e) => { if (isSec(e.target)) { secFix(e.target); secHint(e.target); secMask(e.target); } });
+document.addEventListener('focusout', (e) => { if (isSec(e.target)) { secFix(e.target); secHint(e.target); secMask(e.target); } });
 
 /* ---------- funding a new wallet ----------
    A Stellar account only exists once it holds XLM: 1 XLM is the base reserve, plus 0.5 per token (trustline), open order or extra signer. */
@@ -14063,7 +14082,8 @@ async function priceAssets(a) {
 }
 const szFmt = (v) => fx(v, v < 10 ? 2 : 0);   // order sizes: small ones keep 2 decimals
 // amounts: only as many decimals as needed — 2 from 0.01 up, 3 from 0.001, 4 from 0.0001; below that the full 7 (e.g. an NFT's 0.0000001)
-const amtFmt = (v) => (v >= 0.01 || v === 0 ? fx(v, 2) : v >= 0.001 ? fx(v, 3) : v >= 0.0001 ? fx(v, 4) : v > 0 ? v.toFixed(7) : '0.00');
+const fdn = (v, d) => fx(Math.floor(v * 10 ** d + 1e-9) / 10 ** d, d);   // round down, so an amount shown is never more than you have
+const amtFmt = (v) => (v >= 0.01 || v === 0 ? fdn(v, 2) : v >= 0.001 ? fdn(v, 3) : v >= 0.0001 ? fdn(v, 4) : v > 0 ? v.toFixed(7) : '0.00');
 function balRows(a) {
   if (!a) return '<div><span class="mu">Account not funded yet</span></div>';
   const L = a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares').map((b) => ({ b, usd: balUsd(b), nft: isNFT(b), st: stableUsd(b) != null, none: b.asset_type !== 'native' && !!(AV[akey(b)] || {}).none }));
@@ -14102,6 +14122,12 @@ const tradeAccts = () => [...NS().bots, ...OWN().filter((a) => a.type === 'tradi
 const allAccts = () => { const seen = new Set(); return [...persAccts(), ...tradeAccts().filter((b) => b.addr)].filter((a) => !seen.has(a.addr) && seen.add(a.addr)); };
 const watched = () => NS().bots.filter((b) => b.addr && !K.x.some((o) => o.kp.publicKey() === b.addr));
 // kill switch is shown only when the phone can act: a watched wallet with this phone's emergency key as signer, or an own-key trading wallet
+// Cancel all / Flatten sit at the bottom of Accounts (after + Add wallet, before Settings) whenever you watch any wallet
+function kbPaint() {
+  const W = tradeAccts().filter((b) => b.addr), any = W.length, on = ksReady(), loading = W.some((b) => !BOT[b.addr]); if (!$('#bTrade2')) return;
+  $('#bTrade2').style.display = any ? '' : 'none';
+  $('#kbNote').innerHTML = !on && loading ? 'Kill switch · checking your watched wallets…' : on ? 'Kill switch · Cancel Orders leaves positions open · Cancel + Close Positions also closes them at market, within your Trade slippage cap' : '<span class="amb">Kill switch is off on every watched wallet.</span> Open one and follow "Kill switch · off" to turn it on.';
+}
 const ksReady = () => tradeAccts().some((b) => b.addr && (b.own || (BOT[b.addr] && BOT[b.addr].a && sigState(BOT[b.addr].a).ok)));
 const sameAcct = (a, b) => a.addr === b.addr && a.name === b.name;
 function walletAccts() {
@@ -14124,7 +14150,7 @@ async function drawHome() {
     priceAssets(a).then((ch) => { if (ch && cur === 'home' && ACC[homeAddr] === a) { $('#hBal').innerHTML = balRows(a); $('#hTot').textContent = '$' + fx(usdVal(a)); } });
     $('#s-home').classList.toggle('unf', !a); $('#hFund').innerHTML = a ? '' : fundCard(); if (!a) fundSrcLoad().then(() => { if (cur === 'home' && !ACC[homeAddr]) $('#hFund').innerHTML = fundCard(); });
     const ops = a ? (await H(`/accounts/${homeAddr}/operations?order=desc&limit=8`))._embedded.records : [];
-    $('#hRec').innerHTML = ops.length ? ops.map((o) => `<div><span>${esc(opText(o, homeAddr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(o.created_at))}</span></div>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
+    $('#hRec').innerHTML = ops.length ? ops.map((o) => `<details class="recrow" data-tx="${esc(o.transaction_hash)}"><summary><span>${esc(opText(o, homeAddr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(o.created_at))}</span></summary>${opDetail(o, homeAddr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
   } catch (e) { $('#hBal').innerHTML = `<div><span class="red">${esc(niceErr(e))}</span></div>`; }
 }
 function ago(t) { const s = (Date.now() - Date.parse(t)) / 1000; return s < 90 ? Math.round(s) + 's' : s < 5400 ? Math.round(s / 60) + 'm' : s < 129600 ? Math.round(s / 3600) + 'h' : Math.round(s / 86400) + 'd'; }
@@ -14132,14 +14158,44 @@ function opText(o, me) {
   const an = (t, c) => t === 'native' ? 'XLM' : c;
   switch (o.type) {
     case 'create_account': return o.account === me ? `Account created with ${fx(o.starting_balance)} XLM` : `Created ${short(o.account)}`;
-    case 'payment': return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
-    case 'path_payment_strict_send': case 'path_payment_strict_receive': return `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
-    case 'manage_sell_offer': case 'manage_buy_offer': return +o.amount === 0 ? 'Cancelled an order' : 'Placed/updated an order';
+    case 'payment': if (o.from === me && o.to === SWAP_FEE.to[S.net]) return `Swap fee ${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`; return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
+    case 'path_payment_strict_send': case 'path_payment_strict_receive': if (o.to === SWAP_FEE.to[S.net] && o.from === me) return `Swap fee ${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; if (o.to === me && o.from !== me) return `Received ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} from ${short(o.from)}`; if (o.to !== me) return `Sent ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} to ${short(o.to)}`; return `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
+    case 'manage_sell_offer': case 'manage_buy_offer': { if (+o.amount === 0) return 'Cancelled an order'; const buy = o.type === 'manage_buy_offer', a = buy ? an(o.buying_asset_type, o.buying_asset_code) : an(o.selling_asset_type, o.selling_asset_code); return `${+o.offer_id ? 'Changed' : 'Placed'} ${buy ? 'buy' : 'sell'} order · ${amtFmt(+o.amount)} ${a} @ ${(+o.price).toFixed(6)}`; }
     case 'change_trust': return (+o.limit === 0 ? 'Removed ' : 'Added ') + 'trustline ' + o.asset_code;
     case 'set_options': return 'Changed account options/signers';
     default: return o.type.replace(/_/g, ' ');
   }
 }
+
+// Recent on a wallet page: tap a line to see its details (memo and network fee load when opened)
+function opDetail(o, me) {
+  const an = (t, c, i) => (t === 'native' ? 'XLM' : c + (i ? ` <span class="mu">· ${short(i)}</span>` : '')), row = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
+  const ad = (a) => (a === me ? 'this wallet' : `<span title="${esc(a)}">${esc(short(a))}</span>`), L = [];
+  switch (o.type) {
+    case 'payment': L.push(row('Amount', `${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code, o.asset_issuer)}`), row('From', ad(o.from)), row('To', ad(o.to))); break;
+    case 'path_payment_strict_send': case 'path_payment_strict_receive':
+      L.push(row('Paid', `${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`), row('Got', `${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`));
+      if ((o.path || []).length) L.push(row('Route', esc([an(o.source_asset_type, o.source_asset_code), ...o.path.map((x) => an(x.asset_type, x.asset_code)), an(o.asset_type, o.asset_code)].join(' → '))));
+      if (o.from !== me) L.push(row('From', ad(o.from))); if (o.to !== me) L.push(row('To', ad(o.to))); break;
+    case 'manage_sell_offer': case 'manage_buy_offer':
+      L.push(row(+o.amount === 0 ? 'Cancelled' : 'Order', `${o.type === 'manage_buy_offer' ? 'Buy' : 'Sell'} ${amtFmt(+o.amount)} ${an(o.type === 'manage_buy_offer' ? o.buying_asset_type : o.selling_asset_type, o.type === 'manage_buy_offer' ? o.buying_asset_code : o.selling_asset_code)}`), row('Price', `${(+o.price).toFixed(6)}`));
+      if (+o.offer_id) L.push(row('Order #', esc(o.offer_id))); break;
+    case 'change_trust': L.push(row('Token', an(o.asset_type, o.asset_code, o.asset_issuer)), row('Limit', +o.limit === 0 ? 'removed' : 'max')); break;
+    case 'create_account': L.push(row('Starting XLM', amtFmt(+o.starting_balance)), row('Funded by', ad(o.funder)), row('Account', ad(o.account))); break;
+    case 'set_options': if (o.signer_key) L.push(row('Signer', `${esc(short(o.signer_key))} · weight ${o.signer_weight}`)); if (o.med_threshold != null) L.push(row('Thresholds', `${o.low_threshold}/${o.med_threshold}/${o.high_threshold}`)); break;
+  }
+  L.push(row('Time', esc(new Date(o.created_at).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))));
+  return `<div class="recd">${L.join('')}<div class="recx"></div><div><span></span><a href="${NET().expert}/tx/${esc(o.transaction_hash)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a></div></div>`;
+}
+document.addEventListener('toggle', async (e) => {   // memo + network fee from the transaction, fetched once when a line is opened
+  const d = e.target; if (!d.classList || !d.classList.contains('recrow') || !d.open || d.dataset.loaded) return; d.dataset.loaded = '1';
+  const x = d.querySelector('.recx'); if (!x) return;
+  try {
+    const t = await H('/transactions/' + d.dataset.tx);
+    const memo = t.memo_type && t.memo_type !== 'none' ? `${esc(String(t.memo))}${t.memo_type !== 'text' ? ` <span class="mu">(${esc(t.memo_type)})</span>` : ''}` : '';
+    x.outerHTML = (memo ? `<div><span>Memo</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${memo}</span></div>` : '') + `<div><span>Network fee</span><span class="mono">${(+t.fee_charged / 1e7).toFixed(7).replace(/0+$/, '').replace(/\.$/, '')} XLM</span></div>`;
+  } catch (er) { x.remove(); }
+}, true);
 
 /* ---------- bots ---------- */
 const BOT = {};   // addr -> {a, offers, err}
@@ -14152,19 +14208,8 @@ function sigState(a) {
   if (s.weight < a.thresholds.med_threshold) return { ok: false, txt: 'signer weight too low' };
   return { ok: true, txt: 'signer ready' };
 }
-function position(b, offers) {   // from the bot's own exit orders on XLM/USDC
-  if (b.kind !== 'dir') return null;
-  let short = 0, long = 0;
-  for (const o of offers) {
-    if (isUSDC(o.selling) && o.buying.asset_type === 'native') short += +o.amount * +o.price;   // buy XLM with USDC = cover orders
-    if (o.selling.asset_type === 'native' && isUSDC(o.buying)) long += +o.amount;             // sell XLM for USDC = exit orders
-  }
-  if (short > long) return { side: 'short', qty: short - long };
-  if (long > short) return { side: 'long', qty: long - short };
-  return null;
-}
 async function loadBot(b) {
-  try { const [a, off] = await Promise.all([refreshAcct(b.addr), offersOf(b.addr).catch(() => [])]); BOT[b.addr] = { a, offers: off, at: Date.now() }; }
+  try { let offErr = null; const [a, off] = await Promise.all([refreshAcct(b.addr), offersOf(b.addr).catch((e) => { offErr = niceErr(e); return []; })]); BOT[b.addr] = { a, offers: off, offErr, at: Date.now() }; }
   catch (e) { BOT[b.addr] = { err: niceErr(e) }; }
   return BOT[b.addr];
 }
@@ -14194,11 +14239,11 @@ function allRows() {   // in the order added, unless moved by holding and draggi
 async function drawBots(reload = true) {
   const bots = tradeAccts();
   $('#bTrade').style.display = 'none';   // per-bot table no longer needed: every wallet shows its own P/L
-  $('#bTrade2').style.display = ksReady() ? '' : 'none';
+  kbPaint();
   $('#bList').style.display = 'none'; const bl = $('#bTrade2 .lbl'); if (bl) bl.style.display = 'none';
   if (bots.length || persAccts().length) drawPnl();
   const drawPers = () => {
-    paintTotal(); $('#bTrade2').style.display = ksReady() ? '' : 'none'; if (drag || press) return;
+    paintTotal(); kbPaint(); if (drag || press) return;
     const RR = P.res[P.sel], R = allRows();
     if (!R.length) { $('#bPers').innerHTML = '<div class="note">No wallets yet. Tap + Add wallet to make a new one or bring one you have.</div>'; return; }
     $('#bPers').innerHTML = R.map((x, i) => {
@@ -14209,8 +14254,8 @@ async function drawBots(reload = true) {
       let note = '';
       if (isBot) {
         if (!a.addr) note = '<span class="amb" style="font-size:12px">no address set</span>';
-        else { const sg = d.a ? sigState(d.a) : null, pos = d.offers ? position(a, d.offers) : null;
-          note = `<span style="font-size:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${sg && sg.ok ? '<span class="tag ks">kill switch</span>' : ''}${pos ? `<span class="tag t-red">${pos.side.toUpperCase()} ${fx(pos.qty, 0)} XLM</span>` : ''}${sg && sg.ok && d.offers && d.offers.length ? `<span class="mu">${d.offers.length} open order${d.offers.length === 1 ? '' : 's'}</span>` : ''}${d.err ? `<span class="red">${esc(d.err)}</span>` : ''}</span>`; }
+        else { const sg = d.a ? sigState(d.a) : null;
+          note = `<span style="font-size:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${sg && sg.ok ? '<span class="tag ks">kill switch</span>' : ''}${sg && sg.ok && d.offers && d.offers.length ? `<span class="mu">${d.offers.length} open order${d.offers.length === 1 ? '' : 's'}</span>` : ''}${d.err ? `<span class="red">${esc(d.err)}</span>` : ''}</span>`; }
       }
       const tag = isBot ? 'watch' : 'wallet';
       return `<div class="wrow" data-row="${i}" data-glist="wal"><button class="acct" ${isBot ? `data-bot="${x.bot}"` : `data-act="openPersonal" data-addr="${a.addr}"`}><div class="r"><span style="font-size:17px;font-weight:600">${esc(a.name)} <span class="mu" style="font-weight:400">· ${esc(tag)}</span></span><span class="mono" style="font-weight:600">${val}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${a.addr ? short(a.addr) : ''}</span>${pl}</div>${note ? `<div class="r">${note}<span></span></div>` : ''}</button></div>`;
@@ -14233,7 +14278,7 @@ async function drawBot() {
     const sg = d.a ? sigState(d.a) : { ok: false, txt: d.a === null ? 'not funded' : '…' }, on = sg.ok;
     $('#dSig').innerHTML = `<span class="tag">Watch</span>`;
     $('#dTot').textContent = d.a ? '$' + fx(usdVal(d.a)) : d.a === null ? 'Not funded' : '…';
-    $('#dKs').innerHTML = !d.a ? '' : on ? `<div class="card"><div class="top"><span class="lbl">Kill switch</span><span class="tag ks">on</span></div><div class="mu" style="font-size:13px">This phone can stop this wallet in an emergency. When you press Flatten:</div><div class="seg" id="dKind"><button data-v="dir" class="${b.kind === 'dir' ? 'on' : ''}">Close its trade</button><button data-v="mm" class="${b.kind !== 'dir' ? 'on' : ''}">Only cancel orders</button></div></div>`
+    $('#dKs').innerHTML = !d.a ? '' : on ? `<div class="card"><div class="top"><span class="lbl">Kill switch</span><span class="tag ks">on</span></div><div class="mu" style="font-size:13px">This phone can stop this wallet in an emergency. When you press Cancel + Close Positions:</div><div class="seg" id="dKind"><button data-v="dir" class="${b.kind === 'dir' ? 'on' : ''}">Close into ${flatCode()}</button><button data-v="mm" class="${b.kind !== 'dir' ? 'on' : ''}">Only cancel orders</button></div></div>`
       : `<details class="card more"><summary>Kill switch · off</summary><div style="display:flex;flex-direction:column;gap:8px"><div class="mu" style="font-size:13px">For a bot your PC runs: let this phone cancel its orders or close its trade in an emergency. On the PC, run <b>Add-Emergency-Signer.bat</b> and paste this phone's key:</div><div class="addr">${esc(K.em.publicKey())}</div><button class="b-out sm" data-act="copyEm">Copy key</button><div class="mu" style="font-size:12px">${sg.txt === 'signer weight too low' ? 'The key is added but its weight is too low to cancel orders.' : 'Not added yet.'}</div></div></details>`;
     ['dMktC', 'dPos'].forEach((id) => { $('#' + id).style.display = on ? '' : 'none'; }); $('#dKill').style.display = on ? 'flex' : 'none';
     $('#dFlat').style.display = on && b.kind === 'dir' ? '' : 'none';
@@ -14241,9 +14286,7 @@ async function drawBot() {
     if (d.a && !d.priced) { d.priced = true; priceAssets(d.a).then((ch) => { if (ch && cur === 'bot') paint(); }); }
     $('#dOff').innerHTML = (d.offers || []).length ? d.offers.map((o) => offerCard(o)).join('') : '<div class="note">No open orders.</div>';
     if (d.a && !d.priced2) { d.priced2 = true; priceAssets(d.a).then(() => { if (cur === 'bot' && d.a) $('#dTot').textContent = '$' + fx(usdVal(d.a)); }); }
-    const pos = d.offers ? position(b, d.offers) : null;
-    $('#dPos').innerHTML = b.kind !== 'dir' ? '' : pos ? `<div class="card"><div class="top"><span class="lbl">Position (from its exit orders)</span><span class="tag t-red">${pos.side.toUpperCase()}</span></div><div class="mono" style="font-size:28px;font-weight:600">${pos.side === 'short' ? '−' : ''}${fx(pos.qty, 2)} XLM</div><div class="note amb" style="padding:8px 0;background:none">Stop lives on the PC only. Stellar has no stop orders.</div></div>`
-      : `<div class="card"><span class="lbl">Position</span><div>No open trade orders found. If the bot holds a trade without orders, Flatten will ask for the amount.</div></div>`;
+    $('#dPos').innerHTML = '';
     drawBotMarket();
   };
   paint(); await loadBot(b); if (cur === 'bot') paint();
@@ -14258,7 +14301,7 @@ function offerCard(o, extra = '') {
 }
 function drawBotMarket() {
   if (!$('#dMkt')) return; $('#dMkt').innerHTML = mktCells();
-  const b = tradeAccts()[botSel]; const d = b && BOT[b.addr]; const pos = d && d.offers ? position(b, d.offers) : null;
+  const b = tradeAccts()[botSel]; const d = b && BOT[b.addr]; const pos = null;
   if (pos) { const c = walk(pos.side === 'short' ? 'buy' : 'sell', pos.qty); $('#dCost').innerHTML = c == null ? 'Book too thin to show the full close cost' : `${pos.side === 'short' ? 'Buy back' : 'Sell'} ${fx(pos.qty, 0)} XLM now ≈ <span class="mono" style="color:var(--tx)">${fx(c)} USDC</span> (avg ${(c / pos.qty).toFixed(6)})`; }
   else $('#dCost').textContent = '';
 }
@@ -14415,7 +14458,7 @@ function paintPnl() {
   const R = P.res[P.sel], nm = PERS.find((x) => x[0] === P.sel)[1], W = R ? R.W : perWindow(P.sel);
   $('#pByL').textContent = 'Bots · ' + nm;
   const noBots = !tradeAccts().some((b) => b.addr); $('#pBots').style.display = $('#pByL').style.display = noBots ? 'none' : '';
-  if ($('#bTrade')) { $('#bTrade').style.display = 'none'; $('#bTrade2').style.display = ksReady() ? '' : 'none'; }
+  if ($('#bTrade')) { $('#bTrade').style.display = 'none'; kbPaint(); }
   paintTopPnl(R, nm);
   if (cur === 'bots') drawPersOnly();
   if (cur === 'port') paintPort();
@@ -14456,7 +14499,7 @@ function fillFor(r, addr) {
   const quote = [got[0], gave[0]].includes('USDC') ? 'USDC' : [got[0], gave[0]].includes('XLM') ? 'XLM' : gave[0];
   const buy = gave[0] === quote;
   const thing = buy ? got : gave, q = buy ? gave : got;
-  return { t: Date.parse(r.ledger_close_time), op: r.id.split('-')[0], side: buy ? 'BUY' : 'SELL', asset: thing[0], qty: thing[1], quote, qamt: q[1], pool: r.trade_type === 'liquidity_pool', n: 1, got, gave };
+  return { t: Date.parse(r.ledger_close_time), op: r.id.split('-')[0], side: buy ? 'BUY' : 'SELL', asset: thing[0], qty: thing[1], quote, qamt: q[1], pool: r.trade_type === 'liquidity_pool', n: 1, got, gave, ix: +(String(r.id).split('-')[1] || 0) };   // ix: order of this fill inside its operation
 }
 async function actLoad(more) {
   if (ACT.busy) return; ACT.busy = true; $('#aMore').textContent = 'Loading…';
@@ -14496,7 +14539,7 @@ function paintAct() {
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i], same = rows.filter((x) => x !== r && x.acct === r.acct && x.op === r.op && !x.merged);
     if (r.merged || !same.length) continue;
-    const legs = [r, ...same].flatMap((x) => x.fills).sort((x, y) => x.t - y.t);
+    const legs = [r, ...same].flatMap((x) => x.fills).sort((x, y) => x.t - y.t || x.ix - y.ix);
     const giv = {}, gotm = {}; legs.forEach((f) => { giv[f.gave[0]] = (giv[f.gave[0]] || 0) + f.gave[1]; gotm[f.got[0]] = (gotm[f.got[0]] || 0) + f.got[1]; });
     const inA = Object.keys(giv).find((k) => !(k in gotm)), outA = Object.keys(gotm).find((k) => !(k in giv));
     if (!inA || !outA) continue;
@@ -14513,9 +14556,9 @@ function paintAct() {
     if (d !== day) { if (open) html += '</div>'; day = d; html += `<span class="lbl" style="margin-top:6px">${d === today ? 'Today' : d === yday ? 'Yesterday' : esc(ptDay(r.t, { weekday: 'short', month: 'short', day: 'numeric' }))}</span><div class="card" style="padding:0 14px;gap:0">`; open = true; }
     const px = r.qamt / r.qty, dp = r.quote === 'USDC' && r.asset === 'XLM' ? 5 : 4;
     const extra = [r.n > 1 ? r.n + ' fills' : '', r.pool ? 'pool' : ''].filter(Boolean).join(' · ');
-    const steps = [];   // details: each step and where it filled (order book or AMM pool)
-    for (const f of r.fills) { const k = f.gave[0] + '→' + f.got[0] + (f.pool ? 'P' : 'B'), l = steps.find((x) => x.k === k); if (l) { l.g += f.gave[1]; l.o += f.got[1]; l.n++; } else steps.push({ k, a: f.gave[0], b: f.got[0], g: f.gave[1], o: f.got[1], pool: f.pool, n: 1 }); }
-    const det = `<div class="actd">${steps.map((x) => `<div><span>${esc(x.a)} → ${esc(x.b)} · <b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}</b>${x.n > 1 ? ` · ${x.n} fills` : ''}</span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' })}</span><a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a></div></div>`;
+    const steps = [];   // details: each step and where it filled (order book or AMM pool), in the order they happened
+    for (const f of [...r.fills].sort((x, y) => x.t - y.t || x.ix - y.ix)) { const k = f.gave[0] + '→' + f.got[0] + (f.pool ? 'P' : 'B'), l = steps.find((x) => x.k === k); if (l) { l.g += f.gave[1]; l.o += f.got[1]; l.n++; } else steps.push({ k, a: f.gave[0], b: f.got[0], g: f.gave[1], o: f.got[1], pool: f.pool, n: 1 }); }
+    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span><a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a></div></div>`;
     const head = r.swap ? `${amtFmt(r.qamt)} ${esc(r.quote)} → ${amtFmt(r.qty)} ${esc(r.asset)}` : `${fx(r.qty, 2)} ${esc(r.asset)} @ ${px.toFixed(dp)}`;
     html += `<details class="actrow"><summary style="display:flex;align-items:center;gap:10px;padding:10px 0"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : r.side === 'SELL' ? '--sell' : '--blu'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:14px">${head}</span><span class="mu" style="font-size:12px">${esc(r.acct)}${r.swap ? ` · ${steps.length} steps` : ` · ${fx(r.qamt, 2)} ${esc(r.quote)}`}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:12px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></summary>${det}</details>`;
   }
@@ -14541,63 +14584,73 @@ async function quote(side, qty) {   // side 'buy' = buy qty XLM paying USDC; 'se
 }
 async function planCancel(b) {
   const d = await loadBot(b); if (d.err) throw new Error(d.err);
+  if (d.offErr) throw new Error(`${b.name}: couldn't load its open orders (${d.offErr}). Try again.`);
   if (!sigState(d.a).ok) throw new Error(`${b.name}: ${sigState(d.a).txt}`);
   return { bot: b, kind: 'cancel', offers: d.offers, lines: d.offers.map((o) => ({ t: 'Cancel order #' + o.id, s: offerTextShort(o) })) };
 }
 function offerTextShort(o) { return o.selling.asset_type === 'native' ? `sell ${fx(+o.amount, 2)} XLM` : o.buying.asset_type === 'native' ? `buy ${fx(+o.amount * +o.price, 2)} XLM` : `sell ${fx(+o.amount, 2)} ${aName(o.selling)}`; }
-async function planFlat(b, manualQty) {
-  const p = await planCancel(b);
-  const d = BOT[b.addr]; let pos = position(b, d.offers);
-  if (!pos && manualQty) pos = manualQty;
-  if (!pos || pos.qty <= 0) { p.note = 'No open trade orders found, so only cancels.'; return p; }
-  const q = await quote(pos.side === 'short' ? 'buy' : 'sell', pos.qty);
-  const slip = S.slip / 100;
-  p.kind = 'flat'; p.pos = pos; p.q = q;
-  if (pos.side === 'short') {
-    p.cap = q.usd * (1 + slip);
-    const usdBal = +((d.a.balances.find(isUSDC) || {}).balance || 0);
-    if (usdBal < q.usd) throw new Error(`${b.name}: holds ${fx(usdBal)} USDC, needs ${fx(q.usd)} to buy back ${fx(pos.qty)} XLM.`);
-    if (usdBal < p.cap) p.cap = usdBal;
-    p.lines.push({ t: `Buy back ${fx(pos.qty, 2)} XLM at market`, s: `book quote ${fx(q.usd)} USDC (avg ${(q.usd / pos.qty).toFixed(6)}) · pay at most ${fx(p.cap)} USDC`, hl: 1 });
-  } else {
-    p.cap = q.usd * (1 - slip);
-    p.lines.push({ t: `Sell ${fx(pos.qty, 2)} XLM at market`, s: `book quote ${fx(q.usd)} USDC (avg ${(q.usd / pos.qty).toFixed(6)}) · receive at least ${fx(p.cap)} USDC`, hl: 1 });
+// Close positions = after cancelling every order, turn what the wallet holds into the "flat" currency (Settings → Close positions into:
+// USDC by default, or EURC / XLM). Based on balances, not on guessing from orders. Only XLM and the built-in stablecoins are closed;
+// other tokens are left alone. XLM keeps its reserve (+0.5 for fees).
+const FLAT_OPTS = () => (S.net === 'public' ? ['USDC', 'EURC', 'XLM'] : ['USDC', 'XLM']);
+const flatCode = () => (FLAT_OPTS().includes(S.flatTo) ? S.flatTo : 'USDC');
+function flatAssetKey(code) { if (code === 'XLM') return 'XLM'; if (code === NS().usdc.code) return NS().usdc.code + ':' + NS().usdc.issuer; const k = (KNOWN[S.net] || []).find((x) => x.code === code); return k ? k.code + ':' + k.issuer : null; }
+async function planFlat(b) {
+  const p = await planCancel(b), d = BOT[b.addr], a = d.a, fk = flatAssetKey(flatCode()), slip = (+S.slip || 1) / 100;
+  p.kind = 'flat'; p.swaps = []; p.flat = flatCode();
+  if (!fk) { p.note = `${p.flat} isn't available on ${NET().name}, so only cancels.`; return p; }
+  if (fk !== 'XLM' && !a.balances.some((x) => akey(x) === fk)) { p.note = `${b.name} can't hold ${p.flat} (no trustline), so only cancels.`; p.lines.push({ t: `Can't close into ${p.flat}`, s: `${b.name} has no ${p.flat} trustline` }); return p; }
+  const sub = a.subentry_count - (d.offers || []).length + (a.num_sponsoring || 0) - (a.num_sponsored || 0);
+  const take = a.balances.filter((x) => x.asset_type !== 'liquidity_pool_shares' && !isNFT(x) && akey(x) !== fk && (x.asset_type === 'native' || isTrusted(x.asset_code, x.asset_issuer)));
+  for (const x of take) {
+    const k = akey(x), amt = x.asset_type === 'native' ? Math.max(0, +x.balance - (1 + 0.5 * sub) - 0.5) : +x.balance;   // orders are cancelled first in the same transaction, so their holds are free
+    if (!(amt >= 0.0001)) continue;
+    let best = null;
+    try {
+      const j = await H(`/paths/strict-send?${hzAssetQ(k, 'source_')}&source_amount=${amt7(amt)}&destination_assets=${fk === 'XLM' ? 'native' : fk}`);
+      best = ((j._embedded || {}).records || []).filter((r) => (fk === 'XLM' ? r.destination_asset_type === 'native' : akey({ asset_type: r.destination_asset_type, asset_code: r.destination_asset_code, asset_issuer: r.destination_asset_issuer }) === fk)).sort((m, n) => +n.destination_amount - +m.destination_amount)[0];
+    } catch (e) { throw new Error(`${b.name}: couldn't get a price for ${kName(k)} → ${p.flat}: ${niceErr(e)}`); }
+    if (!best) throw new Error(`${b.name}: no market right now to sell ${amtFmt(amt)} ${kName(k)} for ${p.flat}.`);
+    const out = +best.destination_amount, min = out * (1 - slip);
+    p.swaps.push({ k, amt, out, min, path: best.path || [] });
+    p.lines.push({ t: `Sell ${amtFmt(amt)} ${kName(k)} → ${p.flat} at market`, s: `≈ ${amtFmt(out)} ${p.flat} · at least ${amtFmt(min)} (Trade slippage cap ${+S.slip || 1}%)`, hl: 1 });
   }
+  if (!p.swaps.length) p.note = `Already in ${p.flat}: nothing to close.`;
   return p;
-}
-function opsFor(p) {
-  const ops = p.offers.map(cancelOp);
-  if (p.kind === 'flat') {
-    const me = p.bot.addr;
-    if (p.pos.side === 'short') ops.push(SDK.Operation.pathPaymentStrictReceive({ sendAsset: USDC(), sendMax: amt7(p.cap), destination: me, destAsset: SDK.Asset.native(), destAmount: amt7(p.pos.qty), path: p.q.path }));
-    else ops.push(SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: amt7(p.pos.qty), destination: me, destAsset: USDC(), destMin: amt7(p.cap), path: p.q.path }));
-  }
-  return ops;
 }
 async function runPlans(plans) {
   const out = [];
   await Promise.all(plans.map(async (p) => {
-    const ops = opsFor(p);
-    if (!ops.length) { out.push({ p, ok: true, nothing: true }); return; }
-    try {
-      const chunks = []; for (let i = 0; i < ops.length; i += 100) chunks.push(ops.slice(i, i + 100));
-      if (chunks.length > 1 && p.kind === 'flat') { const last = chunks.pop(); for (const c of chunks) { const t = await buildTx(p.bot.addr, c); t.sign(kpFor(p.bot.addr)); await submit(t); } chunks.push(last); }
-      let res;
-      for (const c of chunks) { const t = await buildTx(p.bot.addr, c); t.sign(kpFor(p.bot.addr)); res = await submit(t); }
-      out.push({ p, ok: true, hash: res.hash, ledger: res.ledger });
-    } catch (e) { out.push({ p, ok: false, err: niceErr(e) }); }
+    const kp = kpFor(p.bot.addr), send = async (ops) => { const t = await buildTx(p.bot.addr, ops); t.sign(kp); return submit(t); };
+    const cancels = p.offers.map(cancelOp), swaps = p.kind === 'flat' ? (p.swaps || []) : [];
+    if (!cancels.length && !swaps.length) { out.push({ p, ok: true, nothing: true }); return; }
+    const r = { p, ok: true, hashes: [], sold: [], unsold: [] };
+    try { for (let i = 0; i < cancels.length; i += 100) { const x = await send(cancels.slice(i, i + 100)); r.hashes.push(x.hash); } }   // the cancels always go first, on their own: a sale that fails can't undo them
+    catch (e) { out.push({ p, ok: false, err: niceErr(e) }); return; }
+    const fk = swaps.length ? flatAssetKey(p.flat) : null, slip = (+S.slip || 1) / 100;
+    for (const w of swaps) {   // each sale separately, re-priced on the book as it is now
+      try {
+        const j = await H(`/paths/strict-send?${hzAssetQ(w.k, 'source_')}&source_amount=${amt7(w.amt)}&destination_assets=${fk === 'XLM' ? 'native' : fk}`);
+        const best = ((j._embedded || {}).records || []).filter((q) => (fk === 'XLM' ? q.destination_asset_type === 'native' : akey({ asset_type: q.destination_asset_type, asset_code: q.destination_asset_code, asset_issuer: q.destination_asset_issuer }) === fk)).sort((m, n) => +n.destination_amount - +m.destination_amount)[0];
+        if (!best) throw new Error('no market right now');
+        const min = Math.max(0.0000001, Math.min(w.min, +best.destination_amount * (1 - slip)));   // never accept less than what you confirmed
+        if (+best.destination_amount < w.min) throw new Error(`price moved: ${amtFmt(+best.destination_amount)} ${p.flat} now, you confirmed at least ${amtFmt(w.min)}`);
+        const x = await send([SDK.Operation.pathPaymentStrictSend({ sendAsset: asOf(w.k), sendAmount: amt7(w.amt), destination: p.bot.addr, destAsset: asOf(fk), destMin: amt7(min), path: (best.path || []).map(hAsset) })]);
+        r.hashes.push(x.hash); r.sold.push(w);
+      } catch (e) { r.unsold.push({ w, err: niceErr(e) }); }
+    }
+    if (r.unsold.length) r.ok = false, r.err = r.unsold.map((u) => `${kName(u.w.k)} not sold: ${u.err}`).join(' · ');
+    r.hash = r.hashes[r.hashes.length - 1]; out.push(r);
   }));
   return out;
 }
 async function fillResult(r) {
-  if (!r.ok || r.p.kind !== 'flat' || !r.hash) return '';
-  try {
-    const ops = (await H(`/transactions/${r.hash}/operations?limit=200`))._embedded.records;
-    const pp = ops.find((o) => o.type.startsWith('path_payment'));
-    if (!pp) return '';
-    const x = r.p.pos.side === 'short' ? +pp.amount : +pp.source_amount, u = r.p.pos.side === 'short' ? +pp.source_amount : +pp.amount;
-    return `${r.p.pos.side === 'short' ? 'Bought' : 'Sold'} ${fx(x)} XLM for ${fx(u)} USDC · avg ${(u / x).toFixed(6)}`;
-  } catch (e) { return ''; }
+  if (r.p.kind !== 'flat' || !(r.sold || []).length) return '';
+  const lines = [];
+  for (const h of r.hashes || []) {
+    try { const ops = (await H(`/transactions/${h}/operations?limit=200`))._embedded.records.filter((o) => o.type.startsWith('path_payment')); ops.forEach((o) => lines.push(`Sold ${amtFmt(+o.source_amount)} ${o.source_asset_type === 'native' ? 'XLM' : o.source_asset_code} for ${amtFmt(+o.amount)} ${o.asset_type === 'native' ? 'XLM' : o.asset_code}`)); } catch (e) {}
+  }
+  return lines.join(' · ');
 }
 
 /* ---------- confirm sheet ---------- */
@@ -14644,25 +14697,25 @@ async function killFlow(plansP, title, verb) {
   try { plans = await plansP; } catch (e) { return toast(niceErr(e), 6000); }
   const items = []; plans.forEach((p) => { items.push({ t: `— ${p.bot.name} —` }); p.lines.forEach((l) => items.push(l)); if (!p.lines.length) items.push({ t: 'Nothing to cancel', s: p.note || '' }); });
   const age = MK.at ? Math.round((Date.now() - MK.at) / 1000) + 's ago' : '';
-  const sub = `${plans.length > 1 ? 'One transaction per account' : 'One transaction · all or nothing'} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${NET().name}</b><br>Bid ${MK.bids[0] ? MK.bids[0][0].toFixed(6) : '–'} · Ask ${MK.asks[0] ? MK.asks[0][0].toFixed(6) : '–'} · Last ${MK.last ? MK.last.toFixed(6) : '–'} · book ${age} · cap ${S.slip}%`;
+  const sub = `${plans.some((p) => (p.swaps || []).length) ? 'Orders are cancelled first, then each sale is sent on its own' : plans.length > 1 ? 'One transaction per account' : 'One transaction · all or nothing'} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${NET().name}</b><br>Bid ${MK.bids[0] ? MK.bids[0][0].toFixed(6) : '–'} · Ask ${MK.asks[0] ? MK.asks[0][0].toFixed(6) : '–'} · Last ${MK.last ? MK.last.toFixed(6) : '–'} · book ${age} · cap ${S.slip}%`;
   confirmSheet(title, sub, items, 'Hold to ' + verb, async () => {
     const res = await runPlans(plans);
     const rows = await Promise.all(res.map(async (r) => {
       const fill = await fillResult(r);
       return `<div class="card"><div class="top"><b>${esc(r.p.bot.name)}</b><span class="tag ${r.ok ? 't-grn' : 't-red'}">${r.ok ? (r.nothing ? 'nothing to do' : 'done') : 'failed'}</span></div>
-        ${r.ok && !r.nothing ? `<div class="mu" style="font-size:13px">${r.p.offers.length} order(s) cancelled${fill ? '<br>' + esc(fill) : ''}</div><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a>` : ''}
+        ${(r.ok || (r.hashes || []).length) && !r.nothing ? `<div class="mu" style="font-size:13px">${r.p.offers.length} order(s) cancelled${fill ? '<br>' + esc(fill) : ''}</div><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a>` : ''}
         ${!r.ok ? `<div class="red" style="font-size:13px">${esc(r.err)}</div>` : ''}</div>`;
     }));
-    if (res.some((r) => r.ok && r.p.kind === 'flat')) rows.push(`<div class="note">When the PC comes back, a bot that tracks its own exit orders will find them gone. Make sure it treats the trade as closed by hand and does not re-enter.</div>`);
+    if (res.some((r) => (r.sold || []).length)) rows.push(`<div class="note">When the PC comes back, a bot that tracks its own exit orders will find them gone. Make sure it treats the trade as closed by hand and does not re-enter.</div>`);
     const allOk = res.every((r) => r.ok);
-    showResult(allOk, allOk ? (plans.some((p) => p.kind === 'flat') ? 'Flat' : 'Orders cancelled') : 'Some actions failed', rows);
+    showResult(allOk, allOk ? (res.some((r) => (r.sold || []).length) ? 'Orders cancelled, positions closed' : 'Orders cancelled') : 'Some actions failed', rows);
     tradeAccts().forEach((b) => { if (b.addr) delete BOT[b.addr]; });
   });
 }
 function readyBots() { return tradeAccts().filter((b) => b.addr && BOT[b.addr] && BOT[b.addr].a && sigState(BOT[b.addr].a).ok); }
 async function allPlans(flat) {
   await Promise.all(tradeAccts().filter((b) => b.addr).map(loadBot));
-  const bots = readyBots(); if (!bots.length) throw new Error('No bot accounts have this phone\'s key as a signer yet.');
+  const bots = readyBots(); if (!bots.length) throw new Error('Kill switch is off on every watched wallet. Open one and follow "Kill switch · off" to add this phone\'s key on the PC.');
   return Promise.all(bots.map((b) => (flat && b.kind === 'dir') ? planFlat(b) : planCancel(b)));
 }
 
@@ -14966,6 +15019,7 @@ async function trCheck() {
 function drawSet() {
   $$('#setNet button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.net));
   $$('#setSlip button').forEach((b) => b.classList.toggle('on', +b.dataset.v === +S.slip));
+  $('#setFlat').innerHTML = FLAT_OPTS().map((c) => `<button data-v="${c}" class="${c === flatCode() ? 'on' : ''}">${c}</button>`).join('');
   $$('#setSwSlip button').forEach((b) => b.classList.toggle('on', +b.dataset.v === swSlip()));
   $$('#setCol button').forEach((b) => b.classList.toggle('on', b.dataset.v === (S.col || 'bp')));
   drawHz();
@@ -15084,6 +15138,7 @@ document.addEventListener('click', async (e) => {
     if (seg === 'dKind') { const b = tradeAccts()[botSel]; if (b) { b.kind = v; saveS(); drawBot(); } return; }
     if (seg === 'suLen' || seg === 'cpLen') { const w = seg === 'suLen' ? 'su' : 'cp'; pinPick[w] = +v; return pinLenPaint(w); }
     if (seg === 'setSlip') { S.slip = +v; saveS(); return drawSet(); }
+    if (seg === 'setFlat') { S.flatTo = v; saveS(); return drawSet(); }
     if (seg === 'setSwSlip') { S.swSlip = +v; saveS(); return drawSet(); }
     if (seg === 'setCol') { S.col = v; saveS(); applyCol(); return drawSet(); }
     if (seg === 'setNet') return setNet(v);
@@ -15107,7 +15162,8 @@ document.addEventListener('click', async (e) => {
   const A = {
     setup: doSetup, exportVault, lock,
     setBack: () => go(setFrom || 'mkt'),
-    secEye: () => { const el = $('#' + t.dataset.for); if (!el) return; const on = el.classList.toggle('show'); t.classList.toggle('on', on); t.setAttribute('aria-label', on ? 'Hide what you typed' : 'Show what you typed'); },
+    secFixDigits: () => { const el = $('#' + t.dataset.for); if (!el) return; el.value = el.value.replace(/0/g, 'O').replace(/1/g, 'I').replace(/8/g, 'B'); secHint(el); secMask(el); },
+    secEye: () => { const el = $('#' + t.dataset.for); if (!el) return; const on = el.classList.toggle('show'); secMask(el); t.classList.toggle('on', on); t.setAttribute('aria-label', on ? 'Hide what you typed' : 'Show what you typed'); },
     scanClose: () => scanStop(),
     scanWatch: () => scanInline($('#xScan'), (r) => { $('#xAddr').value = r.addr; toast('Address scanned: ' + short(r.addr)); }),
     scanSend: () => scanInline($('#sScan'), (r) => { $('#sNAddr').value = r.addr; $('#sNMemo').value = r.memo || ''; toast('Address scanned: ' + short(r.addr) + (r.memo ? ' · memo ' + r.memo : '')); }),
@@ -15149,9 +15205,9 @@ document.addEventListener('click', async (e) => {
     addWallet: () => { pending = null; const h0 = addHow; addHow = 'new'; sheet(`<h2>Add a wallet</h2>
       <div class="seg" id="xHow"><button data-v="new">New</button><button data-v="imp">Import</button><button data-v="watch">Watch</button></div>
       <label>Name<input id="xName" placeholder="e.g. Savings" autocomplete="off"></label>
-      <label id="xSecW" style="display:none">Secret key (S…) or recovery phrase (12 or 24 words)<div class="secw"><textarea id="xSec" class="sec" rows="2" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" data-hint="xSecH"></textarea><button type="button" class="eyeb" data-act="secEye" data-for="xSec" aria-label="Show what you typed"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><span class="mu" id="xSecH" style="font-size:12px"></span></label>
+      <label id="xSecW" style="display:none">Secret key (S…) or recovery phrase (12 or 24 words)<div class="secw"><div class="secmask" aria-hidden="true"></div><textarea id="xSec" class="sec" rows="2" autocomplete="off" spellcheck="false" autocapitalize="characters" autocorrect="off" data-hint="xSecH"></textarea><button type="button" class="eyeb" data-act="secEye" data-for="xSec" aria-label="Show what you typed"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><span class="mu" id="xSecH" style="font-size:12px"></span></label>
       <label id="xNumW" style="display:none">Which wallet in that phrase<input id="xNum" type="number" min="1" value="1" inputmode="numeric"></label>
-      <div id="xAddrW" style="display:none;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">Public address (G…)</span><div class="scanrow"><input id="xAddr" placeholder="G…" spellcheck="false" autocomplete="off" aria-label="Public address"><button class="b-out" data-act="scanWatch"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Scan</button></div><div id="xScan"></div></div>
+      <div id="xAddrW" style="display:none;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">Public address (G…)</span><div class="scanrow"><input id="xAddr" placeholder="G…" spellcheck="false" autocomplete="off" autocapitalize="characters" autocorrect="off" aria-label="Public address"><button class="b-out" data-act="scanWatch"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Scan</button></div><div id="xScan"></div></div>
       <div class="mu" id="xHowNote" style="font-size:13px"></div>
       <button class="b-light big" data-act="addAcctOk">Add wallet</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
       const how = () => ($('#xHow .on') || { dataset: { v: 'new' } }).dataset.v;
@@ -15196,19 +15252,10 @@ document.addEventListener('click', async (e) => {
     actRefresh: () => { ACT.at = 0; drawAct(); },
     actMore: () => actLoad(true),
     pnlRefresh: () => { pnlReset(); paintPnl(); loadPer(P.sel); },
-    killAll: () => killFlow(allPlans(false), 'Cancel all orders?', 'cancel all'),
-    flatAll: () => killFlow(allPlans(true), 'Flatten everything?', 'flatten'),
+    killAll: () => killFlow(allPlans(false), 'Cancel orders?', 'cancel orders'),
+    flatAll: () => killFlow(allPlans(true), 'Cancel orders and close positions?', 'cancel + close'),
     killOne: () => killFlow(planCancel(tradeAccts()[botSel]).then((p) => [p]), `Cancel ${tradeAccts()[botSel].name} orders?`, 'cancel'),
-    flatOne: async () => {
-      const b = tradeAccts()[botSel]; const d = await loadBot(b);
-      if (!position(b, d.offers || [])) {
-        pending = null;
-        sheet(`<h2>No trade orders found</h2><div class="mu" style="font-size:14px">${esc(b.name)} has no T1/T3 exit orders, so the position size is unknown. Enter it to close it, or just cancel.</div><div class="seg" id="mSide"><button class="on" data-v="short">Short (buy back)</button><button data-v="long">Long (sell)</button></div><label>XLM amount<input id="mQty" inputmode="decimal"></label><button class="b-red big" data-act="flatManual">Continue</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
-        return;
-      }
-      killFlow(planFlat(b).then((p) => [p]), `Close ${b.name} position?`, 'confirm');
-    },
-    flatManual: () => { const q = +$('#mQty').value; if (!(q > 0)) return toast('Enter the XLM amount.'); const side = $('#mSide .on').dataset.v; closeSheet(); const b = tradeAccts()[botSel]; killFlow(planFlat(b, { side, qty: q }).then((p) => [p]), `Close ${b.name} position?`, 'confirm'); },
+    flatOne: () => { const b = tradeAccts()[botSel]; killFlow(planFlat(b).then((p) => [p]), `Cancel ${b.name} orders and close positions into ${flatCode()}?`, 'cancel + close'); },
     resultBack: () => go(resultBack),
     tradeReview, sendReview, saveAddr, saveAddrOk, trCheck,
     trAddCustom: () => { const c = window._custom; if (!c) return; if (!NS().extraKnown.some((k) => k.code === c.code && k.issuer === c.issuer)) { NS().extraKnown.push(c); saveS(); } trustOp(c, false); },
@@ -15239,7 +15286,6 @@ document.addEventListener('click', async (e) => {
 });
 document.addEventListener('click', (e) => { if (cur === 'mkt') { const r = e.target.closest('[data-sym]'); if (r) { L2.sym = watch()[+r.dataset.sym]; L2.ven = 'all'; go('l2'); return; } } const c = e.target.closest('[data-l2v]'); if (c) { L2.ven = c.dataset.l2v; paintL2(); return; } const pk = e.target.closest('[data-pick]'); if (pk) addSymOk(pk.dataset.pick); });
 document.addEventListener('click', (e) => { const t = e.target.closest('[data-pickaddr]'); if (t) { homeAddr = t.dataset.pickaddr; closeSheet(); drawHome(); } });
-document.addEventListener('click', (e) => { const t = e.target.closest('#mSide button'); if (t) { $$('#mSide button').forEach((b) => b.classList.toggle('on', b === t)); } });
 $('#sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
 $('#tAmt').addEventListener('input', tradeEst); $('#tPx').addEventListener('input', tradeEst);
 $('#sTo').addEventListener('change', sendToChanged); $('#sFrom').addEventListener('change', sendAssets);
