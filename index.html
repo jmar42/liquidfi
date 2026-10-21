@@ -207,6 +207,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 .chip{min-height:40px;font-size:14px;white-space:nowrap;flex:none}
 .foot{font-size:11.5px;color:var(--mu);margin:0 4px;line-height:1.5}
 .killbar{position:sticky;bottom:72px;z-index:3;background:var(--bg);margin:auto -18px 0;padding:10px 18px 4px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--bd)}
+#tLimMode button{font-size:13.5px;padding-left:2px;padding-right:2px;min-width:0}
 </style>
 </head>
 <body>
@@ -221,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.0</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.1</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -266,7 +267,8 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div id="hFund"></div>
   <span class="lbl hide-unf">Balances</span>
   <div class="card rows hide-unf" id="hBal" style="padding:4px 14px"></div>
-  <div id="hOff"></div>
+  <div class="top hide-unf" style="align-items:baseline"><span class="lbl">Open orders<span id="hOffN"></span></span><button class="b-out sm" data-go="trade" style="width:auto;min-height:30px;padding:0 12px">Trade ›</button></div>
+  <div id="hOff" class="hide-unf" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl hide-unf">Recent</span>
   <div class="card rows hide-unf" id="hRec" style="padding:4px 14px;font-size:14px"></div>
   <div class="mu mono" style="font-size:11.5px;overflow-wrap:anywhere;word-break:break-all" id="hAddr"></div>
@@ -367,10 +369,18 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card"><div class="book" id="tBook"></div></div>
   <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="grn" style="font-size:11px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
   <div class="seg" id="tSide"><button class="on" data-v="buy">Buy XLM</button><button data-v="sell">Sell XLM</button></div>
-  <div class="seg" id="tMode"><button class="on" data-v="lim">Limit</button><button data-v="mkt">Market</button></div>
+  <div class="seg" id="tMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
   <label>Amount (XLM)<input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
-  <div class="mu" id="tMktNote" style="font-size:12px;display:none">Market fills right away at the best price Stellar finds: the order book or the AMM pools, whichever is better, all in one step. Capped by your slippage.</div>
+  <div class="mu" id="tMktNote" style="font-size:12px;display:none">Market fills right away at the best price Stellar finds: the order book or the AMM pools, whichever is better, all in one step. Capped by your Trade slippage cap. Includes a 0.5% fee; limit orders have no fee.</div>
+  <div id="tStopW" style="display:none;flex-direction:column;gap:10px">
+    <label>Stop price<input id="tStop" inputmode="decimal"></label>
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px" id="tLimLbl">Fill no worse than</span><div class="seg" id="tLimMode" style="font-size:13.5px"><button data-v="mkt">Market</button><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="custom">Custom</button></div></div>
+    <label id="tLimW" style="display:none">Limit price<input id="tLim" inputmode="decimal"></label>
+    <div class="mu" id="tLimTxt" style="font-size:12.5px;line-height:1.5"></div>
+    <div class="g2"><label>Trigger on<select id="tFeed"><option value="avg">3-exchange avg</option><option value="stellar">Stellar last sale</option><option value="cb">Coinbase</option><option value="kr">Kraken</option><option value="bn">Binance</option></select></label><label>Ends after<select id="tDays"><option value="1">1 day</option><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select></label></div>
+    <div class="mu" id="tStopNote" style="font-size:12px;line-height:1.5"></div>
+  </div>
   <label id="tPxW" style="display:none">Limit price (USDC per XLM)<input id="tPx" inputmode="decimal"></label>
   <div class="card rows" id="tEst" style="padding:4px 14px;font-size:14px"></div>
   <button class="b-grn big" data-act="tradeReview" id="tGo">Review buy</button>
@@ -438,6 +448,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
+  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
   <div class="card"><span class="lbl">Kill switch key (this phone)</span><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">On the PC run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Watched wallets (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">Wallets you watch by address, like bots your PC runs. No key here. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Watch an address</button><button class="b-out sm" data-act="saveBots">Save list</button></div></div>
@@ -451,7 +462,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.0 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.1 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13748,7 +13759,20 @@ async function feeLive(a) {   // → Set of asset keys the fee wallet can take d
   let ok = null; try { const f = await acct(a); if (f) ok = new Set(['XLM', ...f.balances.filter((b) => b.asset_type !== 'native' && b.asset_type !== 'liquidity_pool_shares' && b.is_authorized !== false && +b.limit > +b.balance).map(akey)]); } catch (e) { return c ? c.ok : null; }
   FEEOK[a] = { ok, at: Date.now() }; return ok;
 }
-const feeTo = () => { const a = (SWAP_FEE.to[S.net] || '').trim(); return a && SDK.StrKey.isValidEd25519PublicKey(a) && a !== homeAddr ? a : null; };
+const feeTo = (src = homeAddr) => { const a = (SWAP_FEE.to[S.net] || '').trim(); return a && SDK.StrKey.isValidEd25519PublicKey(a) && a !== src ? a : null; };
+const feeOf = (amt) => Math.floor(amt * SWAP_FEE.bps / 10000 * 1e7) / 1e7;
+// fee leg for paying `fee` of token k from src: direct when the fee wallet holds k, else converted to XLM (min 1 stroop so it can't fail the trade). null = no fee (wallet not funded / not set)
+async function feeLegFor(k, fee, src) {
+  const to = feeTo(src); if (!to || !(fee >= 0.0000001)) return null;
+  const take = await feeLive(to); if (!take) return null;
+  if (take.has(k)) return { to, amt: fee, k, direct: true, path: [] };
+  const fj = await H(`/paths/strict-send?${hzAssetQ(k, 'source_')}&source_amount=${amt7(fee)}&destination_assets=native`);
+  const fr = ((fj._embedded || {}).records || []).filter((r) => r.destination_asset_type === 'native').sort((x, y) => +y.destination_amount - +x.destination_amount)[0];
+  if (!fr) throw new Error(`No route to pay the ${SWAP_FEE.bps / 100}% fee for ${kName(k)} right now.`);
+  return { to, amt: fee, k, direct: false, path: fr.path || [] };
+}
+const feeOp = (f) => f.direct ? SDK.Operation.payment({ destination: f.to, asset: asOf(f.k), amount: amt7(f.amt) })
+  : SDK.Operation.pathPaymentStrictSend({ sendAsset: asOf(f.k), sendAmount: amt7(f.amt), destination: f.to, destAsset: SDK.Asset.native(), destMin: '0.0000001', path: f.path.map(hAsset) });
 const asOf = (k) => (k === 'XLM' ? SDK.Asset.native() : new SDK.Asset(k.split(':')[0], k.split(':')[1]));
 const kName = (k) => k.split(':')[0];
 const hzAssetQ = (k, pre) => (k === 'XLM' ? `${pre}asset_type=native` : `${pre}asset_type=${kName(k).length > 4 ? 'credit_alphanum12' : 'credit_alphanum4'}&${pre}asset_code=${kName(k)}&${pre}asset_issuer=${k.split(':')[1]}`);
@@ -14149,17 +14173,37 @@ async function drawHome() {
     $('#hTot').textContent = a ? '$' + fx(usdVal(a)) : '$0.00';
     priceAssets(a).then((ch) => { if (ch && cur === 'home' && ACC[homeAddr] === a) { $('#hBal').innerHTML = balRows(a); $('#hTot').textContent = '$' + fx(usdVal(a)); } });
     $('#s-home').classList.toggle('unf', !a); $('#hFund').innerHTML = a ? '' : fundCard(); if (!a) fundSrcLoad().then(() => { if (cur === 'home' && !ACC[homeAddr]) $('#hFund').innerHTML = fundCard(); });
+    homeOrders(a);
     const ops = a ? (await H(`/accounts/${homeAddr}/operations?order=desc&limit=8`))._embedded.records : [];
     $('#hRec').innerHTML = ops.length ? ops.map((o) => `<details class="recrow" data-tx="${esc(o.transaction_hash)}"><summary><span>${esc(opText(o, homeAddr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(o.created_at))}</span></summary>${opDetail(o, homeAddr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
   } catch (e) { $('#hBal').innerHTML = `<div><span class="red">${esc(niceErr(e))}</span></div>`; }
+}
+let HOME_ALL = false, HOME_PAINT = null;
+// Open orders on the wallet page (same cards as Trade: limit orders + stops, with Edit / Cancel)
+async function homeOrders(a) {
+  const addr = homeAddr, el = $('#hOff'); if (!el) return;
+  if (HOME_ALL !== false && HOME_ALL !== addr) HOME_ALL = false;
+  if (!a) { el.innerHTML = ''; $('#hOffN').textContent = ''; return; }
+  el.innerHTML = '<div class="note">Loading…</div>';
+  let off = []; try { off = await offersOf(addr); } catch (e) { if (cur === 'home' && homeAddr === addr) el.innerHTML = `<div class="note">Couldn't load open orders (${esc(niceErr(e))}).</div>`; return; }
+  if (cur !== 'home' || homeAddr !== addr) return;
+  TRADE_OFF = off; tradeAddr = addr;
+  const paint = () => { if (cur !== 'home' || homeAddr !== addr) return; const st = STOPS.addr === addr ? STOPS.list.filter(stopLive) : [], n = st.length + off.length;
+    $('#hOffN').textContent = n ? ` (${n})` : '';
+    const cards = [...st.map(stopCard), ...off.map(orderCard)], cap = HOME_ALL ? cards.length : 5;   // a busy wallet (bot ladders) shows 5, then "Show all"
+    el.innerHTML = n ? cards.slice(0, cap).join('') + (cards.length > cap ? `<button class="b-out sm" data-act="homeAll">Show all ${cards.length} open orders</button>` : '') : '<div class="note">No open orders. Place limit and stop orders in Trade.</div>'; };
+  HOME_PAINT = paint;
+  STOP_PAINT = paint; paint();
+  Promise.all(off.map(async (o) => { const f = await offerFilled(o); if (f != null) FILLED[o.id] = f; })).then(paint);
+  if (S.stopUrl) stopList(addr).then(paint).catch(() => {});
 }
 function ago(t) { const s = (Date.now() - Date.parse(t)) / 1000; return s < 90 ? Math.round(s) + 's' : s < 5400 ? Math.round(s / 60) + 'm' : s < 129600 ? Math.round(s / 3600) + 'h' : Math.round(s / 86400) + 'd'; }
 function opText(o, me) {
   const an = (t, c) => t === 'native' ? 'XLM' : c;
   switch (o.type) {
     case 'create_account': return o.account === me ? `Account created with ${fx(o.starting_balance)} XLM` : `Created ${short(o.account)}`;
-    case 'payment': if (o.from === me && o.to === SWAP_FEE.to[S.net]) return `Swap fee ${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`; return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
-    case 'path_payment_strict_send': case 'path_payment_strict_receive': if (o.to === SWAP_FEE.to[S.net] && o.from === me) return `Swap fee ${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; if (o.to === me && o.from !== me) return `Received ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} from ${short(o.from)}`; if (o.to !== me) return `Sent ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} to ${short(o.to)}`; return `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
+    case 'payment': if (o.from === me && o.to === SWAP_FEE.to[S.net]) return `Liquidfi fee ${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`; return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
+    case 'path_payment_strict_send': case 'path_payment_strict_receive': if (o.to === SWAP_FEE.to[S.net] && o.from === me) return `Liquidfi fee ${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; if (o.to === me && o.from !== me) return `Received ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} from ${short(o.from)}`; if (o.to !== me) return `Sent ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} to ${short(o.to)}`; return `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
     case 'manage_sell_offer': case 'manage_buy_offer': { if (+o.amount === 0) return 'Cancelled an order'; const buy = o.type === 'manage_buy_offer', a = buy ? an(o.buying_asset_type, o.buying_asset_code) : an(o.selling_asset_type, o.selling_asset_code); return `${+o.offer_id ? 'Changed' : 'Placed'} ${buy ? 'buy' : 'sell'} order · ${amtFmt(+o.amount)} ${a} @ ${(+o.price).toFixed(6)}`; }
     case 'change_trust': return (+o.limit === 0 ? 'Removed ' : 'Added ') + 'trustline ' + o.asset_code;
     case 'set_options': return 'Changed account options/signers';
@@ -14720,21 +14764,26 @@ async function allPlans(flat) {
 }
 
 /* ---------- trade (Personal) ---------- */
-const T = { mode: 'lim', side: 'buy' };   // Limit is the default
+const T = { mode: 'mkt', side: 'buy' };   // Market is the default
 let tradeAddr = null;
 async function drawTrade() {
   tradeAddr = homeAddr || firstWallet();
   $('#tFrom').textContent = (allAccts().find((x) => x.addr === tradeAddr) || {}).name || '';
   $$('#tMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.mode));
   $$('#tSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.side));
-  $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none';
-  const g = $('#tGo'); g.textContent = 'Review ' + T.side; g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
+  $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none'; $('#tStopW').style.display = T.mode === 'stop' ? 'flex' : 'none';
+  if (T.mode === 'stop') stopDefaults();
+  const g = $('#tGo'); g.textContent = 'Review ' + (T.mode === 'stop' ? 'stop ' : '') + T.side; g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
   drawTradeBook(); tradeEst();
+  if (feeTo(tradeAddr)) feeLive(feeTo(tradeAddr)).then(() => { if (cur === 'trade') tradeEst(); }).catch(() => {});
   const a = await refreshAcct(tradeAddr).catch(() => null);
   const off = a ? await offersOf(tradeAddr).catch(() => []) : [];
   TRADE_OFF = off;
-  const paintOpen = () => { if (cur === 'trade') $('#tOpen').innerHTML = off.length ? off.map(orderCard).join('') : '<div class="note">No open orders.</div>'; };
+  const paintOpen = () => { if (cur !== 'trade') return; const st = STOPS.addr === tradeAddr ? STOPS.list : [], live = st.filter(stopLive), old = st.filter((x) => !stopLive(x) && Date.now() / 1000 - (x.done_at || 0) < 86400);
+    $('#tOpen').innerHTML = (live.length || off.length || old.length) ? live.map(stopCard).join('') + off.map(orderCard).join('') + old.map(stopCard).join('') : '<div class="note">No open orders.</div>'; };
+  STOP_PAINT = paintOpen;
   paintOpen(); drawFills(tradeAddr, off);
+  if (S.stopUrl) stopList(tradeAddr).then(paintOpen).catch((e) => { STOPS.err = niceErr(e); });
   Promise.all(off.map(async (o) => { const f = await offerFilled(o); if (f != null) FILLED[o.id] = f; })).then(paintOpen);
 }
 let TRADE_OFF = [];
@@ -14750,10 +14799,13 @@ function drawTradeBook() {
 }
 function tradeEst() {
   const q = +$('#tAmt').value || 0, el = $('#tEst'); if (!el) return;
-  if (!q) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; return; }
+  if (!q) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; if (T.mode === 'stop') stopEst(0, null); return; }
+  if (T.mode === 'stop') return stopEst(q, el);
   if (T.mode === 'lim') { const p = +$('#tPx').value || 0; el.innerHTML = `<div><span class="mu">${T.side === 'buy' ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p)} USDC</span></div>`; return; }
-  const c = walk(T.side, q);
-  el.innerHTML = c == null ? '<div><span class="amb">Book too thin for this size</span></div>' : `<div><span class="mu">Est. ${T.side === 'buy' ? 'cost' : 'proceeds'}</span><span class="mono">${fx(c)} USDC</span></div><div><span class="mu">Avg price</span><span class="mono">${(c / q).toFixed(6)}</span></div><div><span class="mu">${T.side === 'buy' ? 'Max' : 'Min'} with ${S.slip}% cap</span><span class="mono">${fx(T.side === 'buy' ? c * (1 + S.slip / 100) : c * (1 - S.slip / 100))} USDC</span></div>`;
+  const fOn = !!feeTo(tradeAddr) && (FEEOK[feeTo(tradeAddr)] || { ok: 1 }).ok, fx_ = fOn ? feeOf(T.side === 'sell' ? q : 0) : 0;   // sell: fee in XLM off the top · buy: fee in USDC on top
+  const c = walk(T.side, T.side === 'sell' ? q - fx_ : q), fu = fOn && T.side === 'buy' && c != null ? feeOf(c) : 0;
+  const feeRow = fOn ? `<div><span class="mu">Fee ${SWAP_FEE.bps / 100}%</span><span class="mono">${T.side === 'sell' ? m2(fx_) + ' XLM' : m2(fu) + ' USDC'}</span></div>` : '';
+  el.innerHTML = c == null ? '<div><span class="amb">Book too thin for this size</span></div>' : `<div><span class="mu">Est. ${T.side === 'buy' ? 'cost' : 'proceeds'}</span><span class="mono">${fx(c)} USDC</span></div>${feeRow}<div><span class="mu">Avg price</span><span class="mono">${(c / (T.side === 'sell' ? q - fx_ : q)).toFixed(6)}</span></div><div><span class="mu">${T.side === 'buy' ? 'Max' : 'Min'} with ${S.slip}% cap</span><span class="mono">${fx(T.side === 'buy' ? c * (1 + S.slip / 100) : c * (1 - S.slip / 100))} USDC</span></div>`;
 }
 function spendable(a, isXLM) {
   if (!a) return 0;
@@ -14765,26 +14817,176 @@ async function tradeReview() {
   const a = ACC[tradeAddr]; if (!a) return toast('Account not funded.');
   if (!a.balances.find(isUSDC)) return toast('Add the USDC trustline first (Assets).');
   const kp = kpFor(tradeAddr);
+  if (T.mode === 'stop') return stopReview(q, a, kp);
   if (T.mode === 'lim') {
     const p = +$('#tPx').value; if (!(p > 0)) return toast('Enter a limit price.');
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: USDC(), buying: SDK.Asset.native(), buyAmount: amt7(q), price: p.toFixed(7) })
       : SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: USDC(), amount: amt7(q), price: p.toFixed(7) });
     return confirmSheet(`Limit ${T.side} ${fx(q)} XLM`, `${NET().name} · stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)} USDC`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} USDC` }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
   }
-  let qt; try { qt = await quote(T.side, q); } catch (e) { return toast(niceErr(e)); }
-  const cap = T.side === 'buy' ? qt.usd * (1 + S.slip / 100) : qt.usd * (1 - S.slip / 100);
-  if (T.side === 'buy' && spendable(a, false) < qt.usd) return toast(`Not enough USDC (have ${fx(spendable(a, false))}).`);
-  if (T.side === 'sell' && spendable(a, true) < q) return toast(`Not enough spendable XLM (have ${fx(spendable(a, true))}).`);
-  const capU = T.side === 'buy' ? Math.min(cap, spendable(a, false)) : cap;
-  const op = T.side === 'buy' ? SDK.Operation.pathPaymentStrictReceive({ sendAsset: USDC(), sendMax: amt7(capU), destination: tradeAddr, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: qt.path })
-    : SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: amt7(q), destination: tradeAddr, destAsset: USDC(), destMin: amt7(capU), path: qt.path });
-  confirmSheet(`Market ${T.side} ${fx(q)} XLM`, `${NET().name} · fills now or not at all`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM`, s: `quote ${fx(qt.usd)} USDC (avg ${(qt.usd / q).toFixed(6)}) · ${T.side === 'buy' ? 'pay at most' : 'receive at least'} ${fx(capU)} USDC`, hl: 1 }], `Send market ${T.side}`, () => personalTx(kp, tradeAddr, [op], 'Sent', 'trade', null, `${T.side === 'buy' ? 'Bought' : 'Sold'} ${fx(q, 2)} XLM at market`), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
+  // Market = path payment to self + the 0.5% fee in the same transaction (all or nothing). Buy: fee in USDC on top of the cost. Sell: fee in XLM, the rest is sold.
+  const uK = NS().usdc.code + ':' + NS().usdc.issuer, buy = T.side === 'buy';
+  if (!buy && spendable(a, true) < q) return toast(`Not enough spendable XLM (have ${fx(spendable(a, true))}).`);
+  let qt, fee = null, sq = q;
+  try {
+    if (!buy) { fee = await feeLegFor('XLM', feeOf(q), tradeAddr); if (fee) sq = +(q - fee.amt).toFixed(7); }
+    qt = await quote(T.side, sq);
+    if (buy) fee = await feeLegFor(uK, feeOf(qt.usd), tradeAddr);
+  } catch (e) { return toast(niceErr(e)); }
+  const fU = buy && fee ? fee.amt : 0;
+  if (buy && spendable(a, false) < qt.usd + fU) return toast(`Not enough USDC (have ${fx(spendable(a, false))}, need ${fx(qt.usd + fU)} with the fee).`);
+  const cap = buy ? qt.usd * (1 + S.slip / 100) : qt.usd * (1 - S.slip / 100);
+  const capU = buy ? Math.min(cap, spendable(a, false) - fU) : cap;
+  const ops = [buy ? SDK.Operation.pathPaymentStrictReceive({ sendAsset: USDC(), sendMax: amt7(capU), destination: tradeAddr, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: qt.path })
+    : SDK.Operation.pathPaymentStrictSend({ sendAsset: SDK.Asset.native(), sendAmount: amt7(sq), destination: tradeAddr, destAsset: USDC(), destMin: amt7(capU), path: qt.path })];
+  if (fee) ops.push(feeOp(fee));
+  const feeTxt = fee ? (buy ? `fee ${m2(fee.amt)} USDC (${SWAP_FEE.bps / 100}%)` : `${m2(sq)} sold + ${m2(fee.amt)} XLM fee (${SWAP_FEE.bps / 100}%)`) : '';
+  const items = [{ t: `${buy ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM`, s: `${buy ? '' : feeTxt ? feeTxt + ' · ' : ''}quote ${fx(qt.usd)} USDC (avg ${(qt.usd / sq).toFixed(6)}) · ${buy ? 'pay at most' : 'receive at least'} ${fx(capU)} USDC`, hl: 1 }];
+  if (buy && fee) items.push({ t: `Fee ${m2(fee.amt)} USDC`, s: `${SWAP_FEE.bps / 100}% of the cost · total about ${fx(qt.usd + fee.amt)} USDC` });
+  confirmSheet(`Market ${T.side} ${fx(q)} XLM`, `${NET().name} · fills now or not at all`, items, `Send market ${T.side}`, () => personalTx(kp, tradeAddr, ops, 'Sent', 'trade', null, `${buy ? 'Bought' : 'Sold'} ${fx(buy ? q : sq, 2)} XLM at market${fee ? ` · fee ${m2(fee.amt)} ${buy ? 'USDC' : 'XLM'}` : ''}`), false, buy ? 'b-grn' : 'b-pur', 'Sending…', true);
 }
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   try {
     const t = await buildTx(src, ops, memo); t.sign(kp); const r = await submit(t);
     showResult(true, okTitle, [...(what ? [`<div class="card"><b>${esc(what)}</b><span class="mu" style="font-size:12.5px">Confirmed in ledger ${r.ledger}</span></div>`] : []), `<div class="card"><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a></div>`], back);
   } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], back); }
+}
+
+/* ---------- stop orders (held by your stop server on the watcher box) ----------
+   The phone signs the order now with the wallet key; the stop server only holds the signed order and sends it when the
+   price hits. A "channel" account of the server pays the network fee and gives the sequence number, so the stop stays good
+   while the wallet does other things. Cancel = the server burns that sequence number. */
+const STOPS = { addr: null, list: [], err: null };
+let STOP_PAINT = null;
+const FEEDN = { avg: 'Avg Coinbase · Kraken · Binance', stellar: 'Stellar last sale', cb: 'Coinbase', kr: 'Kraken', bn: 'Binance' };
+const stopLive = (x) => ['armed', 'triggered', 'sending', 'checking', 'cancelling', 'closing'].includes(x.status);
+const hexOk = (h, n) => typeof h === 'string' && new RegExp(`^[0-9a-f]{${n}}$`).test(h);
+const stopSig = (kp, msg) => b64(kp.sign(new TextEncoder().encode(msg)));
+async function stopApi(path, body) {
+  if (!S.stopUrl) throw new Error('Set your stop server in Settings → Stop orders.');
+  let r; try { r = await fetch(S.stopUrl.replace(/\/+$/, '') + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); }
+  catch (e) { throw new Error("Can't reach your stop server."); }
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Stop server error ' + r.status); return j;
+}
+async function stopList(addr) {
+  const kp = kpFor(addr), ts = Date.now();
+  const j = await stopApi('/list', { net: S.net, wallet: addr, ts, sig: stopSig(kp, `liquidfi-stops:list:${S.net}:${addr}:${ts}`) });
+  STOPS.addr = addr; STOPS.list = j.stops || []; STOPS.err = null; return STOPS.list;
+}
+const p4 = (x) => (+x).toFixed(x < 1 ? 6 : 4);
+// how far past the stop it may fill: 0.5 / 1 / 2 %, Market (= up to STOP_MKT % so a flash crash can't sell for almost nothing), or Custom
+const STOP_MKT = 5;
+const limMode = () => (['0.5', '1', '2', 'mkt', 'custom'].includes(String(S.stopLim)) ? String(S.stopLim) : 'mkt');   // Market is the default
+const limPct = () => (limMode() === 'mkt' ? STOP_MKT : +limMode());
+function stopDefaults() {
+  const m = mid(), mode = limMode(), sell = T.side === 'sell';
+  if (m && (!$('#tStop').value || T.stopSide !== T.side)) { const st = sell ? m * 0.95 : m * 1.05; $('#tStop').value = st.toFixed(4); T.stopSide = T.side; if (mode === 'custom') $('#tLim').value = ''; }
+  $$('#tLimMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === mode));
+  $('#tLimLbl').textContent = sell ? 'Sell no lower than' : 'Buy no higher than';
+  $('#tLimW').style.display = mode === 'custom' ? '' : 'none';
+  const st = +$('#tStop').value;
+  if (mode !== 'custom' && st > 0) $('#tLim').value = (sell ? st * (1 - limPct() / 100) : st * (1 + limPct() / 100)).toFixed(6);
+  const lim = +$('#tLim').value;
+  $('#tLimTxt').textContent = !(st > 0 && lim > 0) ? '' : mode === 'mkt' ? `Market: fills at the best price on the book, down to ${p4(lim)} (${STOP_MKT}% ${sell ? 'below' : 'above'} the stop) as a safety floor`
+    : `Limit ${p4(lim)} · ${(Math.abs(lim / st - 1) * 100).toFixed(2)}% ${sell ? 'below' : 'above'} the stop`;
+}
+function stopEst(q, el) {
+  const st = +$('#tStop').value || 0, lim = +$('#tLim').value || 0, sell = T.side === 'sell', m = mid();
+  $('#tStopNote').innerHTML = !S.stopUrl ? '<span class="amb">Set your stop server first: Settings → Stop orders.</span>'
+    : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? 'XLM stays' : 'USDC stays'} in your wallet until then. Includes the 0.5% fee if it fills.`;
+  if (!el) return;
+  const fOn = !!feeTo(tradeAddr) && (FEEOK[feeTo(tradeAddr)] || { ok: 1 }).ok, f = fOn ? feeOf(sell ? q : q * st) : 0;
+  const warn = st && m && (sell ? st >= m : st <= m) ? `<div><span class="amb">The price is ${p4(m)} now: a ${sell ? 'sell' : 'buy'} stop goes ${sell ? 'below' : 'above'} it.</span></div>` : '';
+  const badLim = st && lim && (sell ? lim > st : lim < st) ? `<div><span class="amb">The limit should be ${sell ? 'at or below' : 'at or above'} the stop.</span></div>` : '';
+  el.innerHTML = warn + badLim + `<div><span class="mu">Now</span><span class="mono">${m ? p4(m) : '–'}</span></div>`
+    + (sell ? `<div><span class="mu">If it fills, at least</span><span class="mono">${fx((q - f) * lim)} USDC</span></div>` : `<div><span class="mu">If it fills, pay at most</span><span class="mono">${fx(q * lim)} USDC</span></div>`)
+    + (fOn ? `<div><span class="mu">Fee ${SWAP_FEE.bps / 100}%</span><span class="mono">${sell ? m2(f) + ' XLM' : m2(f) + ' USDC'}</span></div>` : '');
+}
+async function stopReview(q, a, kp) {
+  if (!S.stopUrl) return toast('Set your stop server first: Settings → Stop orders.');
+  const sell = T.side === 'sell', st = +$('#tStop').value, lim = +$('#tLim').value, feed = $('#tFeed').value, days = +$('#tDays').value, m = mid();
+  if (!(st > 0)) return toast('Enter a stop price.'); if (!(lim > 0)) return toast('Enter a limit price.');
+  if (sell ? lim > st : lim < st) return toast(`The limit must be ${sell ? 'at or below' : 'at or above'} the stop.`);
+  if (m && (sell ? st >= m : st <= m)) return toast(`The price is ${p4(m)} now. A ${sell ? 'sell stop goes below' : 'buy stop goes above'} it.`);
+  const uK = NS().usdc.code + ':' + NS().usdc.issuer;
+  let fee = null; try { fee = await feeLegFor(sell ? 'XLM' : uK, feeOf(sell ? q : q * st), tradeAddr); } catch (e) { return toast(niceErr(e)); }
+  const sq = sell && fee ? +(q - fee.amt).toFixed(7) : q, usd = sell ? sq * lim : q * lim;
+  if (sell && spendable(a, true) < q) return toast(`Not enough spendable XLM (have ${fx(spendable(a, true))}).`);
+  if (!sell && spendable(a, false) < usd + (fee ? fee.amt : 0)) return toast(`Not enough USDC (have ${fx(spendable(a, false))}, need ${fx(usd + (fee ? fee.amt : 0))}).`);
+  const end = new Date(Date.now() + days * 86400e3);
+  const items = [{ t: `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}`, hl: 1 },
+    { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} XLM at ${p4(lim)} or better` : `Buy ${fx(q, 2)} XLM at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} USDC${fee ? ` · ${m2(sq)} sold + ${m2(fee.amt)} XLM fee (0.5%)` : ''}` : `pay at most ${fx(usd)} USDC${fee ? ` + ${m2(fee.amt)} USDC fee (0.5%)` : ''}` },
+    { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` }];
+  confirmSheet(`Stop ${T.side} ${fx(q)} XLM`, `${NET().name} · signed now, sent when the price hits`, items, `Place stop ${T.side}`, async () => {
+    try {
+      const w = tradeAddr, ts = Date.now();
+      const pr = await stopApi('/prepare', { net: S.net, wallet: w, ts, sig: stopSig(kp, `liquidfi-stops:prepare:${S.net}:${w}:${ts}`) });
+      const ops = [sell ? SDK.Operation.pathPaymentStrictSend({ source: w, sendAsset: SDK.Asset.native(), sendAmount: amt7(sq), destination: w, destAsset: USDC(), destMin: amt7(usd), path: [] })
+        : SDK.Operation.pathPaymentStrictReceive({ source: w, sendAsset: USDC(), sendMax: amt7(usd), destination: w, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: [] })];
+      if (fee) { ops.push(SDK.Operation[fee.direct ? 'payment' : 'pathPaymentStrictSend'](fee.direct ? { source: w, destination: fee.to, asset: asOf(fee.k), amount: amt7(fee.amt) } : { source: w, sendAsset: asOf(fee.k), sendAmount: amt7(fee.amt), destination: fee.to, destAsset: SDK.Asset.native(), destMin: '0.0000001', path: fee.path.map(hAsset) })); }
+      // signed copies at sequences A+1…A+N, each with "minimum sequence A": if one attempt fails in a fast market the next copy is still good
+      const per = Math.max(100, Math.floor(Math.min(pr.max_fee || 200000, 20000) / ops.length)), n = Math.max(1, Math.min(10, +pr.copies || 1)), xdrs = [];
+      for (let i = 0; i < n; i++) {
+        const b = new SDK.TransactionBuilder(new SDK.Account(pr.channel, (BigInt(pr.seq) - 1n + BigInt(i)).toString()), { fee: String(per), networkPassphrase: NET().pass, timebounds: { minTime: 0, maxTime: Math.floor(end.getTime() / 1000) }, minAccountSequence: String(pr.min_seq) });
+        ops.forEach((o) => b.addOperation(o));
+        const tx = b.build(); tx.sign(kp); xdrs.push(tx.toXDR());
+      }
+      await stopApi('/arm', { id: pr.id, xdrs, feed, stop: st, lim_mode: limMode(), guard: stopGuard() });
+      stopList(w).catch(() => {});
+      showResult(true, 'Stop placed', [`<div class="card"><b>${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM if ${esc(FEEDN[feed])} ${sell ? 'falls to' : 'rises to'} ${p4(st)}</b><span class="mu" style="font-size:12.5px">Limit ${p4(lim)} · ends ${end.toLocaleDateString()} · watched by your stop server</span></div>`], 'trade');
+    } catch (e) { showResult(false, 'Stop not placed', [`<div class="card red">${esc(niceErr(e))}</div>`], 'trade'); }
+  }, false, sell ? 'b-pur' : 'b-grn', 'Placing…', true);
+}
+function stopCard(x) {
+  const sell = x.side === 'sell', live = stopLive(x), d = new Date((x.expires || 0) * 1000);
+  const stTxt = { armed: `Waiting · ends ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })}${x.note ? ' · ' + esc(x.note) : ''}`, triggered: `Triggered at ${p4(+x.trig_px || 0)} · ${esc(x.note || 'sending…')}`, sending: 'Sending…', checking: 'Sent · confirming…', cancelling: 'Cancelling…', closing: 'Finishing…',
+    filled: 'Filled', failed: 'Not filled: ' + esc(x.err || ''), cancelled: 'Cancelled', expired: 'Ended without triggering' }[x.status] || esc(x.status);
+  return `<div class="card ocard${live ? '' : ' gone'}"><div class="r"><span><span class="tag ${sell ? 't-sell' : 't-buy'}">STOP ${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(+x.xlm || 0, 2)} XLM</b> <span class="mu">stop</span> <b class="mono">${p4(+x.stop || 0)}</b> <span class="mu">${x.lim_mode === 'mkt' ? 'market, floor' : 'limit'}</span> <b class="mono">${p4(+x.limit || 0)}</b></span></div>
+    <div class="r" style="font-size:12.5px"><span class="mu">${esc(x.feed_name || FEEDN[x.feed] || '')}${+x.px ? ` · now <b class="mono" style="color:var(--tx)">${p4(+x.px)}</b>` : ''}</span></div>
+    <div class="r" style="font-size:12.5px"><span class="${x.status === 'failed' ? 'amb' : x.status === 'filled' ? 'grn' : 'mu'}">${stTxt}</span>${hexOk(x.hash, 64) && x.status === 'filled' ? `<a class="mono" style="font-size:12px" href="${NET().expert}/tx/${x.hash}" target="_blank" rel="noopener">${short(x.hash)}</a>` : ''}</div>
+    ${live && ['armed', 'triggered'].includes(x.status) && hexOk(x.id, 32) ? `<button class="b-out sm" data-scancel="${x.id}">Cancel stop</button>` : ''}</div>`;
+}
+async function stopCancel(t) {
+  const id = t.dataset.scancel, card = t.closest('.card'); if (t.disabled) return; t.disabled = true; t.textContent = 'Cancelling…';
+  try { const kp = kpFor(tradeAddr), ts = Date.now(); const r = await stopApi('/cancel', { id, ts, sig: stopSig(kp, `liquidfi-stops:cancel:${id}:${ts}`) });
+    t.textContent = r.status === 'cancelled' ? 'Cancelled' : 'Cancelling…'; t.classList.add('done'); if (card) card.classList.add('gone');
+    const again = () => stopList(tradeAddr).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {}); setTimeout(again, 1500); setTimeout(again, 4000);   // the server closes it within a few seconds
+  } catch (e) { t.disabled = false; t.textContent = 'Cancel stop'; toast('Not cancelled: ' + niceErr(e)); }
+}
+// The public /health only says "stop server" + networks. Counts and the service balance need a request signed by one of your wallets.
+const servesNet = (j) => Array.isArray(j.nets) ? j.nets.includes(S.net) : !!(j.nets && j.nets[S.net]);
+async function stopCheck() {
+  const u = ($('#setStopUrl').value || '').trim().replace(/\/+$/, ''), el = $('#setStopSt');
+  if (!u) { S.stopUrl = ''; saveS(); el.textContent = 'Off. Stop orders are hidden until you add your stop server.'; return; }
+  if (!/^https:\/\//.test(u) && !/^http:\/\/(127\.0\.0\.1|localhost|192\.168\.)/.test(u)) { el.innerHTML = '<span class="red">Use an https address.</span>'; return; }
+  el.textContent = 'Checking…';
+  try {
+    const r = await fetch(u + '/health'); const j = await r.json(); if (!j.ok || !j.nets) throw new Error('not a stop server');
+    if (!servesNet(j)) { el.innerHTML = `<span class="red">That stop server doesn't serve ${NET().name}.</span>`; return; }
+    S.stopUrl = u; saveS(); stopStatus(j);
+  } catch (e) { el.innerHTML = `<span class="red">Can't reach a stop server there (${esc(niceErr(e))}).</span>`; }
+}
+async function stopStatus(h) {
+  const el = $('#setStopSt'), w = (OWN()[0] || {}).addr;
+  const head = `<span class="grn">✓ Connected</span> · v${esc(String(h.version))}`;
+  if (!w) { el.innerHTML = head; return; }
+  el.innerHTML = head + ' · checking…';
+  try {
+    const kp = kpFor(w), ts = Date.now();
+    const j = await stopApi('/status', { net: S.net, wallet: w, ts, sig: stopSig(kp, `liquidfi-stops:status:${S.net}:${w}:${ts}`) });
+    const k = +j.stops || 0, x = j.xlm == null ? null : +j.xlm;
+    el.innerHTML = `${head} · ${NET().name}${j.private ? ' · private' : ' · <span class="amb">open to any wallet</span>'}`
+      + (x != null && x < 3 && S.net === 'testnet' ? '<br>Testnet: it funds itself from friendbot the first time you place a stop.'
+        : x != null && x < 3 ? `<br><span class="amb">The stop server needs about 10 XLM on ${NET().name} to open its channels. Send it to <span class="mono">${esc(String(j.funder || ''))}</span>.</span>`
+        : `<br>Service balance ${fx(x || 0, 2)} XLM (pays network fees, not your trades).`);
+  } catch (e) { el.innerHTML = `${head}<br><span class="amb">${esc(niceErr(e))}</span>`; }
+}
+const stopGuard = () => { const g = S.stopGuard; return g === 0 || [1, 1.5, 3].includes(g) ? g : 1.5; };   // price guard %, 0 = off
+function drawStopSet() {
+  $$('#setGuard button').forEach((b) => b.classList.toggle('on', +b.dataset.v === stopGuard()));
+  $('#setStopUrl').value = S.stopUrl || '';
+  if (!S.stopUrl) { $('#setStopSt').textContent = 'Off. Add your stop server to use stop orders.'; return; }
+  $('#setStopSt').textContent = 'Checking…'; fetch(S.stopUrl + '/health').then((r) => r.json()).then((j) => servesNet(j) ? stopStatus(j) : ($('#setStopSt').innerHTML = `<span class="amb">Doesn't serve ${NET().name}.</span>`)).catch(() => { $('#setStopSt').innerHTML = '<span class="amb">Not answering right now.</span>'; });
 }
 
 /* ---------- orders: what filled, what rests, edit / cancel ---------- */
@@ -15022,7 +15224,7 @@ function drawSet() {
   $('#setFlat').innerHTML = FLAT_OPTS().map((c) => `<button data-v="${c}" class="${c === flatCode() ? 'on' : ''}">${c}</button>`).join('');
   $$('#setSwSlip button').forEach((b) => b.classList.toggle('on', +b.dataset.v === swSlip()));
   $$('#setCol button').forEach((b) => b.classList.toggle('on', b.dataset.v === (S.col || 'bp')));
-  drawHz();
+  drawHz(); drawStopSet();
   $('#setBk').innerHTML = !S.bk ? '<span class="amb">Not backed up yet. Needed before Mainnet.</span>' : bkOk() ? `<span class="grn">Backed up ${new Date(S.bk).toLocaleDateString()}</span>` : '<span class="amb">Accounts added since your last backup. Save a new file.</span>';
   $('#setEm').textContent = K.em.publicKey();
   $('#setBio').checked = !!S.bio; $('#setPinLen').textContent = S.pinLen || (PIN ? PIN.length : 6);
@@ -15134,17 +15336,20 @@ document.addEventListener('click', async (e) => {
     const seg = t.parentElement.id, v = t.dataset.v;
     if (seg === 'tMode') T.mode = v; if (seg === 'tSide' && T.side !== v) { T.side = v; $('#tPx').value = ''; }   // limit price restarts at the best bid (buy) / best ask (sell)
     if (seg === 'tMode' || seg === 'tSide') return drawTrade();
+    if (seg === 'tLimMode') { S.stopLim = v; saveS(); if (v === 'custom' && !$('#tLim').value) stopDefaults(); stopDefaults(); return tradeEst(); }
     if (seg === 'oMode') { S.pMode = v; saveS(); return paintPort(); }
     if (seg === 'dKind') { const b = tradeAccts()[botSel]; if (b) { b.kind = v; saveS(); drawBot(); } return; }
     if (seg === 'suLen' || seg === 'cpLen') { const w = seg === 'suLen' ? 'su' : 'cp'; pinPick[w] = +v; return pinLenPaint(w); }
     if (seg === 'setSlip') { S.slip = +v; saveS(); return drawSet(); }
     if (seg === 'setFlat') { S.flatTo = v; saveS(); return drawSet(); }
+    if (seg === 'setGuard') { S.stopGuard = +v; saveS(); return drawStopSet(); }
     if (seg === 'setSwSlip') { S.swSlip = +v; saveS(); return drawSet(); }
     if (seg === 'setCol') { S.col = v; saveS(); applyCol(); return drawSet(); }
     if (seg === 'setNet') return setNet(v);
     if (seg === 'setHz') return hzSet(v);
   }
-  if (t.dataset.pct) { const a = ACC[tradeAddr]; if (!a) return; const p = +t.dataset.pct / 100; const m = mid() || 1; const x = T.side === 'sell' ? spendable(a, true) * p : spendable(a, false) * p / (m * (1 + S.slip / 100)); $('#tAmt').value = (Math.floor(x * 100) / 100).toString(); return tradeEst(); }
+  if (t.dataset.pct) { const a = ACC[tradeAddr]; if (!a) return; const p = +t.dataset.pct / 100; const m = mid() || 1; const x = T.side === 'sell' ? spendable(a, true) * p : spendable(a, false) * p / (m * (1 + S.slip / 100) * (1 + (T.mode === 'mkt' && feeTo(tradeAddr) ? SWAP_FEE.bps / 10000 : 0))); $('#tAmt').value = (Math.floor(x * 100) / 100).toString(); return tradeEst(); }
+  if (t.dataset.scancel) return stopCancel(t);
   if (t.dataset.edit) { const o = TRADE_OFF.find((x) => x.id === t.dataset.edit); if (o) editSheet(o); return; }
   if (t.dataset.cancel) {   // one tap: Cancel → Cancelling… → Cancelled, right on the order
     const o = TRADE_OFF.find((x) => x.id === t.dataset.cancel); if (!o || t.disabled) return;
@@ -15152,7 +15357,7 @@ document.addEventListener('click', async (e) => {
     try {
       const tx = await buildTx(tradeAddr, [cancelOp(o)]); tx.sign(kpFor(tradeAddr)); await submit(tx);
       t.textContent = 'Cancelled'; t.classList.add('done'); if (card) card.classList.add('gone');
-      setTimeout(() => { if (cur === 'trade') drawTrade(); }, 1500);
+      setTimeout(() => { if (cur === 'trade') drawTrade(); else if (cur === 'home') homeOrders(ACC[homeAddr]); }, 1500);
     } catch (e) { t.disabled = false; t.textContent = 'Cancel'; if (card) card.querySelectorAll('button').forEach((b) => (b.disabled = false)); toast('Not cancelled: ' + niceErr(e)); }
     return;
   }
@@ -15273,7 +15478,7 @@ document.addEventListener('click', async (e) => {
     },
     rmBot: () => { const i = +t.dataset.i, b = NS().bots[i]; if (!b) return; pending = null; sheet(`<h2>Remove ${esc(b.name)}?</h2><div class="mu" style="font-size:14px">Only removes it from this phone's list. The account and the emergency signer on it stay as they are (remove the signer from the PC with Remove-Emergency-Signer.bat).</div><button class="b-red big" data-act="rmBotOk" data-i="${i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     rmBotOk: () => { NS().bots.splice(+t.dataset.i, 1); saveS(); closeSheet(); P.res = {}; if (cur === 'bot') go('bots'); else drawSet(); toast('Removed.'); },
-    hzCheck: () => hzCheck(),
+    hzCheck: () => hzCheck(), stopCheck, homeAll: () => { HOME_ALL = homeAddr; if (HOME_PAINT) HOME_PAINT(); },
     resetAsk: () => resetSheet(),
     saveBots: () => { const bad = []; $$('[data-baddr]').forEach((i) => { const v = i.value.trim(); if (v && !SDK.StrKey.isValidEd25519PublicKey(v)) bad.push(NS().bots[+i.dataset.baddr].name); else NS().bots[+i.dataset.baddr].addr = v; }); saveS(); toast(bad.length ? 'Not valid: ' + bad.join(', ') : 'Saved.'); },
     mnOk: () => switchMainnet(),
@@ -15288,6 +15493,7 @@ document.addEventListener('click', (e) => { if (cur === 'mkt') { const r = e.tar
 document.addEventListener('click', (e) => { const t = e.target.closest('[data-pickaddr]'); if (t) { homeAddr = t.dataset.pickaddr; closeSheet(); drawHome(); } });
 $('#sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
 $('#tAmt').addEventListener('input', tradeEst); $('#tPx').addEventListener('input', tradeEst);
+$('#tStop').addEventListener('input', () => { stopDefaults(); tradeEst(); }); $('#tLim').addEventListener('input', () => { stopDefaults(); tradeEst(); }); $('#tFeed').addEventListener('change', tradeEst);
 $('#sTo').addEventListener('change', sendToChanged); $('#sFrom').addEventListener('change', sendAssets);
 $('#rAcct').addEventListener('change', drawReceive);
 $('#wAmt').addEventListener('input', swapQuote); $('#wFrom').addEventListener('change', () => { if ($('#wFrom').value === $('#wTo').value) { const o = [...$('#wTo').options].find((x) => x.value !== $('#wFrom').value); if (o) $('#wTo').value = o.value; } swapQuote(); }); $('#wTo').addEventListener('change', swapQuote);
