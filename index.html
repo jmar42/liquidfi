@@ -271,6 +271,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div id="hOff" class="hide-unf" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl hide-unf">Recent</span>
   <div class="card rows hide-unf" id="hRec" style="padding:4px 14px;font-size:14px"></div>
+  <button class="b-out sm" data-act="homeBackup" id="hBk">Back up: show key and recovery phrase</button>
   <div class="mu mono" style="font-size:11.5px;overflow-wrap:anywhere;word-break:break-all" id="hAddr"></div>
 </section>
 
@@ -369,6 +370,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div id="xrTrust" style="display:flex;flex-direction:column;gap:6px"></div>
   <span class="lbl">Recent</span>
   <div class="card" id="xrRec" style="padding:4px 14px;font-size:14px"></div>
+  <div id="xrBk"></div>
   <div class="mu mono" style="font-size:11.5px;overflow-wrap:anywhere;word-break:break-all" id="xrFull"></div>
 </section>
 
@@ -13199,7 +13201,7 @@ let PIN = null;    // kept only while unlocked, to re-seal
 let idleT = null;
 function bumpIdle() { clearTimeout(idleT); if (K) idleT = setTimeout(lock, 120000); }
 ['pointerdown', 'keydown'].forEach((e) => document.addEventListener(e, bumpIdle, { passive: true }));
-function lock() { if (clipT) clearClip(); pinOkAt = 0; bioTried = false; K = null; PIN = null; closeSheet(); go('lock'); }
+function lock() { if (clipT) clearClip(); pinOkAt = 0; bioTried = false; K = null; PIN = null; closeSheet(); const bk = $('#bkKeys'); if (bk) bk.innerHTML = ''; $('#sheetIn').innerHTML = ''; go('lock'); }
 // screens still loading when the wallet locks find K gone; drop those leftovers quietly
 window.addEventListener('unhandledrejection', (e) => { if (!K) e.preventDefault(); });
 
@@ -13768,12 +13770,14 @@ async function scanInline(box, onAddr, parse = parseAddrQR, what = 'a Stellar ad
 const XRPL_URL = { public: ['https://xrplcluster.com/', 'https://s2.ripple.com:51234/', 'https://s1.ripple.com:51234/'], testnet: ['https://testnet.xrpl-labs.com/', 'https://s.altnet.rippletest.net:51234/'] };
 const XRP_EXPL = { public: 'https://livenet.xrpl.org', testnet: 'https://testnet.xrpl.org' };
 const XRP_USD_ISS = { public: ['rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De'], testnet: ['rQhWct2fv4Vc4KRjRgMrxa8xPN9Zx9iLKV'] };   // RLUSD (Ripple USD): counted as $1
-const XRA = {};   // address → { a: account_data | null (not activated), lines, at }
+const XRA = {};   // address → { a: account_data | null (not activated), lines, at } — for the current network only
+let XRA_NET = null;
+function xrNetGuard() { if (XRA_NET !== S.net) { for (const k of Object.keys(XRA)) delete XRA[k]; XRA_NET = S.net; } }
 let XRSV = null, xrSel = null, XRPX = { px: 0, at: 0 };
-const xrList = () => { const own = (K && K.xr || []).map((o) => ({ name: o.name, addr: o.w.classicAddress, own: true })); return [...own, ...(NS().xrw || []).filter((w) => !own.some((o) => o.addr === w.addr)).map((w) => ({ ...w, own: false }))]; };
+const xrList = () => { const own = (K && K.xr || []).filter((o) => o.w).map((o) => ({ name: o.name, addr: o.w.classicAddress, own: true })); return [...own, ...(NS().xrw || []).filter((w) => !own.some((o) => o.addr === w.addr)).map((w) => ({ ...w, own: false }))]; };
 // Old-style secrets (s…, the 2013–2019 kind) are secp256k1; newer sEd… ones are ed25519. xrpl.js must be told which, or it opens a different address.
 const xrFromSeed = (seed) => xrpl.Wallet.fromSeed(seed, { algorithm: seed.startsWith('sEd') ? 'ed25519' : 'ecdsa-secp256k1' });
-const xrOwn = (addr) => (K && K.xr || []).find((o) => o.w.classicAddress === addr);
+const xrOwn = (addr) => (K && K.xr || []).find((o) => o.w && o.w.classicAddress === addr);
 async function xr(method, params = {}) {   // JSON-RPC with failover; returns `result` (which may carry error: 'actNotFound' etc.)
   let err;
   for (const u of XRPL_URL[S.net] || XRPL_URL.public) {
@@ -13802,6 +13806,7 @@ async function xrpPrice() {   // XRP in USD: Coinbase, then Kraken. Cached 30 s.
 }
 const xrCur = (c) => { if (!c || c.length !== 40) return c; let s = ''; for (let i = 0; i < 40; i += 2) { const n = parseInt(c.slice(i, i + 2), 16); if (n) s += String.fromCharCode(n); } return /^[\x20-\x7e]+$/.test(s) ? s : c.slice(0, 6) + '…'; };
 async function xrLoad(addr) {
+  xrNetGuard();
   const [ai, al] = await Promise.all([xr('account_info', { account: addr, ledger_index: 'validated' }), xr('account_lines', { account: addr, ledger_index: 'validated' }).catch(() => ({ lines: [] }))]);
   if (ai.error === 'actNotFound') { XRA[addr] = { a: null, lines: [], at: Date.now() }; return XRA[addr]; }
   if (ai.error) throw new Error(ai.error_message || ai.error);
@@ -13811,18 +13816,11 @@ async function xrLoad(addr) {
 const xrXrp = (d) => (d && d.a ? +d.a.Balance / 1e6 : 0);
 function xrSpend(d) { if (!d || !d.a) return 0; const sv = XRSV || { base: 1, inc: 0.2 }; return Math.max(0, xrXrp(d) - sv.base - sv.inc * (+d.a.OwnerCount || 0)); }
 const xrIsUsd = (l) => (XRP_USD_ISS[S.net] || []).includes(l.account) && ['RLUSD', 'USD'].includes(xrCur(l.currency));
-function xrUsd(d) { if (!d || !d.a) return 0; return xrXrp(d) * (XRPX.px || 0) + d.lines.filter(xrIsUsd).reduce((t, l) => t + Math.max(0, +l.balance), 0); }
-const xrTotal = () => xrList().reduce((t, w) => t + xrUsd(XRA[w.addr]), 0);
+function xrUsd(d) { if (!d || !d.a || S.net !== 'public') return 0; return xrXrp(d) * (XRPX.px || 0) + d.lines.filter(xrIsUsd).reduce((t, l) => t + Math.max(0, +l.balance), 0); }
+const xrTotal = () => (xrNetGuard(), xrList()).reduce((t, w) => t + xrUsd(XRA[w.addr]), 0);
 
 /* Accounts: an "XRP Ledger" group under the Stellar wallets */
-function drawXrpRows() {
-  const el = $('#bXrp'); if (!el) return; const L = xrList();
-  if (!L.length) { el.innerHTML = ''; return; }
-  el.innerHTML = '<span class="lbl" style="margin-top:4px">XRP Ledger</span>' + L.map((w) => {
-    const d = XRA[w.addr], val = d ? (d.a ? '$' + fx(xrUsd(d)) : 'not activated') : '…';
-    return `<button class="acct" data-xr="${esc(w.addr)}"><div class="r"><span style="font-size:17px;font-weight:600">${esc(w.name)} <span class="mu" style="font-size:12px;font-weight:400">${w.own ? 'XRP wallet' : 'XRP · watch'}</span></span><span class="mono" style="font-size:16px">${val}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${short(w.addr)}</span><span class="mono mu" style="font-size:12.5px">${d && d.a ? m2(xrXrp(d)) + ' XRP' : ''}</span></div></button>`;
-  }).join('');
-}
+function drawXrpRows() { const el = $('#bXrp'); if (el) el.innerHTML = ''; }   // XRP wallets now sit in the one Accounts list
 async function loadXrpAll() {
   const L = xrList(); if (!L.length) return;
   xrServer().catch(() => null); await xrpPrice().catch(() => 0);
@@ -13831,9 +13829,11 @@ async function loadXrpAll() {
 
 /* the XRP wallet page */
 async function drawXrp() {
+  xrNetGuard();
   const addr = xrSel, w = xrList().find((x) => x.addr === addr); if (!w) return go('bots');
   const own = !!xrOwn(addr);
   $('#xrName').textContent = w.name; $('#xrAddr').textContent = short(addr) + ' · XRP Ledger ' + (S.net === 'public' ? 'Mainnet' : 'Testnet'); $('#xrFull').textContent = addr;
+  $('#xrBk').innerHTML = own ? '<button class="b-out sm" data-act="xrBackup">Back up: show key and recovery phrase</button>' : '';
   $('#xrActs').innerHTML = own ? '<button class="b-out" data-act="xrSend">Send</button><button class="b-out" data-act="xrRcv">Receive</button>' : '<button class="b-out" data-act="xrRcv">Receive</button><button class="b-out" data-act="xrRmWatch">Remove</button>';
   const paint = () => {
     const d = XRA[addr];
@@ -13847,12 +13847,12 @@ async function drawXrp() {
     $('#xrFund').innerHTML = '';
     const sv = XRSV || { base: 1, inc: 0.2 }, res = sv.base + sv.inc * (+d.a.OwnerCount || 0);
     $('#xrBal').innerHTML = `<div><div><b>XRP</b><div class="mu" style="font-size:12px">${m2(xrSpend(d))} available · ${m2(res)} reserved by the ledger</div></div><div style="text-align:right"><div class="mono">${m2(xrXrp(d))}</div><div class="mu mono" style="font-size:12px">${XRPX.px ? '$' + fx(xrXrp(d) * XRPX.px) : ''}</div></div></div>`
-      + d.lines.map((l) => `<div><div><b>${esc(xrIsUsd(l) && l.currency === RLUSD_CUR ? 'RLUSD' : xrCur(l.currency))}</b><div class="mu mono" style="font-size:12px">${short(l.account)}</div></div><div style="text-align:right"><div class="mono">${m2(+l.balance)}</div><div class="mu mono" style="font-size:12px">${xrIsUsd(l) ? '$' + fx(+l.balance) : ''}</div></div></div>`).join('');
+      + d.lines.map((l) => `<div><div><b>${esc(xrIsUsd(l) && l.currency === RLUSD_CUR ? 'RLUSD' : xrCur(l.currency))}</b><div class="mu mono" style="font-size:12px">${esc(short(String(l.account)))}</div></div><div style="text-align:right"><div class="mono">${m2(+l.balance)}</div><div class="mu mono" style="font-size:12px">${xrIsUsd(l) ? '$' + fx(+l.balance) : ''}</div></div></div>`).join('');
   };
   paint();
   const trustBtn = () => { const d = XRA[addr]; $('#xrTrust').innerHTML = own && d && d.a && !hasRlusd(d) ? `<button class="b-out" data-act="xrTrust">+ Add RLUSD (Ripple USD)</button><div class="mu" style="font-size:12px">Lets this wallet hold Ripple's dollar. Uses ${m2((XRSV || { inc: 0.2 }).inc)} XRP of reserve.</div>` : ''; };
   trustBtn();
-  try { await xrServer(); await xrpPrice(); await xrLoad(addr); } catch (e) { if (cur === 'xrp') $('#xrBal').innerHTML = `<div><span class="red">${esc(niceErr(e))}</span></div>`; return; }
+  try { await xrServer(); await xrpPrice(); await xrLoad(addr); } catch (e) { if (cur === 'xrp') $('#xrBal').innerHTML = `<div><span class="red">${esc(e.message || String(e))}</span></div>`; return; }
   if (cur !== 'xrp' || xrSel !== addr) return; paint(); trustBtn();
   if (!XRA[addr].a) return;
   try {
@@ -13860,7 +13860,7 @@ async function drawXrp() {
     if (cur !== 'xrp' || xrSel !== addr) return;
     const T = (r.transactions || []).map((x) => ({ tx: x.tx || x.tx_json || {}, meta: x.meta || {}, hash: x.hash || (x.tx || {}).hash, iso: x.close_time_iso || ((x.tx || x.tx_json || {}).date != null ? new Date(((x.tx || x.tx_json).date + 946684800) * 1000).toISOString() : null) }));
     $('#xrRec').innerHTML = T.length ? T.map((x) => `<div class="recrow" style="display:flex;justify-content:space-between;gap:10px;padding:8px 0"><span>${esc(xrTxText(x, addr))}</span><a class="mu" style="font-size:12px;white-space:nowrap" href="${XRP_EXPL[S.net]}/transactions/${esc(x.hash)}" target="_blank" rel="noopener">${x.iso ? esc(ago(x.iso)) : 'view'}</a></div>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
-  } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(niceErr(e))}</span></div>`; }
+  } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
 }
 function xrAmt(a) { if (a == null) return '?'; if (typeof a === 'string') return m2(+a / 1e6) + ' XRP'; return m2(+a.value) + ' ' + xrCur(a.currency); }
 function xrTxText(x, me) {
@@ -13899,31 +13899,56 @@ async function xrSendReview() {
   if (tagS && !/^\d{1,10}$/.test(tagS) || (tagS && +tagS > 4294967295)) return toast('A destination tag is a whole number.');
   if (!(amt > 0)) return toast('Enter an amount.');
   let sv, dst, fee;
-  try { sv = await xrServer(); [dst, fee] = await Promise.all([xr('account_info', { account: to, ledger_index: 'validated' }), xr('fee')]); } catch (e) { return toast(niceErr(e)); }
+  try { sv = await xrServer(); [dst, fee] = await Promise.all([xr('account_info', { account: to, ledger_index: 'validated' }), xr('fee'), xrLoad(xrSel)]); } catch (e) { return toast(e.message || String(e)); }
+  const d2 = XRA[xrSel] || d;
   const drops = Math.min(1000, Math.max(12, Math.ceil(+((fee.drops || {}).open_ledger_fee || 12) * 1.2)));
-  if (amt + drops / 1e6 > xrSpend(d) + 1e-9) return toast(`Not enough XRP (${m2(xrSpend(d))} available after the ledger reserve).`);
+  if (amt + drops / 1e6 > xrSpend(d2) + 1e-9) return toast(`Not enough XRP (${m2(xrSpend(d2))} available after the ledger reserve).`);
   if (dst.error === 'actNotFound' && amt < sv.base) return toast(`That address isn't activated yet. Send at least ${m2(sv.base)} XRP to open it.`);
   if (dst.error && dst.error !== 'actNotFound') return toast(dst.error_message || dst.error);
   if (dst.account_data && (+dst.account_data.Flags & 0x00020000) && !tagS) return toast('That address needs a destination tag (exchanges do). Add it from the exchange.');
+  if (dst.account_data && (+dst.account_data.Flags & 0x01000000)) return toast('That address only accepts payments from senders it approved (Deposit Authorization). The ledger would refuse it.');
+  if (dst.account_data && (+dst.account_data.Flags & 0x00080000) && !confirm('That address asks not to be sent XRP. Send anyway?')) return;
   const items = [{ t: `Send ${m2(amt)} XRP`, s: `to ${to}`, hl: 1 }, ...(tagS ? [{ t: `Destination tag ${tagS}` }] : []), { t: `Network fee ${m2(drops / 1e6)} XRP`, s: (dst.error === 'actNotFound' ? `This opens a new XRP Ledger address (it keeps ${m2(sv.base)} XRP as reserve). ` : '') + XR_BOT_NOTE }];
   confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger ${S.net === 'public' ? 'Mainnet' : 'Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops), false, 'b-acc', 'Sending…', true);
 }
-// sign + submit + wait for validation. tx needs TransactionType and its fields; Account, Sequence, Fee, LastLedgerSequence are filled here.
+// sign + submit + wait until the outcome is CERTAIN. A payment is only "not sent" once the ledger has passed its
+// LastLedgerSequence without it. Timeouts, tef/ter/tel answers (e.g. tefPAST_SEQ from a second server that already has it)
+// never mean "try again": we look the hash up until it is found or has expired. → { hash, state: 'ok'|'failed'|'expired'|'pending', code, ledger }
 async function xrSubmit(o, tx, drops) {
   const from = o.w.classicAddress;
-  const [ai, sv] = await Promise.all([xr('account_info', { account: from, ledger_index: 'current' }), xr('ledger_current')]);
+  const [ai, cl] = await Promise.all([xr('account_info', { account: from, ledger_index: 'current' }), xr('ledger_current')]);
+  const minL = Math.max(1, (+cl.ledger_current_index || 1) - 1);
   const seq = (ai.account_data || {}).Sequence; if (seq == null) throw new Error('Wallet not found on the XRP Ledger.');
-  const full = { ...tx, Account: from, Fee: String(drops), Sequence: seq, LastLedgerSequence: (+sv.ledger_current_index || 0) + 20 };
+  const lls = (+cl.ledger_current_index || 0) + 20;
+  const full = { ...tx, Account: from, Fee: String(drops), Sequence: seq, LastLedgerSequence: lls };
   const s = o.w.sign(full);
-  const r = await xr('submit', { tx_blob: s.tx_blob });
-  const er = r.engine_result || r.error;
-  if (!/^(tes|terQUEUED)/.test(er || '')) throw new Error(xrErr(er, r.engine_result_message || r.error_message));
-  let fin = null;
-  for (let i = 0; i < 12 && !fin; i++) { await sleep(2500); const q = await xr('tx', { transaction: s.hash }).catch(() => ({})); if (q.validated) fin = q; }
-  const res = fin ? (fin.meta || {}).TransactionResult : null;
-  if (fin && res !== 'tesSUCCESS') throw new Error(xrErr(res));
+  let first = null;
+  try { const r = await xr('submit', { tx_blob: s.tx_blob }); first = r.engine_result || r.error || null; } catch (e) { first = null; }   // no answer: it may still have reached the network
+  if (first && /^tem/.test(first)) return { hash: s.hash, state: 'expired', code: first };   // malformed: rejected outright, nothing can apply
+  const t0 = Date.now();
+  while (Date.now() - t0 < 150000) {
+    await sleep(3000); bumpIdle();   // keep the wallet unlocked until the outcome is shown
+    const q = await xr('tx', { transaction: s.hash }).catch(() => ({}));
+    if (q.validated) { delete XRA[from]; const res = (q.meta || {}).TransactionResult; return { hash: s.hash, state: res === 'tesSUCCESS' ? 'ok' : 'failed', code: res, ledger: +q.ledger_index || null }; }
+    const v = await xr('ledger', { ledger_index: 'validated' }).catch(() => ({}));
+    const vi = +((v.ledger || {}).ledger_index || v.ledger_index || 0);
+    if (vi > lls) {   // past its last ledger and not found on any server: it can never apply
+      const again = await xr('tx', { transaction: s.hash, min_ledger: minL, max_ledger: lls }).catch(() => ({}));
+      if (again.validated) { delete XRA[from]; const res = (again.meta || {}).TransactionResult; return { hash: s.hash, state: res === 'tesSUCCESS' ? 'ok' : 'failed', code: res, ledger: +again.ledger_index || null }; }
+      if (again.error === 'txnNotFound' && again.searched_all === true) return { hash: s.hash, state: 'expired', code: first };   // the server checked every ledger it could have landed in
+      continue;   // couldn't be sure: keep looking (ends as "pending", never "safe to try again")
+    }
+  }
   delete XRA[from];
-  return { hash: s.hash, fin };
+  return { hash: s.hash, state: 'pending', code: first };
+}
+// one result screen for every outcome
+function xrOutcome(r, okTitle, okLine, failTitle) {
+  const link = `<div class="card"><a class="mono" style="font-size:12px" href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">${esc(short(r.hash))} · view</a></div>`;
+  if (r.state === 'ok') return showResult(true, okTitle, [`<div class="card"><b>${okLine}</b><span class="mu" style="font-size:12.5px">Confirmed in ledger ${+r.ledger || ''}</span></div>`, link], 'xrp');
+  if (r.state === 'failed') return showResult(false, failTitle, [`<div class="card red">Failed on the ledger: ${esc(xrErr(r.code))} The network fee was charged; nothing else moved.</div>`, link], 'xrp');
+  if (r.state === 'expired') return showResult(false, failTitle, [`<div class="card red">${esc(r.code ? xrErr(r.code) : 'It never reached the ledger.')} Nothing moved and no fee was charged, so it's safe to try again.</div>`], 'xrp');
+  showResult(false, 'Still pending', [`<div class="card amb">Sent, but not confirmed yet. Don't send it again: check this wallet's Recent list or the link below in a minute.</div>`, link], 'xrp');
 }
 async function xrFee() { const f = await xr('fee'); return Math.min(1000, Math.max(12, Math.ceil(+((f.drops || {}).open_ledger_fee || 12) * 1.2))); }
 const XR_BOT_NOTE = 'If a bot (like XRP Sweepr) trades from this wallet, pause it first so the two don\'t clash.';
@@ -13931,9 +13956,9 @@ async function xrSendRun(o, to, tag, amt, drops) {
   try {
     const tx = { TransactionType: 'Payment', Destination: to, Amount: String(Math.round(amt * 1e6)) };
     if (tag != null) tx.DestinationTag = tag;
-    const { hash: h, fin } = await xrSubmit(o, tx, drops), s = { hash: h };
-    showResult(true, fin ? 'Sent' : 'Sent, confirming', [`<div class="card"><b>${m2(amt)} XRP to ${esc(short(to))}${tag != null ? ' · tag ' + tag : ''}</b><span class="mu" style="font-size:12.5px">${fin ? 'Confirmed in ledger ' + fin.ledger_index : 'Not confirmed yet. Check its activity in a minute.'}</span></div>`, `<div class="card"><a class="mono" style="font-size:12px" href="${XRP_EXPL[S.net]}/transactions/${s.hash}" target="_blank" rel="noopener">${short(s.hash)} · view</a></div>`], 'xrp');
-  } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], 'xrp'); }
+    const r = await xrSubmit(o, tx, drops);
+    return xrOutcome(r, 'Sent', `${m2(amt)} XRP to ${esc(short(to))}${tag != null ? ' · tag ' + tag : ''}`, 'Not sent');
+  } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
 }
 function xrErr(code, msg) {
   const m = { tecUNFUNDED_PAYMENT: 'Not enough XRP after the ledger reserve.', tecNO_DST_INSUF_XRP: "That address isn't activated; send at least the reserve to open it.", tecDST_TAG_NEEDED: 'That address needs a destination tag.', tefPAST_SEQ: 'Another transaction went first. Try again.', telINSUF_FEE_P: 'Network busy. Try again in a moment.', tecNO_PERMISSION: 'That address does not accept this payment.', tecPATH_DRY: 'No path for this payment.', tecNO_DST: "That address doesn't exist yet." };
@@ -13957,17 +13982,33 @@ const hasRlusd = (d) => !!(d && d.lines.some((l) => l.account === rlusdIss() && 
 async function xrTrustReview() {
   const o = xrOwn(xrSel), d = XRA[xrSel]; if (!o || !d || !d.a) return toast('This wallet is not activated yet.');
   if (hasRlusd(d)) return toast('RLUSD is already added.');
-  let sv, drops; try { sv = await xrServer(); drops = await xrFee(); } catch (e) { return toast(niceErr(e)); }
+  let sv, drops; try { sv = await xrServer(); drops = await xrFee(); } catch (e) { return toast(e.message || String(e)); }
   if (xrSpend(d) < sv.inc + drops / 1e6) return toast(`Needs ${m2(sv.inc)} XRP free for the reserve (${m2(xrSpend(d))} available).`);
   confirmSheet('Add RLUSD (Ripple USD)', `XRP Ledger ${S.net === 'public' ? 'Mainnet' : 'Testnet'} · ${esc(o.name)}`, [
     { t: 'Hold RLUSD in this wallet', s: `issuer ${rlusdIss()} (Ripple)`, hl: 1 },
     { t: `Reserve +${m2(sv.inc)} XRP`, s: 'the ledger holds it while the trust line is open; you get it back if you remove the line at 0 balance' },
     { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], 'Add RLUSD', async () => {
     try {
-      const { hash, fin } = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: RLUSD_CUR, issuer: rlusdIss(), value: '1000000000' }, Flags: 0x00020000 }, drops);   // tfSetNoRipple
-      showResult(true, fin ? 'RLUSD added' : 'Sent, confirming', [`<div class="card"><b>${esc(o.name)} can now hold RLUSD</b><span class="mu" style="font-size:12.5px">${fin ? 'Confirmed in ledger ' + fin.ledger_index : 'Not confirmed yet. Check in a minute.'} · reserve +${m2(sv.inc)} XRP</span></div>`, `<div class="card"><a class="mono" style="font-size:12px" href="${XRP_EXPL[S.net]}/transactions/${hash}" target="_blank" rel="noopener">${short(hash)} · view</a></div>`], 'xrp');
-    } catch (e) { showResult(false, 'RLUSD not added', [`<div class="card red">${esc(niceErr(e))}</div>`], 'xrp'); }
+      const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: RLUSD_CUR, issuer: rlusdIss(), value: '1000000000' }, Flags: 0x00020000 }, drops);   // tfSetNoRipple
+      xrOutcome(r, 'RLUSD added', `${esc(o.name)} can now hold RLUSD · reserve +${m2(sv.inc)} XRP`, 'RLUSD not added');
+    } catch (e) { showResult(false, 'RLUSD not added', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
   }, false, 'b-acc', 'Adding…', true);
+}
+
+/* back up one wallet from its own page: PIN, then its recovery phrase (if it came from one) and its secret key */
+function walletKeySheet(kind, i) {
+  const o = kind === 'xrp' ? (K.xr || [])[i] : K.x[i]; if (!o || (kind === 'xrp' && !o.w)) return;
+  needPin(() => {
+    const bk = $('#bkKeys'); if (bk) bk.innerHTML = '';   // only one copy of the phrase on the page at a time
+    const sec = kind === 'xrp' ? xrSecret(o) : o.kp.secret(), fromPh = o.hd != null && !!K.ph, addr = kind === 'xrp' ? o.w.classicAddress : o.kp.publicKey();
+    pending = null;
+    sheet(`<h2>Back up ${esc(o.name)}</h2><div class="mu" style="font-size:13px">Write these on paper or keep them in a password manager. Anyone who has them can take the funds. Never type them into a website or chat.</div>
+      ${fromPh ? `<b>Recovery phrase (${K.ph.split(' ').length} words)</b><div class="mu" style="font-size:12px">Restores this wallet (${kind === 'xrp' ? 'XRP' : 'Stellar'} #${o.hd + 1}) and every other wallet made from the same words.</div>${phraseRow(true)}` : ''}
+      <b>Secret key${kind === 'xrp' && !o.seed && !o.w.seed ? ' (private key)' : ''}</b><div class="addr" id="wkSec">${esc(sec)}</div><div class="amb" id="wkCw" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div>
+      <button class="b-out sm" data-act="wkCopy" data-kind="${kind}" data-i="${i}">Copy key</button>
+      <div class="mu" style="font-size:12px">Address: <span class="mono">${esc(addr)}</span>. You can see these again any time here or in Settings → Back up keys.</div>
+      <button class="b-light big" data-act="closeSheet">Done</button>`);
+  });
 }
 
 /* add / remove */
@@ -13988,18 +14029,20 @@ async function xrAdd(how, name) {
     else return toast('That is not an XRP secret (s…) or a recovery phrase.');
   }
   if (xrList().some((x) => x.addr === w.classicAddress && x.own)) return toast('That wallet is already here.');
+  const ph0 = K.ph, phN0 = K.phN, xrN0 = K.xrN;
   if (adoptPh) { K.ph = adoptPh; K.phN = K.phN || 0; }
   K.xr = K.xr || []; K.xr.push({ name, w, hd, seed });
   if (how === 'new') K.xrN = hd + 1; else if (hd != null) K.xrN = Math.max(K.xrN || 0, hd + 1);
   const N = NS(); if (N.xrw) N.xrw = N.xrw.filter((x) => x.addr !== w.classicAddress);
   $('#xSec').value = '';
-  if (!(await resealVault())) { K.xr.pop(); if (freshPh) { K.ph = null; K.phN = 0; } return; }
+  if (!(await resealVault())) { K.xr.pop(); K.ph = ph0; K.phN = phN0; K.xrN = xrN0; return; }   // undo everything this add changed
   pinOkAt = Date.now(); drawBots(true);
   if (how !== 'new') { closeSheet(); return toast(name + ' added.'); }
   pending = null;
   sheet(`<h2>${esc(name)} is ready</h2><div class="mu" style="font-size:14px">XRP Ledger address (safe to share): <span class="addr">${esc(w.classicAddress)}</span></div>
     ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this XRP wallet and your Stellar wallets, here or in any wallet app that takes a 24-word XRP phrase (Ledger, Trust Wallet).</div>${phraseRow(true)}` : `<div class="note">It comes from your recovery phrase (XRP #${hd + 1}), so the words you saved already back it up.</div>`}
     <div class="mu" style="font-size:12px">${S.net === 'public' ? `Next it needs at least ${m2((XRSV || { base: 1 }).base)} XRP to open on the XRP Ledger. Send XRP to the address above.` : 'Next, tap "Get free test XRP" on its page.'}</div>
+    <div class="mu" style="font-size:12px">Missed it? Open the wallet and tap "Back up: show key and recovery phrase", or Settings → Back up keys. Your PIN shows it again.</div>
     <button class="b-light big" data-act="xrNewDone" data-addr="${esc(w.classicAddress)}">I saved it</button>`);
 }
 const xrKeyRow = (i) => { const o = K.xr[i]; return `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(o.name)} <span class="mu" style="font-weight:400">· XRP</span></b><span class="mu" style="font-size:12px">${o.hd != null && K.ph ? 'phrase XRP #' + (o.hd + 1) + ' · ' : ''}${short(o.w.classicAddress)}</span></div><div class="addr" id="xsec${i}" style="display:none"></div><div class="amb" id="xcw${i}" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="xrSecShow" data-i="${i}">Show key</button><button class="b-out sm" data-act="xrSecCopy" data-i="${i}">Copy key</button></div></div>`; };
@@ -14311,7 +14354,7 @@ async function copySecret(text, btn, warnId) {   // first tap arms (shows the wa
 function drawBkKeys() {
   const el = $('#bkKeys'); if (!el) return;
   const ph = K.ph ? `<div style="display:flex;flex-direction:column;gap:6px"><b>Recovery phrase (${K.ph.split(' ').length} words)</b><div class="mu" style="font-size:12px">Restores every wallet marked "phrase #" below, here or in LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(false)}</div>` : '';
-  const xk = (K.xr || []).map((o, i) => xrKeyRow(i)).join('');
+  const xk = (K.xr || []).map((o, i) => (o.w ? xrKeyRow(i) : '')).join('');
   el.innerHTML = ph + (K.x.length || xk ? K.x.map((o, i) => keyRow(i)).join('') + xk : '<div class="mu" style="font-size:13px">No wallet keys on this phone. The backup file covers the emergency key.</div>');
 }
 let clipT = 0;
@@ -14322,6 +14365,7 @@ function newWalletSheet(i, freshPh) {
     ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this wallet and every wallet you create later on this phone, in Liquidfi or LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(true)}` : `<div class="note amb">Save the secret key now${o.hd != null && K.ph ? ', or rely on your recovery phrase (this is wallet #' + (o.hd + 1) + ' in it)' : ''}. Without it, a lost phone means a lost wallet.</div>`}
     ${keyRow(i)}
     <div class="mu" style="font-size:12px">${S.net === 'public' ? 'Next it needs about 3 XLM to open on Stellar. Its page has a Fund button, or send XLM to the address above.' : 'Next, tap "Get free test XLM" on its page.'}</div>
+    <div class="mu" style="font-size:12px">Missed it? Open the wallet and tap "Back up: show key and recovery phrase", or Settings → Back up keys. Your PIN shows it again.</div>
     <button class="b-light big" data-act="newWalletDone">I saved it</button>`);
 }
 function eraseAll() { try { localStorage.removeItem(SKEY); } catch (e) {} K = null; PIN = null; location.reload(); }
@@ -14396,10 +14440,10 @@ let homeAddr = null, rcvWant = null;
 /* every account: Personal (own key), imported (own key, Personal or Trading), bots (emergency signer, Trading) */
 const loadX = (x) => (x || []).map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, kp: SDK.Keypair.fromSecret(o.sec) }));
 // older vaults kept the Personal key apart (v.pe); it now sits in the account list like any other wallet
-function unpackVault(v) { const x = loadX(v.x); if (v.pe) x.unshift({ name: 'Personal', type: 'personal', kp: SDK.Keypair.fromSecret(v.pe) }); return { em: SDK.Keypair.fromSecret(v.em), pe: null, x, ph: v.ph || null, phN: v.phN || 0, xrN: v.xrN || 0, xr: (v.xr || []).map((o) => ({ name: o.name, hd: o.hd, seed: o.seed || null, w: o.seed ? xrFromSeed(o.seed) : new xrpl.Wallet(o.pub, o.priv) })) }; }
+function unpackVault(v) { const x = loadX(v.x); if (v.pe) x.unshift({ name: 'Personal', type: 'personal', kp: SDK.Keypair.fromSecret(v.pe) }); return { em: SDK.Keypair.fromSecret(v.em), pe: null, x, ph: v.ph || null, phN: v.phN || 0, xrN: v.xrN || 0, xr: (v.xr || []).map((o) => { try { return { name: o.name, hd: o.hd, seed: o.seed || null, w: o.seed ? xrFromSeed(o.seed) : new xrpl.Wallet(o.pub, o.priv) }; } catch (e) { return { name: o.name, raw: o, w: null }; } }) }; }   // an entry that can't be rebuilt is kept as-is (never dropped)
 const firstWallet = () => (persAccts()[0] || OWN()[0] || {}).addr;
 async function resealVault() {   // seal first, keep the old vault if the save fails (so the PIN on disk never drifts)
-  const nv = await seal(PIN, { em: K.em.secret(), pe: null, ph: K.ph || null, phN: K.phN || 0, x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, sec: o.kp.secret() })), xrN: K.xrN || 0, xr: (K.xr || []).map((o) => ({ name: o.name, hd: o.hd, seed: o.seed || null, pub: o.w.publicKey, priv: o.w.privateKey })) });
+  const nv = await seal(PIN, { em: K.em.secret(), pe: null, ph: K.ph || null, phN: K.phN || 0, x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, sec: o.kp.secret() })), xrN: K.xrN || 0, xr: (K.xr || []).map((o) => (o.w ? { name: o.name, hd: o.hd, seed: o.seed || null, pub: o.w.publicKey, priv: o.w.privateKey } : o.raw)) });
   const old = S.vault, oldAt = S.keysAt; S.vault = nv; S.keysAt = Date.now();
   if (!saveS()) { S.vault = old; S.keysAt = oldAt; return false; }
   return true;
@@ -14540,7 +14584,7 @@ function paintTotal() {   // every wallet plus every bot, in dollars
 }
 // Accounts: one list of every wallet. Keys on this phone or a bot run from the PC, they all sit together.
 function allRows() {   // in the order added, unless moved by holding and dragging
-  const L = [...persAccts().map((a) => ({ a, bot: -1 })), ...NS().bots.map((a, i) => ({ a, bot: i })).filter((r) => !K.x.some((o) => o.kp.publicKey() === r.a.addr))], O = S.wOrder || [];
+  const L = [...persAccts().map((a) => ({ a, bot: -1 })), ...NS().bots.map((a, i) => ({ a, bot: i })).filter((r) => !K.x.some((o) => o.kp.publicKey() === r.a.addr)), ...xrList().map((w) => ({ a: w, bot: -1, xr: true }))], O = S.wOrder || [];
   const ix = (r) => { const i = r.a.addr ? O.indexOf(r.a.addr) : -1; return i < 0 ? 1e6 : i; };
   return L.map((r, n) => ({ ...r, n })).sort((x, y) => ix(x) - ix(y) || x.n - y.n);
 }
@@ -14553,8 +14597,10 @@ async function drawBots(reload = true) {
   const drawPers = () => {
     paintTotal(); kbPaint(); drawXrpRows(); if (drag || press) return;
     const RR = P.res[P.sel], R = allRows();
-    if (!R.length) { $('#bPers').innerHTML = xrList().length ? '' : '<div class="note">No wallets yet. Tap + Add wallet to make a new one or bring one you have.</div>'; return; }
+    if (!R.length) { $('#bPers').innerHTML = '<div class="note">No wallets yet. Tap + Add wallet to make a new one or bring one you have.</div>'; return; }
     $('#bPers').innerHTML = R.map((x, i) => {
+      if (x.xr) { const a = x.a, d = XRA[a.addr], val = d ? (d.a ? '$' + fx(xrUsd(d)) : 'not activated') : '…';
+        return `<div class="wrow" data-row="${i}" data-glist="wal"><button class="acct" data-xr="${esc(a.addr)}"><div class="r"><span style="font-size:17px;font-weight:600">${esc(a.name)} <span class="mu" style="font-weight:400">· ${a.own ? 'XRP' : 'XRP watch'}</span></span><span class="mono" style="font-weight:600">${val}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${esc(short(a.addr))}</span><span class="mono mu" style="font-size:12.5px">${d && d.a ? m2(xrXrp(d)) + ' XRP' : ''}</span></div></button></div>`; }
       const a = x.a, isBot = x.bot >= 0, d = isBot ? BOT[a.addr] || {} : null, acc = isBot ? d.a : ACC[a.addr];
       const val = !a.addr ? '' : acc ? '$' + fx(usdVal(acc)) : acc === null ? 'not funded' : '…';
       const r = RR && a.addr && RR.rows.find((y) => y.bot && y.bot.addr === a.addr && !y.err && !y.none);
@@ -15497,7 +15543,7 @@ function drawSet() {
   $('#setBNet').textContent = NET().name; $('#setSand').style.display = S.net === 'testnet' ? '' : 'none';
   $('#setBots').innerHTML = NS().bots.map((b, i) => `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(b.name)}${b.tag ? ` <span class="mu" style="font-weight:400">· ${esc(b.tag)}</span>` : ''}</b><span style="display:flex;gap:8px;align-items:center"><button class="b-out sm" style="min-height:34px" data-act="rmBot" data-i="${i}">Remove</button></span></div><input data-baddr="${i}" value="${esc(b.addr)}" placeholder="G… public address" spellcheck="false" autocomplete="off"></div>`).join('') || '<div class="mu">None yet.</div>';
   $('#setSig').innerHTML = '';
-  $('#setX').innerHTML = K.x.length || (K.xr || []).length ? K.x.map((o, i) => `<div><div><b>${esc(o.name)}</b><div class="mu" style="font-size:12px">${short(o.kp.publicKey())}</div></div><button class="b-out sm" data-act="rmAcct" data-i="${i}">Remove</button></div>`).join('') + (K.xr || []).map((o, i) => `<div><div><b>${esc(o.name)} <span class="mu" style="font-weight:400">· XRP</span></b><div class="mu" style="font-size:12px">${short(o.w.classicAddress)}</div></div><button class="b-out sm" data-act="rmXr" data-i="${i}">Remove</button></div>`).join('') : '<div><span class="mu">None. Add one on the Accounts screen.</span></div>';
+  $('#setX').innerHTML = K.x.length || (K.xr || []).length ? K.x.map((o, i) => `<div><div><b>${esc(o.name)}</b><div class="mu" style="font-size:12px">${short(o.kp.publicKey())}</div></div><button class="b-out sm" data-act="rmAcct" data-i="${i}">Remove</button></div>`).join('') + (K.xr || []).map((o, i) => `<div><div><b>${esc(o.name)} <span class="mu" style="font-weight:400">· XRP</span></b><div class="mu" style="font-size:12px">${o.w ? short(o.w.classicAddress) : 'could not open this key'}</div></div><button class="b-out sm" data-act="rmXr" data-i="${i}">Remove</button></div>`).join('') : '<div><span class="mu">None. Add one on the Accounts screen.</span></div>';
 }
 let hzPick = null;   // Custom tapped but not saved yet
 function drawHz() {
@@ -15673,15 +15719,18 @@ document.addEventListener('click', async (e) => {
     rcvHome: () => { rcvWant = homeAddr; go('receive'); },
     rmWatch: () => { const i = NS().bots.indexOf(tradeAccts()[botSel]); if (i < 0) return; t.dataset.i = i; A.rmBot(); },
     addAcct: () => A.addWallet(),
+    xrBackup: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i >= 0) walletKeySheet('xrp', i); },
+    homeBackup: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i >= 0) walletKeySheet('xlm', i); },
+    wkCopy: () => { const k = t.dataset.kind, i = +t.dataset.i, o = k === 'xrp' ? (K.xr || [])[i] : K.x[i]; if (!o) return; t.dataset.label = 'Copy key'; const sec = k === 'xrp' ? xrSecret(o) : o.kp.secret(); if (t.dataset.armed === '1') return copySecret(sec, t, 'wkCw'); needPin(() => copySecret(sec, document.querySelector('[data-act=wkCopy]') || t, 'wkCw')); },
     xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
-    xrScan: () => scanInline($('#xsScan'), (r) => { $('#xsTo').value = r.addr; if (r.tag) $('#xsTag').value = r.tag; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
+    xrScan: () => scanInline($('#xsScan'), (r) => { $('#xsTo').value = r.addr; $('#xsTag').value = r.tag || ''; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
     xrMax: () => { const d = XRA[xrSel]; $('#xsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
     xrNewDone: () => { closeSheet(); xrSel = t.dataset.addr; go('xrp'); },
     xrRmWatch: () => { const w = (NS().xrw || []).find((x) => x.addr === xrSel); if (!w) return; pending = null; sheet(`<h2>Stop watching ${esc(w.name)}?</h2><div class="addr">${esc(w.addr)}</div><button class="b-red big" data-act="xrRmWatchOk">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     xrRmWatchOk: () => { const N = NS(); N.xrw = (N.xrw || []).filter((x) => x.addr !== xrSel); saveS(); closeSheet(); go('bots'); toast('Removed.'); },
     xrSecShow: () => { const i = +t.dataset.i, o = (K.xr || [])[i]; if (!o) return; needPin(() => { const e = $('#xsec' + i), b = document.querySelector(`[data-act=xrSecShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? xrSecret(o) : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide key' : 'Show key'; }); },
     xrSecCopy: () => { const i = +t.dataset.i, o = (K.xr || [])[i], b = t; if (!o) return; b.dataset.label = 'Copy key'; if (b.dataset.armed === '1') return copySecret(xrSecret(o), b, 'xcw' + i); needPin(() => copySecret(xrSecret(o), document.querySelector(`[data-act=xrSecCopy][data-i="${i}"]`) || b, 'xcw' + i)); },
-    rmXr: () => { const o = (K.xr || [])[+t.dataset.i]; if (!o) return; pending = null; sheet(`<h2>Remove ${esc(o.name)} from this phone?</h2><div class="note amb">The XRP and its tokens stay on the XRP Ledger, but this phone forgets the key. Without the secret (or your recovery phrase / backup file) you can't reach them again.</div><div class="addr">${esc(o.w.classicAddress)}</div><button class="b-red big" data-act="rmXrOk" data-i="${t.dataset.i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
+    rmXr: () => { const o = (K.xr || [])[+t.dataset.i]; if (!o) return; pending = null; sheet(`<h2>Remove ${esc(o.name)} from this phone?</h2><div class="note amb">The XRP and its tokens stay on the XRP Ledger, but this phone forgets the key. Without the secret (or your recovery phrase / backup file) you can't reach them again.</div><div class="addr">${esc(o.w ? o.w.classicAddress : '')}</div><button class="b-red big" data-act="rmXrOk" data-i="${t.dataset.i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     rmXrOk: async () => { const i = +t.dataset.i; const o = K.xr.splice(i, 1)[0]; if (!(await resealVault())) { K.xr.splice(i, 0, o); return; } closeSheet(); toast('Removed.'); drawSet(); },
     addWallet: () => { pending = null; const h0 = addHow; addHow = 'new'; sheet(`<h2>Add a wallet</h2>
       <div class="seg" id="xChain"><button class="on" data-v="xlm">Stellar</button><button data-v="xrp">XRP Ledger</button></div>
