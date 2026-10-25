@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.10</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.11</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -482,7 +482,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.10</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.11</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
@@ -499,7 +499,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.10 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.11 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13877,7 +13877,7 @@ async function drawXrp() {
   try { await xrServer(); await xrpPrice(); await xrLoad(addr); } catch (e) { if (cur === 'xrp') $('#xrOff').innerHTML = ''; if (cur === 'xrp') $('#xrBal').innerHTML = `<div><span class="red">${esc(e.message || String(e))}</span></div>`; return; }
   if (cur !== 'xrp' || xrSel !== addr) return; paint(); trustBtn();
   if (!XRA[addr].a) { $('#xrOff').innerHTML = '<div class="note">No open orders.</div>'; return; }
-  xrLoadOpen(addr);
+  xrLoadOpen(addr); xrWatch(addr);
   try {
     const r = await xr('account_tx', { account: addr, limit: 10, ledger_index_min: -1, ledger_index_max: -1 });
     if (cur !== 'xrp' || xrSel !== addr) return;
@@ -13886,6 +13886,27 @@ async function drawXrp() {
   } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
 }
 function xrAmt(a) { if (a == null) return '?'; if (typeof a === 'string') return m2(+a / 1e6) + ' XRP'; return m2(+a.value) + ' ' + xrCur(a.currency); }
+/* What a transaction did to MY XRP and RLUSD (from the ledger's before/after), fee put back for my own transactions.
+   → { x: XRP change, u: RLUSD change } ; a trade = the two move in opposite directions. */
+function xrMyDelta(meta, me, tx) {
+  let x = 0, u = 0; const iss = rlusdIss();
+  for (const n of (meta && meta.AffectedNodes) || []) {
+    const k = Object.keys(n)[0], v = n[k] || {}, F = v.FinalFields || v.NewFields || {}, P = v.PreviousFields || {};
+    if (v.LedgerEntryType === 'AccountRoot' && F.Account === me && P.Balance != null) x += (+F.Balance - +P.Balance) / 1e6;
+    if (v.LedgerEntryType === 'RippleState' && F.Balance && F.Balance.currency === RLUSD_CUR && P.Balance) {
+      const lo = (F.LowLimit || {}).issuer, hi = (F.HighLimit || {}).issuer;
+      if (!((lo === me && hi === iss) || (hi === me && lo === iss))) continue;
+      const sg = lo === me ? 1 : -1; u += sg * (+F.Balance.value - +P.Balance.value);
+    }
+  }
+  if (tx && tx.Account === me && tx.Fee) x += +tx.Fee / 1e6;
+  return { x, u };
+}
+function xrTradeText(d) {   // null if this wasn't an XRP/RLUSD trade
+  if (!(Math.abs(d.x) > 1e-6 && Math.abs(d.u) > 1e-6) || Math.sign(d.x) === Math.sign(d.u)) return null;
+  const px = Math.abs(d.u / d.x);
+  return d.x < 0 ? `sold ${m2(-d.x)} XRP for ${m2(d.u)} RLUSD @ ${px.toFixed(5)}` : `bought ${m2(d.x)} XRP for ${m2(-d.u)} RLUSD @ ${px.toFixed(5)}`;
+}
 function xrTxText(x, me) {
   const t = x.tx, ok = (x.meta.TransactionResult || 'tesSUCCESS') === 'tesSUCCESS';
   let s;
@@ -13893,7 +13914,10 @@ function xrTxText(x, me) {
     const amt = x.meta.delivered_amount || x.meta.DeliveredAmount || t.DeliverMax || t.Amount;
     s = t.Destination === me && t.Account !== me ? `Received ${xrAmt(amt)} from ${short(t.Account)}` : t.Account === me && t.Destination !== me ? `Sent ${xrAmt(amt)} to ${short(t.Destination)}${t.DestinationTag != null ? ' · tag ' + t.DestinationTag : ''}` : `Payment ${xrAmt(amt)}`;
   } else if (t.TransactionType === 'TrustSet') s = `Trust line ${xrCur((t.LimitAmount || {}).currency)}`;
-  else if (t.TransactionType === 'OfferCreate') s = `Order: sell ${xrAmt(t.TakerGets)} for ${xrAmt(t.TakerPays)}`;
+  else if (t.Account !== me) { const tr = ok && xrTradeText(xrMyDelta(x.meta, me, t)); s = tr ? `Order filled: ${tr}` : (t.TransactionType || 'Transaction'); }   // someone else's transaction that touched this wallet: usually a fill of my order
+  else if (t.TransactionType === 'OfferCreate') { const tr = ok && xrTradeText(xrMyDelta(x.meta, me, t)), sell = typeof t.TakerGets === 'string';
+    const rest = (x.meta.AffectedNodes || []).some((n) => n.CreatedNode && n.CreatedNode.LedgerEntryType === 'Offer' && (n.CreatedNode.NewFields || {}).Account === me);
+    s = tr ? (rest ? `Filled part: ${tr} · rest open` : (t.Flags & 0x00040000 ? 'Market: ' : 'Filled at once: ') + tr) : `Order placed: ${sell ? 'sell' : 'buy'} ${xrAmt(sell ? t.TakerGets : t.TakerPays)} for ${xrAmt(sell ? t.TakerPays : t.TakerGets)}`; }
   else if (t.TransactionType === 'OfferCancel') s = 'Order cancelled';
   else s = t.TransactionType || 'Transaction';
   return s + (ok ? '' : ' · failed');
@@ -14191,7 +14215,7 @@ function xtPollStart() {
     if (cur !== 'xtrade' || XW.live) { XT.polling = false; return; }
     try { await xtLoadBook(); XT.fails = 0; XT.err = null; } catch (e) { XT.fails++; XT.err = e.message || String(e); }
     if (cur === 'xtrade' && !XW.live) { xtPaint(); xtEst(); }
-    if (!XT.fails && n++ % 3 === 0) { try { await xtLoadSales(); } catch (e) {} if (cur === 'xtrade') xtPaintSales(); }
+    if (!XT.fails && n++ % 3 === 0) { try { await xtLoadSales(); } catch (e) {} if (cur === 'xtrade') { xtPaintSales(); xtLoadOpen(); } }
     if (cur === 'xtrade' && !XW.live) XT.timer = setTimeout(tick, Math.min(30000, 5000 * 2 ** Math.min(XT.fails, 3))); else XT.polling = false;
   };
   tick();
@@ -14211,6 +14235,18 @@ function xwQ(command, params = {}) {
     XW.cb[id] = (m) => { clearTimeout(t); delete XW.cb[id]; if (m.status === 'error' || !m.result) rej(new Error(m.error || 'error')); else res(m.result); };
     ws.send(JSON.stringify({ ...params, command, id }));
   });
+}
+const XSEEN = new Set();
+function xtMine(m) {   // a validated transaction from the push stream: did it touch my wallet?
+  const me = xrSel, tx = m.transaction || m.tx_json || m.tx || {}, h = m.hash || tx.hash; if (!me || !h || XSEEN.has(h)) return; XSEEN.add(h);
+  const touched = (m.meta && m.meta.AffectedNodes || []).some((n) => { const v = n[Object.keys(n)[0]] || {}, F = v.FinalFields || v.NewFields || {}; return F.Account === me || (F.LowLimit || {}).issuer === me || (F.HighLimit || {}).issuer === me; });
+  if (!touched) return;
+  if (tx.Account !== me) { const tr = xrTradeText(xrMyDelta(m.meta, me, tx)); if (tr) toast('✓ Your order filled: ' + tr, 8000); }
+  xtRefreshMine();
+}
+let xtRefT = 0;
+function xtRefreshMine() {   // open orders + balances, at most once a second
+  clearTimeout(xtRefT); xtRefT = setTimeout(() => { if (cur !== 'xtrade') return; xtLoadOpen(); delete XRA[xrSel]; xrLoad(xrSel).then(() => { if (cur === 'xtrade') xtPaint(); }).catch(() => {}); }, 800);
 }
 function xwFail() {   // drop to polling now, try push again later (5 s, 10 s, … up to 60 s), next server each time
   const was = XW.ws != null; xwStop(); XW.i++; XW.tries++;
@@ -14232,7 +14268,7 @@ function xwStart() {
   XW.ws = ws; XW.net = net; XW.lastLed = Date.now();
   ws.onopen = () => {
     if (XW.ws !== ws) return;
-    xwQ('subscribe', { streams: ['ledger'], accounts: [rlusdIss()] })
+    xwQ('subscribe', { streams: ['ledger'], accounts: [rlusdIss(), ...(xrSel ? [xrSel] : [])] })
       .then(() => { if (XW.ws !== ws) return; XW.live = true; XW.tries = 0; XW.lastLed = Date.now(); clearTimeout(XT.timer); XT.polling = false; xtPushBook(); })
       .catch(() => { if (XW.ws === ws) xwFail(); });
   };
@@ -14241,6 +14277,7 @@ function xwStart() {
     if (m.id != null && XW.cb[m.id]) return XW.cb[m.id](m);
     if (m.type === 'ledgerClosed') { XW.lastLed = Date.now(); xtPushBook(); }
     else if (m.type === 'transaction' && m.validated) {
+      xtMine(m);
       const t = xtSaleOf(m);
       if (t && !XT.sales.some((x) => x.hash && x.hash === t.hash)) { XT.sales = [t, ...XT.sales].sort((a, b) => b.t - a.t).slice(0, 12); XT.salesAt = Date.now(); if (cur === 'xtrade') xtPaintSales(); }
     }
@@ -14328,6 +14365,25 @@ function xtOfferCard(f, own) {
   return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${sell ? 't-sell' : 't-buy'}">${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${txt}</b><div class="mono mu" style="font-size:12px">order #${+f.seq}</div></div>${btns}</div>`;
 }
 // Open orders on the XRP wallet page: every order this address has on the XRP Ledger DEX (a bot's too), with Cancel
+let XRWT = 0, XRW_LAST = null;
+function xrWatch(addr) {   // wallet page: look for new activity every 8 s (fills by others, a bot's orders), redraw only on a change
+  clearTimeout(XRWT);
+  const step = async () => {
+    if (cur !== 'xrp' || xrSel !== addr || !K) return;
+    try {
+      const r = await xr('account_tx', { account: addr, limit: 5, ledger_index_min: -1, ledger_index_max: -1 });
+      const T = r.transactions || [], top = T[0] && (T[0].hash || (T[0].tx || T[0].tx_json || {}).hash);
+      if (XRW_LAST && XRW_LAST.addr === addr && top && top !== XRW_LAST.h && cur === 'xrp' && xrSel === addr) {
+        for (const x of T) { const h = x.hash || (x.tx || x.tx_json || {}).hash; if (h === XRW_LAST.h) break; const tx = x.tx || x.tx_json || {};
+          if (tx.Account !== addr) { const tr = xrTradeText(xrMyDelta(x.meta, addr, tx)); if (tr) { toast('✓ Your order filled: ' + tr, 8000); break; } } }
+        XRW_LAST = { addr, h: top }; delete XRA[addr]; drawXrp(); return;   // drawXrp starts the next watch
+      }
+      if (top) XRW_LAST = { addr, h: top };
+    } catch (e) {}
+    if (cur === 'xrp' && xrSel === addr) XRWT = setTimeout(step, 8000);
+  };
+  XRWT = setTimeout(step, XRW_LAST && XRW_LAST.addr === addr ? 8000 : 0);
+}
 async function xrLoadOpen(addr) {
   const el = $('#xrOff'); if (!el) return;
   try {
