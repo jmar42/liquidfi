@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.8</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.10</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -482,7 +482,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.8</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.10</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
@@ -499,7 +499,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.8 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.10 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13787,8 +13787,8 @@ async function scanInline(box, onAddr, parse = parseAddrQR, what = 'a Stellar ad
    Own-key XRP wallets live in K.xr (sealed in the vault with the Stellar keys); watched XRP addresses in NS().xrw.
    New XRP wallets come from the same recovery phrase as Stellar (BIP44 m/44'/144'/0'/0/n, like Ledger / Trust Wallet).
    Talks to public XRP Ledger servers over JSON-RPC (xrplcluster.com has CORS). Network follows Mainnet / Testnet. */
-const XRPL_URL = { public: ['https://xrplcluster.com/', 'https://s2.ripple.com:51234/', 'https://s1.ripple.com:51234/'], testnet: ['https://testnet.xrpl-labs.com/', 'https://s.altnet.rippletest.net:51234/'] };
-const XRPL_WS = { public: ['wss://xrplcluster.com/', 'wss://s2.ripple.com/', 'wss://s1.ripple.com/'], testnet: ['wss://testnet.xrpl-labs.com/', 'wss://s.altnet.rippletest.net:51233/'] };   // push updates (Trade XRP)
+const XRPL_URL = { public: ['https://xrplcluster.com/', 'https://xrpl.link/', 'https://xrpl.ws/', 'https://s2.ripple.com:51234/', 'https://s1.ripple.com:51234/'], testnet: ['https://testnet.xrpl-labs.com/', 'https://s.altnet.rippletest.net:51234/'] };
+const XRPL_WS = { public: ['wss://xrplcluster.com/', 'wss://xrpl.link/', 'wss://s2.ripple.com/', 'wss://s1.ripple.com/'], testnet: ['wss://testnet.xrpl-labs.com/', 'wss://s.altnet.rippletest.net:51233/'] };   // push updates (Trade XRP)
 const XRP_EXPL = { public: 'https://livenet.xrpl.org', testnet: 'https://testnet.xrpl.org' };
 const XRP_USD_ISS = { public: ['rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De'], testnet: ['rQhWct2fv4Vc4KRjRgMrxa8xPN9Zx9iLKV'] };   // RLUSD (Ripple USD): counted as $1
 const XRA = {};   // address → { a: account_data | null (not activated), lines, at } — for the current network only
@@ -13931,26 +13931,39 @@ async function xrSendReview() {
   if (dst.account_data && (+dst.account_data.Flags & 0x00020000) && !tagS) return toast('That address needs a destination tag (exchanges do). Add it from the exchange.');
   if (dst.account_data && (+dst.account_data.Flags & 0x01000000)) return toast('That address only accepts payments from senders it approved (Deposit Authorization). The ledger would refuse it.');
   if (dst.account_data && (+dst.account_data.Flags & 0x00080000) && !confirm('That address asks not to be sent XRP. Send anyway?')) return;
-  const items = [{ t: `Send ${m2(amt)} XRP`, s: `to ${to}`, hl: 1 }, ...(tagS ? [{ t: `Destination tag ${tagS}` }] : []), { t: `Network fee ${m2(drops / 1e6)} XRP`, s: (dst.error === 'actNotFound' ? `This opens a new XRP Ledger address (it keeps ${m2(sv.base)} XRP as reserve). ` : '') + XR_BOT_NOTE }];
+  const items = [...await xrBusy(xrSel), { t: `Send ${m2(amt)} XRP`, s: `to ${to}`, hl: 1 }, ...(tagS ? [{ t: `Destination tag ${tagS}` }] : []), { t: `Network fee ${m2(drops / 1e6)} XRP`, s: (dst.error === 'actNotFound' ? `This opens a new XRP Ledger address (it keeps ${m2(sv.base)} XRP as reserve). ` : '') + XR_BOT_NOTE }];
   confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger ${S.net === 'public' ? 'Mainnet' : 'Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops), false, 'b-acc', 'Sending…', true);
 }
 // sign + submit + wait until the outcome is CERTAIN. A payment is only "not sent" once the ledger has passed its
 // LastLedgerSequence without it. Timeouts, tef/ter/tel answers (e.g. tefPAST_SEQ from a second server that already has it)
 // never mean "try again": we look the hash up until it is found or has expired. → { hash, state: 'ok'|'failed'|'expired'|'pending', code, ledger }
+/* Where the ledger is now. Uses the VALIDATED ledger (every server answers that the same way). Don't use ledger_current:
+   xrplcluster.com sends about half its calls to Clio servers, which answer ledger_current with the validated-ledger shape
+   (no ledger_current_index). That made LastLedgerSequence = 20, so every transaction was dead on arrival and the
+   phone sat on "Sending…". */
+function xrWaitLabel(t0) { const b = document.querySelector('#holdBtn span'); if (b && $('#holdBtn').disabled) b.textContent = `Sent · waiting for the ledger ${Math.round((Date.now() - t0) / 1000)}s`; }
+async function xrLedgerNow() {
+  const v = await xr('ledger', { ledger_index: 'validated' });
+  const vi = +((v.ledger || {}).ledger_index || v.ledger_index || 0);
+  if (!(vi > 1000)) throw new Error("Couldn't read the XRP Ledger's position. Nothing was sent; try again.");
+  return vi;
+}
 async function xrSubmit(o, tx, drops) {
   const from = o.w.classicAddress;
-  const [ai, cl] = await Promise.all([xr('account_info', { account: from, ledger_index: 'current' }), xr('ledger_current')]);
-  const minL = Math.max(1, (+cl.ledger_current_index || 1) - 1);
+  const [ai, vl] = await Promise.all([xr('account_info', { account: from, ledger_index: 'current' }), xrLedgerNow()]);
+  const minL = vl;
   const seq = (ai.account_data || {}).Sequence; if (seq == null) throw new Error('Wallet not found on the XRP Ledger.');
-  const lls = (+cl.ledger_current_index || 0) + 20;
+  const lls = vl + 12;   // ~45 s: if it isn't in by then it never will be
   const full = { ...tx, Account: from, Fee: String(drops), Sequence: seq, LastLedgerSequence: lls };
   const s = o.w.sign(full);
   let first = null;
   try { const r = await xr('submit', { tx_blob: s.tx_blob }); first = r.engine_result || r.error || null; } catch (e) { first = null; }   // no answer: it may still have reached the network
   if (first && /^tem/.test(first)) return { hash: s.hash, state: 'expired', code: first };   // malformed: rejected outright, nothing can apply
+  // tef/tel are NOT final here: after a lost answer the next server says tefPAST_SEQ because OUR transaction already went in. Keep watching (≤ ~45 s).
   const t0 = Date.now();
   while (Date.now() - t0 < 150000) {
     await sleep(3000); bumpIdle();   // keep the wallet unlocked until the outcome is shown
+    xrWaitLabel(t0);
     const q = await xr('tx', { transaction: s.hash }).catch(() => ({}));
     if (q.validated) { delete XRA[from]; const res = (q.meta || {}).TransactionResult; return { hash: s.hash, state: res === 'tesSUCCESS' ? 'ok' : 'failed', code: res, ledger: +q.ledger_index || null }; }
     const v = await xr('ledger', { ledger_index: 'validated' }).catch(() => ({}));
@@ -13969,9 +13982,9 @@ async function xrSubmit(o, tx, drops) {
    until it validates, or provably can never apply (past its last ledger and not on any server), else "pending". */
 async function xrSubmitAll(o, txs, drops) {
   const from = o.w.classicAddress;
-  const [ai, cl] = await Promise.all([xr('account_info', { account: from, ledger_index: 'current' }), xr('ledger_current')]);
+  const [ai, vl] = await Promise.all([xr('account_info', { account: from, ledger_index: 'current' }), xrLedgerNow()]);
   const seq = (ai.account_data || {}).Sequence; if (seq == null) throw new Error('Wallet not found on the XRP Ledger.');
-  const minL = Math.max(1, (+cl.ledger_current_index || 1) - 1), lls = (+cl.ledger_current_index || 0) + 20;
+  const minL = vl, lls = vl + 12;
   const L = txs.map((tx, i) => ({ s: o.w.sign({ ...tx, Account: from, Fee: String(drops), Sequence: seq + i, LastLedgerSequence: lls }), first: null, r: null }));
   for (const x of L) {
     try { const r = await xr('submit', { tx_blob: x.s.tx_blob }); x.first = r.engine_result || r.error || null; } catch (e) { x.first = null; }
@@ -13979,7 +13992,7 @@ async function xrSubmitAll(o, txs, drops) {
   }
   const t0 = Date.now();
   while (L.some((x) => !x.r) && Date.now() - t0 < 150000) {
-    await sleep(3000); bumpIdle();
+    await sleep(3000); bumpIdle(); xrWaitLabel(t0);
     const v = await xr('ledger', { ledger_index: 'validated' }).catch(() => ({})), vi = +((v.ledger || {}).ledger_index || v.ledger_index || 0);
     for (const x of L.filter((y) => !y.r)) {
       const q = await xr('tx', vi > lls ? { transaction: x.s.hash, min_ledger: minL, max_ledger: lls } : { transaction: x.s.hash }).catch(() => ({}));
@@ -13994,7 +14007,7 @@ const xrOfferText = (f) => { const t = xtOfferCard(f, false).match(/<b class="mo
 // own XRP wallets with open orders (current network) → [{ o, name, offers } | { name, err }]
 async function xrKillPlans(only) {
   const W = (K && K.xr || []).filter((o) => o.w && (!only || o.w.classicAddress === only));
-  const P = await Promise.all(W.map(async (o) => { try { const r = await xr('account_offers', { account: o.w.classicAddress, ledger_index: 'validated' }); return { o, name: o.name, offers: r.offers || [] }; } catch (e) { return { o, name: o.name, err: e.message || String(e) }; } }));
+  const P = await Promise.all(W.map(async (o) => { try { const r = await xr('account_offers', { account: o.w.classicAddress, ledger_index: 'validated' }); const offers = r.offers || []; return { o, name: o.name, offers, busy: offers.length ? await xrBusyN(o.w.classicAddress) : 0 }; } catch (e) { return { o, name: o.name, err: e.message || String(e) }; } }));
   return P.filter((p) => p.err || p.offers.length);
 }
 async function xrKillRun(P) {   // → result cards
@@ -14012,10 +14025,10 @@ async function xrKillRun(P) {   // → result cards
 }
 function xrCancelAll() {
   const addr = xrSel, o = xrOwn(addr); if (!o) return;
-  xrKillPlans(addr).then((P) => {
+  xrKillPlans(addr).then(async (P) => {
     if (!P.length) { toast('No open orders on this wallet.'); return xrLoadOpen(addr); }
     if (P[0].err) return toast(P[0].err);
-    const items = P[0].offers.map((f) => ({ t: xrOfferText(f), s: 'order #' + f.seq }));
+    const items = [...xrBusyItems(P[0].busy), ...P[0].offers.map((f) => ({ t: xrOfferText(f), s: 'order #' + f.seq }))];
     items.push({ t: `Network fee about ${m2(P[0].offers.length * 0.000015)} XRP`, s: XR_BOT_NOTE });
     confirmSheet(`Cancel all ${P[0].offers.length} order(s)?`, `XRP Ledger DEX · ${esc(o.name)} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${S.net === 'public' ? 'Mainnet' : 'Testnet'}</b><br>One cancel per order, sent together`, items, 'Hold to cancel all', async () => {
       const rows = await xrKillRun(P);
@@ -14032,6 +14045,17 @@ function xrOutcome(r, okTitle, okLine, failTitle, back = 'xrp') {
   showResult(false, 'Still pending', [`<div class="card amb">Sent, but not confirmed yet. Don't send it again: check this wallet's Recent list or the link below in a minute.</div>`, link], back);
 }
 async function xrFee() { const f = await xr('fee'); return Math.min(1000, Math.max(12, Math.ceil(+((f.drops || {}).open_ledger_fee || 12) * 1.2))); }
+/* Is something else (XRP Sweepr) sending from this wallet right now? Two programs using one wallet race for the same
+   sequence number: one of them gets "tefPAST_SEQ" and nothing happens. → number of its transactions in the last 90 s. */
+async function xrBusyN(addr) {
+  try {
+    const r = await xr('account_tx', { account: addr, limit: 10, ledger_index_min: -1, ledger_index_max: -1 });
+    const now = Date.now();
+    return (r.transactions || []).filter((x) => { const tx = x.tx || x.tx_json || {}; const iso = x.close_time_iso || (tx.date != null ? new Date((tx.date + 946684800) * 1000).toISOString() : null); return tx.Account === addr && iso && now - Date.parse(iso) < 90000; }).length;
+  } catch (e) { return 0; }
+}
+const xrBusyItems = (n) => n >= 2 ? [{ t: '⚠ A bot is trading from this wallet right now', s: `it sent ${n} transactions in the last 90 seconds (XRP Sweepr?). Pause it first: two programs on one wallet collide and this may not go through.`, hl: 1 }] : [];
+async function xrBusy(addr) { return xrBusyItems(await xrBusyN(addr)); }
 const XR_BOT_NOTE = 'If a bot (like XRP Sweepr) trades from this wallet, pause it first so the two don\'t clash.';
 async function xrSendRun(o, to, tag, amt, drops) {
   try {
@@ -14042,7 +14066,7 @@ async function xrSendRun(o, to, tag, amt, drops) {
   } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
 }
 function xrErr(code, msg) {
-  const m = { tecUNFUNDED_PAYMENT: 'Not enough XRP after the ledger reserve.', tecNO_DST_INSUF_XRP: "That address isn't activated; send at least the reserve to open it.", tecDST_TAG_NEEDED: 'That address needs a destination tag.', tefPAST_SEQ: 'Another transaction went first. Try again.', telINSUF_FEE_P: 'Network busy. Try again in a moment.', tecNO_PERMISSION: 'That address does not accept this payment.', tecPATH_DRY: 'No path for this payment.', tecKILLED: 'Not enough on the book at your price right now, so nothing traded.', tecUNFUNDED_OFFER: 'Not enough funds for that order.', tecINSUF_RESERVE_OFFER: 'Not enough XRP for the reserve an open order needs.', tecNO_LINE: 'Add RLUSD to this wallet first.', tecNO_LINE_INSUF_RESERVE: 'Not enough XRP for the RLUSD trust line reserve.', tecNO_DST: "That address doesn't exist yet." };
+  const m = { tecUNFUNDED_PAYMENT: 'Not enough XRP after the ledger reserve.', tecNO_DST_INSUF_XRP: "That address isn't activated; send at least the reserve to open it.", tecDST_TAG_NEEDED: 'That address needs a destination tag.', tefPAST_SEQ: 'Another transaction from this wallet took the same slot first (is XRP Sweepr running on it?). Pause the bot, then try again.', tefMAX_LEDGER: 'It took too long to reach the ledger. Try again.', telCAN_NOT_QUEUE: 'The network queue for this wallet is full (a bot may be sending from it). Try again in a moment.', telCAN_NOT_QUEUE_FULL: 'The network is busy. Try again in a moment.', telINSUF_FEE_P: 'Network busy. Try again in a moment.', tecNO_PERMISSION: 'That address does not accept this payment.', tecPATH_DRY: 'No path for this payment.', tecKILLED: 'Not enough on the book at your price right now, so nothing traded.', tecUNFUNDED_OFFER: 'Not enough funds for that order.', tecINSUF_RESERVE_OFFER: 'Not enough XRP for the reserve an open order needs.', tecNO_LINE: 'Add RLUSD to this wallet first.', tecNO_LINE_INSUF_RESERVE: 'Not enough XRP for the RLUSD trust line reserve.', tecNO_DST: "That address doesn't exist yet." };
   return m[code] || (msg ? `${msg} (${code})` : String(code || 'Rejected'));
 }
 function xrRcvSheet() {
@@ -14065,7 +14089,8 @@ async function xrTrustReview() {
   if (hasRlusd(d)) return toast('RLUSD is already added.');
   let sv, drops; try { sv = await xrServer(); drops = await xrFee(); } catch (e) { return toast(e.message || String(e)); }
   if (xrSpend(d) < sv.inc + drops / 1e6) return toast(`Needs ${m2(sv.inc)} XRP free for the reserve (${m2(xrSpend(d))} available).`);
-  confirmSheet('Add RLUSD (Ripple USD)', `XRP Ledger ${S.net === 'public' ? 'Mainnet' : 'Testnet'} · ${esc(o.name)}`, [
+  const BZ = await xrBusy(xrSel);
+  confirmSheet('Add RLUSD (Ripple USD)', `XRP Ledger ${S.net === 'public' ? 'Mainnet' : 'Testnet'} · ${esc(o.name)}`, [...BZ,
     { t: 'Hold RLUSD in this wallet', s: `issuer ${rlusdIss()} (Ripple)`, hl: 1 },
     { t: `Reserve +${m2(sv.inc)} XRP`, s: 'the ledger holds it while the trust line is open; you get it back if you remove the line at 0 balance' },
     { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], 'Add RLUSD', async () => {
@@ -14244,7 +14269,7 @@ function xtPaint() {
 function xtEst() {
   const el = $('#xtEst'); if (!el) return; const q = +$('#xtAmt').value || 0;
   if (!q) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; return; }
-  if (XT.mode === 'lim') { const p = +$('#xtPx').value || 0; el.innerHTML = `<div><span class="mu">${XT.side === 'buy' ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p)} RLUSD</span></div><div><span class="mu">Reserve while open</span><span class="mono">${m2((XRSV || { inc: 0.2 }).inc)} XRP</span></div>`; return; }
+  if (XT.mode === 'lim') { const p = +$('#xtPx').value || 0; el.innerHTML = `<div><span class="mu">${XT.side === 'buy' ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p)} RLUSD</span></div><div><span class="mu">Ledger holds while open (not a fee, back when it closes)</span><span class="mono">${m2((XRSV || { inc: 0.2 }).inc)} XRP</span></div>`; return; }
   const c = xtWalk(XT.side, q), cap = +S.slip || 1;
   el.innerHTML = c == null ? '<div><span class="amb">Book too thin for this size (the AMM pool may still fill part of it)</span></div>'
     : `<div><span class="mu">Est. ${XT.side === 'buy' ? 'cost' : 'proceeds'}</span><span class="mono">${fx(c)} RLUSD</span></div><div><span class="mu">Avg price</span><span class="mono">${(c / q).toFixed(5)}</span></div><div><span class="mu">${XT.side === 'buy' ? 'Max' : 'Min'} with ${cap}% cap</span><span class="mono">${fx(XT.side === 'buy' ? c * (1 + cap / 100) : c * (1 - cap / 100))} RLUSD</span></div>`;
@@ -14282,7 +14307,7 @@ async function xtReview() {
   const R = { currency: RLUSD_CUR, issuer: rlusdIss(), value: xtAmtStr(usd) };
   const tx = buy ? { TransactionType: 'OfferCreate', TakerPays: String(xd), TakerGets: R, Flags: flags }   // you pay RLUSD (TakerGets), get XRP
     : { TransactionType: 'OfferCreate', TakerGets: String(xd), TakerPays: R, Flags: flags };              // you pay XRP, get RLUSD
-  lines.push({ t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE });
+  lines.push({ t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }); lines.unshift(...await xrBusy(xrSel));
   confirmSheet(title, `XRP Ledger DEX · ${S.net === 'public' ? 'Mainnet' : 'Testnet'} · ${esc(o.name)}`, lines, `Send ${XT.mode === 'lim' ? 'order' : XT.side}`, async () => {
     try {
       const r = await xrSubmit(o, tx, drops);
@@ -14347,7 +14372,8 @@ async function xtEditOk(seq) {
   if (i.sell && xrSpend(d) < q + drops / 1e6) return toast(`Not enough XRP (${m2(xrSpend(d))} available).`);   // XRP Ledger orders don't lock funds: the wallet must hold it
   const R = { currency: RLUSD_CUR, issuer: rlusdIss(), value: xtAmtStr(q * p) }, xd = String(Math.round(q * 1e6));
   const tx = i.sell ? { TransactionType: 'OfferCreate', TakerGets: xd, TakerPays: R, OfferSequence: seq } : { TransactionType: 'OfferCreate', TakerPays: xd, TakerGets: R, OfferSequence: seq };
-  confirmSheet(`Change order #${seq}`, `XRP Ledger DEX · ${esc(o.name)}`, [
+  const BZ = await xrBusy(xrSel);
+  confirmSheet(`Change order #${seq}`, `XRP Ledger DEX · ${esc(o.name)}`, [...BZ,
     { t: `Was: ${i.sell ? 'Sell' : 'Buy'} ${m2(i.x)} XRP @ ${i.px.toFixed(5)}`, s: 'open now' },
     { t: `New: ${i.sell ? 'Sell' : 'Buy'} ${m2(q)} XRP @ ${p.toFixed(5)}`, s: 'if the new price crosses the book, it fills right away', hl: 1 },
     { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], 'Send edit', async () => {
@@ -15425,7 +15451,7 @@ async function killFlow(plansP, title, verb, xrP = null) {
   const items = []; plans.forEach((p) => { items.push({ t: `— ${p.bot.name} —` }); p.lines.forEach((l) => items.push(l)); if (!p.lines.length) items.push({ t: 'Nothing to cancel', s: p.note || '' }); });
   const age = MK.at ? Math.round((Date.now() - MK.at) / 1000) + 's ago' : '';
   const sub = `${plans.some((p) => (p.swaps || []).length) ? 'Orders are cancelled first, then each sale is sent on its own' : plans.length > 1 ? 'One transaction per account' : 'One transaction · all or nothing'} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${NET().name}</b><br>Bid ${MK.bids[0] ? MK.bids[0][0].toFixed(6) : '–'} · Ask ${MK.asks[0] ? MK.asks[0][0].toFixed(6) : '–'} · Last ${MK.last ? MK.last.toFixed(6) : '–'} · book ${age} · cap ${S.slip}%`;
-  xp.forEach((p) => { items.push({ t: `— ${p.name} · XRP Ledger —` }); if (p.err) items.push({ t: "Can't read its orders", s: p.err }); else p.offers.forEach((f) => items.push({ t: 'Cancel ' + xrOfferText(f), s: 'order #' + f.seq })); });
+  xp.forEach((p) => { items.push({ t: `— ${p.name} · XRP Ledger —` }); if (p.err) items.push({ t: "Can't read its orders", s: p.err }); else { items.push(...xrBusyItems(p.busy)); p.offers.forEach((f) => items.push({ t: 'Cancel ' + xrOfferText(f), s: 'order #' + f.seq })); } });
   confirmSheet(title, sub, items, 'Hold to ' + verb, async () => {
     const [res, xrows] = await Promise.all([runPlans(plans), xp.length ? xrKillRun(xp) : []]);
     const rows = await Promise.all(res.map(async (r) => {
