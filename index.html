@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.7</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.8</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -369,7 +369,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <span class="lbl">Balances</span>
   <div class="card rows" id="xrBal" style="padding:4px 14px"></div>
   <div id="xrTrust" style="display:flex;flex-direction:column;gap:6px"></div>
-  <span class="lbl">Open orders<span id="xrOffN"></span></span>
+  <div class="top" style="align-items:baseline"><span class="lbl">Open orders<span id="xrOffN"></span></span><button class="b-redout sm" data-act="xrCancelAll" id="xrCanAll" style="width:auto;min-height:30px;padding:0 12px;display:none">Cancel all</button></div>
   <div id="xrOff" style="display:flex;flex-direction:column;gap:8px"><div class="note">Loading…</div></div>
   <span class="lbl">Recent</span>
   <div class="card" id="xrRec" style="padding:4px 14px;font-size:14px"></div>
@@ -482,7 +482,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.7</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.8</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
@@ -499,7 +499,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.7 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.8 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13965,6 +13965,64 @@ async function xrSubmit(o, tx, drops) {
   delete XRA[from];
   return { hash: s.hash, state: 'pending', code: first };
 }
+/* Several transactions from one wallet (Cancel all): sequence numbers in a row, all submitted at once, then each watched
+   until it validates, or provably can never apply (past its last ledger and not on any server), else "pending". */
+async function xrSubmitAll(o, txs, drops) {
+  const from = o.w.classicAddress;
+  const [ai, cl] = await Promise.all([xr('account_info', { account: from, ledger_index: 'current' }), xr('ledger_current')]);
+  const seq = (ai.account_data || {}).Sequence; if (seq == null) throw new Error('Wallet not found on the XRP Ledger.');
+  const minL = Math.max(1, (+cl.ledger_current_index || 1) - 1), lls = (+cl.ledger_current_index || 0) + 20;
+  const L = txs.map((tx, i) => ({ s: o.w.sign({ ...tx, Account: from, Fee: String(drops), Sequence: seq + i, LastLedgerSequence: lls }), first: null, r: null }));
+  for (const x of L) {
+    try { const r = await xr('submit', { tx_blob: x.s.tx_blob }); x.first = r.engine_result || r.error || null; } catch (e) { x.first = null; }
+    if (x.first && /^tem/.test(x.first)) x.r = { hash: x.s.hash, state: 'expired', code: x.first };
+  }
+  const t0 = Date.now();
+  while (L.some((x) => !x.r) && Date.now() - t0 < 150000) {
+    await sleep(3000); bumpIdle();
+    const v = await xr('ledger', { ledger_index: 'validated' }).catch(() => ({})), vi = +((v.ledger || {}).ledger_index || v.ledger_index || 0);
+    for (const x of L.filter((y) => !y.r)) {
+      const q = await xr('tx', vi > lls ? { transaction: x.s.hash, min_ledger: minL, max_ledger: lls } : { transaction: x.s.hash }).catch(() => ({}));
+      if (q.validated) { const res = (q.meta || {}).TransactionResult; x.r = { hash: x.s.hash, state: res === 'tesSUCCESS' ? 'ok' : 'failed', code: res }; }
+      else if (vi > lls && q.error === 'txnNotFound' && q.searched_all === true) x.r = { hash: x.s.hash, state: 'expired', code: x.first };
+    }
+  }
+  delete XRA[from];
+  return L.map((x) => x.r || { hash: x.s.hash, state: 'pending', code: x.first });
+}
+const xrOfferText = (f) => { const t = xtOfferCard(f, false).match(/<b class="mono">(.*?)<\/b>/); return t ? t[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'") : 'order #' + f.seq; };
+// own XRP wallets with open orders (current network) → [{ o, name, offers } | { name, err }]
+async function xrKillPlans(only) {
+  const W = (K && K.xr || []).filter((o) => o.w && (!only || o.w.classicAddress === only));
+  const P = await Promise.all(W.map(async (o) => { try { const r = await xr('account_offers', { account: o.w.classicAddress, ledger_index: 'validated' }); return { o, name: o.name, offers: r.offers || [] }; } catch (e) { return { o, name: o.name, err: e.message || String(e) }; } }));
+  return P.filter((p) => p.err || p.offers.length);
+}
+async function xrKillRun(P) {   // → result cards
+  let drops = 15; try { drops = await xrFee(); } catch (e) {}
+  return Promise.all(P.map(async (p) => {
+    if (p.err) return `<div class="card"><div class="top"><b>${esc(p.name)} · XRP</b><span class="tag t-red">failed</span></div><div class="red" style="font-size:13px">${esc(p.err)}</div></div>`;
+    let R; try { R = await xrSubmitAll(p.o, p.offers.map((f) => ({ TransactionType: 'OfferCancel', OfferSequence: +f.seq })), drops); }
+    catch (e) { return `<div class="card"><div class="top"><b>${esc(p.name)} · XRP</b><span class="tag t-red">failed</span></div><div class="red" style="font-size:13px">${esc(e.message || String(e))} Nothing was sent.</div></div>`; }
+    const ok = R.filter((r) => r.state === 'ok').length, pend = R.filter((r) => r.state === 'pending').length, bad = R.length - ok - pend;
+    p.ok = ok === R.length;
+    return `<div class="card"><div class="top"><b>${esc(p.name)} · XRP</b><span class="tag ${p.ok ? 't-grn' : 't-red'}">${p.ok ? 'done' : pend && !bad ? 'pending' : 'some failed'}</span></div>
+      <div class="mu" style="font-size:13px">${ok} of ${R.length} order(s) cancelled${pend ? ` · ${pend} sent, not confirmed yet (check again in a minute)` : ''}${bad ? ` · ${bad} not cancelled (${esc(R.filter((r) => r.state === 'failed' || r.state === 'expired').map((r) => xrErr(r.code)).join(', '))})` : ''}</div>
+      ${R.map((r, i) => `<a class="mono" style="font-size:12px" href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">#${+p.offers[i].seq} ${r.state === 'ok' ? '✓' : r.state === 'pending' ? '…' : '✗'} ${esc(short(r.hash))}</a>`).join('')}</div>`;
+  }));
+}
+function xrCancelAll() {
+  const addr = xrSel, o = xrOwn(addr); if (!o) return;
+  xrKillPlans(addr).then((P) => {
+    if (!P.length) { toast('No open orders on this wallet.'); return xrLoadOpen(addr); }
+    if (P[0].err) return toast(P[0].err);
+    const items = P[0].offers.map((f) => ({ t: xrOfferText(f), s: 'order #' + f.seq }));
+    items.push({ t: `Network fee about ${m2(P[0].offers.length * 0.000015)} XRP`, s: XR_BOT_NOTE });
+    confirmSheet(`Cancel all ${P[0].offers.length} order(s)?`, `XRP Ledger DEX · ${esc(o.name)} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${S.net === 'public' ? 'Mainnet' : 'Testnet'}</b><br>One cancel per order, sent together`, items, 'Hold to cancel all', async () => {
+      const rows = await xrKillRun(P);
+      showResult(P.every((p) => p.ok), P.every((p) => p.ok) ? 'Orders cancelled' : 'Some orders not cancelled', rows, 'xrp');
+    });
+  }).catch((e) => toast(e.message || String(e)));
+}
 // one result screen for every outcome
 function xrOutcome(r, okTitle, okLine, failTitle, back = 'xrp') {
   const link = `<div class="card"><a class="mono" style="font-size:12px" href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">${esc(short(r.hash))} · view</a></div>`;
@@ -14252,7 +14310,7 @@ async function xrLoadOpen(addr) {
     if (cur !== 'xrp' || xrSel !== addr) return;
     const L = r.offers || [], own = !!xrOwn(addr), isR = (a) => typeof a === 'object' && a.currency === RLUSD_CUR && a.issuer === rlusdIss();
     XT.offers = L.filter((f) => (typeof f.taker_gets === 'string' && isR(f.taker_pays)) || (typeof f.taker_pays === 'string' && isR(f.taker_gets)));   // Edit works from here too
-    $('#xrOffN').textContent = L.length ? ` (${L.length})` : '';
+    $('#xrOffN').textContent = L.length ? ` (${L.length})` : ''; $('#xrCanAll').style.display = own && L.length ? '' : 'none';
     el.innerHTML = L.length ? L.map((f) => xtOfferCard(f, own)).join('') + (own ? `<div class="mu" style="font-size:12px">${XR_BOT_NOTE}</div>` : '<div class="mu" style="font-size:12px">Watch only: import this wallet\'s secret to cancel from here.</div>')
       : '<div class="note">No open orders.</div>';
   } catch (e) { if (cur === 'xrp') el.innerHTML = `<div class="note">${esc(e.message || String(e))}</div>`; }
@@ -15359,14 +15417,17 @@ function showResult(ok, title, rows, back = 'bots') {
   $('#rTitle').textContent = title; $('#rBody').innerHTML = rows.join(''); resultBack = back; go('result');
 }
 let resultBack = 'bots';
-async function killFlow(plansP, title, verb) {
-  let plans;
-  try { plans = await plansP; } catch (e) { return toast(niceErr(e), 6000); }
+async function killFlow(plansP, title, verb, xrP = null) {
+  let plans, xp = [];
+  const [pr, xr2] = await Promise.allSettled([plansP, xrP || Promise.resolve([])]);   // both at once, so neither rejection goes unhandled
+  if (xr2.status === 'fulfilled') xp = xr2.value;
+  if (pr.status === 'fulfilled') plans = pr.value; else { if (!xp.length) return toast(niceErr(pr.reason), 6000); plans = []; }   // no Stellar kill switch, but XRP orders to cancel   // no Stellar kill switch, but XRP orders to cancel
   const items = []; plans.forEach((p) => { items.push({ t: `— ${p.bot.name} —` }); p.lines.forEach((l) => items.push(l)); if (!p.lines.length) items.push({ t: 'Nothing to cancel', s: p.note || '' }); });
   const age = MK.at ? Math.round((Date.now() - MK.at) / 1000) + 's ago' : '';
   const sub = `${plans.some((p) => (p.swaps || []).length) ? 'Orders are cancelled first, then each sale is sent on its own' : plans.length > 1 ? 'One transaction per account' : 'One transaction · all or nothing'} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${NET().name}</b><br>Bid ${MK.bids[0] ? MK.bids[0][0].toFixed(6) : '–'} · Ask ${MK.asks[0] ? MK.asks[0][0].toFixed(6) : '–'} · Last ${MK.last ? MK.last.toFixed(6) : '–'} · book ${age} · cap ${S.slip}%`;
+  xp.forEach((p) => { items.push({ t: `— ${p.name} · XRP Ledger —` }); if (p.err) items.push({ t: "Can't read its orders", s: p.err }); else p.offers.forEach((f) => items.push({ t: 'Cancel ' + xrOfferText(f), s: 'order #' + f.seq })); });
   confirmSheet(title, sub, items, 'Hold to ' + verb, async () => {
-    const res = await runPlans(plans);
+    const [res, xrows] = await Promise.all([runPlans(plans), xp.length ? xrKillRun(xp) : []]);
     const rows = await Promise.all(res.map(async (r) => {
       const fill = await fillResult(r);
       return `<div class="card"><div class="top"><b>${esc(r.p.bot.name)}</b><span class="tag ${r.ok ? 't-grn' : 't-red'}">${r.ok ? (r.nothing ? 'nothing to do' : 'done') : 'failed'}</span></div>
@@ -15374,7 +15435,8 @@ async function killFlow(plansP, title, verb) {
         ${!r.ok ? `<div class="red" style="font-size:13px">${esc(r.err)}</div>` : ''}</div>`;
     }));
     if (res.some((r) => (r.sold || []).length)) rows.push(`<div class="note">When the PC comes back, a bot that tracks its own exit orders will find them gone. Make sure it treats the trade as closed by hand and does not re-enter.</div>`);
-    const allOk = res.every((r) => r.ok);
+    rows.push(...xrows);
+    const allOk = res.every((r) => r.ok) && xp.every((p) => p.ok);
     showResult(allOk, allOk ? (res.some((r) => (r.sold || []).length) ? 'Orders cancelled, positions closed' : 'Orders cancelled') : 'Some actions failed', rows);
     tradeAccts().forEach((b) => { if (b.addr) delete BOT[b.addr]; });
   });
@@ -16113,7 +16175,8 @@ document.addEventListener('click', async (e) => {
     actRefresh: () => { ACT.at = 0; drawAct(); },
     actMore: () => actLoad(true),
     pnlRefresh: () => { pnlReset(); paintPnl(); loadPer(P.sel); },
-    killAll: () => killFlow(allPlans(false), 'Cancel orders?', 'cancel orders'),
+    killAll: () => killFlow(allPlans(false), 'Cancel orders?', 'cancel orders', xrKillPlans()),
+    xrCancelAll: () => xrCancelAll(),
     flatAll: () => killFlow(allPlans(true), 'Cancel orders and close positions?', 'cancel + close'),
     killOne: () => killFlow(planCancel(tradeAccts()[botSel]).then((p) => [p]), `Cancel ${tradeAccts()[botSel].name} orders?`, 'cancel'),
     flatOne: () => { const b = tradeAccts()[botSel]; killFlow(planFlat(b).then((p) => [p]), `Cancel ${b.name} orders and close positions into ${flatCode()}?`, 'cancel + close'); },
