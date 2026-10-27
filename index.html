@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.11</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.14</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -267,7 +267,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div id="hFund"></div>
   <span class="lbl hide-unf">Balances</span>
   <div class="card rows hide-unf" id="hBal" style="padding:4px 14px"></div>
-  <div class="top hide-unf" style="align-items:baseline"><span class="lbl">Open orders<span id="hOffN"></span></span><button class="b-out sm" data-go="trade" style="width:auto;min-height:30px;padding:0 12px">Trade ›</button></div>
+  <div class="top hide-unf" style="align-items:baseline"><span class="lbl">Open orders<span id="hOffN"></span></span><span style="display:flex;gap:8px"><button class="b-redout sm" data-act="homeCancelAll" id="hCanAll" style="width:auto;min-height:30px;padding:0 12px;display:none">Cancel all</button><button class="b-out sm" data-go="trade" style="width:auto;min-height:30px;padding:0 12px">Trade ›</button></span></div>
   <div id="hOff" class="hide-unf" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl hide-unf">Recent</span>
   <div class="card rows hide-unf" id="hRec" style="padding:4px 14px;font-size:14px"></div>
@@ -482,7 +482,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.11</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.14</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
@@ -499,7 +499,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.11 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.14 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13879,10 +13879,14 @@ async function drawXrp() {
   if (!XRA[addr].a) { $('#xrOff').innerHTML = '<div class="note">No open orders.</div>'; return; }
   xrLoadOpen(addr); xrWatch(addr);
   try {
-    const r = await xr('account_tx', { account: addr, limit: 10, ledger_index_min: -1, ledger_index_max: -1 });
+    const r = await xr('account_tx', { account: addr, limit: 60, ledger_index_min: -1, ledger_index_max: -1 });
     if (cur !== 'xrp' || xrSel !== addr) return;
     const T = (r.transactions || []).map((x) => ({ tx: x.tx || x.tx_json || {}, meta: x.meta || {}, hash: x.hash || (x.tx || {}).hash, iso: x.close_time_iso || ((x.tx || x.tx_json || {}).date != null ? new Date(((x.tx || x.tx_json).date + 946684800) * 1000).toISOString() : null) }));
-    $('#xrRec').innerHTML = T.length ? T.map((x) => `<div class="recrow" style="display:flex;justify-content:space-between;gap:10px;padding:8px 0"><span>${esc(xrTxText(x, addr))}</span><a class="mu" style="font-size:12px;white-space:nowrap" href="${XRP_EXPL[S.net]}/transactions/${esc(x.hash)}" target="_blank" rel="noopener">${x.iso ? esc(ago(x.iso)) : 'view'}</a></div>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
+    // a bot re-quotes every few seconds: 3+ "Order placed / Order cancelled" in a row collapse into one line, so fills and payments stay visible
+    const R = []; for (const x of T) { const t = xrTxText(x, addr), q = /^(Order placed|Order cancelled)/.test(t);
+      const last = R[R.length - 1]; if (q && last && last.q) { last.m.push({ x, t }); continue; } R.push({ q, m: [{ x, t }] }); }
+    const rows = R.flatMap((g) => g.q && g.m.length >= 3 ? [{ x: g.m[0].x, t: `${g.m.length} orders placed / replaced (a bot re-quoting)` }] : g.m).slice(0, 12);   // runs of 1-2 stay as they are
+    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<div class="recrow" style="display:flex;justify-content:space-between;gap:10px;padding:8px 0"><span${/^Order filled|^Filled|^Market/.test(t) ? ' class="grn"' : ''}>${esc(t)}</span><a class="mu" style="font-size:12px;white-space:nowrap" href="${XRP_EXPL[S.net]}/transactions/${esc(x.hash)}" target="_blank" rel="noopener">${x.iso ? esc(ago(x.iso)) : 'view'}</a></div>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
   } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
 }
 function xrAmt(a) { if (a == null) return '?'; if (typeof a === 'string') return m2(+a / 1e6) + ' XRP'; return m2(+a.value) + ' ' + xrCur(a.currency); }
@@ -14933,23 +14937,130 @@ async function drawHome() {
     $('#hTot').textContent = a ? '$' + fx(usdVal(a)) : '$0.00';
     priceAssets(a).then((ch) => { if (ch && cur === 'home' && ACC[homeAddr] === a) { $('#hBal').innerHTML = balRows(a); $('#hTot').textContent = '$' + fx(usdVal(a)); } });
     $('#s-home').classList.toggle('unf', !a); $('#hFund').innerHTML = a ? '' : fundCard(); if (!a) fundSrcLoad().then(() => { if (cur === 'home' && !ACC[homeAddr]) $('#hFund').innerHTML = fundCard(); });
-    homeOrders(a);
-    const ops = a ? (await H(`/accounts/${homeAddr}/operations?order=desc&limit=8`))._embedded.records : [];
-    $('#hRec').innerHTML = ops.length ? ops.map((o) => `<details class="recrow" data-tx="${esc(o.transaction_hash)}"><summary><span>${esc(opText(o, homeAddr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(o.created_at))}</span></summary>${opDetail(o, homeAddr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
+    homeOrders(a); acctWatch(homeAddr);
+    if (a) await homeRecent(homeAddr); else $('#hRec').innerHTML = '';
   } catch (e) { $('#hBal').innerHTML = `<div><span class="red">${esc(niceErr(e))}</span></div>`; }
+}
+async function homeLive(addr) {   // something changed on this wallet (a fill, a payment): balances, orders and Recent, without "Loading…"
+  const a = await refreshAcct(addr).catch(() => null); if (cur !== 'home' || homeAddr !== addr || !a) return;
+  $('#hBal').innerHTML = balRows(a); $('#hTot').textContent = '$' + fx(usdVal(a));
+  if (!$('#hOff [data-cancel][disabled], #hOff [data-scancel][disabled], #hOff [data-armed="1"]')) homeOrders(a, true);   // a cancel in progress keeps its card
+  homeRecent(addr).catch(() => {});
+}
+const effAsset = (t, c) => (t === 'native' ? 'XLM' : c);
+function fillText(sold, sa, bought, ba) {   // "sold 100.00 XLM for 18.20 USDC @ 0.18200"
+  const px = sa === 'XLM' ? bought / sold : ba === 'XLM' ? sold / bought : null;
+  return `${sa === 'XLM' || ba !== 'XLM' ? 'sold ' + fx(sold, 2) + ' ' + sa + ' for ' + fx(bought, 2) + ' ' + ba : 'bought ' + fx(bought, 2) + ' ' + ba + ' for ' + fx(sold, 2) + ' ' + sa}${px ? ' @ ' + px.toFixed(5) : ''}`;
+}
+async function homeRecent(addr) {
+  // Recent = what this wallet did (its own operations, payments in) + its orders that FILLED (trade effects, grouped per operation).
+  // Another trader's order that took ours is listed as "Order filled", not as their order.
+  const [opsR, effR] = await Promise.all([H(`/accounts/${addr}/operations?order=desc&limit=10`), H(`/accounts/${addr}/effects?order=desc&limit=40`).catch(() => null)]);
+  if (cur !== 'home' || homeAddr !== addr) return;
+  const all = opsR._embedded.records, ops = all.filter((o) => o.source_account === addr || !/offer/.test(o.type));
+  const oldest = all.length >= 10 ? Date.parse(all[all.length - 1].created_at) : 0;   // effects reach further back than 10 operations: don't show fills from a period whose operations aren't shown
+  const ownPath = new Set(all.filter((o) => o.source_account === addr && /^path_payment/.test(o.type)).map((o) => o.id));   // own swaps: already listed as the swap
+  const G = new Map();
+  for (const e of ((effR && effR._embedded.records) || []).filter((x) => x.type === 'trade' && x.account === addr)) {
+    if (Date.parse(e.created_at) < oldest) continue;
+    const opId = String(e.paging_token || '').split('-')[0]; if (ownPath.has(opId)) continue;
+    const k = opId + effAsset(e.sold_asset_type, e.sold_asset_code) + effAsset(e.bought_asset_type, e.bought_asset_code);
+    const g = G.get(k) || { opId, t: e.created_at, sold: 0, bought: 0, sa: effAsset(e.sold_asset_type, e.sold_asset_code), ba: effAsset(e.bought_asset_type, e.bought_asset_code), mine: ops.some((o) => o.id === opId) };
+    g.sold += +e.sold_amount; g.bought += +e.bought_amount; G.set(k, g);
+  }
+  const rows = [...ops.map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
+  const was = new Set([...document.querySelectorAll('#hRec details[open]')].map((d) => d.dataset.tx || d.dataset.op));   // rows you opened stay open
+  $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span>${esc(opText(r.o, addr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
+    : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
+    : '<div><span class="mu">Nothing yet</span></div>';
+  if (was.size) document.querySelectorAll('#hRec details').forEach((d) => { if (was.has(d.dataset.tx || d.dataset.op)) { d.dataset.loaded = d.dataset.loaded || ''; d.open = true; } });
+}
+/* Live wallet: Horizon pushes every change on the wallet (effects stream). On a fill: a message, then balances, open orders,
+   Recent (wallet page) or open orders and fills (Trade) refresh by themselves. No stream → check every 10 s. */
+const AW = { es: null, addr: null, net: null, poll: 0, wd: 0, last: null, fills: [], t: 0 };
+function acctUnwatch() { if (AW.es) { AW.es.onmessage = AW.es.onerror = null; try { AW.es.close(); } catch (e) {} } clearTimeout(AW.poll); clearInterval(AW.wd); clearTimeout(AW.t); Object.assign(AW, { es: null, addr: null, poll: 0, wd: 0, t: 0, last: null, fills: [] }); }
+const awHere = () => K && S.net === AW.net && ((cur === 'home' && homeAddr === AW.addr) || (cur === 'trade' && tradeAddr === AW.addr));
+function acctWatch(addr) {
+  if (!addr) return; if (AW.addr === addr && AW.net === S.net && (AW.es || AW.poll)) return;
+  acctUnwatch(); AW.addr = addr; AW.net = S.net;
+  try {
+    const es = new EventSource(`${HZ()}/accounts/${addr}/effects?cursor=now`); AW.es = es;
+    es.onmessage = (m) => { if (AW.es !== es) return; let e; try { e = JSON.parse(m.data); } catch (x) { return; } acctEffect(e); };
+    let errs = 0; es.onopen = () => { errs = 0; };
+    es.onerror = () => { if (AW.es !== es) return; if (es.readyState === 2 || ++errs >= 3) { es.onmessage = es.onerror = null; try { es.close(); } catch (x) {} AW.es = null; acctPoll(); } };   // stream keeps failing: check every 10 s instead
+  } catch (e) { acctPoll(); }
+  AW.wd = setInterval(() => { if (!awHere()) acctUnwatch(); }, 3000);
+}
+function tokGt(a, b) { const [a1, a2] = String(a).split('-'), [b1, b2] = String(b).split('-'); try { const x = BigInt(a1 || 0), y = BigInt(b1 || 0); return x !== y ? x > y : +a2 > +b2; } catch (e) { return false; } }
+function acctPoll() {
+  const addr = AW.addr; clearTimeout(AW.poll);
+  const step = async () => {
+    if (AW.addr !== addr) return; if (!awHere()) return acctUnwatch();   // never leave a stopped poll that looks alive
+    try { const j = await H(`/accounts/${addr}/effects?order=desc&limit=20`); const L = j._embedded.records;
+      if (AW.last == null) AW.last = L.length ? L[0].paging_token : '0-0';
+      else { const nw = L.filter((e) => tokGt(e.paging_token, AW.last)).reverse(); for (const e of nw) { acctEffect(e); AW.last = e.paging_token; } } } catch (e) {}   // only effects NEWER than the last one seen (a server that is behind can't replay old fills)
+    if (AW.addr === addr) AW.poll = setTimeout(step, 10000);
+  };
+  AW.poll = setTimeout(step, 0);
+}
+function acctEffect(e) {
+  if (!e || e.account !== AW.addr) return;
+  if (e.type === 'trade') AW.fills.push(e);
+  clearTimeout(AW.t); AW.t = setTimeout(acctFlush, 1200);   // a burst (one order hitting several) becomes one refresh
+}
+async function acctFlush() {
+  if (!awHere()) return;
+  const addr = AW.addr; let F = AW.fills.splice(0);
+  if (F.length) {   // a fill caused by THIS wallet's own swap / market order is not news: keep only fills where another account's operation took our order
+    const ids = [...new Set(F.map((e) => String(e.paging_token || '').split('-')[0]))], own = new Set();
+    await Promise.all(ids.map(async (id) => { try { const o = await H('/operations/' + id); if (o.source_account === addr) own.add(id); } catch (e) {} }));
+    F = F.filter((e) => !own.has(String(e.paging_token || '').split('-')[0]));
+    if (!awHere() || AW.addr !== addr) return;
+  }
+  if (F.length) { const G = {}; for (const e of F) { const sa = effAsset(e.sold_asset_type, e.sold_asset_code), ba = effAsset(e.bought_asset_type, e.bought_asset_code), k = sa + '>' + ba; const g = G[k] || (G[k] = { sold: 0, bought: 0, sa, ba }); g.sold += +e.sold_amount; g.bought += +e.bought_amount; }
+    toast('✓ Order filled: ' + Object.values(G).map((g) => fillText(g.sold, g.sa, g.bought, g.ba)).join(' · '), 8000); }
+  if (cur === 'home') homeLive(AW.addr); else if (cur === 'trade') tradeLoadMine();
 }
 let HOME_ALL = false, HOME_PAINT = null;
 // Open orders on the wallet page (same cards as Trade: limit orders + stops, with Edit / Cancel)
-async function homeOrders(a) {
+// Cancel all on a Stellar wallet page: every open order on the DEX (one transaction, up to 100 per batch) + every waiting stop
+async function homeCancelAll() {
+  const addr = homeAddr, w = OWN().find((x) => x.addr === addr); if (!w) return;
+  const name = (allAccts().find((x) => x.addr === addr) || {}).name || short(addr);
+  let off; try { off = await offersOf(addr); } catch (e) { return toast(niceErr(e)); }
+  const st = STOPS.addr === addr ? STOPS.list.filter((x) => stopLive(x) && ['armed', 'triggered'].includes(x.status) && hexOk(x.id, 32)) : [];
+  if (!off.length && !st.length) { toast('No open orders on this wallet.'); return homeOrders(ACC[addr]); }
+  const items = [...off.map((o) => ({ t: 'Cancel order #' + o.id, s: offerTextShort(o) + ' @ ' + o.price })), ...st.map((x) => ({ t: `Cancel stop ${x.side} ${fx(+x.xlm || 0, 2)} XLM`, s: 'stop ' + p4(+x.stop || 0) }))];
+  confirmSheet(`Cancel all ${items.length} order(s)?`, `${esc(name)} · <b style="color:${S.net === 'public' ? 'var(--redt)' : 'var(--amb)'}">${NET().name}</b><br>${off.length ? (off.length > 100 ? 'Orders: one transaction per 100' : 'Orders: one transaction · all or nothing') : ''}${off.length && st.length ? ' · ' : ''}${st.length ? 'stops: cancelled on your stop server' : ''}<br><span class="mu">If a bot trades from this wallet, pause it first or it will place new orders.</span>`, items, 'Hold to cancel all', async () => {
+    const rows = []; let okAll = true;
+    let now = off; try { now = await offersOf(addr); } catch (e) {}   // the orders as they are NOW: one that filled meanwhile would fail the whole transaction
+    if (now.length) {
+      let done = 0; const errs = [], links = [];
+      for (let i = 0; i < now.length; i += 100) {   // each batch of 100 is its own transaction: count what went through
+        const part = now.slice(i, i + 100), [r] = await runPlans([{ bot: { addr, name }, kind: 'cancel', offers: part }]);
+        if (r.ok) { done += part.length; if (r.hash) links.push(r.hash); } else errs.push(r.err);
+      }
+      okAll = !errs.length;
+      rows.push(`<div class="card"><div class="top"><b>Orders</b><span class="tag ${okAll ? 't-grn' : 't-red'}">${okAll ? 'done' : done ? 'some failed' : 'failed'}</span></div><div class="mu" style="font-size:13px">${done} of ${now.length} order(s) cancelled</div>${errs.length ? `<div class="red" style="font-size:13px">${esc(errs[0])}</div>` : ''}${links.map((h) => `<a class="mono" style="font-size:12px" href="${NET().expert}/tx/${h}" target="_blank" rel="noopener">${short(h)} · view</a>`).join('')}</div>`);
+    } else if (off.length) rows.push('<div class="card"><b>Orders</b><div class="mu" style="font-size:13px">They had already filled or been cancelled: nothing left to cancel.</div></div>');
+    let sOk = 0, sBad = [];
+    for (const x of st) { try { const ts = Date.now(); await stopApi('/cancel', { id: x.id, ts, sig: stopSig(w.kp, `liquidfi-stops:cancel:${x.id}:${ts}`) }); sOk++; } catch (e) { sBad.push(niceErr(e)); } }
+    if (st.length) rows.push(`<div class="card"><div class="top"><b>Stops</b><span class="tag ${sBad.length ? 't-red' : 't-grn'}">${sBad.length ? 'some failed' : 'done'}</span></div><div class="mu" style="font-size:13px">${sOk} of ${st.length} stop(s) cancelled${sBad.length ? ' · ' + esc(sBad[0]) : ''}</div></div>`);
+    const ok = okAll && !sBad.length;
+    if (st.length) stopList(addr).catch(() => {});
+    showResult(ok, ok ? 'Orders cancelled' : 'Some orders not cancelled', rows, 'home');
+  });
+}
+async function homeOrders(a, quiet) {
   const addr = homeAddr, el = $('#hOff'); if (!el) return;
   if (HOME_ALL !== false && HOME_ALL !== addr) HOME_ALL = false;
   if (!a) { el.innerHTML = ''; $('#hOffN').textContent = ''; return; }
-  el.innerHTML = '<div class="note">Loading…</div>';
+  if (!quiet) el.innerHTML = '<div class="note">Loading…</div>';
   let off = []; try { off = await offersOf(addr); } catch (e) { if (cur === 'home' && homeAddr === addr) el.innerHTML = `<div class="note">Couldn't load open orders (${esc(niceErr(e))}).</div>`; return; }
   if (cur !== 'home' || homeAddr !== addr) return;
   TRADE_OFF = off; tradeAddr = addr;
   const paint = () => { if (cur !== 'home' || homeAddr !== addr) return; const st = STOPS.addr === addr ? STOPS.list.filter(stopLive) : [], n = st.length + off.length;
-    $('#hOffN').textContent = n ? ` (${n})` : '';
+    $('#hOffN').textContent = n ? ` (${n})` : ''; $('#hCanAll').style.display = (off.length || st.some((x) => ['armed', 'triggered'].includes(x.status))) && OWN().some((w) => w.addr === addr) ? '' : 'none';
     const cards = [...st.map(stopCard), ...off.map(orderCard)], cap = HOME_ALL ? cards.length : 5;   // a busy wallet (bot ladders) shows 5, then "Show all"
     el.innerHTML = n ? cards.slice(0, cap).join('') + (cards.length > cap ? `<button class="b-out sm" data-act="homeAll">Show all ${cards.length} open orders</button>` : '') : '<div class="note">No open orders. Place limit and stop orders in Trade.</div>'; };
   HOME_PAINT = paint;
@@ -15543,8 +15654,13 @@ async function drawTrade() {
   const g = $('#tGo'); g.textContent = 'Review ' + (T.mode === 'stop' ? 'stop ' : '') + T.side; g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
   drawTradeBook(); tradeEst();
   if (feeTo(tradeAddr)) feeLive(feeTo(tradeAddr)).then(() => { if (cur === 'trade') tradeEst(); }).catch(() => {});
-  const a = await refreshAcct(tradeAddr).catch(() => null);
-  const off = a ? await offersOf(tradeAddr).catch(() => []) : [];
+  await tradeLoadMine(); if (cur === 'trade') acctWatch(tradeAddr);   // not after you left (it would replace the wallet page's watch)
+}
+async function tradeLoadMine() {   // open orders, stops and fills of the Trade wallet (also called live when something fills)
+  const addr = tradeAddr;
+  const a = await refreshAcct(addr).catch(() => null);
+  const off = a ? await offersOf(addr).catch(() => []) : [];
+  if (cur !== 'trade' || tradeAddr !== addr) return;   // left Trade, or picked another wallet meanwhile
   TRADE_OFF = off;
   const paintOpen = () => { if (cur !== 'trade') return; const st = STOPS.addr === tradeAddr ? STOPS.list : [], live = st.filter(stopLive), old = st.filter((x) => !stopLive(x) && Date.now() / 1000 - (x.done_at || 0) < 86400);
     $('#tOpen').innerHTML = (live.length || off.length || old.length) ? live.map(stopCard).join('') + off.map(orderCard).join('') + old.map(stopCard).join('') : '<div class="note">No open orders.</div>'; };
@@ -16259,6 +16375,7 @@ document.addEventListener('click', async (e) => {
     pnlRefresh: () => { pnlReset(); paintPnl(); loadPer(P.sel); },
     killAll: () => killFlow(allPlans(false), 'Cancel orders?', 'cancel orders', xrKillPlans()),
     xrCancelAll: () => xrCancelAll(),
+    homeCancelAll: () => homeCancelAll(),
     flatAll: () => killFlow(allPlans(true), 'Cancel orders and close positions?', 'cancel + close'),
     killOne: () => killFlow(planCancel(tradeAccts()[botSel]).then((p) => [p]), `Cancel ${tradeAccts()[botSel].name} orders?`, 'cancel'),
     flatOne: () => { const b = tradeAccts()[botSel]; killFlow(planFlat(b).then((p) => [p]), `Cancel ${b.name} orders and close positions into ${flatCode()}?`, 'cancel + close'); },
