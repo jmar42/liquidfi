@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.14</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.15</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -466,6 +466,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="qr" id="rQr"></div>
   <div class="card"><span class="lbl">Address</span><div class="addr" id="rAddr"></div><div class="g2"><button class="b-light" data-act="copyAddr">Copy</button><button class="b-out" data-act="shareAddr">Share</button></div></div>
   <div class="mu" style="font-size:13px" id="rCan"></div>
+  <button class="b-out" data-act="onrBuy" data-chain="stellar" id="rBuy">Buy with Coinbase</button>
 </section>
 
 <!-- TRUST -->
@@ -482,10 +483,11 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.14</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.15</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
+  <div class="card"><span class="lbl">Buy with Coinbase</span><div class="mu" style="font-size:12px">Buy XLM or XRP with your Coinbase account and have it sent straight to your wallet. Uses your stop server, which holds your Coinbase Developer key (never this phone). Mainnet only.</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Kill switch key (this phone)</span><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">On the PC run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Watched wallets (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">Wallets you watch by address, like bots your PC runs. No key here. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Watch an address</button><button class="b-out sm" data-act="saveBots">Save list</button></div></div>
@@ -499,7 +501,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.14 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.15 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14101,7 +14103,7 @@ function xrRcvSheet() {
   const addr = xrSel; pending = null; let svg = '';
   try { const q = qrcode(0, 'M'); q.addData(addr); q.make(); svg = q.createSvgTag({ cellSize: 6, margin: 0, scalable: false }); } catch (e) {}
   sheet(`<h2>Receive XRP</h2><div style="background:#fff;padding:14px;border-radius:12px;align-self:center">${svg}</div><div class="addr">${esc(addr)}</div><button class="b-light" data-act="xrCopy">Copy address</button>
-    <div class="mu" style="font-size:12.5px">XRP Ledger only: XRP and XRP Ledger tokens. No destination tag is needed for your own wallet. Don't send Stellar assets here.${XRA[addr] && !XRA[addr].a ? ` A new address opens once it receives at least ${m2((XRSV || { base: 1 }).base)} XRP.` : ''}</div><button class="b-out" data-act="closeSheet">Done</button>`);
+    <div class="mu" style="font-size:12.5px">XRP Ledger only: XRP and XRP Ledger tokens. No destination tag is needed for your own wallet. Don't send Stellar assets here.${XRA[addr] && !XRA[addr].a ? ` A new address opens once it receives at least ${m2((XRSV || { base: 1 }).base)} XRP.` : ''}</div><button class="b-out" data-act="onrBuy" data-chain="xrp" data-addr="${esc(addr)}">Buy XRP with Coinbase</button><button class="b-out" data-act="closeSheet">Done</button>`);
 }
 async function xrFaucet() {
   try { const r = await fetch('https://faucet.altnet.rippletest.net/accounts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ destination: xrSel }) }); if (!r.ok) throw new Error('faucet said ' + r.status); toast('Test XRP on the way. It can take a few seconds.'); setTimeout(() => { if (cur === 'xrp') drawXrp(); }, 6000); }
@@ -15872,6 +15874,71 @@ function drawStopSet() {
   $('#setStopSt').textContent = 'Checking…'; fetch(S.stopUrl + '/health').then((r) => r.json()).then((j) => servesNet(j) ? stopStatus(j) : ($('#setStopSt').innerHTML = `<span class="amb">Doesn't serve ${NET().name}.</span>`)).catch(() => { $('#setStopSt').innerHTML = '<span class="amb">Not answering right now.</span>'; });
 }
 
+/* ---------- Coinbase Onramp: buy XLM / XRP into your own wallet (v2.15) ----------
+   The stop server makes a one-time Coinbase session token with your CDP key (kept on the server). The phone
+   opens Coinbase's own buy window; Coinbase sends the coins straight to the wallet address. */
+const ONR = { opts: null, at: 0, chain: 'stellar', addr: '', asset: '', network: '', usd: 5 };
+const ONR_URL = 'https://pay.coinbase.com/buy/select-asset';
+function onrSigner() { const w = (OWN()[0] || {}).addr; if (!w) throw new Error('Add a Stellar wallet with its key first: it signs the request to your server.'); return { w, kp: kpFor(w) }; }
+async function onrApi(path, extra, msgFn) {
+  const { w, kp } = onrSigner(), ts = Date.now();
+  return stopApi(path, { net: S.net, wallet: w, ts, ...extra, sig: stopSig(kp, msgFn(w, ts)) });
+}
+async function onrOpts(fresh) {
+  if (!fresh && ONR.opts && Date.now() - ONR.at < 6 * 3600e3) return ONR.opts;
+  const j = await onrApi('/onramp/options', { fresh: !!fresh }, (w, ts) => `liquidfi-stops:onramp-opts:${S.net}:${w}:${ts}`);
+  ONR.opts = j; ONR.at = Date.now(); return j;
+}
+const onrFor = (o, chain) => ((o && o.assets) || []).map((a) => ({ ...a, net: a.networks.find((n) => n.chain === chain) })).filter((a) => a.net);
+function onrWhy() {
+  if (S.net !== 'public') return 'Coinbase buys are Mainnet only. Switch Settings → Network to Mainnet.';
+  if (!S.stopUrl) return 'Set your stop server first (Settings → Stop orders). It makes the Coinbase session.';
+  return '';
+}
+async function onrCheck() {
+  const el = $('#setOnrSt'); const why = onrWhy(); if (why) { el.innerHTML = `<span class="amb">${esc(why)}</span>`; return; }
+  el.textContent = 'Checking…';
+  try {
+    const o = await onrOpts(true), st = onrFor(o, 'stellar').map((a) => a.symbol), xr = onrFor(o, 'xrp').map((a) => a.symbol);
+    const lim = (o.limits || []).map((l) => `${({ ACH_BANK_ACCOUNT: 'Bank', CARD: 'Card', APPLE_PAY: 'Apple Pay', PAYPAL: 'PayPal' })[l.id] || l.id} $${l.min}–$${l.max}`).join(' · ');
+    el.innerHTML = `<span class="grn">✓ Coinbase connected</span><br>To Stellar: ${st.length ? esc(st.join(', ')) : '<span class="amb">nothing offered</span>'}<br>To the XRP Ledger: ${xr.length ? esc(xr.join(', ')) : '<span class="amb">nothing offered</span>'}${lim ? '<br>' + esc(lim) : ''}`;
+  } catch (e) { el.innerHTML = `<span class="amb">${esc(niceErr(e))}</span>`; }
+}
+async function onrBuySheet(chain, addr) {
+  ONR.chain = chain; ONR.addr = addr; pending = null;
+  const why = onrWhy(); if (why) return sheet(`<h2>Buy with Coinbase</h2><div class="note amb">${esc(why)}</div><button class="b-out" data-act="closeSheet">Close</button>`);
+  sheet(`<h2>Buy with Coinbase</h2><div class="mu">Checking what Coinbase can send here…</div><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  let L;
+  try { L = onrFor(await onrOpts(false), chain); } catch (e) { return sheet(`<h2>Buy with Coinbase</h2><div class="note amb">${esc(niceErr(e))}</div><button class="b-out" data-act="closeSheet">Close</button>`); }
+  if (!L.length) return sheet(`<h2>Buy with Coinbase</h2><div class="note amb">Coinbase doesn't offer any coin on ${chain === 'xrp' ? 'the XRP Ledger' : 'Stellar'} right now.</div><button class="b-out" data-act="closeSheet">Close</button>`);
+  const pick = L.find((a) => a.symbol === (chain === 'xrp' ? 'XRP' : 'XLM')) || L[0]; ONR.asset = pick.symbol; ONR.network = pick.net.name;
+  const nm = (allAccts().find((x) => x.addr === addr) || (NS().xrw || []).find((x) => x.addr === addr) || (K.xr || []).map((o) => ({ name: o.name, addr: o.w && o.w.classicAddress })).find((x) => x.addr === addr) || {}).name;
+  let note = '';
+  if (chain === 'stellar') { const a = await refreshAcct(addr).catch(() => null); if (!a) note = 'This wallet isn’t open on Stellar yet. Buy at least a few dollars of XLM so it can open (1 XLM reserve).'; }
+  sheet(`<h2>Buy with Coinbase</h2>
+    <div class="mu" style="font-size:13px">Sent by Coinbase straight to ${nm ? esc(nm) + ' · ' : ''}<span class="mono">${esc(short(addr))}</span></div>
+    <span class="lbl">Coin</span><div class="seg" id="onrAs">${L.map((a) => `<button data-act="onrAsset" data-v="${esc(a.symbol)}" data-n="${esc(a.net.name)}" class="${a.symbol === ONR.asset ? 'on' : ''}">${esc(a.symbol)}</button>`).join('')}</div>
+    <span class="lbl">Amount (USD)</span><div class="seg" id="onrUsd">${[5, 25, 100, 500].map((v) => `<button data-act="onrUsd" data-v="${v}" class="${v === ONR.usd ? 'on' : ''}">$${v}</button>`).join('')}</div>
+    <label>Or type an amount<input id="onrAmt" type="number" min="1" step="1" inputmode="decimal" placeholder="${ONR.usd}"></label>
+    ${note ? `<div class="note amb">${esc(note)}</div>` : ''}
+    <div class="mu" style="font-size:12px">Coinbase opens in a new tab. You sign in, pick bank or card and confirm there. Coinbase's fee shows before you pay. The coins show up here when Coinbase sends them, usually within a few minutes. While Coinbase reviews the Liquidfi app, buys are limited to $5.</div>
+    <button class="b-light big" data-act="onrGo">Open Coinbase</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+function onrGo(btn) {
+  const amt = +($('#onrAmt') || {}).value || ONR.usd;
+  if (!(amt >= 1)) return toast('Enter an amount of at least $1.');
+  const win = window.open('about:blank', '_blank');   // opened right on the tap so the browser doesn't block it
+  btn.disabled = true; btn.textContent = 'Opening Coinbase…';
+  onrApi('/onramp/token', { chain: ONR.chain, address: ONR.addr, network: ONR.network, asset: ONR.asset }, (w, ts) => `liquidfi-stops:onramp:${S.net}:${w}:${ONR.chain}:${ONR.addr}:${ts}`)
+    .then((j) => {
+      const q = new URLSearchParams({ sessionToken: j.token, defaultNetwork: ONR.network, defaultAsset: ONR.asset, presetFiatAmount: String(amt), fiatCurrency: 'USD', defaultExperience: 'buy', redirectUrl: location.origin + location.pathname });
+      const url = ONR_URL + '?' + q.toString();
+      if (win && !win.closed) win.location.href = url; else location.href = url;
+      closeSheet(); toast(`Coinbase opened. Your ${ONR.asset} shows up in this wallet once Coinbase sends it.`, 7000);
+    })
+    .catch((e) => { try { if (win) win.close(); } catch (x) {} btn.disabled = false; btn.textContent = 'Open Coinbase'; toast('Coinbase not opened: ' + niceErr(e), 7000); });
+}
+
 /* ---------- orders: what filled, what rests, edit / cancel ---------- */
 const stro = (x) => +x.toString() / 1e7;
 function ordStore() { const N = NS(); if (!N.ord) N.ord = {}; return N.ord; }   // offer id → { orig XLM, side, px, at } for orders placed from this phone
@@ -16303,6 +16370,10 @@ document.addEventListener('click', async (e) => {
     xrRemoveMe: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i < 0) return; t.dataset.i = i; A.rmXr(); },
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
     xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
+    onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : $('#rAcct').value), onrCheck,
+    onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; $$('#onrAs button').forEach((b) => b.classList.toggle('on', b === t)); },
+    onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
+    onrGo: () => onrGo(t),
     xrScan: () => scanInline($('#xsScan'), (r) => { $('#xsTo').value = r.addr; $('#xsTag').value = r.tag || ''; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
     xrMax: () => { const d = XRA[xrSel]; $('#xsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
     xrNewDone: () => { closeSheet(); xrSel = t.dataset.addr; go('xrp'); },
