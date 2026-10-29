@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.15</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.19</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -278,7 +278,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- BOTS / KILL -->
 <section class="scr" id="s-bots">
-  <div class="tothero" id="bTot" data-go="port" style="cursor:pointer"><div class="r"><span class="mu" style="font-size:13px">Total balance</span><span id="bNet"></span></div><div style="display:flex;align-items:center;gap:10px"><span class="mono" id="bTotV">–</span><span class="mu" style="font-size:26px;line-height:1" aria-hidden="true">›</span></div><div id="bPnl" class="tpnl"></div><span class="mu" id="bTotSub" style="font-size:12.5px"></span><div id="pPer" hidden></div><div class="g3" id="bActs" style="margin-top:10px"><button class="b-out" data-act="accSwap">Swap</button><button class="b-out" data-act="accSend">Send</button><button class="b-out" data-act="accRcv">Receive</button></div></div>
+  <div class="tothero" id="bTot" data-go="port" style="cursor:pointer"><div class="r"><span class="mu" style="font-size:13px">Total balance</span><span id="bNet"></span></div><div style="display:flex;align-items:center;gap:10px"><span class="mono" id="bTotV">–</span><span class="mu" style="font-size:26px;line-height:1" aria-hidden="true">›</span></div><div id="bPnl" class="tpnl"></div><span class="mu" id="bTotSub" style="font-size:12.5px"></span><div id="pPer" hidden></div><div class="g4" id="bActs" style="margin-top:10px"><button class="b-light" data-act="accBuy">Buy</button><button class="b-out" data-act="accSwap">Swap</button><button class="b-out" data-act="accSend">Send</button><button class="b-out" data-act="accRcv">Receive</button></div></div>
   <span class="lbl">Wallets</span>
   <div class="list" id="bPers" style="display:flex;flex-direction:column;gap:10px"></div>
   <div class="list" id="bXrp" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -409,7 +409,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="seg" id="tMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
   <label>Amount (XLM)<input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
-  <div class="mu" id="tMktNote" style="font-size:12px;display:none">Market fills right away at the best price Stellar finds: the order book or the AMM pools, whichever is better, all in one step. Capped by your Trade slippage cap. Includes a 0.5% fee; limit orders have no fee.</div>
+  <div class="mu" id="tMktNote" style="font-size:12px;display:none">Market fills right away at the best price Stellar finds: the order book or the AMM pools, whichever is better, all in one step. Capped by your Trade slippage cap. Includes a 0.25% fee; limit orders have no fee.</div>
   <div id="tStopW" style="display:none;flex-direction:column;gap:10px">
     <label>Stop price<input id="tStop" inputmode="decimal"></label>
     <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px" id="tLimLbl">Fill no worse than</span><div class="seg" id="tLimMode" style="font-size:13.5px"><button data-v="mkt">Market</button><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="custom">Custom</button></div></div>
@@ -483,11 +483,11 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.15</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.19</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
-  <div class="card"><span class="lbl">Buy with Coinbase</span><div class="mu" style="font-size:12px">Buy XLM or XRP with your Coinbase account and have it sent straight to your wallet. Uses your stop server, which holds your Coinbase Developer key (never this phone). Mainnet only.</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
+  <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:12px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone). Mainnet only.</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Kill switch key (this phone)</span><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">On the PC run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Watched wallets (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">Wallets you watch by address, like bots your PC runs. No key here. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Watch an address</button><button class="b-out sm" data-act="saveBots">Save list</button></div></div>
@@ -501,7 +501,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.15 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.19 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14512,10 +14512,10 @@ const xrSecret = (o) => o.seed || o.w.seed || o.w.privateKey;   // family seed (
 const SWP = { q: null, seq: 0, t: 0 };
 const swSlip = () => +S.swSlip || 1;   // Swap's own slippage cap (Settings → Swap slippage cap), default 1%
 const m2 = (v) => amtFmt(v);   // swap screen amounts: same short decimals as everywhere (0.01 → 2, 0.001 → 3, smaller → 4)
-// Liquidfi swap fee: 0.5% of what you pay, sent to the fee wallet in the SAME transaction. Paid in the same token when the fee
+// Liquidfi swap fee: 0.25% of what you pay (swap, market and stop orders), sent to the fee wallet in the SAME transaction. Paid in the same token when the fee
 // wallet can hold it (XLM, or a token it has a trustline for, e.g. USDC/EURC); any other token is converted to XLM by a second
 // path payment (XLM needs no trustline, so every token can be swapped). Empty address = no fee.
-const SWAP_FEE = { bps: 50, to: { public: 'GCA656TSFSK7OX6ZVAK75K2L5GXKOVEQW6LC7ZU6P655ERR6SRTCHODL', testnet: '' } };
+const SWAP_FEE = { bps: 25, to: { public: 'GCA656TSFSK7OX6ZVAK75K2L5GXKOVEQW6LC7ZU6P655ERR6SRTCHODL', testnet: '' } };
 const FEEOK = {};   // fee wallet → { ok, at }: a payment to an account that doesn't exist yet would fail the whole swap, so the fee is skipped until it's funded
 async function feeLive(a) {   // → Set of asset keys the fee wallet can take directly ('XLM' + its open trustlines), or null if it isn't funded
   const c = FEEOK[a]; if (c && Date.now() - c.at < 600000) return c.ok;
@@ -14592,7 +14592,7 @@ function swapQuote() {
         else {
           const fj = await H(`/paths/strict-send?${hzAssetQ(from, 'source_')}&source_amount=${amt7(fee)}&destination_assets=native`);
           const fr = ((fj._embedded || {}).records || []).filter((r) => r.destination_asset_type === 'native').sort((x, y) => +y.destination_amount - +x.destination_amount)[0];
-          if (!fr || !(+fr.destination_amount > 0)) { if (seq === SWP.seq) $('#wInfo').innerHTML = `<div><span class="amb">No route to pay the 0.5% fee in XLM for ${esc(kName(from))} right now.</span></div>`; return; }
+          if (!fr || !(+fr.destination_amount > 0)) { if (seq === SWP.seq) $('#wInfo').innerHTML = `<div><span class="amb">No route to pay the ${SWAP_FEE.bps / 100}% fee in XLM for ${esc(kName(from))} right now.</span></div>`; return; }
           const xlm = +fr.destination_amount; feeLeg = { amt: fee, xlm, min: Math.max(0.0000001, xlm * (1 - swSlip() / 100)), path: fr.path || [] };
         }
       }
@@ -15709,7 +15709,7 @@ async function tradeReview() {
       : SDK.Operation.manageSellOffer({ selling: SDK.Asset.native(), buying: USDC(), amount: amt7(q), price: p.toFixed(7) });
     return confirmSheet(`Limit ${T.side} ${fx(q)} XLM`, `${NET().name} · stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} XLM @ ${p.toFixed(6)} USDC`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} USDC` }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
   }
-  // Market = path payment to self + the 0.5% fee in the same transaction (all or nothing). Buy: fee in USDC on top of the cost. Sell: fee in XLM, the rest is sold.
+  // Market = path payment to self + the Liquidfi fee in the same transaction (all or nothing). Buy: fee in USDC on top of the cost. Sell: fee in XLM, the rest is sold.
   const uK = NS().usdc.code + ':' + NS().usdc.issuer, buy = T.side === 'buy';
   if (!buy && spendable(a, true) < q) return toast(`Not enough spendable XLM (have ${fx(spendable(a, true))}).`);
   let qt, fee = null, sq = q;
@@ -15778,7 +15778,7 @@ function stopDefaults() {
 function stopEst(q, el) {
   const st = +$('#tStop').value || 0, lim = +$('#tLim').value || 0, sell = T.side === 'sell', m = mid();
   $('#tStopNote').innerHTML = !S.stopUrl ? '<span class="amb">Set your stop server first: Settings → Stop orders.</span>'
-    : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? 'XLM stays' : 'USDC stays'} in your wallet until then. Includes the 0.5% fee if it fills.`;
+    : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? 'XLM stays' : 'USDC stays'} in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
   if (!el) return;
   const fOn = !!feeTo(tradeAddr) && (FEEOK[feeTo(tradeAddr)] || { ok: 1 }).ok, f = fOn ? feeOf(sell ? q : q * st) : 0;
   const warn = st && m && (sell ? st >= m : st <= m) ? `<div><span class="amb">The price is ${p4(m)} now: a ${sell ? 'sell' : 'buy'} stop goes ${sell ? 'below' : 'above'} it.</span></div>` : '';
@@ -15800,7 +15800,7 @@ async function stopReview(q, a, kp) {
   if (!sell && spendable(a, false) < usd + (fee ? fee.amt : 0)) return toast(`Not enough USDC (have ${fx(spendable(a, false))}, need ${fx(usd + (fee ? fee.amt : 0))}).`);
   const end = new Date(Date.now() + days * 86400e3);
   const items = [{ t: `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}`, hl: 1 },
-    { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} XLM at ${p4(lim)} or better` : `Buy ${fx(q, 2)} XLM at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} USDC${fee ? ` · ${m2(sq)} sold + ${m2(fee.amt)} XLM fee (0.5%)` : ''}` : `pay at most ${fx(usd)} USDC${fee ? ` + ${m2(fee.amt)} USDC fee (0.5%)` : ''}` },
+    { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} XLM at ${p4(lim)} or better` : `Buy ${fx(q, 2)} XLM at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} USDC${fee ? ` · ${m2(sq)} sold + ${m2(fee.amt)} XLM fee (${SWAP_FEE.bps / 100}%)` : ''}` : `pay at most ${fx(usd)} USDC${fee ? ` + ${m2(fee.amt)} USDC fee (${SWAP_FEE.bps / 100}%)` : ''}` },
     { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` }];
   confirmSheet(`Stop ${T.side} ${fx(q)} XLM`, `${NET().name} · signed now, sent when the price hits`, items, `Place stop ${T.side}`, async () => {
     try {
@@ -15874,10 +15874,10 @@ function drawStopSet() {
   $('#setStopSt').textContent = 'Checking…'; fetch(S.stopUrl + '/health').then((r) => r.json()).then((j) => servesNet(j) ? stopStatus(j) : ($('#setStopSt').innerHTML = `<span class="amb">Doesn't serve ${NET().name}.</span>`)).catch(() => { $('#setStopSt').innerHTML = '<span class="amb">Not answering right now.</span>'; });
 }
 
-/* ---------- Coinbase Onramp: buy XLM / XRP into your own wallet (v2.15) ----------
+/* ---------- Coinbase Onramp: buy XLM / XRP into your own wallet (v2.18) ----------
    The stop server makes a one-time Coinbase session token with your CDP key (kept on the server). The phone
    opens Coinbase's own buy window; Coinbase sends the coins straight to the wallet address. */
-const ONR = { opts: null, at: 0, chain: 'stellar', addr: '', asset: '', network: '', usd: 5 };
+const ONR = { opts: null, at: 0, chain: 'stellar', addr: '', asset: '', network: '', usd: 25, prov: '' };
 const ONR_URL = 'https://pay.coinbase.com/buy/select-asset';
 function onrSigner() { const w = (OWN()[0] || {}).addr; if (!w) throw new Error('Add a Stellar wallet with its key first: it signs the request to your server.'); return { w, kp: kpFor(w) }; }
 async function onrApi(path, extra, msgFn) {
@@ -15895,48 +15895,120 @@ function onrWhy() {
   if (!S.stopUrl) return 'Set your stop server first (Settings → Stop orders). It makes the Coinbase session.';
   return '';
 }
+const onrStat = (b) => b.status === 'CREATED' ? '<span class="mu">opened, not paid yet</span>' : b.status === 'SUCCESS' ? '<span class="grn">sent to your wallet</span>' : b.status === 'FAILED' ? `<span class="red">failed${b.failure === 'SEND_FAILED' ? ': bought but not sent (it stays in your Coinbase account; send it yourself)' : b.failure === 'BUY_FAILED' ? ': not bought' : ''}</span>` : '<span class="amb">in progress</span>';
+const onrRow = (b) => { const a = b.amount || {}, pd = b.paid || {}; return `${b.by ? esc(b.by) + ': ' : ''}${esc(a.value || '?')} ${esc(b.asset || '')} for $${esc(pd.value || '?')} · ${onrStat(b)}${b.to ? ' · to ' + esc(short(b.to)) : ''}${b.at ? ' · ' + new Date(b.at).toLocaleString() : ''}`; };
+const STRIPE_ST = { fulfillment_complete: 'SUCCESS', fulfillment_processing: 'IN_PROGRESS', rejected: 'FAILED', requires_payment: 'CREATED', initialized: 'CREATED' };
+async function onrHist() {
+  const h = await onrHealth().catch(() => ({ onramp: true }));
+  const cb = h.onramp ? onrApi('/onramp/history', {}, (w, ts) => `liquidfi-stops:onramp-hist:${S.net}:${w}:${ts}`).then((j) => (j.buys || []).map((b) => ({ ...b, by: 'Coinbase' }))).catch(() => []) : Promise.resolve([]);
+  const st = h.stripe ? onrApi('/stripe/history', {}, (w, ts) => `liquidfi-stops:stripe-hist:${S.net}:${w}:${ts}`).then((j) => (j.buys || []).map((b) => ({ id: b.id, by: 'Stripe', status: STRIPE_ST[b.status] || 'IN_PROGRESS', asset: (b.asset || '').toUpperCase(), amount: { value: b.amount }, paid: { value: b.paid }, to: b.to, at: b.at ? new Date(b.at * 1000).toISOString() : null })).filter((b) => b.status !== 'CREATED' || Date.now() - Date.parse(b.at) < 30 * 60e3)).catch(() => []) : Promise.resolve([]);
+  const [a, c] = await Promise.all([cb, st]);
+  return [...a, ...c].sort((x, y) => (Date.parse(y.at) || 0) - (Date.parse(x.at) || 0));
+}
+let onrW = null;
+function onrWatch() {   // after Coinbase opens: when you come back to Liquidfi, check the buy for up to 20 minutes
+  if (onrW) clearInterval(onrW);
+  const t0 = Date.now(); let seen = null;
+  onrHist().then((L) => { seen = new Map(L.map((b) => [b.id, b.status])); }).catch(() => { seen = new Map(); });
+  const tick = async () => {
+    if (Date.now() - t0 > 20 * 60e3) { clearInterval(onrW); onrW = null; return; }
+    if (document.hidden || !seen) return;
+    try {
+      for (const b of await onrHist()) {
+        if (seen.get(b.id) === b.status) continue;
+        seen.set(b.id, b.status);
+        if (b.status === 'SUCCESS' || b.status === 'FAILED') { toast(onrRow(b).replace(/<[^>]+>/g, ''), 9000); clearInterval(onrW); onrW = null; return; }
+        if (b.status !== 'CREATED') toast(`${b.by || 'Coinbase'}: buying ${b.asset || ''}… it's on the way to your wallet.`, 6000);
+      }
+    } catch (e) {}
+  };
+  onrW = setInterval(tick, 15000);
+}
 async function onrCheck() {
   const el = $('#setOnrSt'); const why = onrWhy(); if (why) { el.innerHTML = `<span class="amb">${esc(why)}</span>`; return; }
-  el.textContent = 'Checking…';
+  el.textContent = 'Checking…'; ONRH = null;
   try {
-    const o = await onrOpts(true), st = onrFor(o, 'stellar').map((a) => a.symbol), xr = onrFor(o, 'xrp').map((a) => a.symbol);
-    const lim = (o.limits || []).map((l) => `${({ ACH_BANK_ACCOUNT: 'Bank', CARD: 'Card', APPLE_PAY: 'Apple Pay', PAYPAL: 'PayPal' })[l.id] || l.id} $${l.min}–$${l.max}`).join(' · ');
-    el.innerHTML = `<span class="grn">✓ Coinbase connected</span><br>To Stellar: ${st.length ? esc(st.join(', ')) : '<span class="amb">nothing offered</span>'}<br>To the XRP Ledger: ${xr.length ? esc(xr.join(', ')) : '<span class="amb">nothing offered</span>'}${lim ? '<br>' + esc(lim) : ''}`;
+    const h = await onrHealth(); const out = [];
+    out.push(h.stripe ? '<span class="grn">✓ Stripe</span>: XLM and USDC to Stellar, no exchange account needed' : '<span class="mu">Stripe: not set up</span>');
+    if (h.onramp) {
+      try {
+        const o = await onrOpts(true), st = onrFor(o, 'stellar').map((a) => a.symbol), xr = onrFor(o, 'xrp').map((a) => a.symbol);
+        const lim = (o.limits || []).map((l) => `${({ ACH_BANK_ACCOUNT: 'Bank', CARD: 'Card', APPLE_PAY: 'Apple Pay', PAYPAL: 'PayPal' })[l.id] || l.id} $${l.min}–$${l.max}`).join(' · ');
+        out.push(`<span class="grn">✓ Coinbase connected</span> (needs a Coinbase account)<br>To Stellar: ${st.length ? esc(st.join(', ')) : '<span class="amb">nothing offered</span>'}<br>To the XRP Ledger: ${xr.length ? esc(xr.join(', ')) : '<span class="amb">nothing offered</span>'}${lim ? '<br>' + esc(lim) : ''}`);
+      } catch (e) { out.push(`<span class="amb">Coinbase: ${esc(niceErr(e))}</span>`); }
+    } else out.push('<span class="mu">Coinbase: not set up</span>');
+    let rec = ''; try { const H = await onrHist(); rec = H.length ? '<br><b>Your buys from Liquidfi</b><br>' + H.slice(0, 6).map(onrRow).join('<br>') : '<br>No buys from Liquidfi yet.'; } catch (e) { rec = ''; }
+    el.innerHTML = out.join('<br>') + rec;
   } catch (e) { el.innerHTML = `<span class="amb">${esc(niceErr(e))}</span>`; }
 }
+let ONRH = null, ONRH_AT = 0;   // stop server /health (which buy providers it has)
+async function onrHealth() {
+  if (ONRH && Date.now() - ONRH_AT < 10 * 60e3) return ONRH;
+  const r = await fetch(S.stopUrl.replace(/\/+$/, '') + '/health').catch(() => { throw new Error("Can't reach your stop server."); });
+  ONRH = await r.json(); ONRH_AT = Date.now(); return ONRH;
+}
+const PROV_NM = { stripe: 'Stripe', coinbase: 'Coinbase' };
 async function onrBuySheet(chain, addr) {
   ONR.chain = chain; ONR.addr = addr; pending = null;
-  const why = onrWhy(); if (why) return sheet(`<h2>Buy with Coinbase</h2><div class="note amb">${esc(why)}</div><button class="b-out" data-act="closeSheet">Close</button>`);
-  sheet(`<h2>Buy with Coinbase</h2><div class="mu">Checking what Coinbase can send here…</div><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  const why = onrWhy(); if (why) return sheet(`<h2>Buy</h2><div class="note amb">${esc(why)}</div><button class="b-out" data-act="closeSheet">Close</button>`);
+  sheet(`<h2>Buy</h2><div class="mu">Checking what you can buy here…</div><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  let h; try { h = await onrHealth(); } catch (e) { return sheet(`<h2>Buy</h2><div class="note amb">${esc(niceErr(e))}</div><button class="b-out" data-act="closeSheet">Close</button>`); }
+  const provs = [...(chain === 'stellar' && h.stripe ? ['stripe'] : []), ...(h.onramp ? ['coinbase'] : [])];
+  if (!provs.length) return sheet(`<h2>Buy</h2><div class="note amb">${chain === 'xrp' ? 'Buying XRP needs the Coinbase key on your stop server.' : 'No buy service is set up on your stop server yet (Stripe or Coinbase key).'}</div><button class="b-out" data-act="closeSheet">Close</button>`);
+  if (!provs.includes(ONR.prov)) ONR.prov = provs[0];
+  const P = PROV_NM[ONR.prov];
   let L;
-  try { L = onrFor(await onrOpts(false), chain); } catch (e) { return sheet(`<h2>Buy with Coinbase</h2><div class="note amb">${esc(niceErr(e))}</div><button class="b-out" data-act="closeSheet">Close</button>`); }
-  if (!L.length) return sheet(`<h2>Buy with Coinbase</h2><div class="note amb">Coinbase doesn't offer any coin on ${chain === 'xrp' ? 'the XRP Ledger' : 'Stellar'} right now.</div><button class="b-out" data-act="closeSheet">Close</button>`);
-  const pick = L.find((a) => a.symbol === (chain === 'xrp' ? 'XRP' : 'XLM')) || L[0]; ONR.asset = pick.symbol; ONR.network = pick.net.name;
+  if (ONR.prov === 'stripe') L = [{ symbol: 'XLM', net: { name: 'stellar' } }, { symbol: 'USDC', net: { name: 'stellar' } }];
+  else {
+    try { L = onrFor(await onrOpts(false), chain); } catch (e) { return sheet(`<h2>Buy</h2><div class="note amb">${esc(niceErr(e))}</div><button class="b-out" data-act="closeSheet">Close</button>`); }
+    if (!L.length) return sheet(`<h2>Buy</h2><div class="note amb">Coinbase doesn't offer any coin on ${chain === 'xrp' ? 'the XRP Ledger' : 'Stellar'} right now.</div><button class="b-out" data-act="closeSheet">Close</button>`);
+  }
+  const pick = L.find((a) => a.symbol === ONR.asset) || L.find((a) => a.symbol === (chain === 'xrp' ? 'XRP' : 'XLM')) || L[0]; ONR.asset = pick.symbol; ONR.network = pick.net.name;
   const nm = (allAccts().find((x) => x.addr === addr) || (NS().xrw || []).find((x) => x.addr === addr) || (K.xr || []).map((o) => ({ name: o.name, addr: o.w && o.w.classicAddress })).find((x) => x.addr === addr) || {}).name;
   let note = '';
-  if (chain === 'stellar') { const a = await refreshAcct(addr).catch(() => null); if (!a) note = 'This wallet isn’t open on Stellar yet. Buy at least a few dollars of XLM so it can open (1 XLM reserve).'; }
-  sheet(`<h2>Buy with Coinbase</h2>
-    <div class="mu" style="font-size:13px">Sent by Coinbase straight to ${nm ? esc(nm) + ' · ' : ''}<span class="mono">${esc(short(addr))}</span></div>
+  if (chain === 'stellar') {
+    const a = await refreshAcct(addr).catch(() => null);
+    if (!a) note = 'This wallet isn’t open on Stellar yet. Buy at least a few dollars of XLM so it can open (1 XLM reserve).';
+    else if (ONR.asset === 'USDC' && !a.balances.some((b) => b.asset_code === 'USDC' && b.asset_issuer === NS().usdc.issuer)) note = 'This wallet has no USDC trustline yet. Add USDC (Assets) before buying USDC, or buy XLM.';
+  }
+  const how = ONR.prov === 'stripe'
+    ? 'Stripe opens in a new tab. No exchange account: you check out with Link (email, a quick ID check the first time, then card or bank). The fee shows before you pay. The coins come straight to this wallet.'
+    : `<div class="note" style="font-size:12.5px">Sign in to coinbase.com in Chrome once before you start, so the code from your authenticator app doesn't make you lose the page. Finish the buy on the page Liquidfi opens: a buy made in the regular Coinbase app stays in your Coinbase account.</div>Coinbase opens in a new tab. You sign in, pick a payment method and confirm there. Coinbase's fee shows before you pay. While Coinbase reviews the Liquidfi app, buys are limited to $5.`;
+  sheet(`<h2>Buy</h2>
+    <div class="mu" style="font-size:13px">Sent by ${P} straight to ${nm ? esc(nm) + ' · ' : ''}<span class="mono">${esc(short(addr))}</span></div>
+    ${provs.length > 1 ? `<span class="lbl">Pay with</span><div class="seg" id="onrPv">${provs.map((v) => `<button data-act="onrProv" data-v="${v}" class="${v === ONR.prov ? 'on' : ''}">${PROV_NM[v]}${v === 'stripe' ? ' (no account)' : ' account'}</button>`).join('')}</div>` : ''}
     <span class="lbl">Coin</span><div class="seg" id="onrAs">${L.map((a) => `<button data-act="onrAsset" data-v="${esc(a.symbol)}" data-n="${esc(a.net.name)}" class="${a.symbol === ONR.asset ? 'on' : ''}">${esc(a.symbol)}</button>`).join('')}</div>
     <span class="lbl">Amount (USD)</span><div class="seg" id="onrUsd">${[5, 25, 100, 500].map((v) => `<button data-act="onrUsd" data-v="${v}" class="${v === ONR.usd ? 'on' : ''}">$${v}</button>`).join('')}</div>
     <label>Or type an amount<input id="onrAmt" type="number" min="1" step="1" inputmode="decimal" placeholder="${ONR.usd}"></label>
     ${note ? `<div class="note amb">${esc(note)}</div>` : ''}
-    <div class="mu" style="font-size:12px">Coinbase opens in a new tab. You sign in, pick bank or card and confirm there. Coinbase's fee shows before you pay. The coins show up here when Coinbase sends them, usually within a few minutes. While Coinbase reviews the Liquidfi app, buys are limited to $5.</div>
-    <button class="b-light big" data-act="onrGo">Open Coinbase</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+    <div class="mu" style="font-size:12px">${how}</div>
+    <button class="b-light big" data-act="onrGo">Open ${P}</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+function onrPickSheet() {
+  const L = [...OWN().map((o) => ({ chain: 'stellar', coin: 'XLM', name: o.name, addr: o.addr })),
+    ...(K.xr || []).filter((o) => o.w).map((o) => ({ chain: 'xrp', coin: 'XRP', name: o.name, addr: o.w.classicAddress }))];
+  if (!L.length) return toast('Add a wallet first.');
+  if (L.length === 1) return onrBuySheet(L[0].chain, L[0].addr);
+  pending = null;
+  sheet(`<h2>Buy</h2><div class="mu" style="font-size:13px">Which wallet should the coins go to?</div>${L.map((x) => `<button class="b-out" data-act="onrPick" data-chain="${x.chain}" data-addr="${esc(x.addr)}" style="text-align:left"><b>${x.coin}</b> into ${esc(x.name)} · <span class="mono mu">${esc(short(x.addr))}</span></button>`).join('')}<button class="b-out" data-act="closeSheet">Cancel</button>`);
 }
 function onrGo(btn) {
-  const amt = +($('#onrAmt') || {}).value || ONR.usd;
+  const amt = +($('#onrAmt') || {}).value || ONR.usd, P = PROV_NM[ONR.prov] || 'Coinbase';
   if (!(amt >= 1)) return toast('Enter an amount of at least $1.');
   const win = window.open('about:blank', '_blank');   // opened right on the tap so the browser doesn't block it
-  btn.disabled = true; btn.textContent = 'Opening Coinbase…';
-  onrApi('/onramp/token', { chain: ONR.chain, address: ONR.addr, network: ONR.network, asset: ONR.asset }, (w, ts) => `liquidfi-stops:onramp:${S.net}:${w}:${ONR.chain}:${ONR.addr}:${ts}`)
-    .then((j) => {
+  btn.disabled = true; btn.textContent = `Opening ${P}…`;
+  const go = ONR.prov === 'stripe'
+    ? onrApi('/stripe/session', { address: ONR.addr, asset: ONR.asset.toLowerCase(), usd: amt }, (w, ts) => `liquidfi-stops:stripe:${S.net}:${w}:${ONR.addr}:${ts}`).then((j) => j.url)
+    : onrApi('/onramp/token', { chain: ONR.chain, address: ONR.addr, network: ONR.network, asset: ONR.asset }, (w, ts) => `liquidfi-stops:onramp:${S.net}:${w}:${ONR.chain}:${ONR.addr}:${ts}`).then((j) => {
       const q = new URLSearchParams({ sessionToken: j.token, defaultNetwork: ONR.network, defaultAsset: ONR.asset, presetFiatAmount: String(amt), fiatCurrency: 'USD', defaultExperience: 'buy', redirectUrl: location.origin + location.pathname });
-      const url = ONR_URL + '?' + q.toString();
+      if (j.ref) q.set('partnerUserRef', j.ref);
+      return ONR_URL + '?' + q.toString();
+    });
+  go.then((url) => {
       if (win && !win.closed) win.location.href = url; else location.href = url;
-      closeSheet(); toast(`Coinbase opened. Your ${ONR.asset} shows up in this wallet once Coinbase sends it.`, 7000);
+      closeSheet(); toast(ONR.prov === 'stripe' ? `Stripe opened. Your ${ONR.asset} shows up here once Stripe sends it.` : `Coinbase opened. Finish on that page (not the Coinbase app). Your ${ONR.asset} shows up here once Coinbase sends it.`, 8000); onrWatch();
     })
-    .catch((e) => { try { if (win) win.close(); } catch (x) {} btn.disabled = false; btn.textContent = 'Open Coinbase'; toast('Coinbase not opened: ' + niceErr(e), 7000); });
+    .catch((e) => { try { if (win) win.close(); } catch (x) {} btn.disabled = false; btn.textContent = `Open ${P}`; toast(`${P} not opened: ` + niceErr(e), 7000); });
 }
 
 /* ---------- orders: what filled, what rests, edit / cancel ---------- */
@@ -16329,6 +16401,8 @@ document.addEventListener('click', async (e) => {
     scrBack: () => go(backTo[cur] || 'home'),
     accSend: () => { if (!OWN().length) return toast('Add a wallet first.'); if (!OWN().some((o) => o.addr === homeAddr)) homeAddr = firstWallet(); go('send'); },
     accRcv: () => { if (!allAccts().length) return toast('Add a wallet first.'); rcvWant = OWN().some((o) => o.addr === homeAddr) ? homeAddr : firstWallet(); go('receive'); },
+    accBuy: () => onrPickSheet(),
+    onrPick: () => onrBuySheet(t.dataset.chain, t.dataset.addr),
     accSwap: () => { if (!OWN().length) return toast('Add a wallet first.'); go('swap'); },
     swapMax: () => { const k = $('#wFrom').value, v = swapAvail(ACC[homeAddr], k); $('#wAmt').value = v > 0 ? amt7(v).replace(/\.?0+$/, '') : ''; swapQuote(); },
     swapFlip: () => { const f = $('#wFrom').value, t2 = $('#wTo').value; if (![...$('#wFrom').options].some((o) => o.value === t2)) return toast(`This wallet doesn't hold ${kName(t2)} yet.`); $('#wFrom').value = t2; $('#wTo').value = f; $('#wAmt').value = ''; swapQuote(); },
@@ -16371,7 +16445,8 @@ document.addEventListener('click', async (e) => {
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
     xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
     onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : $('#rAcct').value), onrCheck,
-    onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; $$('#onrAs button').forEach((b) => b.classList.toggle('on', b === t)); },
+    onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
+    onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; ONR.usd = +(($('#onrAmt') || {}).value) || ONR.usd; onrBuySheet(ONR.chain, ONR.addr); },
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
     onrGo: () => onrGo(t),
     xrScan: () => scanInline($('#xsScan'), (r) => { $('#xsTo').value = r.addr; $('#xsTag').value = r.tag || ''; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
