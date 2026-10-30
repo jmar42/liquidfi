@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.28</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.29</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -272,7 +272,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <span class="lbl hide-unf">Recent</span>
   <div class="card rows hide-unf" id="hRec" style="padding:4px 14px;font-size:14px"></div>
   <button class="b-out sm" data-act="homeBackup" id="hBk">Back up: show key and recovery phrase</button>
-  <button class="b-out sm" data-act="homeRemove" style="color:var(--redt)">Remove this wallet from the phone</button>
+  <button class="b-out sm" data-act="homeRemove" id="hRm" style="color:var(--redt)">Remove this wallet from the phone</button>
   <button class="b-out sm hide-unf" data-act="clOpen" style="color:var(--redt)">Close wallet: move everything out and delete it</button>
   <div class="mu mono" style="font-size:11.5px;overflow-wrap:anywhere;word-break:break-all" id="hAddr"></div>
 </section>
@@ -484,7 +484,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.28</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.29</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
@@ -502,7 +502,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.28 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.29 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14813,7 +14813,8 @@ async function closeReview() {
   items.push({ t: `Send about ${m2(xlm + sold)} XLM to ${toName}`, s: 'every XLM left, the reserve included', hl: 1 }, { t: `Delete ${w.name} from Stellar`, s: 'and take it off this phone' });
   confirmSheet(`Close ${w.name}?`, `${NET().name} · ${esc(short(addr))} → ${esc(short(to))}<br>This can't be undone. Keep its recovery phrase or key anyway.`, items, 'Hold to close wallet', async () => {
     try {
-      const tx = await buildTx(addr, ops); tx.sign(kpFor(addr)); const r = await submit(tx);
+      const tx = await buildTx(addr, ops); tx.sign(kpFor(addr)); let r;
+      try { r = await submit(tx); } catch (e) { let gone; try { await new Promise((ok) => setTimeout(ok, 6000)); gone = (await acct(addr)) === null; } catch (e2) {} if (!gone) throw e; r = { hash: tx.hash().toString('hex') }; }   // timeout but it went through
       const i = K.x.findIndex((o) => o.kp.publicKey() === addr); let gone = false;
       if (i >= 0) { const o = K.x.splice(i, 1)[0]; if (await resealVault()) gone = true; else K.x.splice(i, 0, o); }
       delete ACC[addr]; homeAddr = null; P.res = {};
@@ -15042,19 +15043,24 @@ async function drawHome() {
   const nm = (allAccts().find((x) => x.addr === homeAddr) || { name: 'Personal' }).name;
   $('#hAcct').textContent = nm + ' ▾';
   $('#hAddr').textContent = homeAddr;
-  $('#hBal').innerHTML = '<div><span class="mu">Loading…</span></div>'; $('#s-home').classList.remove('unf'); $('#hFund').innerHTML = '';
+  $('#hBal').innerHTML = '<div><span class="mu">Loading…</span></div>'; $('#s-home').classList.remove('unf'); $('#hFund').innerHTML = ''; $('#hRm').style.display = '';
   try {
     const a = await refreshAcct(homeAddr);
     $('#hBal').innerHTML = balRows(a);
     $('#hTot').textContent = a ? '$' + fx(usdVal(a)) : '$0.00';
     priceAssets(a).then((ch) => { if (ch && cur === 'home' && ACC[homeAddr] === a) { $('#hBal').innerHTML = balRows(a); $('#hTot').textContent = '$' + fx(usdVal(a)); } });
-    $('#s-home').classList.toggle('unf', !a); $('#hFund').innerHTML = a ? '' : fundCard(); if (!a) fundSrcLoad().then(() => { if (cur === 'home' && !ACC[homeAddr]) $('#hFund').innerHTML = fundCard(); });
+    $('#s-home').classList.toggle('unf', !a); $('#hFund').innerHTML = a ? '' : fundCard(); if (!a) fundSrcLoad().then(() => { if (cur === 'home' && !ACC[homeAddr] && !$('#hClosed')) $('#hFund').innerHTML = fundCard(); });
+    if (!a) { const addr = homeAddr, m = await closedInfo(addr); if (m && cur === 'home' && homeAddr === addr) { $('#hFund').innerHTML = `<div class="card" id="hClosed"><b>This wallet is closed</b><div class="mu" style="font-size:13px">On ${esc(new Date(m.created_at).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))} it was deleted from Stellar and <span class="mamt" data-mop="${esc(m.id)}">all its XLM</span> went to ${esc((allAccts().find((x) => x.addr === m.into) || {}).name || short(m.into))}. It can't hold anything now. Keep its recovery phrase or key anyway.</div><button class="b-out" data-act="homeRemove" style="color:var(--redt)">Remove it from this phone</button><a href="${NET().expert}/tx/${esc(m.transaction_hash)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a></div>`; mergeAmts($('#hFund'), addr); $('#hRm').style.display = 'none'; } }
     homeOrders(a); acctWatch(homeAddr);
     if (a) await homeRecent(homeAddr); else $('#hRec').innerHTML = '';
   } catch (e) { $('#hBal').innerHTML = `<div><span class="red">${esc(niceErr(e))}</span></div>`; }
 }
+async function closedInfo(addr) {   // the merge that closed this address, if its latest operation is one
+  try { const j = await H(`/accounts/${addr}/operations?order=desc&limit=3`); return (j._embedded.records || []).find((o) => o.type === 'account_merge' && o.account === addr) || null; } catch (e) { return null; }
+}
 async function homeLive(addr) {   // something changed on this wallet (a fill, a payment): balances, orders and Recent, without "Loading…"
-  const a = await refreshAcct(addr).catch(() => null); if (cur !== 'home' || homeAddr !== addr || !a) return;
+  const a = await refreshAcct(addr).catch(() => undefined); if (cur !== 'home' || homeAddr !== addr || a === undefined) return;
+  if (a === null) return drawHome();   // gone from Stellar (closed): redraw as closed
   $('#hBal').innerHTML = balRows(a); $('#hTot').textContent = '$' + fx(usdVal(a));
   if (!$('#hOff [data-cancel][disabled], #hOff [data-scancel][disabled], #hOff [data-armed="1"]')) homeOrders(a, true);   // a cancel in progress keeps its card
   homeRecent(addr).catch(() => {});
@@ -15086,6 +15092,7 @@ async function homeRecent(addr) {
     : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
     : '<div><span class="mu">Nothing yet</span></div>';
   if (was.size) document.querySelectorAll('#hRec details').forEach((d) => { if (was.has(d.dataset.tx || d.dataset.op)) { d.dataset.loaded = d.dataset.loaded || ''; d.open = true; } });
+  mergeAmts($('#hRec'), addr);
 }
 /* Live wallet: Horizon pushes every change on the wallet (effects stream). On a fill: a message, then balances, open orders,
    Recent (wallet page) or open orders and fills (Trade) refresh by themselves. No stream → check every 10 s. */
@@ -15190,11 +15197,19 @@ function opText(o, me) {
     case 'manage_sell_offer': case 'manage_buy_offer': { if (+o.amount === 0) return 'Cancelled an order'; const buy = o.type === 'manage_buy_offer', a = buy ? an(o.buying_asset_type, o.buying_asset_code) : an(o.selling_asset_type, o.selling_asset_code); return `${+o.offer_id ? 'Changed' : 'Placed'} ${buy ? 'buy' : 'sell'} order · ${amtFmt(+o.amount)} ${a} @ ${(+o.price).toFixed(6)}`; }
     case 'change_trust': return (+o.limit === 0 ? 'Removed ' : 'Added ') + 'trustline ' + o.asset_code;
     case 'set_options': return 'Changed account options/signers';
+    case 'account_merge': { const nm = (a) => ((allAccts().find((x) => x.addr === a) || {}).name || short(a)), amt = MERGEAMT[o.id] != null ? fx(MERGEAMT[o.id]) + ' XLM' : 'all its XLM';
+      return o.account === me ? `Closed this wallet · sent ${amt} to ${nm(o.into)}` : `Received ${amt} from closed wallet ${nm(o.account)}`; }
     default: return o.type.replace(/_/g, ' ');
   }
 }
 
 // Recent on a wallet page: tap a line to see its details (memo and network fee load when opened)
+const MERGEAMT = {};   // merge op id → XLM moved (from its account_credited effect)
+async function mergeAmts(root, me) {
+  const ids = [...new Set([...root.querySelectorAll('[data-mop]')].map((e) => e.dataset.mop))].filter((id) => MERGEAMT[id] == null);
+  await Promise.all(ids.map(async (id) => { try { const j = await H(`/operations/${id}/effects`); const c = (j._embedded.records || []).find((e) => e.type === 'account_credited'); if (c) MERGEAMT[id] = +c.amount; } catch (e) {} }));
+  root.querySelectorAll('[data-mop]').forEach((e) => { const v = MERGEAMT[e.dataset.mop]; if (v == null) return; e.textContent = amtFmt(v) + ' XLM'; const sm = e.closest('details') && e.closest('details').querySelector('summary span'); if (sm) sm.textContent = sm.textContent.replace('all its XLM', fx(v) + ' XLM'); });
+}
 function opDetail(o, me) {
   const an = (t, c, i) => (t === 'native' ? 'XLM' : c + (i ? ` <span class="mu">· ${short(i)}</span>` : '')), row = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
   const ad = (a) => (a === me ? 'this wallet' : `<span title="${esc(a)}">${esc(short(a))}</span>`), L = [];
@@ -15209,6 +15224,7 @@ function opDetail(o, me) {
       if (+o.offer_id) L.push(row('Order #', esc(o.offer_id))); break;
     case 'change_trust': L.push(row('Token', an(o.asset_type, o.asset_code, o.asset_issuer)), row('Limit', +o.limit === 0 ? 'removed' : 'max')); break;
     case 'create_account': L.push(row('Starting XLM', amtFmt(+o.starting_balance)), row('Funded by', ad(o.funder)), row('Account', ad(o.account))); break;
+    case 'account_merge': L.push(row('XLM moved', `<span class="mamt" data-mop="${esc(o.id)}">${MERGEAMT[o.id] != null ? amtFmt(MERGEAMT[o.id]) + ' XLM' : '…'}</span>`), row('From', ad(o.account)), row('To', ad(o.into)), row('What', o.account === me ? 'Wallet closed and deleted from Stellar (reserve included)' : 'Everything left in a closed wallet')); break;
     case 'set_options': if (o.signer_key) L.push(row('Signer', `${esc(short(o.signer_key))} · weight ${o.signer_weight}`)); if (o.med_threshold != null) L.push(row('Thresholds', `${o.low_threshold}/${o.med_threshold}/${o.high_threshold}`)); break;
   }
   L.push(row('Time', esc(new Date(o.created_at).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))));
