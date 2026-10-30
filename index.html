@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.26</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.28</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -273,6 +273,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card rows hide-unf" id="hRec" style="padding:4px 14px;font-size:14px"></div>
   <button class="b-out sm" data-act="homeBackup" id="hBk">Back up: show key and recovery phrase</button>
   <button class="b-out sm" data-act="homeRemove" style="color:var(--redt)">Remove this wallet from the phone</button>
+  <button class="b-out sm hide-unf" data-act="clOpen" style="color:var(--redt)">Close wallet: move everything out and delete it</button>
   <div class="mu mono" style="font-size:11.5px;overflow-wrap:anywhere;word-break:break-all" id="hAddr"></div>
 </section>
 
@@ -483,7 +484,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.26</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.28</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
@@ -501,7 +502,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.26 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.28 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13298,7 +13299,7 @@ const CODES = {
   op_under_dest_min: 'Price moved past your cap. Nothing traded. Try again.', op_too_few_offers: 'Not enough orders on the book to fill this.',
   op_no_trust: 'The receiver has no trustline for this asset.', op_no_destination: 'That account does not exist yet.',
   op_low_reserve: 'Not enough XLM for the reserve.', tx_insufficient_balance: 'Not enough XLM to pay the fee.', op_line_full: 'The receiver\'s trustline limit is full.',
-  op_cross_self: 'This would trade against your own order.', tx_bad_seq: 'Account sequence changed (a bot sent something). Try again.',
+  op_cross_self: 'This would trade against your own order.', op_has_sub_entries: 'This wallet still holds an order, token or data entry.', op_is_sponsor: 'This wallet sponsors another entry.', op_seqnum_too_far: 'This wallet was used just now. Wait a minute and try again.', op_dest_full: 'The receiving wallet can\'t take that much XLM.', tx_bad_seq: 'Account sequence changed (a bot sent something). Try again.',
 };
 function niceErr(e) {
   const rc = e.j && e.j.extras && e.j.extras.result_codes;
@@ -14720,6 +14721,105 @@ async function fundReview() {
   let dest = null; try { dest = await acct(to); } catch (e) { return toast(niceErr(e)); }
   const op = dest ? SDK.Operation.payment({ destination: to, asset: SDK.Asset.native(), amount: amt7(amt) }) : SDK.Operation.createAccount({ destination: to, startingBalance: amt7(amt) });
   confirmSheet(`Fund ${nm} with ${fx(amt, 2)} XLM`, `${NET().name} · between your own wallets`, [{ t: `From ${src.name}`, s: from }, { t: `To ${nm}`, s: to }, { t: dest ? 'Adds XLM' : 'Opens it on Stellar', s: '1 XLM stays as its reserve' }], 'Send', () => personalTx(kpFor(from), from, [op], 'Funded', 'home', null, `${nm} now has ${fx(amt, 2)} XLM`), false, 'b-acc', 'Sending…', true);
+}
+
+/* ---------- Close wallet (Stellar account merge) ----------
+   One transaction: cancel its orders, move / sell / give up each token, remove the trustlines and data entries, then merge:
+   every XLM left, the 1 XLM base reserve included, goes to the receiving wallet and the account is deleted from Stellar.
+   Payments to a deleted address fail at the sender; anyone could re-open it with a create-account, and the recovery phrase /
+   secret key would control that, so keep them. History stays public on explorers. */
+const CLW = { addr: null, a: null, off: [], dest: null };
+async function closeWallet() {
+  const addr = homeAddr, w = OWN().find((x) => x.addr === addr); if (!w) return;
+  sheet(`<h2>Close ${esc(w.name)}</h2><div class="mu">Checking the wallet…</div><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  let a, off; try { a = await acct(addr); off = a ? await offersOf(addr) : []; } catch (e) { return closeSheet(), toast(niceErr(e)); }
+  if (!a) return sheet(`<h2>Close ${esc(w.name)}</h2><div class="note">This wallet isn't open on Stellar, so there's nothing to move. To take it off this phone, use "Remove this wallet from the phone".</div><button class="b-out" data-act="closeSheet">OK</button>`);
+  const block = [];
+  if (+a.num_sponsoring > 0) block.push('It pays the reserve for another account or entry (sponsoring). End that first.');
+  if (a.balances.some((b) => b.asset_type === 'liquidity_pool_shares')) block.push('It is set up for a liquidity pool. Withdraw your shares and remove the pool from the wallet first (in the app where you added it).');
+  if (S.stopUrl) { try { const L = await stopList(addr); if (L.some((x) => stopLive(x))) block.push('It has stop orders on your stop server. Cancel them first (Open orders → Cancel all).'); } catch (e) {} }
+  if (block.length) return sheet(`<h2>Close ${esc(w.name)}</h2><div class="note amb">${block.map(esc).join('<br>')}</div><button class="b-out" data-act="closeSheet">OK</button>`);
+  CLW.addr = addr; CLW.a = a; CLW.off = off;
+  await Promise.all(OWN().filter((o) => o.addr !== addr).map((o) => refreshAcct(o.addr).catch(() => null)));
+  const dests = OWN().filter((o) => o.addr !== addr && ACC[o.addr]);
+  const toks = a.balances.filter((b) => b.asset_type !== 'native' && b.asset_type !== 'liquidity_pool_shares');
+  const xlm = +(a.balances.find((b) => b.asset_type === 'native') || {}).balance || 0;
+  pending = null;
+  sheet(`<h2>Close ${esc(w.name)}</h2>
+    <div class="mu" style="font-size:13px">Moves everything out and deletes this wallet from Stellar, so you get back the reserve it locks (1 XLM, plus 0.5 for each token and order). All of it happens in one transaction, or nothing does.</div>
+    <label>Send everything to<select id="clTo">${dests.map((o) => `<option value="${esc(o.addr)}">${esc(o.name)} · ${esc(short(o.addr))}</option>`).join('')}<option value="other">Another address…</option></select></label>
+    <div id="clOther" style="display:none;flex-direction:column;gap:8px">
+      <div class="note amb">Only use an address you control. Many exchanges don't credit this kind of transfer (an account merge), and funds sent that way can be lost. To move funds to an exchange, use Send first, then close into one of your own wallets.</div>
+      <label>Address (G…)<input id="clAddr" autocomplete="off" spellcheck="false" autocapitalize="characters"></label>
+      <label style="flex-direction:row;align-items:center;gap:8px;font-size:13px"><input type="checkbox" id="clRisk" style="width:auto"> I control this address and it isn't an exchange</label>
+    </div>
+    <div class="card rows" style="font-size:13.5px">
+      <div><span>XLM</span><span class="mono">${m2(xlm)}</span></div>
+      ${off.length ? `<div><span>Open orders</span><span>${off.length} will be cancelled</span></div>` : ''}
+      ${toks.map((b, i) => `<div style="flex-wrap:wrap;gap:6px"><span>${esc(b.asset_code)} <span class="mono mu">${m2(+b.balance)}</span></span>${+b.balance > 0 ? `<select data-cltok="${i}" style="max-width:62%"><option value="move">Move to new wallet</option><option value="sell">Sell for XLM</option><option value="give">Give up (send back to issuer)</option></select>` : '<span class="mu">empty · removed</span>'}</div>`).join('')}
+    </div>
+    ${toks.some((b) => +b.balance > 0) ? '<div class="mu" style="font-size:12px">Move needs the new wallet to hold that token already. Sell pays the 0.25% Liquidfi fee. Give up returns it to its issuer: use it for NFTs or tokens you don\'t want.</div>' : ''}
+    <div class="mu" style="font-size:12px">Keep this wallet's recovery phrase or secret key: if anyone ever re-opens the address, they control it. Its history stays public on Stellar.</div>
+    <button class="b-red big" data-act="clReview">Review close</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  const sel = $('#clTo'); const tog = () => { $('#clOther').style.display = sel.value === 'other' ? 'flex' : 'none'; }; sel.addEventListener('change', tog); tog();
+}
+async function closeReview() {
+  const addr = CLW.addr, w = OWN().find((x) => x.addr === addr); if (!w) return;
+  let to = $('#clTo').value, ext = to === 'other';
+  if (ext) { to = ($('#clAddr').value || '').trim().toUpperCase(); if (!SDK.StrKey.isValidEd25519PublicKey(to)) return toast('That is not a Stellar address (G…).'); if (to === addr) return toast('Pick a different wallet.'); if (!$('#clRisk').checked) return toast('Tick the box to confirm you control that address.'); }
+  const toName = ext ? short(to) : (OWN().find((o) => o.addr === to) || {}).name;
+  let a, off, d; try { [a, off, d] = await Promise.all([acct(addr), offersOf(addr), acct(to)]); } catch (e) { return toast(niceErr(e)); }
+  if (!a) return toast('This wallet is already closed.');
+  if (!d) return toast(`${toName} isn't open on Stellar yet. A wallet can only close into an open one: fund it first.`);
+  const toks = CLW.a.balances.filter((b) => b.asset_type !== 'native' && b.asset_type !== 'liquidity_pool_shares');
+  const choice = {}; $$('[data-cltok]').forEach((s) => { const b = toks[+s.dataset.cltok]; if (b) choice[akey(b)] = s.value; });
+  const ops = [], items = []; let sold = 0;
+  off.forEach((o) => ops.push(cancelOp(o)));
+  if (off.length) items.push({ t: `Cancel ${off.length} open order${off.length === 1 ? '' : 's'}` });
+  const curT = a.balances.filter((b) => b.asset_type !== 'native' && b.asset_type !== 'liquidity_pool_shares');
+  for (const b of curT) {
+    const k = akey(b), bal = +b.balance, as = hAsset(b), how = choice[k] || 'move';
+    if (bal > 0) {
+      if (b.is_authorized === false) return toast(`${b.asset_code} is frozen by its issuer, so it can't be moved. This wallet can't be closed while it holds ${b.asset_code}.`, 7000);
+      if (how === 'move') {
+        const t = d.balances.find((x) => akey(x) === k);
+        if (!t || t.is_authorized === false || +t.limit - +t.balance < bal) return toast(`${toName} can't hold ${b.asset_code} (no trustline or not enough room). Add ${b.asset_code} to it first, or pick Sell or Give up.`, 6000);
+        ops.push(SDK.Operation.payment({ destination: to, asset: as, amount: b.balance })); items.push({ t: `Move ${m2(bal)} ${b.asset_code} to ${toName}` });
+      } else if (how === 'sell') {
+        // exact stroop math: what is sold + the fee must equal the balance to the last stroop, or the trustline can't be removed
+        const balS = Math.round(+b.balance * 1e7), feeS = Math.floor(balS * SWAP_FEE.bps / 10000), s7 = (n) => (n / 1e7).toFixed(7);
+        let fee = null; try { fee = feeS > 0 ? await feeLegFor(k, feeS / 1e7, addr) : null; } catch (e) { return toast(niceErr(e)); }
+        const qS = balS - (fee ? feeS : 0), q = qS / 1e7;
+        let r; try { const j = await H(`/paths/strict-send?${hzAssetQ(k, 'source_')}&source_amount=${s7(qS)}&destination_assets=native`); r = ((j._embedded || {}).records || []).filter((x) => x.destination_asset_type === 'native').sort((x, y) => +y.destination_amount - +x.destination_amount)[0]; } catch (e) { return toast(niceErr(e)); }
+        if (!r) return toast(`No market to sell ${b.asset_code} for XLM right now. Pick Move or Give up.`, 6000);
+        const min = +r.destination_amount * (1 - swSlip() / 100);
+        ops.push(SDK.Operation.pathPaymentStrictSend({ sendAsset: as, sendAmount: s7(qS), destination: addr, destAsset: SDK.Asset.native(), destMin: amt7(min), path: (r.path || []).map(hAsset) }));
+        if (fee) ops.push(fee.direct ? SDK.Operation.payment({ destination: fee.to, asset: as, amount: s7(feeS) })
+          : SDK.Operation.pathPaymentStrictSend({ sendAsset: as, sendAmount: s7(feeS), destination: fee.to, destAsset: SDK.Asset.native(), destMin: '0.0000001', path: fee.path.map(hAsset) }));
+        sold += +r.destination_amount; items.push({ t: `Sell ${m2(bal)} ${b.asset_code} for about ${m2(+r.destination_amount)} XLM`, s: `at least ${m2(min)} XLM${fee ? ` · fee ${m2(fee.amt)} ${b.asset_code} (${SWAP_FEE.bps / 100}%)` : ''}` });
+      } else {
+        let iss = null; try { iss = await acct(b.asset_issuer); } catch (e) { return toast(niceErr(e)); }
+        if (!iss) return toast(`${b.asset_code}'s issuer no longer exists, so it can't take it back. Pick Move or Sell for ${b.asset_code}.`, 7000);
+        ops.push(SDK.Operation.payment({ destination: b.asset_issuer, asset: as, amount: b.balance })); items.push({ t: `Give up ${m2(bal)} ${b.asset_code}`, s: 'sent back to its issuer ' + short(b.asset_issuer) });
+      }
+    }
+    ops.push(SDK.Operation.changeTrust({ asset: as, limit: '0' }));
+  }
+  if (curT.length) items.push({ t: `Remove ${curT.length} trustline${curT.length === 1 ? '' : 's'}`, s: curT.map((b) => b.asset_code).join(', ') });
+  Object.keys(a.data || {}).forEach((n) => ops.push(SDK.Operation.manageData({ name: n, value: null })));
+  ops.push(SDK.Operation.accountMerge({ destination: to }));
+  if (ops.length > 100) return toast('Too many orders and tokens for one transaction. Cancel the open orders first, then close.', 6000);
+  const xlm = +(a.balances.find((b) => b.asset_type === 'native') || {}).balance || 0;
+  items.push({ t: `Send about ${m2(xlm + sold)} XLM to ${toName}`, s: 'every XLM left, the reserve included', hl: 1 }, { t: `Delete ${w.name} from Stellar`, s: 'and take it off this phone' });
+  confirmSheet(`Close ${w.name}?`, `${NET().name} · ${esc(short(addr))} → ${esc(short(to))}<br>This can't be undone. Keep its recovery phrase or key anyway.`, items, 'Hold to close wallet', async () => {
+    try {
+      const tx = await buildTx(addr, ops); tx.sign(kpFor(addr)); const r = await submit(tx);
+      const i = K.x.findIndex((o) => o.kp.publicKey() === addr); let gone = false;
+      if (i >= 0) { const o = K.x.splice(i, 1)[0]; if (await resealVault()) gone = true; else K.x.splice(i, 0, o); }
+      delete ACC[addr]; homeAddr = null; P.res = {};
+      showResult(true, 'Wallet closed', [`<div class="card"><b>${esc(w.name)} is closed</b><span class="mu" style="font-size:13px">About ${m2(xlm + sold)} XLM went to ${esc(toName)}. ${gone ? 'It is off this phone now.' : 'Remove it from the phone in Settings.'}</span>${r && r.hash ? `<a href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>` : ''}</div>`]);
+    } catch (e) { showResult(false, 'Not closed', [`<div class="card"><b>Nothing changed</b><span class="mu" style="font-size:13px">${esc(niceErr(e))}</span></div>`], 'home'); }
+  }, true, null, 'Closing…');
 }
 
 /* ---------- lock screen ---------- */
@@ -16458,6 +16558,7 @@ document.addEventListener('click', async (e) => {
     xtReview, xtEditOk: () => xtEditOk(+t.dataset.seq),
     xrWatchTrade: () => { pending = null; sheet(`<h2>This wallet is watch only</h2><div class="mu" style="font-size:14px">Liquidfi has its address but not its key, so it can show balances but can't trade or send. To trade from it, add it with its key: Accounts → + Add wallet → XRP Ledger → Import, and paste its secret (s…). The screen shows "✓ Opens r…" so you can check it's this wallet. Then remove this watch-only copy.</div><div class="addr">${esc(xrSel)}</div><button class="b-light big" data-act="closeSheet">OK</button>`); },
     xrRemoveMe: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i < 0) return; t.dataset.i = i; A.rmXr(); },
+    clOpen: () => closeWallet(), clReview: () => closeReview(),
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
     xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
     onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value)), onrCheck,
