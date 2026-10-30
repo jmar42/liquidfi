@@ -222,7 +222,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.19</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.26</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -241,7 +241,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   </div>
   <ul class="feats">
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span><b>Your keys stay on this phone.</b> They are encrypted with your PIN. No server, no sign-up.</span></li>
-    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span><b>A kill switch for your bots.</b> This phone gets an emergency key. Add it to your bot accounts as a signer from your PC, then Cancel Orders or Cancel + Close Positions from here.</span></li>
+    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span><b>Cancel All in one tap.</b> Cancel the open orders on every wallet on this phone at once. Buy XLM or USDC with a card, swap and trade on Stellar.</span></li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7.5 14h9"/></svg><span><b>Starts on Testnet.</b> Practise with free test coins, then switch to Mainnet in Settings.</span></li>
   </ul>
 </section>
@@ -290,12 +290,12 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <p class="foot" id="pFoot">Value change in USDC, deposits and withdrawals backed out. Prices are each hour's last trade on Stellar. Days start at midnight Pacific. <span id="pUpd"></span></p>
   </div>
   <div id="bTrade2" style="display:flex;flex-direction:column;gap:12px">
-  <span class="lbl">Bots</span>
+  <span class="lbl" id="kbLbl">Watched wallets</span>
   <div class="list" id="bList" style="display:flex;flex-direction:column;gap:10px"></div>
   <div class="killbar">
     <p class="mu" id="kbNote" style="font-size:11.5px;margin:0 2px"></p>
-    <div class="g2">
-      <button class="b-redout big" data-act="killAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span>Cancel Orders</span><span style="font-size:11px;font-weight:500" class="mu">positions stay open</span></button>
+    <div class="g2" id="kbBtns">
+      <button class="b-redout big" data-act="killAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span>Cancel All</span><span style="font-size:11px;font-weight:500" class="mu">open orders · positions stay</span></button>
       <button class="b-red big" data-act="flatAll" style="flex-direction:column;display:flex;align-items:center;justify-content:center;gap:2px"><span style="line-height:1.15">Cancel + Close Positions</span></button>
     </div>
   </div>
@@ -356,7 +356,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card rows" id="dBal" style="padding:4px 14px"></div>
   <div id="dKill" style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
     <button class="b-red big" data-act="flatOne" id="dFlat">Cancel + Close Positions</button>
-    <button class="b-out" data-act="killOne">Cancel Orders</button>
+    <button class="b-out" data-act="killOne">Cancel All</button>
   </div>
 </section>
 
@@ -466,7 +466,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="qr" id="rQr"></div>
   <div class="card"><span class="lbl">Address</span><div class="addr" id="rAddr"></div><div class="g2"><button class="b-light" data-act="copyAddr">Copy</button><button class="b-out" data-act="shareAddr">Share</button></div></div>
   <div class="mu" style="font-size:13px" id="rCan"></div>
-  <button class="b-out" data-act="onrBuy" data-chain="stellar" id="rBuy">Buy with Coinbase</button>
+  <button class="b-out" data-act="onrBuy" data-chain="stellar" id="rBuy">Buy XLM or USDC</button>
 </section>
 
 <!-- TRUST -->
@@ -483,25 +483,25 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.19</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.26</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
   <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:12px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone). Mainnet only.</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
-  <div class="card"><span class="lbl">Kill switch key (this phone)</span><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">On the PC run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div>
+  <details class="card more" id="setEmCard" style="display:none"><summary>Advanced: this phone’s signer key</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">This is a signing key, not a wallet. It holds no funds; don't send coins to it. For wallets whose key stays somewhere else, like bots on a PC: add it to them as a signer and Cancel All can cancel their orders from this phone. PC bots: run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div></details>
   <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
-  <div class="card"><span class="lbl">Watched wallets (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">Wallets you watch by address, like bots your PC runs. No key here. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Watch an address</button><button class="b-out sm" data-act="saveBots">Save list</button></div></div>
+  <div class="card"><span class="lbl">Watched wallets (<span id="setBNet"></span>)</span><div class="mu" style="font-size:12px">View only: wallets added by address, without their key. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Watch a wallet</button><button class="b-out sm" data-act="saveBots">Save list</button></div></div>
   <div class="card"><span class="lbl">Buy / sell and gain / loss colors</span><div class="seg" id="setCol"><button data-v="bp"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#60A5FA;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F472B6;margin:0 3px"></i> Blue / pink</button><button data-v="gr"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3FB87F;margin:0 3px"></i><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF8A80;margin:0 3px"></i> Green / red</button></div><div class="mu" style="font-size:12px">Order book, last sales, Activity and P/L gains / losses. The Trade screen's Buy / Sell buttons keep their own colors.</div></div>
   <div class="card"><span class="lbl">Swap slippage cap</span><div class="mu" style="font-size:12px">If the price moves more than this before your swap goes through, nothing trades.</div><div class="seg" id="setSwSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
   <div class="card"><span class="lbl">Close positions into</span><div class="mu" style="font-size:12px">What Cancel + Close Positions turns XLM and stablecoins into: your "flat" currency.</div><div class="seg" id="setFlat"></div></div>
-  <div class="card"><span class="lbl">Trade slippage cap</span><div class="mu" style="font-size:12px">Market orders on Trade, and Cancel + Close Positions (kill switch).</div><div class="seg" id="setSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
+  <div class="card"><span class="lbl">Trade slippage cap</span><div class="mu" style="font-size:12px">Market orders on Trade, and Cancel + Close Positions.</div><div class="seg" id="setSlip"><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div>
 
-  <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader holding XLM and USDC with open orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel Orders and Cancel + Close Positions. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
+  <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader holding XLM and USDC with open orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel All and Cancel + Close Positions. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
   <div class="card"><span class="lbl">Backup</span><div id="setBk" style="font-size:13px"></div><button class="b-out sm" data-act="bkOpen">Back up keys</button></div>
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.19 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.26 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14699,7 +14699,7 @@ function fundCard() {
   const src = fundSrc(homeAddr), tn = S.net === 'testnet';
   return `<div class="card"><b>Not active yet</b><div class="mu" style="font-size:13px">A new Stellar wallet opens with its first XLM. 1 XLM stays locked as Stellar's reserve, plus 0.5 for each token (like USDC) or open order. About 3 XLM is a good start.</div>
     ${src.length ? `<button class="b-acc" data-act="fundOpen">Fund from ${src.length === 1 ? esc(src[0].name) : 'another wallet'}</button>` : ''}
-    ${tn ? '<button class="b-light" data-act="friendbot">Get free test XLM</button>' : ''}
+    ${tn ? '<button class="b-light" data-act="friendbot">Get free test XLM</button>' : `<button class="${src.length ? 'b-light' : 'b-acc'}" data-act="onrBuy" data-chain="stellar" data-addr="${esc(homeAddr)}">Buy XLM with card or Google Pay</button>`}
     <button class="b-out" data-act="rcvHome">Show address to send to</button></div>`;
 }
 function fundSheet() {
@@ -14817,10 +14817,13 @@ function drawBkKeys() {
 }
 let clipT = 0;
 function clearClip() { clearTimeout(clipT); clipT = 0; try { navigator.clipboard.writeText(' '); } catch (e) {} }
+let NWFRESH = false;
 function newWalletSheet(i, freshPh) {
-  const o = K.x[i]; pending = null;
+  const o = K.x[i]; pending = null; NWFRESH = !!freshPh;
   sheet(`<h2>${esc(o.name)} is ready</h2><div class="mu" style="font-size:14px">Address (safe to share): <span class="addr">${esc(o.kp.publicKey())}</span></div>
-    ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this wallet and every wallet you create later on this phone, in Liquidfi or LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(true)}` : `<div class="note amb">Save the secret key now${o.hd != null && K.ph ? ', or rely on your recovery phrase (this is wallet #' + (o.hd + 1) + ' in it)' : ''}. Without it, a lost phone means a lost wallet.</div>`}
+    ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this wallet and every wallet you create later on this phone, in Liquidfi or LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(true)}`
+      : o.hd != null && K.ph ? `<div class="note" id="nwPhOk"><span><b>✓ Backed up by your recovery phrase · Wallet #${o.hd + 1}</b><br><span style="font-size:12.5px">The same 24 words you saved for your other wallets restore this one too. No new words to write down.</span></span></div>${!S.phOk && !S.bk ? '<div class="note amb" id="nwPhWarn">You haven\'t confirmed saving your recovery phrase yet. Tap Show recovery phrase and write the 24 words on paper now.</div>' : ''}<button class="b-out" data-act="nwShowPh" data-i="${i}">Show recovery phrase</button><span class="lbl">Secret key (optional extra backup for this wallet only)</span>`
+      : `<div class="note amb">Save the secret key now. Without it, a lost phone means a lost wallet.</div>`}
     ${keyRow(i)}
     <div class="mu" style="font-size:12px">${S.net === 'public' ? 'Next it needs about 3 XLM to open on Stellar. Its page has a Fund button, or send XLM to the address above.' : 'Next, tap "Get free test XLM" on its page.'}</div>
     <div class="mu" style="font-size:12px">Missed it? Open the wallet and tap "Back up: show key and recovery phrase", or Settings → Back up keys. Your PIN shows it again.</div>
@@ -14909,14 +14912,21 @@ async function resealVault() {   // seal first, keep the old vault if the save f
 const OWN = () => K.x.map((o) => ({ name: o.name, tag: o.type === 'personal' ? 'wallet' : (o.kind === 'dir' ? 'trader' : 'market maker') + ' · own key', addr: o.kp.publicKey(), type: o.type, kind: o.kind || 'mm', kp: o.kp, own: true }));
 const persAccts = () => { const L = OWN(), O = S.wOrder || []; const ix = (a) => { const i = O.indexOf(a.addr); return i < 0 ? 1e6 : i; }; return L.map((a, n) => ({ a, n })).sort((x, y) => ix(x.a) - ix(y.a) || x.n - y.n).map((x) => x.a); };   // in the order added, unless moved by dragging
 const tradeAccts = () => [...NS().bots, ...OWN().filter((a) => a.type === 'trading')];
+const cancelAccts = () => [...NS().bots, ...OWN()];
 const allAccts = () => { const seen = new Set(); return [...persAccts(), ...tradeAccts().filter((b) => b.addr)].filter((a) => !seen.has(a.addr) && seen.add(a.addr)); };
 const watched = () => NS().bots.filter((b) => b.addr && !K.x.some((o) => o.kp.publicKey() === b.addr));
 // kill switch is shown only when the phone can act: a watched wallet with this phone's emergency key as signer, or an own-key trading wallet
 // Cancel all / Flatten sit at the bottom of Accounts (after + Add wallet, before Settings) whenever you watch any wallet
 function kbPaint() {
   const W = tradeAccts().filter((b) => b.addr), any = W.length, on = ksReady(), loading = W.some((b) => !BOT[b.addr]); if (!$('#bTrade2')) return;
-  $('#bTrade2').style.display = any ? '' : 'none';
-  $('#kbNote').innerHTML = !on && loading ? 'Kill switch · checking your watched wallets…' : on ? 'Kill switch · Cancel Orders leaves positions open · Cancel + Close Positions also closes them at market, within your Trade slippage cap' : '<span class="amb">Kill switch is off on every watched wallet.</span> Open one and follow "Kill switch · off" to turn it on.';
+  $('#bTrade2').style.display = '';
+  const own = K.x.length, nb = NS().bots.filter((b) => b.addr).length;
+  $('#kbLbl').style.display = any ? '' : 'none';
+  $('#kbBtns').style.display = any || own ? '' : 'none';
+  const fb = $('#kbBtns [data-act=flatAll]'); if (fb) fb.style.display = any && on ? '' : 'none';
+  $('#kbBtns').style.gridTemplateColumns = any && on ? '' : '1fr';
+  $('#kbNote').innerHTML = !nb ? (own ? '<b>Cancel All</b> cancels the open orders on all your wallets on this phone.' : '')
+    : on ? '<b>Cancel All</b> cancels the open orders on your wallets on this phone, plus watched wallets that have this phone’s key. Positions stay open. <b>Cancel + Close Positions</b> also closes them at market, within your Trade slippage cap.' : '<b>Cancel All</b> cancels the open orders on all your wallets on this phone. Watched wallets are view only.';
 }
 const ksReady = () => tradeAccts().some((b) => b.addr && (b.own || (BOT[b.addr] && BOT[b.addr].a && sigState(BOT[b.addr].a).ok)));
 const sameAcct = (a, b) => a.addr === b.addr && a.name === b.name;
@@ -15174,9 +15184,9 @@ async function drawBots(reload = true) {
       if (isBot) {
         if (!a.addr) note = '<span class="amb" style="font-size:12px">no address set</span>';
         else { const sg = d.a ? sigState(d.a) : null;
-          note = `<span style="font-size:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${sg && sg.ok ? '<span class="tag ks">kill switch</span>' : ''}${sg && sg.ok && d.offers && d.offers.length ? `<span class="mu">${d.offers.length} open order${d.offers.length === 1 ? '' : 's'}</span>` : ''}${d.err ? `<span class="red">${esc(d.err)}</span>` : ''}</span>`; }
+          note = `<span style="font-size:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${sg && sg.ok ? '<span class="tag ks">Cancel All on</span>' : ''}${sg && sg.ok && d.offers && d.offers.length ? `<span class="mu">${d.offers.length} open order${d.offers.length === 1 ? '' : 's'}</span>` : ''}${d.err ? `<span class="red">${esc(d.err)}</span>` : ''}</span>`; }
       }
-      const tag = isBot ? 'watch' : 'wallet';
+      const tag = isBot ? 'XLM watch' : 'XLM';
       return `<div class="wrow" data-row="${i}" data-glist="wal"><button class="acct" ${isBot ? `data-bot="${x.bot}"` : `data-act="openPersonal" data-addr="${a.addr}"`}><div class="r"><span style="font-size:17px;font-weight:600">${esc(a.name)} <span class="mu" style="font-weight:400">· ${esc(tag)}</span></span><span class="mono" style="font-weight:600">${val}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${a.addr ? short(a.addr) : ''}</span>${pl}</div>${note ? `<div class="r">${note}<span></span></div>` : ''}</button></div>`;
     }).join('');
     $('#bUpd').textContent = 'Updated ' + new Date().toLocaleTimeString();
@@ -15198,8 +15208,8 @@ async function drawBot() {
     const sg = d.a ? sigState(d.a) : { ok: false, txt: d.a === null ? 'not funded' : '…' }, on = sg.ok;
     $('#dSig').innerHTML = `<span class="tag">Watch</span>`;
     $('#dTot').textContent = d.a ? '$' + fx(usdVal(d.a)) : d.a === null ? 'Not funded' : '…';
-    $('#dKs').innerHTML = !d.a ? '' : on ? `<div class="card"><div class="top"><span class="lbl">Kill switch</span><span class="tag ks">on</span></div><div class="mu" style="font-size:13px">This phone can stop this wallet in an emergency. When you press Cancel + Close Positions:</div><div class="seg" id="dKind"><button data-v="dir" class="${b.kind === 'dir' ? 'on' : ''}">Close into ${flatCode()}</button><button data-v="mm" class="${b.kind !== 'dir' ? 'on' : ''}">Only cancel orders</button></div></div>`
-      : `<details class="card more"><summary>Kill switch · off</summary><div style="display:flex;flex-direction:column;gap:8px"><div class="mu" style="font-size:13px">For a bot your PC runs: let this phone cancel its orders or close its trade in an emergency. On the PC, run <b>Add-Emergency-Signer.bat</b> and paste this phone's key:</div><div class="addr">${esc(K.em.publicKey())}</div><button class="b-out sm" data-act="copyEm">Copy key</button><div class="mu" style="font-size:12px">${sg.txt === 'signer weight too low' ? 'The key is added but its weight is too low to cancel orders.' : 'Not added yet.'}</div></div></details>`;
+    $('#dKs').innerHTML = !d.a ? '' : (on ? '' : '<div class="note"><span><b>View only.</b> Liquidfi has this wallet\'s address, not its key, so it shows balances but can\'t trade, send or cancel orders. To do that from this phone, add it again with Import and its secret key.</span></div>') + (on ? `<div class="card"><div class="top"><span class="lbl">Cancel All</span><span class="tag ks">on</span></div><div class="mu" style="font-size:13px">This phone can stop this wallet in an emergency. When you press Cancel + Close Positions:</div><div class="seg" id="dKind"><button data-v="dir" class="${b.kind === 'dir' ? 'on' : ''}">Close into ${flatCode()}</button><button data-v="mm" class="${b.kind !== 'dir' ? 'on' : ''}">Only cancel orders</button></div></div>`
+      : '');
     ['dMktC', 'dPos'].forEach((id) => { $('#' + id).style.display = on ? '' : 'none'; }); $('#dKill').style.display = on ? 'flex' : 'none';
     $('#dFlat').style.display = on && b.kind === 'dir' ? '' : 'none';
     $('#dBal').innerHTML = balRows(d.a);
@@ -15636,11 +15646,15 @@ async function killFlow(plansP, title, verb, xrP = null) {
     tradeAccts().forEach((b) => { if (b.addr) delete BOT[b.addr]; });
   });
 }
-function readyBots() { return tradeAccts().filter((b) => b.addr && BOT[b.addr] && BOT[b.addr].a && sigState(BOT[b.addr].a).ok); }
+function readyBots(L = tradeAccts()) { return L.filter((b) => b.addr && BOT[b.addr] && BOT[b.addr].a && sigState(BOT[b.addr].a).ok); }
+// Cancel All = every wallet whose key is on this phone + every bot with the kill switch on. Close Positions = bots and trading wallets only (never sells your personal coins).
 async function allPlans(flat) {
-  await Promise.all(tradeAccts().filter((b) => b.addr).map(loadBot));
-  const bots = readyBots(); if (!bots.length) throw new Error('Kill switch is off on every watched wallet. Open one and follow "Kill switch · off" to add this phone\'s key on the PC.');
-  return Promise.all(bots.map((b) => (flat && b.kind === 'dir') ? planFlat(b) : planCancel(b)));
+  const L = flat ? tradeAccts() : cancelAccts();
+  await Promise.all(L.filter((b) => b.addr).map((b) => loadBot(b).catch(() => null)));
+  const bots = readyBots(L); if (!bots.length) throw new Error(flat ? 'Nothing to close: watched wallets are view only.' : 'Nothing to cancel yet: your wallets on this phone aren\'t funded.');
+  const P = (await Promise.all(bots.map((b) => ((flat && b.kind === 'dir') ? planFlat(b) : planCancel(b)).catch((e) => (b.own ? null : Promise.reject(e)))))).filter((p) => p && (flat || !p.bot.own || p.lines.length));
+  if (!P.length) throw new Error('No open orders to cancel.');
+  return P;
 }
 
 /* ---------- trade (Personal) ---------- */
@@ -15958,7 +15972,8 @@ async function onrBuySheet(chain, addr) {
   if (!provs.includes(ONR.prov)) ONR.prov = provs[0];
   const P = PROV_NM[ONR.prov];
   let L;
-  if (ONR.prov === 'stripe') L = [{ symbol: 'XLM', net: { name: 'stellar' } }, { symbol: 'USDC', net: { name: 'stellar' } }];
+  const a0 = chain === 'stellar' ? await refreshAcct(addr).catch(() => null) : null;
+  if (ONR.prov === 'stripe') L = a0 ? [{ symbol: 'XLM', net: { name: 'stellar' } }, { symbol: 'USDC', net: { name: 'stellar' } }] : [{ symbol: 'XLM', net: { name: 'stellar' } }];   // a new wallet can only receive XLM first
   else {
     try { L = onrFor(await onrOpts(false), chain); } catch (e) { return sheet(`<h2>Buy</h2><div class="note amb">${esc(niceErr(e))}</div><button class="b-out" data-act="closeSheet">Close</button>`); }
     if (!L.length) return sheet(`<h2>Buy</h2><div class="note amb">Coinbase doesn't offer any coin on ${chain === 'xrp' ? 'the XRP Ledger' : 'Stellar'} right now.</div><button class="b-out" data-act="closeSheet">Close</button>`);
@@ -15967,8 +15982,8 @@ async function onrBuySheet(chain, addr) {
   const nm = (allAccts().find((x) => x.addr === addr) || (NS().xrw || []).find((x) => x.addr === addr) || (K.xr || []).map((o) => ({ name: o.name, addr: o.w && o.w.classicAddress })).find((x) => x.addr === addr) || {}).name;
   let note = '';
   if (chain === 'stellar') {
-    const a = await refreshAcct(addr).catch(() => null);
-    if (!a) note = 'This wallet isn’t open on Stellar yet. Buy at least a few dollars of XLM so it can open (1 XLM reserve).';
+    const a = a0;
+    if (!a) note = 'This wallet isn’t open on Stellar yet, so buy XLM first: your first XLM opens it (1 XLM stays as its reserve). Add USDC after that.';
     else if (ONR.asset === 'USDC' && !a.balances.some((b) => b.asset_code === 'USDC' && b.asset_issuer === NS().usdc.issuer)) note = 'This wallet has no USDC trustline yet. Add USDC (Assets) before buying USDC, or buy XLM.';
   }
   const how = ONR.prov === 'stripe'
@@ -16421,7 +16436,8 @@ document.addEventListener('click', async (e) => {
     phShow: () => { if (!K.ph) return; needPin(() => { const e = $('#phW'), b = document.querySelector('[data-act=phShow]'); if (!e) return; const on = e.style.display === 'none'; e.innerHTML = on ? K.ph.split(' ').map((w) => `<li>${esc(w)}</li>`).join('') : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide phrase' : 'Show phrase'; }); },
     phCopy: () => { if (!K.ph) return; const b = t; b.dataset.label = 'Copy phrase'; if (b.dataset.armed === '1') return copySecret(K.ph, b, 'cwP'); needPin(() => copySecret(K.ph, document.querySelector('[data-act=phCopy]') || b, 'cwP')); },
     pinChkOk: () => { const v = ($('#pinChk') || {}).value || ''; if (v !== PIN) { $('#pinChk').value = ''; if (++pinBad >= 3) { pinBad = 0; toast('Wrong PIN 3 times. Locked.'); return lock(); } return toast('Wrong PIN.'); } pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); },
-    newWalletDone: () => { closeSheet(); const o = K.x.at(-1); if (o) { homeAddr = o.kp.publicKey(); go('home'); } toast((o || {}).name + ' added. Fund it to start using it.'); },
+    nwShowPh: () => walletKeySheet('xlm', +t.dataset.i),
+    newWalletDone: () => { if (NWFRESH) { S.phOk = Date.now(); saveS(); } NWFRESH = false; closeSheet(); const o = K.x.at(-1); if (o) { homeAddr = o.kp.publicKey(); go('home'); } toast((o || {}).name + ' added. Fund it to start using it.'); },
     bkFile: () => { exportVault(); $('#bkFileOk').style.display = ''; },
     bkBack: () => go('set'),
     bkDone: () => { if (bkNext === 'mainnet') { if (!bkOk()) return toast('Save the backup file first.'); go('set'); return mainnetSheet(); } go('set'); },
@@ -16444,7 +16460,7 @@ document.addEventListener('click', async (e) => {
     xrRemoveMe: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i < 0) return; t.dataset.i = i; A.rmXr(); },
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
     xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
-    onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : $('#rAcct').value), onrCheck,
+    onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value)), onrCheck,
     onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
     onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; ONR.usd = +(($('#onrAmt') || {}).value) || ONR.usd; onrBuySheet(ONR.chain, ONR.addr); },
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
@@ -16471,9 +16487,9 @@ document.addEventListener('click', async (e) => {
       const upd = () => { const h = how(), imp = h === 'imp', X = xrpC();
         $('#xSecW').firstChild.textContent = X ? 'XRP secret (s…) or recovery phrase (12 or 24 words)' : 'Secret key (S…) or recovery phrase (12 or 24 words)';
         $('#xSec').setAttribute('autocapitalize', X ? 'off' : 'characters'); $('#xSec').dataset.xrp = X ? '1' : ''; $('#xSec').dataset.hint = X ? 'xNone' : 'xSecH'; if (X) $('#xSecH').textContent = '';
-        $('#xAddrW span').textContent = X ? 'XRP Ledger address (r…)' : 'Public address (G…)'; $('#xAddr').placeholder = X ? 'r…' : 'G…'; $('#xAddr').setAttribute('autocapitalize', X ? 'off' : 'characters'); $('#xSecW').style.display = imp ? '' : 'none'; $('#xNumW').style.display = imp && /\s/.test($('#xSec').value.trim()) ? '' : 'none'; $('#xAddrW').style.display = h === 'watch' ? 'flex' : 'none'; if (h !== 'watch') scanStop();
+        $('#xAddrW span').textContent = X ? 'XRP Ledger address (r…)' : 'Public address (G…)'; { const wb = $('#xHow [data-v=watch]'); if (wb) wb.textContent = 'Watch'; } $('#xAddr').placeholder = X ? 'r…' : 'G…'; $('#xAddr').setAttribute('autocapitalize', X ? 'off' : 'characters'); $('#xSecW').style.display = imp ? '' : 'none'; $('#xNumW').style.display = imp && /\s/.test($('#xSec').value.trim()) ? '' : 'none'; $('#xAddrW').style.display = h === 'watch' ? 'flex' : 'none'; if (h !== 'watch') scanStop();
         if (X) { $('#xHowNote').textContent = h === 'watch' ? 'See its XRP and token balances without its key.' : imp ? 'It is encrypted with your PIN and stays on this phone. An XRP secret (s…) or a 12/24-word phrase from Ledger or Trust Wallet works.' : K.ph ? 'Makes an XRP wallet from your recovery phrase (the same words back it up). Then send it at least 1 XRP to open it.' : 'Makes a 24-word recovery phrase and an XRP wallet from it. You\'ll see the words next, to save. Then send it at least 1 XRP to open it.'; return; }
-        $('#xHowNote').textContent = h === 'watch' ? 'See its balance and P/L without its key. It can\'t send or trade from here. Use this for a bot your PC runs.' : imp ? 'It is encrypted with your PIN and stays on this phone. A phrase from LOBSTR, Freighter or Stellar Laboratory works too.' : K.ph ? 'Makes the next wallet from your recovery phrase. You\'ll see its secret key next, to save. Then fund it with about 3 XLM.' : 'Makes a 24-word recovery phrase and your first wallet from it. You\'ll see both next, to save. Then fund it with about 3 XLM.'; };
+        $('#xHowNote').textContent = h === 'watch' ? 'View only: add a wallet by its address to see its balance and P/L. It can\'t trade, send or cancel from here. To do that, use Import with its secret key.' : imp ? 'It is encrypted with your PIN and stays on this phone. A phrase from LOBSTR, Freighter or Stellar Laboratory works too.' : K.ph ? 'Makes the next wallet from your recovery phrase. You\'ll see its secret key next, to save. Then fund it with about 3 XLM.' : 'Makes a 24-word recovery phrase and your first wallet from it. You\'ll see both next, to save. Then fund it with about 3 XLM.'; };
       $$('#xHow button').forEach((x) => x.classList.toggle('on', x.dataset.v === h0));
       $('#xSec').addEventListener('input', upd);
       $('#xSec').addEventListener('input', async () => { if (!xrpC()) return; const v = $('#xSec').value.trim(), n = $('#xHowNote');
