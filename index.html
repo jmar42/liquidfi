@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Liquidfi</title>
-<style>html,body{overscroll-behavior-y:contain}
+<style>html,body{overscroll-behavior-y:contain}@keyframes tpl{from{opacity:1}to{opacity:.35}}.tpl{animation:tpl .7s ease-in-out infinite alternate}
 :root{--buy:#60A5FA;--sell:#F472B6;--bg:#0B0E13;--s1:#151A22;--s2:#1D2430;--bd:#2A3240;--bd2:#4A5566;--tx:#E9EDF2;--mu:#9AA4B2;--red:#C9302C;--red2:#9E2420;--redt:#FF8A80;--grn:#3FB87F;--grnf:#1F6B47;--amb:#F0A030;--blu:#6EA8FF}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
@@ -429,6 +429,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <span class="lbl">Open orders</span>
   <div id="tOpen" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl">Activity</span>
+  <div id="tPend" style="display:none;flex-direction:column;gap:8px"></div>
   <div class="card" id="tFills" style="padding:4px 14px"></div>
 </section>
 
@@ -491,7 +492,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.32</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
-  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
+  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop helpers</span><div class="mu" style="font-size:12px">Each waiting stop has its own small helper account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your helpers from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return helper XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:12px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone). Mainnet only.</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
   <details class="card more" id="setEmCard" style="display:none"><summary>Advanced: this phone’s signer key</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">This is a signing key, not a wallet. It holds no funds; don't send coins to it. For wallets whose key stays somewhere else, like bots on a PC: add it to them as a signer and Cancel All can cancel their orders from this phone. PC bots: run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div></details>
   <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
@@ -13289,7 +13290,7 @@ const aKey = (a) => a.asset_type === 'native' ? 'XLM' : a.asset_code + ':' + a.a
 const aName = (a) => a.asset_type === 'native' ? 'XLM' : a.asset_code;
 const isUSDC = (a) => a.asset_type !== 'native' && a.asset_code === NS().usdc.code && a.asset_issuer === NS().usdc.issuer;
 async function feeNow() {
-  try { const f = await H('/fee_stats'); return String(Math.min(200000, Math.max(1000, 2 * +f.fee_charged.p95))); } catch (e) { return '5000'; }
+  try { const f = await H('/fee_stats'), c = f.fee_charged || {}, v = +c.p95 || +c.p90 || +c.max || 0; return v > 0 ? String(Math.min(200000, Math.max(1000, 2 * v))) : '5000'; } catch (e) { return '5000'; }
 }
 async function buildTx(src, ops, memo) {
   const a = await H('/accounts/' + src);
@@ -13574,6 +13575,7 @@ let cur = 'lock';
 let setFrom = 'mkt'; const backTo = {};
 function go(name) {
   if (name !== cur) scanStop();
+  if (cur === 'backup' && name !== 'backup') { const bk = $('#bkKeys'); if (bk) bk.innerHTML = ''; }   // leaving Back up keys: no key or phrase left in the page
   if (name === 'pnl') name = 'bots';   // P/L now lives on Accounts
   if (name !== 'lock' && name !== 'setup' && name !== 'backup' && !K) name = S.vault ? 'lock' : 'setup';
   const NOH = ['lock', 'setup'];
@@ -14743,6 +14745,7 @@ async function closeWallet() {
   if (+a.num_sponsoring > 0) block.push('It pays the reserve for another account or entry (sponsoring). End that first.');
   if (a.balances.some((b) => b.asset_type === 'liquidity_pool_shares')) block.push('It is set up for a liquidity pool. Withdraw your shares and remove the pool from the wallet first (in the app where you added it).');
   if (S.stopUrl) { try { const L = await stopList(addr); if (L.some((x) => stopLive(x))) block.push('It has stop orders on your stop server. Cancel them first (Open orders → Cancel all).'); } catch (e) {} }
+  for (const [h, r] of Object.entries(hlpReg())) if (r.w === addr) { try { if (await acct(h)) { block.push('One of its stop helpers still holds 1.01 XLM. Settings → Stop orders → Return helper XLM first.'); break; } } catch (e) {} }
   if (block.length) return sheet(`<h2>Close ${esc(w.name)}</h2><div class="note amb">${block.map(esc).join('<br>')}</div><button class="b-out" data-act="closeSheet">OK</button>`);
   CLW.addr = addr; CLW.a = a; CLW.off = off;
   await Promise.all(OWN().filter((o) => o.addr !== addr).map((o) => refreshAcct(o.addr).catch(() => null)));
@@ -15842,7 +15845,7 @@ window.addEventListener('popstate', () => {
   if (e.t === 'scr' && e.prev && e.prev !== cur) { navHold = true; go(e.prev); navHold = false; }
 });
 function sheet(html) { if (!$('#sheet').classList.contains('on')) navPush({ t: 'sheet' }); $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
-function closeSheet(fromBack) { scanStop(); const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if ($('#wkSec') || $('#phW')) $('#sheetIn').innerHTML = ''; /* never leave a shown key or phrase in the page */ if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
+function closeSheet(fromBack) { scanStop(); const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if ($('#wkSec') || $('#phW') || $('#sheetIn [data-act=secShow], #sheetIn [data-act=xrSecShow], #sheetIn [data-act=phShow]')) $('#sheetIn').innerHTML = ''; /* never leave a shown key or phrase in the page */ if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
 let pending = null;
 let pendingBusy = null, pendingTap = false;   // tap = one press sends (trades); otherwise press and hold   // what the hold button says while it waits for the ledger
 function confirmSheet(title, sub, items, btn, run, danger = true, cls = null, busy = null, tap = false) {
@@ -15932,11 +15935,12 @@ async function tradeLoadMine() {   // open orders, stops and fills of the Trade 
   const paintOpen = () => { if (cur !== 'trade') return; const st = STOPS.addr === tradeAddr ? STOPS.list : [], live = st.filter(stopLive), old = st.filter((x) => !stopLive(x) && Date.now() / 1000 - (x.done_at || 0) < 86400);
     $('#tOpen').innerHTML = (live.length || off.length || old.length) ? live.map(stopCard).join('') + off.map(orderCard).join('') + old.map(stopCard).join('') : '<div class="note">No open orders.</div>'; };
   STOP_PAINT = paintOpen;
-  paintOpen(); drawFills(tradeAddr, off);
+  paintOpen(); drawFills(tradeAddr, off); tPendPaint();
   if (S.stopUrl) stopList(tradeAddr).then(paintOpen).catch((e) => { STOPS.err = niceErr(e); });
   Promise.all(off.map(async (o) => { const f = await offerFilled(o); if (f != null) FILLED[o.id] = f; })).then(paintOpen);
 }
 let TRADE_OFF = [];
+setInterval(() => { if (cur === 'trade' && S.stopUrl && STOPS.addr === tradeAddr && STOPS.list.some(stopLive) && !document.hidden) stopList(tradeAddr).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {}); }, 15000);   // a waiting stop shows Triggered / Filled without a refresh
 const TBAL = { addr: null, pair: null, b: null, q: null, at: 0 };
 function tBalPaint(a) {   // Available on the current pair: spendable base + quote, with the change since the last trade
   const el = $('#tBal'); if (!el) return; if (!a) { el.innerHTML = ''; return; }
@@ -16063,7 +16067,36 @@ async function tradeReview() {
 }
 // a trade that went through: stay on Trade, say what happened in a message, refresh balances and orders (no extra screen to tap away)
 function tradeDone(msg) { closeSheet(); toast('✓ ' + msg, 6000); if (cur === 'trade') { $('#tAmt').value = ''; drawTrade(); } else go('trade'); }
+/* Orders sent from Trade: the sheet closes on the tap, and the order shows at the top of Activity as it goes:
+   Sending → Sent (waiting for the ledger, ~5 s) → Filled / On the book / Stop armed, or Failed with the reason. No result screen. */
+const TPEND = []; let tPendN = 0;
+function tPend(label) {
+  const p = { id: ++tPendN, label, st: 'Sending…', cls: 'mu', busy: 1, addr: tradeAddr, t: Date.now() };
+  TPEND.unshift(p); TPEND.splice(8); closeSheet(); if ($('#tAmt')) $('#tAmt').value = ''; if (cur === 'trade') tradeEst();
+  tPendPaint(); const el = $('#tPend'); if (el && el.firstElementChild && cur === 'trade') el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  return p;
+}
+function tPendSet(p, st, cls, sub, done) {
+  Object.assign(p, { st, cls: cls || '', busy: done ? 0 : 1 }); if (sub != null) p.sub = sub; if (done) p.t2 = Date.now();
+  tPendPaint();
+  if (done && cur === 'trade') tradeLoadMine();
+}
+function tPendPaint() {
+  const el = $('#tPend'); if (!el) return; const now = Date.now();
+  for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : 120000)) TPEND.splice(i, 1); }   // done ones fade into the normal history below
+  const L = TPEND.filter((p) => p.addr === tradeAddr);
+  el.style.display = L.length ? 'flex' : 'none';
+  el.innerHTML = L.map((p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
+}
+setInterval(() => { if (cur === 'trade' && TPEND.length) tPendPaint(); }, 15000);
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
+  if (back === 'trade') {   // market order: no Sending… screen, no result screen
+    const p = tPend((what || okTitle).replace(/^Bought /, 'Buy ').replace(/^Sold /, 'Sell ').replace(/ · fee .*$/, ''));
+    try { const t = await buildTx(src, ops, memo); t.sign(kp); tPendSet(p, 'Sent', 'mu'); const r = await submit(t);
+      p.label = (what || okTitle).replace(/ · fee .*$/, ''); tPendSet(p, '✓ Filled', 'grn', what && / · fee /.test(what) ? what.replace(/^.* · fee /, 'fee ') + ' · ledger ' + r.ledger : 'ledger ' + r.ledger, true); }
+    catch (e) { tPendSet(p, 'Failed', 'red', niceErr(e) + ' Nothing traded.', true); }
+    return;
+  }
   try {
     const t = await buildTx(src, ops, memo); t.sign(kp); const r = await submit(t);
     if (back === 'trade') return tradeDone(what || okTitle);
@@ -16087,10 +16120,70 @@ async function stopApi(path, body) {
   catch (e) { throw new Error("Can't reach your stop server."); }
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Stop server error ' + r.status); return j;
 }
+/* ---------- stop helpers the wallet owns (stop server v1.5+) ----------
+   Each waiting stop has its own small helper account, made and funded (1.01 XLM) by the wallet, its key derived from the
+   wallet's key (so the wallet's backup restores it). The phone signs the whole order and a "close the helper" cleanup;
+   the stop server only keeps them and sends them. It holds no key and no XLM of anyone's. The helper's XLM comes back
+   by itself when the stop fills; on cancel or end the server sends the cleanup; anything left the phone closes here. */
+const HELPER_XLM = '1.01', HELPER_COPIES = 5, HELPER_FEE = 1000;   // fee per op in stroops (0.0001 XLM); a surge is paid by the server's fee bump
+async function helperKp(kp, k) {
+  const key = await crypto.subtle.importKey('raw', kp.rawSecretKey(), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const seed = new Uint8Array(await crypto.subtle.sign('HMAC', key, te.encode('liquidfi-stop-helper-v1:' + k)));
+  return SDK.Keypair.fromRawEd25519Seed(seed);
+}
+const hlpReg = () => { const N = NS(); if (!N.hlp) N.hlp = {}; return N.hlp; };   // helper address → { w, k, at, sid, exp } (addresses only, no keys)
+let STOPH = null, STOPH_AT = 0;
+async function stopHealth() {
+  if (STOPH && Date.now() - STOPH_AT < 5 * 60e3) return STOPH;
+  const r = await fetch(S.stopUrl.replace(/\/+$/, '') + '/health').catch(() => { throw new Error("Can't reach your stop server."); });
+  STOPH = await r.json(); STOPH_AT = Date.now(); return STOPH;
+}
+async function helperFree(kp, w) {   // the first helper index whose account doesn't exist and isn't in use
+  const R = hlpReg();
+  for (let k = 0; k < 40; k++) {
+    const h = await helperKp(kp, k), a = h.publicKey();
+    if (R[a] && Date.now() - (R[a].at || 0) < 15 * 60e3) continue;   // just made for another stop
+    if (!(await acct(a))) return { h, k };
+  }
+  throw new Error('Too many stop helpers open on this wallet. Cancel a stop first.');
+}
+async function helperClose(w, hkp) {   // helper → wallet (its XLM comes back). Signed by the helper's own key.
+  const a = hkp.publicKey(), x = await acct(a); if (!x) { delete hlpReg()[a]; saveS(); return 'gone'; }
+  const t = new SDK.TransactionBuilder(new SDK.Account(a, x.sequence), { fee: String(HELPER_FEE), networkPassphrase: NET().pass })
+    .addOperation(SDK.Operation.accountMerge({ destination: w })).setTimeout(90).build();
+  t.sign(hkp); await submit(t); delete hlpReg()[a]; saveS(); return 'closed';
+}
+// After the server's list: close helpers whose stop is over (or never armed) so their XLM comes home
+let HSWEEP = 0;
+async function helperSweep(w, list) {
+  if (Date.now() - HSWEEP < 20000) return; HSWEEP = Date.now();
+  const kp = kpFor(w); if (!kp) return; const R = hlpReg(), now = Date.now(), live = new Set((list || []).filter(stopLive).map((x) => x.helper).filter(Boolean));
+  for (const [a, r] of Object.entries(R)) {
+    if (r.w !== w || live.has(a)) continue;
+    const done = r.sid ? (list || []).some((x) => x.id === r.sid && !stopLive(x)) || now > (r.exp || 0) + 10 * 60e3 : now - (r.at || 0) > 15 * 60e3;
+    if (!done) continue;
+    try { const h = await helperKp(kp, r.k); if (h.publicKey() === a && (await helperClose(w, h)) === 'closed') toast('Stop helper closed: its XLM is back in your wallet.'); } catch (e) {}
+  }
+}
+// Lost phone / new phone: find helpers by their keys (from the wallet key) and close every one not holding a live stop
+async function helperRecover() {
+  const el = $('#setHlpSt'); if (el) el.textContent = 'Looking…'; let n = 0, f = 0;
+  try {
+    for (const o of OWN()) {
+      const kp = kpFor(o.addr); if (!kp) continue;
+      let list = []; if (S.stopUrl) list = await stopList(o.addr).catch(() => null); if (list === null) { if (el) el.innerHTML = '<span class="amb">Can\'t reach your stop server, so nothing was closed (a helper might hold a live stop).</span>'; return; }
+      const live = new Set(list.filter(stopLive).map((x) => x.helper).filter(Boolean));
+      for (let k = 0; k < 40; k++) { const h = await helperKp(kp, k), a = h.publicKey(); if (live.has(a)) continue; const x = await acct(a); if (!x) continue; f++; try { if ((await helperClose(o.addr, h)) === 'closed') n++; } catch (e) {} }
+    }
+    if (el) el.textContent = f ? `Closed ${n} of ${f} leftover helper${f > 1 ? 's' : ''}: the XLM is back in your wallets.` : 'No leftover helpers. Nothing to return.';
+  } catch (e) { if (el) el.innerHTML = `<span class="amb">${esc(niceErr(e))}</span>`; }
+}
 async function stopList(addr) {
   const kp = kpFor(addr), ts = Date.now();
   const j = await stopApi('/list', { net: S.net, wallet: addr, ts, sig: stopSig(kp, `liquidfi-stops:list:${S.net}:${addr}:${ts}`) });
-  STOPS.addr = addr; STOPS.list = j.stops || []; STOPS.err = null; return STOPS.list;
+  STOPS.addr = addr; STOPS.list = j.stops || []; STOPS.err = null;
+  if (Object.values(hlpReg()).some((r) => r.w === addr)) helperSweep(addr, STOPS.list).catch(() => {});
+  return STOPS.list;
 }
 const p4 = (x) => (+x).toFixed(x < 1 ? 6 : 4);
 // how far past the stop it may fill: 0.5 / 1 / 2 %, Market (= up to STOP_MKT % so a flash crash can't sell for almost nothing), or Custom
@@ -16130,30 +16223,56 @@ async function stopReview(q, a, kp) {
   const uK = NS().usdc.code + ':' + NS().usdc.issuer;
   let fee = null; try { fee = await feeLegFor(sell ? 'XLM' : uK, feeOf(sell ? q : q * st), tradeAddr); } catch (e) { return toast(niceErr(e)); }
   const sq = sell && fee ? +(q - fee.amt).toFixed(7) : q, usd = sell ? sq * lim : q * lim;
-  if (sell && spendable(a, true) < q) return toast(`Not enough spendable XLM (have ${fx(spendable(a, true))}).`);
+  if (sell && spendable(a, true) < q + 1.02) return toast(`Not enough spendable XLM: ${fx(q, 2)} for the stop + 1.01 held by its helper (have ${fx(spendable(a, true))}).`);
+  if (!sell && spendable(a, true) < 1.02) return toast(`A stop needs 1.01 XLM free for its helper (have ${fx(spendable(a, true))}). It comes back when the stop ends.`);
   if (!sell && spendable(a, false) < usd + (fee ? fee.amt : 0)) return toast(`Not enough USDC (have ${fx(spendable(a, false))}, need ${fx(usd + (fee ? fee.amt : 0))}).`);
   const end = new Date(Date.now() + days * 86400e3);
   const items = [{ t: `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}`, hl: 1 },
     { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} XLM at ${p4(lim)} or better` : `Buy ${fx(q, 2)} XLM at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} USDC${fee ? ` · ${m2(sq)} sold + ${m2(fee.amt)} XLM fee (${SWAP_FEE.bps / 100}%)` : ''}` : `pay at most ${fx(usd)} USDC${fee ? ` + ${m2(fee.amt)} USDC fee (${SWAP_FEE.bps / 100}%)` : ''}` },
-    { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` }];
+    { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` },
+    { t: 'Helper holds 1.01 XLM from this wallet', s: 'Your own helper account sends the order (made and signed on this phone; the stop server holds no keys). The 1.01 XLM comes back when the stop fills, is cancelled or ends.' }];
   confirmSheet(`Stop ${T.side} ${fx(q)} XLM`, `${NET().name} · signed now, sent when the price hits`, items, `Place stop ${T.side}`, async () => {
+    const pnd = tPend(`Stop ${T.side} ${fx(q, 2)} XLM at ${p4(st)}`);
+    let hh = null;
     try {
       const w = tradeAddr, ts = Date.now();
-      const pr = await stopApi('/prepare', { net: S.net, wallet: w, ts, sig: stopSig(kp, `liquidfi-stops:prepare:${S.net}:${w}:${ts}`) });
+      const hl = await stopHealth().catch(() => ({}));
+      if (!hl.own) throw new Error('Update your stop server to v1.5 (own helpers): copy the new stopd.py to the watcher box and run install-stops.sh again.');
+      // a) the wallet makes and funds its own helper
+      tPendSet(pnd, 'Setting up…', 'mu', 'making its helper account (1.01 XLM from this wallet, comes back)');
+      const { h, k } = await helperFree(kp, w); hh = h; const ha = h.publicKey();
+      hlpReg()[ha] = { w, k, at: Date.now() }; saveS();
+      { const t0 = await buildTx(w, [SDK.Operation.createAccount({ destination: ha, startingBalance: HELPER_XLM })]); t0.sign(kp); await submit(t0); }
+      let hx = null; for (let i = 0; i < 6 && !hx; i++) { hx = await acct(ha).catch(() => null); if (!hx) await sleep(1500); }
+      if (!hx) throw new Error('The helper account did not show up on Stellar. Try again.');
+      const s0 = BigInt(hx.sequence);
+      // b) the order: N copies from the helper (min sequence s0), each ends by closing the helper into the wallet
       const ops = [sell ? SDK.Operation.pathPaymentStrictSend({ source: w, sendAsset: SDK.Asset.native(), sendAmount: amt7(sq), destination: w, destAsset: USDC(), destMin: amt7(usd), path: [] })
         : SDK.Operation.pathPaymentStrictReceive({ source: w, sendAsset: USDC(), sendMax: amt7(usd), destination: w, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: [] })];
       if (fee) { ops.push(SDK.Operation[fee.direct ? 'payment' : 'pathPaymentStrictSend'](fee.direct ? { source: w, destination: fee.to, asset: asOf(fee.k), amount: amt7(fee.amt) } : { source: w, sendAsset: asOf(fee.k), sendAmount: amt7(fee.amt), destination: fee.to, destAsset: SDK.Asset.native(), destMin: '0.0000001', path: fee.path.map(hAsset) })); }
-      // signed copies at sequences A+1…A+N, each with "minimum sequence A": if one attempt fails in a fast market the next copy is still good
-      const per = Math.max(100, Math.floor(Math.min(pr.max_fee || 200000, 20000) / ops.length)), n = Math.max(1, Math.min(10, +pr.copies || 1)), xdrs = [];
-      for (let i = 0; i < n; i++) {
-        const b = new SDK.TransactionBuilder(new SDK.Account(pr.channel, (BigInt(pr.seq) - 1n + BigInt(i)).toString()), { fee: String(per), networkPassphrase: NET().pass, timebounds: { minTime: 0, maxTime: Math.floor(end.getTime() / 1000) }, minAccountSequence: String(pr.min_seq) });
+      ops.push(SDK.Operation.accountMerge({ source: ha, destination: w }));
+      const xdrs = [];
+      for (let i = 0; i < HELPER_COPIES; i++) {
+        const b = new SDK.TransactionBuilder(new SDK.Account(ha, (s0 + BigInt(i)).toString()), { fee: String(HELPER_FEE * ops.length), networkPassphrase: NET().pass, timebounds: { minTime: 0, maxTime: Math.floor(end.getTime() / 1000) }, minAccountSequence: s0.toString() });
         ops.forEach((o) => b.addOperation(o));
-        const tx = b.build(); tx.sign(kp); xdrs.push(tx.toXDR());
+        const tx = b.build(); tx.sign(kp); tx.sign(h); xdrs.push(tx.toXDR());
       }
-      await stopApi('/arm', { id: pr.id, xdrs, feed, stop: st, lim_mode: limMode(), guard: stopGuard() });
-      stopList(w).catch(() => {});
-      tradeDone(`Stop placed: ${sell ? 'sell' : 'buy'} ${fx(q, 2)} XLM if ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`);
-    } catch (e) { showResult(false, 'Stop not placed', [`<div class="card red">${esc(niceErr(e))}</div>`], 'trade'); }
+      // c) the cleanup: close the helper into the wallet, good any time (the server sends it on cancel, end, or out of tries)
+      const cb = new SDK.TransactionBuilder(new SDK.Account(ha, (s0 + BigInt(HELPER_COPIES)).toString()), { fee: String(HELPER_FEE), networkPassphrase: NET().pass, timebounds: { minTime: 0, maxTime: 0 }, minAccountSequence: s0.toString() });
+      cb.addOperation(SDK.Operation.accountMerge({ source: ha, destination: w }));
+      const ctx = cb.build(); ctx.sign(h);
+      tPendSet(pnd, 'Sent', 'mu', 'handing the signed order to your stop server');
+      const ts2 = Date.now();
+      const r = await stopApi('/arm_own', { net: S.net, wallet: w, helper: ha, ts: ts2, sig: stopSig(kp, `liquidfi-stops:armown:${S.net}:${w}:${ha}:${ts2}`), xdrs, cleanup: ctx.toXDR(), feed, stop: st, lim_mode: limMode(), guard: stopGuard() });
+      Object.assign(hlpReg()[ha], { sid: r.id, exp: end.getTime() }); saveS(); hh = null;
+      stopList(w).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {});
+      tPendSet(pnd, '✓ Stop armed', 'grn', `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)} · 1.01 XLM in its helper until it ends`, true);
+    } catch (e) {
+      let why = niceErr(e);
+      if (hh) { try { if ((await helperClose(tradeAddr, hh)) === 'closed') why += ' Its helper was closed, so the 1.01 XLM is back.'; } catch (x) { why += ' Its helper will be closed and the XLM returned next time you open Trade.'; } }
+      if (/not funded yet/i.test(why)) why += ' Your stop server needs about 10 XLM on ' + NET().name + ' for its helper accounts. Settings → Stop orders → Check shows the address to send it to.';
+      tPendSet(pnd, 'Failed', 'red', why + ' Nothing was placed.', true);
+    }
   }, false, sell ? 'b-pur' : 'b-grn', 'Placing…', true);
 }
 function stopCard(x) {
@@ -16170,7 +16289,13 @@ async function stopCancel(t) {
   try { const kp = kpFor(tradeAddr), ts = Date.now(); const r = await stopApi('/cancel', { id, ts, sig: stopSig(kp, `liquidfi-stops:cancel:${id}:${ts}`) });
     t.textContent = r.status === 'cancelled' ? 'Cancelled' : 'Cancelling…'; t.classList.add('done'); if (card) card.classList.add('gone');
     const again = () => stopList(tradeAddr).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {}); setTimeout(again, 1500); setTimeout(again, 4000);   // the server closes it within a few seconds
-  } catch (e) { t.disabled = false; t.textContent = 'Cancel stop'; toast('Not cancelled: ' + niceErr(e)); }
+  } catch (e) {
+    const x = (STOPS.list || []).find((y) => y.id === id), r = x && x.helper && hlpReg()[x.helper];
+    if (r) {   // the stop server can't be reached: close the helper from here. That kills every signed copy for good.
+      try { const h = await helperKp(kpFor(r.w), r.k); if (h.publicKey() === x.helper) { await helperClose(r.w, h); t.textContent = 'Cancelled'; t.classList.add('done'); if (card) card.classList.add('gone'); toast('Cancelled from this phone (its helper is closed, the XLM is back).', 6000); return; } } catch (e2) {}
+    }
+    t.disabled = false; t.textContent = 'Cancel stop'; toast('Not cancelled: ' + niceErr(e));
+  }
 }
 // The public /health only says "stop server" + networks. Counts and the service balance need a request signed by one of your wallets.
 const servesNet = (j) => Array.isArray(j.nets) ? j.nets.includes(S.net) : !!(j.nets && j.nets[S.net]);
@@ -16196,7 +16321,8 @@ async function stopStatus(h) {
     const k = +j.stops || 0, x = j.xlm == null ? null : +j.xlm;
     el.innerHTML = `${head} · ${NET().name}${j.private ? ' · private' : ' · <span class="amb">open to any wallet</span>'}`
       + (x != null && x < 3 && S.net === 'testnet' ? '<br>Testnet: it funds itself from friendbot the first time you place a stop.'
-        : x != null && x < 3 ? `<br><span class="amb">The stop server needs about 10 XLM on ${NET().name} to open its channels. Send it to <span class="mono">${esc(String(j.funder || ''))}</span>.</span>`
+        : x != null && x < 3 && h.own ? `<br>Stops use your own helper accounts, so this server needs no XLM. Optional: 2–3 XLM to <span class="mono">${esc(String(j.funder || ''))}</span> lets it pay a higher fee when the network is busy.`
+        : x != null && x < 3 ? `<br><span class="amb">The stop server needs about 10 XLM on ${NET().name} to open its channels. Send it to <span class="mono">${esc(String(j.funder || ''))}</span>. Or update it to v1.5, which needs none.</span>`
         : `<br>Service balance ${fx(x || 0, 2)} XLM (pays network fees, not your trades).`);
   } catch (e) { el.innerHTML = `${head}<br><span class="amb">${esc(niceErr(e))}</span>`; }
 }
@@ -16300,11 +16426,11 @@ async function onrBuySheet(chain, addr) {
   }
   const pick = L.find((a) => a.symbol === ONR.asset) || L.find((a) => a.symbol === (chain === 'xrp' ? 'XRP' : 'XLM')) || L[0]; ONR.asset = pick.symbol; ONR.network = pick.net.name;
   const nm = (allAccts().find((x) => x.addr === addr) || (NS().xrw || []).find((x) => x.addr === addr) || (K.xr || []).map((o) => ({ name: o.name, addr: o.w && o.w.classicAddress })).find((x) => x.addr === addr) || {}).name;
-  let note = '';
+  let note = '', needU = false;
   if (chain === 'stellar') {
     const a = a0;
     if (!a) note = 'This wallet isn’t open on Stellar yet, so buy XLM first: your first XLM opens it (1 XLM stays as its reserve). Add USDC after that.';
-    else if (ONR.asset === 'USDC' && !a.balances.some((b) => b.asset_code === 'USDC' && b.asset_issuer === NS().usdc.issuer)) note = 'This wallet has no USDC trustline yet. Add USDC (Assets) before buying USDC, or buy XLM.';
+    else if (ONR.asset === 'USDC' && !a.balances.some((b) => b.asset_code === 'USDC' && b.asset_issuer === NS().usdc.issuer)) needU = true;
   }
   const how = ONR.prov === 'stripe'
     ? 'Stripe opens in a new tab. No exchange account: you check out with Link (email, a quick ID check the first time, then card or bank). The fee shows before you pay. The coins come straight to this wallet.'
@@ -16317,7 +16443,20 @@ async function onrBuySheet(chain, addr) {
     <label>Or type an amount<input id="onrAmt" type="number" min="1" step="1" inputmode="decimal" placeholder="${ONR.usd}"></label>
     ${note ? `<div class="note amb">${esc(note)}</div>` : ''}
     <div class="mu" style="font-size:12px">${how}</div>
-    <button class="b-light big" data-act="onrGo">Open ${P}</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+    ${needU ? `<div class="note amb">This wallet can't receive USDC yet. Stellar needs a USDC line on the wallet first (it locks 0.5 XLM, which you get back if you remove it). Without it the USDC can't be delivered.</div>
+    <button class="b-light big" data-act="onrAddUsdc">Add USDC to this wallet</button>` : `<button class="b-light big" data-act="onrGo">Open ${P}</button>`}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+// one tap: add the USDC line to the wallet the buy goes to, then back to the Buy sheet
+async function onrAddUsdc(btn) {
+  const addr = ONR.addr, kp = kpFor(addr); if (!kp) return toast('This wallet is view only on this phone.');
+  const a = await refreshAcct(addr).catch(() => null); if (!a) return toast("Couldn't load this wallet. Try again.");
+  const x = a.balances.find((b) => b.asset_type === 'native'), free = +x.balance - (2 + (a.subentry_count || 0)) * 0.5 - +(x.selling_liabilities || 0);
+  if (free < 0.51) return toast(`Adding USDC locks 0.5 XLM and this wallet has ${fx(Math.max(0, free), 2)} XLM free. Buy XLM first.`, 7000);
+  btn.disabled = true; btn.textContent = 'Adding USDC…';
+  try {
+    const tx = await buildTx(addr, [SDK.Operation.changeTrust({ asset: new SDK.Asset(NS().usdc.code, NS().usdc.issuer) })]); tx.sign(kp); await submit(tx);
+    toast('USDC added. Now you can buy USDC.'); ONR.asset = 'USDC'; onrBuySheet(ONR.chain, addr);
+  } catch (e) { btn.disabled = false; btn.textContent = 'Add USDC to this wallet'; toast('USDC not added: ' + niceErr(e), 7000); }
 }
 function onrPickSheet() {
   const L = [...OWN().map((o) => ({ chain: 'stellar', coin: 'XLM', name: o.name, addr: o.addr })),
@@ -16412,8 +16551,10 @@ function editOk(id) {
 }
 // send an order and say plainly what happened
 async function orderTx(kp, src, op, side, title, orig) {
+  const nB0 = kName(TP().b), q0 = orig || 0;
+  const p = tPend(title === 'Edited' ? `Change ${side} order` : `Limit ${side} ${q0 ? fx(q0, 2) + ' ' + nB0 : ''}`.trim());
   try {
-    const t = await buildTx(src, [op]); t.sign(kp); const r = await submit(t);
+    const t = await buildTx(src, [op]); t.sign(kp); tPendSet(p, 'Sent', 'mu'); const r = await submit(t);
     const f = fillSummary(r, side), rows = [];
     if (f) {
       if (f.id && orig) { const st = ordStore(); st[f.id] = { orig, side, at: Date.now() }; saveS(); }
@@ -16422,8 +16563,11 @@ async function orderTx(kp, src, op, side, title, orig) {
       rows.unshift(`<div class="card"><b>${f.filled > 0 && !f.id ? 'Filled' : f.filled > 0 ? 'Partial' : 'Open'}</b><span class="mu" style="font-size:12.5px">Confirmed in ledger ${r.ledger}</span></div>`);
     }
     const nB = kName(TP().b);
-    return tradeDone(!f ? `${side === 'buy' ? 'Buy' : 'Sell'} order sent` : f.filled > 0 && !f.id ? `Filled ${fx(f.filled, 2)} ${nB}${f.avg ? ' @ ' + pxF(f.avg) : ''}` : f.filled > 0 ? `Filled ${fx(f.filled, 2)} ${nB} now · ${fx(f.rest, 2)} on the book` : `${side === 'buy' ? 'Buy' : 'Sell'} order on the book: ${fx(f.rest, 2)} ${nB}${f.id ? ' · #' + f.id : ''}`);
-  } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], 'trade'); }
+    if (!f) return tPendSet(p, '✓ Sent', 'grn', 'ledger ' + r.ledger, true);
+    if (f.filled > 0 && !f.id) return tPendSet(p, '✓ Filled', 'grn', `${fx(f.filled, 2)} ${nB}${f.avg ? ' @ ' + pxF(f.avg) : ''}`, true);
+    if (f.filled > 0) return tPendSet(p, 'Partly filled', 'grn', `${fx(f.filled, 2)} ${nB} filled now · ${fx(f.rest, 2)} on the book${f.id ? ' · #' + f.id : ''}`, true);
+    return tPendSet(p, '✓ On the book', 'grn', `${fx(f.rest, 2)} ${nB} waiting to fill${f.id ? ' · #' + f.id : ''}`, true);
+  } catch (e) { tPendSet(p, 'Failed', 'red', niceErr(e) + ' Nothing traded.', true); }
 }
 // Trade screen activity: orders placed, edited, cancelled, market orders, and fills, newest first
 // which order number a new order got: read it from its transaction result (Horizon's operation record shows offer_id 0 for new orders)
@@ -16786,6 +16930,9 @@ document.addEventListener('click', async (e) => {
     xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
     onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value)), onrCheck,
     onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
+    onrAddUsdc: () => onrAddUsdc(t),
+    helperRecover: () => helperRecover(),
+    tPendX: () => { const i = TPEND.findIndex((p) => p.id === +t.dataset.i); if (i >= 0) TPEND.splice(i, 1); tPendPaint(); },
     onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; ONR.usd = +(($('#onrAmt') || {}).value) || ONR.usd; onrBuySheet(ONR.chain, ONR.addr); },
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
     onrGo: () => onrGo(t),
