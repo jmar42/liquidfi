@@ -415,12 +415,13 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
   <div class="mu" id="tMktNote" style="font-size:12px;display:none">Fills now at the best price (book or AMM pools), within your slippage cap. Includes a 0.25% fee; limit orders have no fee.</div>
   <div class="note" id="tStopOff" style="display:none"><span>Stop orders work on XLM/USDC for now. Switch the pair to XLM/USDC to place one.</span></div>
+  <div class="note" id="tEditBar" style="display:none"></div>
   <div id="tStopW" style="display:none;flex-direction:column;gap:10px">
     <label>Stop price<input id="tStop" inputmode="decimal"></label>
     <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px" id="tLimLbl">Fill no worse than</span><div class="seg" id="tLimMode" style="font-size:13.5px"><button data-v="mkt">Market</button><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="custom">Custom</button></div></div>
     <label id="tLimW" style="display:none">Limit price<input id="tLim" inputmode="decimal"></label>
     <div class="mu" id="tLimTxt" style="font-size:12.5px;line-height:1.5"></div>
-    <div class="g2"><label>Trigger on<select id="tFeed"><option value="avg">3-exchange avg</option><option value="stellar">Stellar last sale</option><option value="cb">Coinbase</option><option value="kr">Kraken</option><option value="bn">Binance</option></select></label><label>Ends after<select id="tDays"><option value="1">1 day</option><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select></label></div>
+    <div class="g2"><label>Trigger on<select id="tFeed"><option value="avg">3-exchange avg</option><option value="stellar">Stellar last sale</option><option value="cb">Coinbase</option><option value="kr">Kraken</option><option value="bn">Binance</option></select></label><label>Ends after<select id="tDays"><option value="1" selected>1 day</option><option value="7">7 days</option><option value="30">30 days</option><option value="90">90 days</option></select></label></div>
     <div class="mu" id="tStopNote" style="font-size:12px;line-height:1.5"></div>
   </div>
   <label id="tPxW" style="display:none"><span id="tPxL">Limit price (USDC per XLM)</span><input id="tPx" inputmode="decimal"></label>
@@ -430,6 +431,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div id="tOpen" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl">Activity</span>
   <div id="tPend" style="display:none;flex-direction:column;gap:8px"></div>
+  <div id="tStopDone" style="display:none;flex-direction:column;gap:8px"></div>
   <div class="card" id="tFills" style="padding:4px 14px"></div>
 </section>
 
@@ -15212,6 +15214,7 @@ async function homeRecent(addr) {
   const [opsR, effR] = await Promise.all([H(`/accounts/${addr}/operations?order=desc&limit=10`), H(`/accounts/${addr}/effects?order=desc&limit=40`).catch(() => null)]);
   if (cur !== 'home' || homeAddr !== addr) return;
   const all = opsR._embedded.records, ops = all.filter((o) => o.source_account === addr || !/offer/.test(o.type));
+  knownAddrs(all.filter((o) => o.type === 'create_account' && o.funder === addr).map((o) => o.account).concat(all.filter((o) => o.type === 'payment' && o.from === addr).map((o) => o.to)));
   const oldest = all.length >= 10 ? Date.parse(all[all.length - 1].created_at) : 0;   // effects reach further back than 10 operations: don't show fills from a period whose operations aren't shown
   const ownPath = new Set(all.filter((o) => o.source_account === addr && /^path_payment/.test(o.type)).map((o) => o.id));   // own swaps: already listed as the swap
   const G = new Map();
@@ -15224,7 +15227,7 @@ async function homeRecent(addr) {
   }
   const rows = [...ops.map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
   const was = new Set([...document.querySelectorAll('#hRec details[open]')].map((d) => d.dataset.tx || d.dataset.op));   // rows you opened stay open
-  $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span>${esc(opText(r.o, addr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
+  $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}>${esc(opText(r.o, addr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
     : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
     : '<div><span class="mu">Nothing yet</span></div>';
   if (was.size) document.querySelectorAll('#hRec details').forEach((d) => { if (was.has(d.dataset.tx || d.dataset.op)) { d.dataset.loaded = d.dataset.loaded || ''; d.open = true; } });
@@ -15316,7 +15319,7 @@ async function homeOrders(a, quiet) {
   TRADE_OFF = off; tradeAddr = addr;
   const paint = () => { if (cur !== 'home' || homeAddr !== addr) return; const st = STOPS.addr === addr ? STOPS.list.filter(stopLive) : [], n = st.length + off.length;
     $('#hOffN').textContent = n ? ` (${n})` : ''; $('#hCanAll').style.display = (off.length || st.some((x) => ['armed', 'triggered'].includes(x.status))) && OWN().some((w) => w.addr === addr) ? '' : 'none';
-    const cards = [...st.map(stopCard), ...off.map(orderCard)], cap = HOME_ALL ? cards.length : 5;   // a busy wallet (bot ladders) shows 5, then "Show all"
+    const cards = [...st.map((x) => stopCard(x)), ...off.map(orderCard)], cap = HOME_ALL ? cards.length : 5;   // a busy wallet (bot ladders) shows 5, then "Show all"
     el.innerHTML = n ? cards.slice(0, cap).join('') + (cards.length > cap ? `<button class="b-out sm" data-act="homeAll">Show all ${cards.length} open orders</button>` : '') : '<div class="note">No open orders. Place limit and stop orders in Trade.</div>'; };
   HOME_PAINT = paint;
   STOP_PAINT = paint; paint();
@@ -15324,12 +15327,38 @@ async function homeOrders(a, quiet) {
   if (S.stopUrl) stopList(addr).then(paint).catch(() => {});
 }
 function ago(t) { const s = (Date.now() - Date.parse(t)) / 1000; return s < 90 ? Math.round(s) + 's' : s < 5400 ? Math.round(s / 60) + 'm' : s < 129600 ? Math.round(s / 3600) + 'h' : Math.round(s / 86400) + 'd'; }
+// a trade with yourself (market order or stop) in trader words: "Filled · bought 10.00 XLM @ 0.170000". XLM / the non-dollar token is the base.
+function fillWords(sa, sAmt, ba, bAmt) {
+  const Q = ['USDC', 'USD', 'PYUSD', 'USDT', 'EURC'];
+  let side, base, bq, q, qq;
+  if (ba === 'XLM' || (!Q.includes(ba) && Q.includes(sa))) { side = 'bought'; base = ba; bq = bAmt; q = sa; qq = sAmt; }
+  else if (sa === 'XLM' || (!Q.includes(sa) && Q.includes(ba))) { side = 'sold'; base = sa; bq = sAmt; q = ba; qq = bAmt; }
+  else return null;
+  if (!(bq > 0)) return null;
+  return `Filled · ${side} ${fx(bq)} ${base} @ ${pxF(qq / bq)}${q === 'USDC' ? '' : ' ' + q}`;
+}
+/* Address poisoning: right after you pay or create an address, scam bots send dust (e.g. 0.0001 XLM) from a LOOK-ALIKE address
+   (same first 4 and last 4 characters) hoping you'll copy it from your history later. Known = your wallets, saved addresses,
+   your stop helpers, and anything this wallet created. */
+let KNOWNADDR = new Set();
+function knownAddrs(extra) {
+  const S2 = new Set([...allAccts().map((x) => x.addr), ...((NS().saved || []).map((x) => x.addr)), ...Object.keys(NS().hlpSeen || {}), ...Object.keys(NS().hlp || {}), ...(extra || [])]);
+  if (SWAP_FEE.to[S.net]) S2.add(SWAP_FEE.to[S.net]);
+  KNOWNADDR = S2; return S2;
+}
+function lookAlike(a) {   // the known address it imitates, or null
+  if (!KNOWNADDR.size) knownAddrs();
+  if (!a || KNOWNADDR.has(a)) return null;
+  for (const k of KNOWNADDR) if (k && k !== a && k.slice(0, 4) === a.slice(0, 4) && k.slice(-4) === a.slice(-4)) return k;
+  return null;
+}
 function opText(o, me) {
   const an = (t, c) => t === 'native' ? 'XLM' : c;
   switch (o.type) {
     case 'create_account': return o.account === me ? `Account created with ${fx(o.starting_balance)} XLM` : isHelper(o.account) ? `Stop helper opened · ${fx(o.starting_balance)} XLM (comes back)` : `Created ${short(o.account)}`;
-    case 'payment': if (o.from === me && o.to === SWAP_FEE.to[S.net]) return `Liquidfi fee ${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`; return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
-    case 'path_payment_strict_send': case 'path_payment_strict_receive': if (o.to === SWAP_FEE.to[S.net] && o.from === me) return `Liquidfi fee ${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; if (o.to === me && o.from !== me) return `Received ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} from ${short(o.from)}`; if (o.to !== me) return `Sent ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} to ${short(o.to)}`; return `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
+    case 'payment': if (o.from === me && o.to === SWAP_FEE.to[S.net]) return `Liquidfi fee ${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`;
+      if (o.to === me && lookAlike(o.from)) return `⚠ Scam dust from a look-alike of ${short(lookAlike(o.from))} · never send to it`; return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
+    case 'path_payment_strict_send': case 'path_payment_strict_receive': if (o.to === SWAP_FEE.to[S.net] && o.from === me) return `Liquidfi fee ${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; if (o.to === me && o.from !== me) return `Received ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} from ${short(o.from)}`; if (o.to !== me) return `Sent ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} to ${short(o.to)}`; return fillWords(an(o.source_asset_type, o.source_asset_code), +o.source_amount, an(o.asset_type, o.asset_code), +o.amount) || `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
     case 'manage_sell_offer': case 'manage_buy_offer': { if (+o.amount === 0) return 'Cancelled an order'; const buy = o.type === 'manage_buy_offer', a = buy ? an(o.buying_asset_type, o.buying_asset_code) : an(o.selling_asset_type, o.selling_asset_code); return `${+o.offer_id ? 'Changed' : 'Placed'} ${buy ? 'buy' : 'sell'} order · ${amtFmt(+o.amount)} ${a} @ ${(+o.price).toFixed(6)}`; }
     case 'change_trust': return (+o.limit === 0 ? 'Removed ' : 'Added ') + 'trustline ' + o.asset_code;
     case 'set_options': return 'Changed account options/signers';
@@ -15921,7 +15950,9 @@ async function drawTrade() {
   $$('#tSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.side));
   $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none'; $('#tStopW').style.display = T.mode === 'stop' ? 'flex' : 'none';
   if (T.mode === 'stop') stopDefaults();
-  const g = $('#tGo'); g.textContent = 'Review ' + (T.mode === 'stop' ? 'stop ' : '') + T.side; g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
+  if (T.replace && (T.mode !== 'stop' || T.side !== T.replace.side || tradeAddr !== T.replace.w)) T.replace = null;   // left the stop being edited
+  { const eb = $('#tEditBar'); if (eb) { eb.style.display = T.replace ? '' : 'none'; eb.innerHTML = T.replace ? `<span><b>Editing your stop ${T.replace.side} ${fx(T.replace.xlm, 2)} XLM at ${p4(T.replace.stop)}.</b> Change anything, then Review replacement: the new stop is placed first, then the old one is cancelled.</span><button class="b-out sm" data-act="stopEditOff" style="margin-top:6px">Don't edit</button>` : ''; } }
+  const g = $('#tGo'); g.textContent = T.replace && T.mode === 'stop' ? 'Review replacement' : 'Review ' + (T.mode === 'stop' ? 'stop ' : '') + T.side; g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
   drawTradeBook(); tradeEst();
   if (feeTo(tradeAddr)) feeLive(feeTo(tradeAddr)).then(() => { if (cur === 'trade') tradeEst(); }).catch(() => {});
   await tradeLoadMine(); if (cur === 'trade') acctWatch(tradeAddr);   // not after you left (it would replace the wallet page's watch)
@@ -15934,7 +15965,8 @@ async function tradeLoadMine() {   // open orders, stops and fills of the Trade 
   tBalPaint(a);
   TRADE_OFF = off;
   const paintOpen = () => { if (cur !== 'trade') return; const st = STOPS.addr === tradeAddr ? STOPS.list : [], live = st.filter(stopLive), old = st.filter((x) => !stopLive(x) && Date.now() / 1000 - (x.done_at || 0) < 86400);
-    $('#tOpen').innerHTML = (live.length || off.length || old.length) ? live.map(stopCard).join('') + off.map(orderCard).join('') + old.map(stopCard).join('') : '<div class="note">No open orders.</div>'; };
+    $('#tOpen').innerHTML = (live.length || off.length) ? live.map((x) => stopCard(x)).join('') + off.map(orderCard).join('') : '<div class="note">No open orders.</div>';
+    const dn = $('#tStopDone'); if (dn) { dn.style.display = old.length ? 'flex' : 'none'; dn.innerHTML = old.map((x) => stopCard(x, true)).join(''); } };   // finished stops (filled / cancelled / ended) live in Activity, not Open orders
   STOP_PAINT = paintOpen;
   paintOpen(); drawFills(tradeAddr, off); tPendPaint();
   if (S.stopUrl) stopList(tradeAddr).then(paintOpen).catch((e) => { STOPS.err = niceErr(e); });
@@ -16075,8 +16107,9 @@ const TPEND = []; let tPendN = 0;
 function tPend(label, scr = 'trade', addr = tradeAddr) {
   const p = { id: ++tPendN, label, st: 'Sending…', cls: 'mu', busy: 1, addr, scr, t: Date.now() };
   TPEND.unshift(p); TPEND.splice(10); closeSheet();
-  if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false;
-    if (cur === 'trade') { if (T.mode === 'stop') stopDefaults(); tradeEst(); } } else if ($('#sAmt')) $('#sAmt').value = '';
+  if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false; if ($('#tDays')) $('#tDays').value = '1';   // stops default to 1 day
+    T.mode = 'mkt'; T.side = 'buy';   // back to the normal order entry (Market · Buy), so it doesn't look like the order is still being entered
+    if (cur === 'trade') drawTrade(); } else if ($('#sAmt')) $('#sAmt').value = '';
   tPendPaint(); const el = $(scr === 'send' ? '#sPend' : '#tPend'); if (el && el.firstElementChild && cur === scr) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
   return p;
 }
@@ -16241,8 +16274,10 @@ async function stopReview(q, a, kp) {
     { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} XLM at ${p4(lim)} or better` : `Buy ${fx(q, 2)} XLM at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} USDC${fee ? ` · fee ${m2(fee.amt)} XLM on top (${SWAP_FEE.bps / 100}%)` : ''}` : `pay at most ${fx(usd)} USDC${fee ? ` + ${m2(fee.amt)} USDC fee (${SWAP_FEE.bps / 100}%)` : ''}` },
     { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` },
     { t: 'Helper holds 1.01 XLM from this wallet', s: 'Your own helper account sends the order (made and signed on this phone; the stop server holds no keys). The 1.01 XLM comes back when the stop fills, is cancelled or ends.' }];
-  confirmSheet(`Stop ${T.side} ${fx(q)} XLM`, `${NET().name} · signed now, sent when the price hits`, items, `Place stop ${T.side}`, async () => {
-    const pnd = tPend(`Stop ${T.side} ${fx(q, 2)} XLM at ${p4(st)}`);
+  const RP = T.replace && T.replace.w === tradeAddr ? { ...T.replace } : null;
+  if (RP) items.push({ t: `Then cancels your old stop: ${RP.side} ${fx(RP.xlm, 2)} XLM at ${p4(RP.stop)}`, s: 'The new stop is placed first, so you are never without one. The old stop\'s helper XLM comes back.' });
+  confirmSheet(RP ? `Replace stop: ${T.side} ${fx(q)} XLM` : `Stop ${T.side} ${fx(q)} XLM`, `${NET().name} · signed now, sent when the price hits`, items, RP ? 'Place new stop, cancel old' : `Place stop ${T.side}`, async () => {
+    const pnd = tPend(`${RP ? 'Replace stop' : 'Stop'} ${T.side} ${fx(q, 2)} XLM at ${p4(st)}`); T.replace = null;
     let hh = null;
     try {
       const w = tradeAddr, ts = Date.now();
@@ -16273,26 +16308,60 @@ async function stopReview(q, a, kp) {
       const ctx = cb.build(); ctx.sign(h);
       tPendSet(pnd, 'Sent', 'mu', 'handing the signed order to your stop server');
       const ts2 = Date.now();
-      const r = await stopApi('/arm_own', { net: S.net, wallet: w, helper: ha, ts: ts2, sig: stopSig(kp, `liquidfi-stops:armown:${S.net}:${w}:${ha}:${ts2}`), xdrs, cleanup: ctx.toXDR(), feed, stop: st, lim_mode: limMode(), guard: stopGuard() });
+      const r = await stopApi('/arm_own', { net: S.net, wallet: w, helper: ha, ts: ts2, sig: stopSig(kp, `liquidfi-stops:armown:${S.net}:${w}:${ha}:${ts2}`), xdrs, cleanup: ctx.toXDR(), feed, stop: st, lim_mode: limMode(), guard: RP && RP.guard != null ? RP.guard : stopGuard() });
       Object.assign(hlpReg()[ha], { sid: r.id, exp: end.getTime() }); saveS(); hh = null;
+      let oldNote = '';
+      if (RP) {   // the new stop is armed: now cancel the old one
+        tPendSet(pnd, 'Cancelling old…', 'mu', 'new stop armed · cancelling the old one');
+        try { await stopCancelId(RP.id, w); oldNote = ' · old stop cancelled'; }
+        catch (e) { oldNote = ` · old stop NOT cancelled (${niceErr(e)}): cancel it in Open orders`; }
+      }
       stopList(w).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {});
-      tPendSet(pnd, '✓ Stop armed', 'grn', `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)} · 1.01 XLM in its helper until it ends`, true);
+      tPendSet(pnd, RP ? (oldNote.includes('NOT') ? '✓ New stop armed' : '✓ Stop replaced') : '✓ Stop armed', oldNote.includes('NOT') ? 'amb' : 'grn', `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)} · 1.01 XLM in its helper until it ends${oldNote}`, true);
     } catch (e) {
       let why = niceErr(e);
       if (hh) { try { if ((await helperClose(tradeAddr, hh)) === 'closed') why += ' Its helper was closed, so the 1.01 XLM is back.'; } catch (x) { why += ' Its helper will be closed and the XLM returned next time you open Trade.'; } }
       if (/not funded yet/i.test(why)) why += ' Your stop server needs about 10 XLM on ' + NET().name + ' for its helper accounts. Settings → Stop orders → Check shows the address to send it to.';
-      tPendSet(pnd, 'Failed', 'red', why + ' Nothing was placed.', true);
+      tPendSet(pnd, 'Failed', 'red', why + (RP ? ' Nothing was placed. Your old stop is still waiting.' : ' Nothing was placed.'), true);
     }
   }, false, sell ? 'b-pur' : 'b-grn', 'Placing…', true);
 }
-function stopCard(x) {
+function stopCard(x, done) {   // done: a finished stop shown in Activity (full brightness, no buttons)
   const sell = x.side === 'sell', live = stopLive(x), d = new Date((x.expires || 0) * 1000);
   const stTxt = { armed: `Waiting · ends ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })}${x.note ? ' · ' + esc(x.note) : ''}`, triggered: `Triggered at ${p4(+x.trig_px || 0)} · ${esc(x.note || 'sending…')}`, sending: 'Sending…', checking: 'Sent · confirming…', cancelling: 'Cancelling…', closing: 'Finishing…',
     filled: 'Filled', failed: 'Not filled: ' + esc(x.err || ''), cancelled: 'Cancelled', expired: 'Ended without triggering' }[x.status] || esc(x.status);
-  return `<div class="card ocard${live ? '' : ' gone'}"><div class="r"><span><span class="tag ${sell ? 't-sell' : 't-buy'}">STOP ${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(+x.xlm || 0, 2)} XLM</b> <span class="mu">stop</span> <b class="mono">${p4(+x.stop || 0)}</b> <span class="mu">${x.lim_mode === 'mkt' ? 'market, floor' : 'limit'}</span> <b class="mono">${p4(+x.limit || 0)}</b></span></div>
+  return `<div class="card ocard${live || done ? '' : ' gone'}"><div class="r"><span><span class="tag ${sell ? 't-sell' : 't-buy'}">STOP ${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(+x.xlm || 0, 2)} XLM</b> <span class="mu">stop</span> <b class="mono">${p4(+x.stop || 0)}</b> <span class="mu">${x.lim_mode === 'mkt' ? 'market, floor' : 'limit'}</span> <b class="mono">${p4(+x.limit || 0)}</b></span></div>
     <div class="r" style="font-size:12.5px"><span class="mu">${esc(x.feed_name || FEEDN[x.feed] || '')}${+x.px ? ` · now <b class="mono" style="color:var(--tx)">${p4(+x.px)}</b>` : ''}</span></div>
-    <div class="r" style="font-size:12.5px"><span class="${x.status === 'failed' ? 'amb' : x.status === 'filled' ? 'grn' : 'mu'}">${stTxt}</span>${hexOk(x.hash, 64) && x.status === 'filled' ? `<a class="mono" style="font-size:12px" href="${NET().expert}/tx/${x.hash}" target="_blank" rel="noopener">${short(x.hash)}</a>` : ''}</div>
-    ${live && ['armed', 'triggered'].includes(x.status) && hexOk(x.id, 32) ? `<button class="b-out sm" data-scancel="${x.id}">Cancel stop</button>` : ''}</div>`;
+    <div class="r" style="font-size:12.5px"><span class="${x.status === 'failed' ? 'amb' : x.status === 'filled' ? 'grn' : x.status === 'cancelled' || x.status === 'expired' ? '' : 'mu'}" style="${done ? 'font-weight:700' : ''}">${stTxt}</span>${hexOk(x.hash, 64) && x.status === 'filled' ? `<a class="mono" style="font-size:12px" href="${NET().expert}/tx/${x.hash}" target="_blank" rel="noopener">${short(x.hash)}</a>` : ''}</div>
+    ${live && x.status === 'armed' && hexOk(x.id, 32) ? `<div class="g2"><button class="b-out sm" data-sedit="${x.id}">Edit</button><button class="b-out sm" data-scancel="${x.id}">Cancel stop</button></div>`
+      : live && x.status === 'triggered' && hexOk(x.id, 32) ? `<button class="b-out sm" data-scancel="${x.id}">Cancel stop</button>` : ''}</div>`;
+}
+/* Edit a waiting stop = replace it: the stop form opens filled with its values; "Review replacement" places the new stop
+   first, then cancels the old one (so the position is never unprotected in between). A signed stop can't be changed in place. */
+function stopEdit(id) {
+  const x = (STOPS.list || []).find((y) => y.id === id); if (!x || x.status !== 'armed') return toast('That stop is no longer waiting.');
+  const w = STOPS.addr; homeAddr = w;
+  if (!isDefPair()) { NS().tPair = { b: 'XLM', q: uKey() }; saveS(); }
+  T.mode = 'stop'; T.side = x.side; T.replace = { id: x.id, xlm: +x.xlm, stop: +x.stop, side: x.side, w, guard: x.guard != null ? +x.guard : null };   // the replacement keeps the old stop's price guard (Settings stays as it is)
+  if (['0.5', '1', '2', 'mkt', 'custom'].includes(String(x.lim_mode))) S.stopLim = String(x.lim_mode); else S.stopLim = 'custom';
+  saveS();
+  const fill = () => {
+    $('#tAmt').value = String(+(+x.xlm).toFixed(7)); $('#tStop').value = String(+x.stop); T.stopTyped = true; T.stopSide = x.side;
+    if (S.stopLim === 'custom') $('#tLim').value = String(+(+x.limit).toFixed(7));
+    if ($('#tFeed') && [...$('#tFeed').options].some((o) => o.value === x.feed)) $('#tFeed').value = x.feed;
+    const left = Math.max(0, (x.expires || 0) - Date.now() / 1000) / 86400, opt = [1, 7, 30, 90].find((d) => d >= left - 0.01) || 90; $('#tDays').value = String(opt);
+    stopDefaults(); tradeEst(); const g = $('#tGo'); if (g) { g.textContent = 'Review replacement'; g.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  };
+  if (cur !== 'trade') { go('trade'); setTimeout(fill, 400); } else { drawTrade(); fill(); }
+}
+async function stopCancelId(id, w) {   // cancel one stop: through the stop server, or (server unreachable) by closing its helper from this phone
+  const kp = kpFor(w), ts = Date.now();
+  try { return await stopApi('/cancel', { id, ts, sig: stopSig(kp, `liquidfi-stops:cancel:${id}:${ts}`) }); }
+  catch (e) {
+    const x = (STOPS.list || []).find((y) => y.id === id), r = x && x.helper && hlpReg()[x.helper];
+    if (r) { const h = await helperKp(kpFor(r.w), r.k); if (h.publicKey() === x.helper) { await helperClose(r.w, h); return { status: 'cancelled' }; } }
+    throw e;
+  }
 }
 async function stopCancel(t) {
   const id = t.dataset.scancel, card = t.closest('.card'); if (t.disabled) return; t.disabled = true; t.textContent = 'Cancelling…';
@@ -16648,6 +16717,8 @@ async function saveAddr() {
   const name = $('#sNName').value.trim(), addr = $('#sNAddr').value.trim(), memo = $('#sNMemo').value.trim();
   if (!name) return toast('Give the address a name.');
   if (!SDK.StrKey.isValidEd25519PublicKey(addr)) return toast('That is not a valid Stellar address (G…).');
+  knownAddrs(); const la = lookAlike(addr);
+  if (la) return toast(`⚠ This looks like ${short(la)} but the middle is different: a scam look-alike. Copy the address from the real source (exchange page or QR), never from your history.`, 9000);
   let a = null; try { a = await acct(addr); } catch (e) {}
   const memoReq = a && a.data && a.data['config.memo_required'] === 'MQ==';
   if (memoReq && !memo) return toast('This account says a memo is required. Add the memo first.');
@@ -16876,6 +16947,8 @@ document.addEventListener('click', async (e) => {
   }
   if (t.dataset.pct) { const a = ACC[tradeAddr]; if (!a) return; const p = +t.dataset.pct / 100, PR = TP(); const m = tMid() || 1; const fR = (T.mode === 'mkt' || T.mode === 'stop') && feeTo(tradeAddr) ? SWAP_FEE.bps / 10000 : 0, x = T.side === 'sell' ? Math.max(0, swapAvail(a, PR.b) - (T.mode === 'stop' && PR.b === 'XLM' ? 1.02 : 0)) * p / (1 + fR) : swapAvail(a, PR.q) * p / (m * (1 + S.slip / 100) * (1 + (T.mode === 'mkt' && feeTo(tradeAddr) ? SWAP_FEE.bps / 10000 : 0))); $('#tAmt').value = (Math.floor(x * 100) / 100).toString(); return tradeEst(); }
   if (t.dataset.scancel) return stopCancel(t);
+  if (t.dataset.sedit) return stopEdit(t.dataset.sedit);
+  if (t.dataset.act === 'stopEditOff') { T.replace = null; return drawTrade(); }
   if (t.dataset.edit) { const o = TRADE_OFF.find((x) => x.id === t.dataset.edit); if (o) editSheet(o); return; }
   if (t.dataset.cancel) {   // one tap: Cancel → Cancelling… → Cancelled, right on the order
     const o = TRADE_OFF.find((x) => x.id === t.dataset.cancel); if (!o || t.disabled) return;
