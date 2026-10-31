@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Liquidfi</title>
-<style>
+<style>html,body{overscroll-behavior-y:contain}
 :root{--buy:#60A5FA;--sell:#F472B6;--bg:#0B0E13;--s1:#151A22;--s2:#1D2430;--bd:#2A3240;--bd2:#4A5566;--tx:#E9EDF2;--mu:#9AA4B2;--red:#C9302C;--red2:#9E2420;--redt:#FF8A80;--grn:#3FB87F;--grnf:#1F6B47;--amb:#F0A030;--blu:#6EA8FF}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
@@ -48,6 +48,8 @@ label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mu);
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:4px}
 .seg button{min-height:42px;border-radius:9px;background:transparent;color:var(--mu)}
 .seg button.on{background:var(--tx);color:var(--bg)}
+.trow{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}.seg.tsm{padding:3px;gap:2px;border-radius:10px}.seg.tsm button{min-height:34px;font-size:13.5px;padding:0 4px;border-radius:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbal{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--mu);margin:-2px 2px 0}.tbal b{color:var(--tx);font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600}.tbal .up{color:var(--grn,#3FB87F)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
 .t-red{background:var(--red);color:#fff}.t-grn{background:#17402D;color:var(--grn)}.t-amb{background:#3d2c10;color:var(--amb)}
@@ -222,7 +224,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.30</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.32</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -406,8 +408,9 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="top" style="min-height:40px"><div class="l" style="gap:6px"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><button class="b-out sm" id="tPair" data-act="tPairPick" style="font-weight:700;font-size:15px;padding:6px 12px">XLM/USDC ▾</button></div><span class="mu" style="font-size:12px" id="tFrom"></span></div>
   <div class="card" style="padding:10px 14px"><div class="book" id="tBook"></div></div>
   <div class="card" style="padding:10px 14px;gap:6px"><div class="top"><span class="lbl" style="font-size:11px">Last sales</span><span class="grn" style="font-size:11px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
-  <div class="seg" id="tSide"><button class="on" data-v="buy" id="tSideB">Buy XLM</button><button data-v="sell" id="tSideS">Sell XLM</button></div>
-  <div class="seg" id="tMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
+  <div class="trow"><div class="seg tsm" id="tSide"><button class="on" data-v="buy" id="tSideB">Buy</button><button data-v="sell" id="tSideS">Sell</button></div>
+  <div class="seg tsm" id="tMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div></div>
+  <div class="tbal" id="tBal"></div>
   <label><span id="tAmtL">Amount (XLM)</span><input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
   <div class="mu" id="tMktNote" style="font-size:12px;display:none">Fills now at the best price (book or AMM pools), within your slippage cap. Includes a 0.25% fee; limit orders have no fee.</div>
@@ -485,7 +488,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.30</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.32</span></div>
   <div class="card"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server · <span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div></div>
@@ -503,7 +506,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.30 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.32 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13223,7 +13226,8 @@ async function unseal(pin, v) {
 let K = null;      // {em: Keypair, pe: Keypair} while unlocked
 let PIN = null;    // kept only while unlocked, to re-seal
 let idleT = null;
-function bumpIdle() { clearTimeout(idleT); if (K) idleT = setTimeout(lock, 120000); }
+function bumpIdle() { clearTimeout(idleT); if (K) idleT = setTimeout(idleLock, 120000); }
+function idleLock() { if (typeof VAN !== 'undefined' && VAN.busy) return bumpIdle(); lock(); }   // never lock in the middle of sending a payment
 ['pointerdown', 'keydown'].forEach((e) => document.addEventListener(e, bumpIdle, { passive: true }));
 function lock() { if (typeof xwStop === 'function') xwStop(); if (clipT) clearClip(); pinOkAt = 0; bioTried = false; K = null; PIN = null; closeSheet(); const bk = $('#bkKeys'); if (bk) bk.innerHTML = ''; $('#sheetIn').innerHTML = ''; go('lock'); }
 // screens still loading when the wallet locks find K gone; drop those leftovers quietly
@@ -14824,6 +14828,131 @@ async function closeReview() {
   }, true, null, 'Closing…');
 }
 
+/* ---------- Vanity address: a Stellar address with your letters, found on THIS phone only ----------
+   The phone's own crypto (WebCrypto Ed25519) makes random keys in background workers until the address ends (or starts,
+   after "G" + A–D) with the letters. The secret never leaves the phone; Liquidfi never sees it. The 10 XLM fee is paid when
+   one is found, in the same transaction that opens the new wallet. Not part of the recovery phrase: the user saves its key. */
+const VANITY_FEE = 10, VAN = { ws: [], rate: 0, n: 0, t0: 0, lock: null, run: null };
+const VAN_ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const vanCores = () => Math.max(1, Math.min(8, (navigator.hardwareConcurrency || 4) - 1));
+const vanFee = (src) => (feeTo(src) ? VANITY_FEE : 0);   // Testnet / no fee wallet: free
+function vanEta(n) { const per = VAN.rate || 8000 * vanCores(), s = Math.pow(32, n) / per; return s < 60 ? 'under a minute' : s < 3600 ? `about ${Math.ceil(s / 60)} minutes` : `about ${(s / 3600).toFixed(s < 36000 ? 1 : 0)} hours`; }
+function vanUpd() {
+  const W = $('#xVanW'); if (!W) return;
+  const X = ($('#xChain .on') || { dataset: {} }).dataset.v === 'xrp', vb = $('#xHow [data-v=van]');
+  if (vb) vb.style.display = X ? 'none' : '';
+  if (X && $('#xHow .on') === vb) { vb.classList.remove('on'); $('#xHow [data-v=new]').classList.add('on'); }
+  const on = !X && ($('#xHow .on') || {}).dataset && $('#xHow .on').dataset.v === 'van';
+  W.style.display = on ? 'flex' : 'none'; $('#xGo').textContent = on ? 'Find my address' : 'Add wallet';
+  if (!on) return;
+  const L = ($('#xVan').value || '').toUpperCase().replace(/[^A-Z2-7]/g, '').slice(0, 5), end = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start';
+  if ($('#xVan').value !== L) $('#xVan').value = L;
+  const fee = vanFee(firstWallet && firstWallet());
+  $('#xHowNote').innerHTML = '';
+  $('#xVanEst').innerHTML = L ? `Looks like <span class="mono">${end ? 'G…' + '<b style="color:var(--blu)">' + L + '</b>' : 'GA<b style="color:var(--blu)">' + L + '</b>…'}</span><br>On this phone: ${vanEta(L.length)} (could be quicker, or a few times longer). Keep Liquidfi open.<br>${fee ? `Costs <b>${fee} XLM</b>, paid only when it's found.` : 'Free on Testnet.'} Made on this phone only: Liquidfi never sees the key.`
+    : 'Type 1 to 5 letters. Stellar addresses use A–Z and 2–7 (no 0, 1, 8 or 9).';
+}
+const VAN_WORKER = `
+const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+function crc(b){let c=0;for(const x of b){c^=x<<8;for(let i=0;i<8;i++)c=(c&0x8000)?((c<<1)^0x1021)&0xffff:(c<<1)&0xffff;}return c;}
+function enc(pub){const d=new Uint8Array(35);d[0]=48;d.set(pub,1);const c=crc(d.subarray(0,33));d[33]=c&255;d[34]=c>>8;let o='',bits=0,v=0;for(const x of d){v=(v<<8)|x;bits+=8;while(bits>=5){o+=A[(v>>>(bits-5))&31];bits-=5;}}if(bits>0)o+=A[(v<<(5-bits))&31];return o;}
+let stop=false;
+onmessage=async(e)=>{if(e.data==='stop'){stop=true;return;}const {L,end}=e.data;let n=0,t=Date.now();
+ while(!stop){const ks=await Promise.all(Array.from({length:32},()=>crypto.subtle.generateKey({name:'Ed25519'},true,['sign'])));
+  for(const k of ks){const pub=new Uint8Array(await crypto.subtle.exportKey('raw',k.publicKey));const a=enc(pub);n++;
+   if(end?a.endsWith(L):a.startsWith(L,2)){const p8=new Uint8Array(await crypto.subtle.exportKey('pkcs8',k.privateKey));postMessage({hit:Array.from(p8.slice(p8.length-32)),addr:a,n});return;}}
+  if(Date.now()-t>700){postMessage({n});n=0;t=Date.now();}}};`;
+function vanStop() { VAN.ws.forEach((w) => { try { w.postMessage('stop'); w.terminate(); } catch (e) {} }); VAN.ws = []; if (VAN.lock) { VAN.lock.release().catch(() => {}); VAN.lock = null; } clearInterval(VAN.tick); }
+async function vanStart(name) {
+  const L = ($('#xVan').value || '').toUpperCase(), end = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start';
+  if (!/^[A-Z2-7]{1,5}$/.test(L)) return toast('Type 1 to 5 letters (A–Z, 2–7).');
+  if (!(window.crypto && crypto.subtle && window.Worker)) return toast('This browser cannot make keys in the background. Try Chrome or Safari.');
+  try { await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign']); } catch (e) { return toast('This browser is too old for vanity addresses. Update it and try again.', 6000); }
+  vanStop(); VAN.n = 0; VAN.t0 = Date.now(); VAN.rate = 0; VAN.run = { name, L, end };
+  try { VAN.lock = navigator.wakeLock ? await navigator.wakeLock.request('screen') : null; } catch (e) { VAN.lock = null; }
+  vanRunSheet();
+  const url = URL.createObjectURL(new Blob([VAN_WORKER], { type: 'text/javascript' }));
+  for (let i = 0; i < vanCores(); i++) {
+    const w = new Worker(url);
+    w.onmessage = (m) => { const d = m.data; VAN.n += d.n || 0; if (d.hit) { vanStop(); vanFound(d.hit, d.addr); } };
+    w.onerror = () => { vanStop(); toast("Couldn't search on this phone."); };
+    w.postMessage({ L, end }); VAN.ws.push(w);
+  }
+  VAN.tick = setInterval(() => { const s = (Date.now() - VAN.t0) / 1000; VAN.rate = s > 1 ? VAN.n / s : 0; const e1 = $('#vanN'); if (!e1) return;
+    e1.textContent = fx(VAN.n, 0); $('#vanR').textContent = VAN.rate ? fx(VAN.rate, 0) + ' / sec' : '…'; $('#vanE').textContent = VAN.rate ? vanEta(L.length) : '…'; }, 1000);
+}
+function vanRunSheet() {
+  const r = VAN.run; if (!r) return; const { L, end } = r; pending = null;
+  sheet(`<h2>Finding your address</h2><div class="mu" style="font-size:13.5px">Looking for <span class="mono">${end ? 'G…<b style="color:var(--blu)">' + esc(L) + '</b>' : 'GA<b style="color:var(--blu)">' + esc(L) + '</b>…'}</span> on this phone. Keep Liquidfi open and the screen on.</div>
+    <div class="card rows" style="font-size:14px"><div><span class="mu">Tried</span><span class="mono" id="vanN">${fx(VAN.n, 0)}</span></div><div><span class="mu">Speed</span><span class="mono" id="vanR">…</span></div><div><span class="mu">Usually takes</span><span id="vanE">…</span></div></div>
+    <div class="mu" style="font-size:12px">The key is made and kept on this phone only. Nothing is paid until one is found. If Liquidfi locks, the search keeps going: unlock to see it.</div>
+    <button class="b-out" data-act="vanCancel">Stop</button>`);
+}
+// After unlock: show a search that kept running, or an address found while locked
+function vanResume() { if (!K) return; if (VANHIT) vanPaySheet(); else if (VAN.ws.length) vanRunSheet(); }
+// Leaving or reloading the page mid-search or mid-payment: ask first (where the browser allows it)
+window.addEventListener('beforeunload', (e) => { if (VAN.busy || VAN.ws.length) { e.preventDefault(); e.returnValue = ''; } });
+let VANHIT = null;
+function vanFound(seed, addr) {
+  const kp = SDK.Keypair.fromRawEd25519Seed(Uint8Array.from(seed));
+  if (kp.publicKey() !== addr) return toast('Check failed. Try again.');
+  VANHIT = { kp, name: VAN.run.name, L: VAN.run.L, end: VAN.run.end };
+  if (K) vanPaySheet();   // locked: shown right after unlock
+}
+function vanPaySheet() {
+  const h = VANHIT; if (!h) return; const a = h.kp.publicKey(), src = fundSrc(a), fee = src.length ? vanFee(src[0].addr) : VANITY_FEE;
+  const pretty = h.end ? esc(a.slice(0, -h.L.length)) + '<b style="color:var(--blu)">' + esc(h.L) + '</b>' : esc(a.slice(0, 2)) + '<b style="color:var(--blu)">' + esc(h.L) + '</b>' + esc(a.slice(2 + h.L.length));
+  pending = null;
+  sheet(`<h2>Found it</h2><div class="addr" style="font-size:15px">${pretty}</div>
+    ${src.length ? `<label>Pay from<select id="vanSrc">${src.map((o) => `<option value="${esc(o.addr)}">${esc(o.name)} · ${fx(o.free, 2)} XLM free</option>`).join('')}</select></label>
+    <label>Start it with (XLM)<input id="vanAmt" type="number" inputmode="decimal" value="3" min="1"></label>
+    <div class="mu" style="font-size:12.5px">One transaction: ${fee ? `<b>${fee} XLM</b> vanity fee, plus ` : ''}the XLM that opens ${esc(h.name)} (1 XLM stays as its reserve).</div>
+    <button class="b-light big" data-act="vanPay">${fee ? `Pay ${fee} XLM and create wallet` : 'Create wallet'}</button>`
+    : `<div class="note amb">You need a funded wallet with at least ${VANITY_FEE + 2} XLM free to pay for this. Fund one, then come back. This address is only kept until you leave this screen; it's never saved unless you pay.</div>`}
+    <div class="mu" style="font-size:12px">Not saved until you pay. Leave this screen without paying and the address is gone.</div>
+    <button class="b-out" data-act="vanDrop">Discard this address</button>`);
+}
+async function vanPay() {
+  const h = VANHIT; if (!h) return; const a = h.kp.publicKey(), from = $('#vanSrc').value, amt = +$('#vanAmt').value, src = fundSrc(a).find((x) => x.addr === from);
+  if (!src) return toast('Pick a wallet to pay from.'); if (!(amt >= 1)) return toast('At least 1 XLM is needed to open it.');
+  const fee = vanFee(from); if (src.free < amt + fee) return toast(`${src.name} has ${fx(src.free, 2)} XLM free; this needs ${fx(amt + fee, 2)}.`);
+  // Nothing is saved until the user taps Pay. Only then is the key put in the vault (marked unpaid, so a crash mid-send
+  // can't lose the new wallet's funds). If the payment doesn't go through, it's taken back out.
+  const ops = [...(fee ? [SDK.Operation.payment({ destination: feeTo(from), asset: SDK.Asset.native(), amount: amt7(fee) })] : []), SDK.Operation.createAccount({ destination: a, startingBalance: amt7(amt) })];
+  confirmSheet(`Create ${h.name}`, `${NET().name} · vanity address`, [...(fee ? [{ t: `Vanity fee ${fee} XLM`, s: 'to Liquidfi' }] : []), { t: `Open ${h.name} with ${fx(amt, 2)} XLM`, s: a, hl: 1 }, { t: `From ${src.name}`, s: from }], fee ? `Pay ${fee} XLM` : 'Create', async () => {
+    VAN.busy = true; try {
+    K.x.push({ name: h.name, type: 'personal', kp: h.kp, vp: 1, vt: Date.now() }); if (!(await resealVault())) { K.x.pop(); return; }
+    const t0 = Date.now(); let ok = false, err = null;
+    try { const tx = await buildTx(from, ops); tx.sign(kpFor(from)); await submit(tx); ok = true; }
+    catch (e) {
+      err = e;
+      if (e.status !== 400) {   // no clear answer (timeout / network): wait until the transaction's 90 s window has passed, then look
+        while (!ok && Date.now() - t0 < 100000) { await sleep(5000); try { ok = !!(await acct(a)); } catch (x) {} }
+      }
+    }
+    if (ok) {
+      const o = K.x.find((x) => x.kp.publicKey() === a); if (o) { delete o.vp; delete o.vt; await resealVault(); }
+      VANHIT = null; P.res = {}; drawBots(true); newWalletSheet(K.x.findIndex((x) => x.kp.publicKey() === a), false);
+    } else {
+      await vanForget(a);   // not paid: the address is not kept
+      toast(`Not paid: ${niceErr(err || new Error('the network did not confirm it'))}. The address was not saved. Try again, or discard it.`, 7000);
+      if (VANHIT && VANHIT.kp.publicKey() === a) vanPaySheet(); else closeSheet();
+    }
+    } finally { VAN.busy = false; bumpIdle(); }
+  }, false, 'b-light', 'Creating…', true);
+}
+async function vanForget(a) {
+  const i = K.x.findIndex((x) => x.vp && x.kp.publicKey() === a); if (i < 0) return;
+  K.x.splice(i, 1); await resealVault(); drawBots(true);
+}
+// After unlock: a vanity wallet left unpaid (app closed mid-payment) is kept only if the payment went through
+async function vanSweep() {
+  for (const o of (K && K.x || []).filter((x) => x.vp)) {
+    if (Date.now() - (o.vt || 0) < 120000) continue;
+    try { const r = await acct(o.kp.publicKey()); if (r) { delete o.vp; delete o.vt; await resealVault(); drawBots(true); } else await vanForget(o.kp.publicKey()); } catch (e) {}
+  }
+}
+
 /* ---------- lock screen ---------- */
 let pinBuf = '';
 function drawLock() {
@@ -14845,7 +14974,7 @@ async function tryUnlock(bio) {
     const p = pinBuf;   // the PIN as typed at this moment (keys pressed during the unlock don't change it)
     const v = await unseal(p, S.vault);
     K = unpackVault(v); PIN = p; unlocking = false;
-    S.fails = 0; S.lockUntil = 0; S.pinLen = PIN.length; saveS(); pinBuf = ''; bumpIdle(); startMarket(); go('bots');   // Accounts is the home page
+    S.fails = 0; S.lockUntil = 0; S.pinLen = PIN.length; saveS(); pinBuf = ''; bumpIdle(); startMarket(); go('bots'); setTimeout(vanSweep, 1500); setTimeout(vanResume, 300);   // Accounts is the home page
     $('#lockMsg').textContent = 'Enter PIN';
   } catch (e) {
     unlocking = false;
@@ -15780,8 +15909,8 @@ let tradeAddr = null;
 async function drawTrade() {
   tradeAddr = homeAddr || firstWallet();
   $('#tFrom').textContent = (allAccts().find((x) => x.addr === tradeAddr) || {}).name || '';
-  { const p = TP(), nB = kName(p.b), nQ = kName(p.q); $('#tPair').textContent = `${nB}/${nQ} ▾`; $('#tSideB').textContent = 'Buy ' + nB; $('#tSideS').textContent = 'Sell ' + nB; $('#tAmtL').textContent = `Amount (${nB})`; $('#tPxL').textContent = `Limit price (${nQ} per ${nB})`;
-    const sb = $('#tMode [data-v=stop]'); if (sb) sb.style.opacity = isDefPair() ? '' : '.45'; $('#tStopOff').style.display = 'none'; tStream(); }
+  { const p = TP(), nB = kName(p.b), nQ = kName(p.q); $('#tPair').textContent = `${nB}/${nQ} ▾`; $('#tSideB').textContent = 'Buy'; $('#tSideS').textContent = 'Sell'; $('#tAmtL').textContent = `Amount (${nB})`; $('#tPxL').textContent = `Limit price (${nQ} per ${nB})`;
+    const sb = $('#tMode [data-v=stop]'); if (sb) sb.style.opacity = isDefPair() ? '' : '.45'; $('#tStopOff').style.display = 'none'; tStream(); tBalPaint(ACC[tradeAddr]); }
   $$('#tMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.mode));
   $$('#tSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.side));
   $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none'; $('#tStopW').style.display = T.mode === 'stop' ? 'flex' : 'none';
@@ -15796,6 +15925,7 @@ async function tradeLoadMine() {   // open orders, stops and fills of the Trade 
   const a = await refreshAcct(addr).catch(() => null);
   const off = a ? await offersOf(addr).catch(() => []) : [];
   if (cur !== 'trade' || tradeAddr !== addr) return;   // left Trade, or picked another wallet meanwhile
+  tBalPaint(a);
   TRADE_OFF = off;
   const paintOpen = () => { if (cur !== 'trade') return; const st = STOPS.addr === tradeAddr ? STOPS.list : [], live = st.filter(stopLive), old = st.filter((x) => !stopLive(x) && Date.now() / 1000 - (x.done_at || 0) < 86400);
     $('#tOpen').innerHTML = (live.length || off.length || old.length) ? live.map(stopCard).join('') + off.map(orderCard).join('') + old.map(stopCard).join('') : '<div class="note">No open orders.</div>'; };
@@ -15805,6 +15935,15 @@ async function tradeLoadMine() {   // open orders, stops and fills of the Trade 
   Promise.all(off.map(async (o) => { const f = await offerFilled(o); if (f != null) FILLED[o.id] = f; })).then(paintOpen);
 }
 let TRADE_OFF = [];
+const TBAL = { addr: null, pair: null, b: null, q: null, at: 0 };
+function tBalPaint(a) {   // Available on the current pair: spendable base + quote, with the change since the last trade
+  const el = $('#tBal'); if (!el) return; if (!a) { el.innerHTML = ''; return; }
+  const p = TP(), nB = kName(p.b), nQ = kName(p.q), vb = swapAvail(a, p.b), vq = swapAvail(a, p.q), key = tradeAddr + p.b + p.q;
+  const ch = (v, old) => (old == null || Math.abs(v - old) < 1e-7 ? '' : ` <span class="${v > old ? 'up' : 'sell'}">${v > old ? '+' : '−'}${fx(Math.abs(v - old), 2)}</span>`);
+  const same = TBAL.pair === key, ob = same ? TBAL.b : null, oq = same ? TBAL.q : null;
+  el.innerHTML = `<span>Available</span><span><b>${fx(vb, 2)}</b> ${esc(nB)}${ch(vb, ob)} · <b>${fx(vq, 2)}</b> ${esc(nQ)}${ch(vq, oq)}</span>`;
+  if (!same || Date.now() - TBAL.at > 120000) Object.assign(TBAL, { pair: key, b: vb, q: vq, at: Date.now() });   // the +/− shows what the last trade changed for 2 minutes
+}
 /* ---------- Trade pair: any token against any token. Price = quote per base. XLM/USDC is the default and uses the always-on MK stream;
    any other pair gets its own book + trades stream (TB). Stops stay XLM/USDC only (the stop server knows that pair). */
 const uKey = () => NS().usdc.code + ':' + NS().usdc.issuer;
@@ -15888,6 +16027,7 @@ function spendable(a, isXLM) {
 async function tradeReview() {
   const q = +$('#tAmt').value; if (!(q > 0)) return toast('Enter an amount.');
   const a = ACC[tradeAddr]; if (!a) return toast('Account not funded.');
+  { const p0 = TP(); Object.assign(TBAL, { pair: tradeAddr + p0.b + p0.q, b: swapAvail(a, p0.b), q: swapAvail(a, p0.q), at: Date.now() }); }   // baseline: the balance line shows what this trade changes
   const PR = TP(), nB = kName(PR.b), nQ = kName(PR.q), AB = asOf(PR.b), AQ = asOf(PR.q), avail = (k) => swapAvail(a, k), holds = (k) => k === 'XLM' || a.balances.some((b) => akey(b) === k);
   for (const k of [PR.q, PR.b]) if (!holds(k)) return toast(`Add ${kName(k)} first (Assets), so this wallet can hold it.`);
   const kp = kpFor(tradeAddr);
@@ -15919,9 +16059,12 @@ async function tradeReview() {
   if (buy && fee) items.push({ t: `Fee ${m2(fee.amt)} ${nQ}`, s: `${SWAP_FEE.bps / 100}% of the cost · total about ${fx(qt.usd + fee.amt)} ${nQ}` });
   confirmSheet(`Market ${T.side} ${fx(q)} ${nB}`, `${NET().name} · fills now or not at all`, items, `Send market ${T.side}`, () => personalTx(kp, tradeAddr, ops, 'Sent', 'trade', null, `${buy ? 'Bought' : 'Sold'} ${fx(buy ? q : sq, 2)} ${nB} at market${fee ? ` · fee ${m2(fee.amt)} ${buy ? nQ : nB}` : ''}`), false, buy ? 'b-grn' : 'b-pur', 'Sending…', true);
 }
+// a trade that went through: stay on Trade, say what happened in a message, refresh balances and orders (no extra screen to tap away)
+function tradeDone(msg) { closeSheet(); toast('✓ ' + msg, 6000); if (cur === 'trade') { $('#tAmt').value = ''; drawTrade(); } else go('trade'); }
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   try {
     const t = await buildTx(src, ops, memo); t.sign(kp); const r = await submit(t);
+    if (back === 'trade') return tradeDone(what || okTitle);
     showResult(true, okTitle, [...(what ? [`<div class="card"><b>${esc(what)}</b><span class="mu" style="font-size:12.5px">Confirmed in ledger ${r.ledger}</span></div>`] : []), `<div class="card"><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a></div>`], back);
   } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], back); }
 }
@@ -16007,7 +16150,7 @@ async function stopReview(q, a, kp) {
       }
       await stopApi('/arm', { id: pr.id, xdrs, feed, stop: st, lim_mode: limMode(), guard: stopGuard() });
       stopList(w).catch(() => {});
-      showResult(true, 'Stop placed', [`<div class="card"><b>${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM if ${esc(FEEDN[feed])} ${sell ? 'falls to' : 'rises to'} ${p4(st)}</b><span class="mu" style="font-size:12.5px">Limit ${p4(lim)} · ends ${end.toLocaleDateString()} · watched by your stop server</span></div>`], 'trade');
+      tradeDone(`Stop placed: ${sell ? 'sell' : 'buy'} ${fx(q, 2)} XLM if ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`);
     } catch (e) { showResult(false, 'Stop not placed', [`<div class="card red">${esc(niceErr(e))}</div>`], 'trade'); }
   }, false, sell ? 'b-pur' : 'b-grn', 'Placing…', true);
 }
@@ -16276,8 +16419,8 @@ async function orderTx(kp, src, op, side, title, orig) {
       rows.push(f.id ? `<div class="card"><div class="r"><span>Open on the book</span><b class="mono">${fx(f.rest, 2)} ${esc(kName(TP().b))}</b></div><div class="r mu" style="font-size:12.5px"><span>order #${esc(f.id)}</span><span>Edit or cancel it on Trade</span></div></div>` : `<div class="card"><span class="grn">Nothing left open.</span></div>`);
       rows.unshift(`<div class="card"><b>${f.filled > 0 && !f.id ? 'Filled' : f.filled > 0 ? 'Partial' : 'Open'}</b><span class="mu" style="font-size:12.5px">Confirmed in ledger ${r.ledger}</span></div>`);
     }
-    rows.push(`<div class="card"><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a></div>`);
-    showResult(true, title, rows, 'trade');
+    const nB = kName(TP().b);
+    return tradeDone(!f ? `${side === 'buy' ? 'Buy' : 'Sell'} order sent` : f.filled > 0 && !f.id ? `Filled ${fx(f.filled, 2)} ${nB}${f.avg ? ' @ ' + pxF(f.avg) : ''}` : f.filled > 0 ? `Filled ${fx(f.filled, 2)} ${nB} now · ${fx(f.rest, 2)} on the book` : `${side === 'buy' ? 'Buy' : 'Sell'} order on the book: ${fx(f.rest, 2)} ${nB}${f.id ? ' · #' + f.id : ''}`);
   } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], 'trade'); }
 }
 // Trade screen activity: orders placed, edited, cancelled, market orders, and fills, newest first
@@ -16635,6 +16778,7 @@ document.addEventListener('click', async (e) => {
     xrWatchTrade: () => { pending = null; sheet(`<h2>This wallet is watch only</h2><div class="mu" style="font-size:14px">Liquidfi has its address but not its key, so it can show balances but can't trade or send. To trade from it, add it with its key: Accounts → + Add wallet → XRP Ledger → Import, and paste its secret (s…). The screen shows "✓ Opens r…" so you can check it's this wallet. Then remove this watch-only copy.</div><div class="addr">${esc(xrSel)}</div><button class="b-light big" data-act="closeSheet">OK</button>`); },
     xrRemoveMe: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i < 0) return; t.dataset.i = i; A.rmXr(); },
     tPairPick: () => tPairSheet(), tPairSet: () => tPairSet(t.dataset.b, t.dataset.q), tPairUse: () => tPairSet($('#tpB').value, $('#tpQ').value), tPairFlip: () => { const b = $('#tpB'), q = $('#tpQ'), x = b.value; b.value = q.value; q.value = x; },
+    vanCancel: () => { vanStop(); closeSheet(); toast('Stopped. Nothing was paid.'); }, vanPay: () => vanPay(), vanDrop: () => { VANHIT = null; closeSheet(); toast('Discarded.'); },
     clOpen: () => closeWallet(), clReview: () => closeReview(),
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
     xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
@@ -16654,13 +16798,14 @@ document.addEventListener('click', async (e) => {
     rmXrOk: async () => { const i = +t.dataset.i; const o = K.xr.splice(i, 1)[0]; if (!(await resealVault())) { K.xr.splice(i, 0, o); return; } closeSheet(); toast('Removed.'); if (cur === 'set') drawSet(); else go('bots'); },
     addWallet: () => { pending = null; const h0 = addHow; addHow = 'new'; sheet(`<h2>Add a wallet</h2>
       <div class="seg" id="xChain"><button class="on" data-v="xlm">Stellar</button><button data-v="xrp">XRP Ledger</button></div>
-      <div class="seg" id="xHow"><button data-v="new">New</button><button data-v="imp">Import</button><button data-v="watch">Watch</button></div>
+      <div class="seg" id="xHow"><button data-v="new">New</button><button data-v="van">Vanity</button><button data-v="imp">Import</button><button data-v="watch">Watch</button></div>
       <label>Name<input id="xName" placeholder="e.g. Savings" autocomplete="off"></label>
+      <div id="xVanW" style="display:none;flex-direction:column;gap:8px"><label>Your letters (up to 5)<input id="xVan" maxlength="5" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="e.g. JEFF"></label><div class="seg" id="xVanPos"><button class="on" data-v="end">At the end</button><button data-v="start">At the start</button></div><div class="mu" id="xVanEst" style="font-size:12.5px;line-height:1.55"></div></div>
       <label id="xSecW" style="display:none">Secret key (S…) or recovery phrase (12 or 24 words)<div class="secw"><div class="secmask" aria-hidden="true"></div><textarea id="xSec" class="sec" rows="2" autocomplete="off" spellcheck="false" autocapitalize="characters" autocorrect="off" data-hint="xSecH"></textarea><button type="button" class="eyeb" data-act="secEye" data-for="xSec" aria-label="Show what you typed"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><span class="mu" id="xSecH" style="font-size:12px"></span></label>
       <label id="xNumW" style="display:none">Which wallet in that phrase<input id="xNum" type="number" min="1" value="1" inputmode="numeric"></label>
       <div id="xAddrW" style="display:none;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">Public address (G…)</span><div class="scanrow"><input id="xAddr" placeholder="G…" spellcheck="false" autocomplete="off" autocapitalize="characters" autocorrect="off" aria-label="Public address"><button class="b-out" data-act="scanWatch"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Scan</button></div><div id="xScan"></div></div>
       <div class="mu" id="xHowNote" style="font-size:13px"></div>
-      <button class="b-light big" data-act="addAcctOk">Add wallet</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+      <button class="b-light big" data-act="addAcctOk" id="xGo">Add wallet</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
       const how = () => ($('#xHow .on') || { dataset: { v: 'new' } }).dataset.v, xrpC = () => ($('#xChain .on') || { dataset: {} }).dataset.v === 'xrp';
       const upd = () => { const h = how(), imp = h === 'imp', X = xrpC();
         $('#xSecW').firstChild.textContent = X ? 'XRP secret (s…) or recovery phrase (12 or 24 words)' : 'Secret key (S…) or recovery phrase (12 or 24 words)';
@@ -16674,13 +16819,15 @@ document.addEventListener('click', async (e) => {
         try { if (/^s[1-9A-HJ-NP-Za-km-z]{20,40}$/.test(v)) n.innerHTML = `<span class="grn">✓ Opens ${esc(xrFromSeed(v).classicAddress)}</span> · check it's the wallet you expect.`;
           else if (/\s/.test(v) && await HD.valid(v.toLowerCase())) { const k = Math.max(1, parseInt($('#xNum').value, 10) || 1) - 1; n.innerHTML = `<span class="grn">✓ Opens ${esc(xrpl.Wallet.fromMnemonic(HD.clean(v.toLowerCase()), { derivationPath: `m/44'/144'/0'/0/${k}` }).classicAddress)}</span>`; } }
         catch (e) { n.innerHTML = '<span class="amb">Not a valid XRP secret (checksum failed: check for a typo).</span>'; } });
-      $('#xChain').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); $$('#xChain button').forEach((x) => x.classList.toggle('on', x === b)); upd(); });
-      $('#xHow').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); $$('#xHow button').forEach((x) => x.classList.toggle('on', x === b)); upd(); });
-      upd(); },
+      $('#xChain').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); $$('#xChain button').forEach((x) => x.classList.toggle('on', x === b)); upd(); vanUpd(); });
+      $('#xHow').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); $$('#xHow button').forEach((x) => x.classList.toggle('on', x === b)); upd(); vanUpd(); });
+      $('#xVan').addEventListener('input', vanUpd); $('#xVanPos').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; e.stopPropagation(); $$('#xVanPos button').forEach((x) => x.classList.toggle('on', x === b)); vanUpd(); });
+      upd(); vanUpd(); },
     addAcctOk: async () => {
       const name = $('#xName').value.trim(), ty = 'personal', h = ($('#xHow .on') || { dataset: { v: 'new' } }).dataset.v; let kp;
       if (!name) return toast('Give the wallet a name.');
       if (($('#xChain .on') || { dataset: {} }).dataset.v === 'xrp') return xrAdd(h, name);
+      if (h === 'van') return vanStart(name);
       if (h === 'watch') {
         const addr = $('#xAddr').value.trim();
         if (!SDK.StrKey.isValidEd25519PublicKey(addr)) return toast('That is not a valid Stellar address (G…).');
