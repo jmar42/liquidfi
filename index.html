@@ -14906,7 +14906,7 @@ function vanPaySheet() {
   sheet(`<h2>Found it</h2><div class="addr" style="font-size:15px">${pretty}</div>
     ${src.length ? `<label>Pay from<select id="vanSrc">${src.map((o) => `<option value="${esc(o.addr)}">${esc(o.name)} · ${fx(o.free, 2)} XLM free</option>`).join('')}</select></label>
     <label>Start it with (XLM)<input id="vanAmt" type="number" inputmode="decimal" value="3" min="1"></label>
-    <div class="mu" style="font-size:12.5px">One transaction: ${fee ? `<b>${fee} XLM</b> vanity fee, plus ` : ''}the XLM that opens ${esc(h.name)} (1 XLM stays as its reserve).</div>
+    <div class="mu" style="font-size:12.5px">One transaction, one tap: ${fee ? `<b>${fee} XLM</b> vanity fee to Liquidfi, plus ` : ''}the XLM that opens ${esc(h.name)} (1 XLM stays as its reserve).</div>
     <button class="b-light big" data-act="vanPay">${fee ? `Pay ${fee} XLM and create wallet` : 'Create wallet'}</button>`
     : `<div class="note amb">You need a funded wallet with at least ${VANITY_FEE + 2} XLM free to pay for this. Fund one, then come back. This address is only kept until you leave this screen; it's never saved unless you pay.</div>`}
     <div class="mu" style="font-size:12px">Not saved until you pay. Leave this screen without paying and the address is gone.</div>
@@ -14919,9 +14919,11 @@ async function vanPay() {
   // Nothing is saved until the user taps Pay. Only then is the key put in the vault (marked unpaid, so a crash mid-send
   // can't lose the new wallet's funds). If the payment doesn't go through, it's taken back out.
   const ops = [...(fee ? [SDK.Operation.payment({ destination: feeTo(from), asset: SDK.Asset.native(), amount: amt7(fee) })] : []), SDK.Operation.createAccount({ destination: a, startingBalance: amt7(amt) })];
-  confirmSheet(`Create ${h.name}`, `${NET().name} · vanity address`, [...(fee ? [{ t: `Vanity fee ${fee} XLM`, s: 'to Liquidfi' }] : []), { t: `Open ${h.name} with ${fx(amt, 2)} XLM`, s: a, hl: 1 }, { t: `From ${src.name}`, s: from }], fee ? `Pay ${fee} XLM` : 'Create', async () => {
+  // one tap: the Found it sheet already shows what is paid, so no second confirm screen
+  if (VAN.busy) return; const btn = $('[data-act=vanPay]'); if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+  {
     VAN.busy = true; try {
-    K.x.push({ name: h.name, type: 'personal', kp: h.kp, vp: 1, vt: Date.now() }); if (!(await resealVault())) { K.x.pop(); return; }
+    K.x.push({ name: h.name, type: 'personal', kp: h.kp, vp: 1, vt: Date.now() }); if (!(await resealVault())) { K.x.pop(); vanPaySheet(); return; }
     const t0 = Date.now(); let ok = false, err = null;
     try { const tx = await buildTx(from, ops); tx.sign(kpFor(from)); await submit(tx); ok = true; }
     catch (e) {
@@ -14939,7 +14941,7 @@ async function vanPay() {
       if (VANHIT && VANHIT.kp.publicKey() === a) vanPaySheet(); else closeSheet();
     }
     } finally { VAN.busy = false; bumpIdle(); }
-  }, false, 'b-light', 'Creating…', true);
+  }
 }
 async function vanForget(a) {
   const i = K.x.findIndex((x) => x.vp && x.kp.publicKey() === a); if (i < 0) return;
