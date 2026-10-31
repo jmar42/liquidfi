@@ -15225,7 +15225,8 @@ async function homeRecent(addr) {
     const g = G.get(k) || { opId, t: e.created_at, sold: 0, bought: 0, sa: effAsset(e.sold_asset_type, e.sold_asset_code), ba: effAsset(e.bought_asset_type, e.bought_asset_code), mine: ops.some((o) => o.id === opId) };
     g.sold += +e.sold_amount; g.bought += +e.bought_amount; G.set(k, g);
   }
-  const rows = [...ops.map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
+  const isDust = (o) => o.type === 'payment' && o.to === addr && !!lookAlike(o.from);   // scam look-alike dust: not shown at all (it only clutters the list)
+  const rows = [...ops.filter((o) => !isDust(o)).map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
   const was = new Set([...document.querySelectorAll('#hRec details[open]')].map((d) => d.dataset.tx || d.dataset.op));   // rows you opened stay open
   $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}>${esc(opText(r.o, addr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
     : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
