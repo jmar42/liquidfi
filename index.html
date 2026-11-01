@@ -14671,8 +14671,8 @@ async function swapReview() {
     try {
       const tx = await buildTx(w0, ops); tx.sign(kpFor(w0)); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(tx);
       const got = swapResult(r), g = got != null ? got : q.out;
-      // Same words and price direction as trades: "Swapped · bought 4.72 XLM @ 0.1695" (price always in USDC per XLM, like the market)
-      pnd.label = (got != null && fillWords(from, q.sw, to, got, 'Swapped')) || `Swapped ${m2(q.amt)} ${from} → ${got != null ? '' : '≈ '}${m2(g)} ${to}`;
+      // Same words and price direction as trades: "Bought 4.72 XLM @ 0.1691" beside ✓ Swapped (price always in USDC per XLM, like the market)
+      pnd.label = (got != null && fillWords(from, q.sw, to, got, '', true)) || `${m2(q.amt)} ${from} → ${got != null ? '' : '≈ '}${m2(g)} ${to}`;
       tPendSet(pnd, '✓ Swapped', 'grn', `${q.fee ? `fee ${m2(q.fee.amt)} ${from} · ` : ''}ledger ${r.ledger}`, true);
     } catch (e) { tPendSet(pnd, 'Failed', 'red', niceErr(e) + ' Nothing was swapped.', true); }
   }, false, 'b-acc', 'Swapping…', true);
@@ -15354,7 +15354,7 @@ async function homeOrders(a, quiet) {
 }
 function ago(t) { const s = (Date.now() - Date.parse(t)) / 1000; return s < 90 ? Math.round(s) + 's' : s < 5400 ? Math.round(s / 60) + 'm' : s < 129600 ? Math.round(s / 3600) + 'h' : Math.round(s / 86400) + 'd'; }
 // a trade with yourself (market order or stop) in trader words: "Filled · bought 10.00 XLM @ 0.170000". XLM / the non-dollar token is the base.
-function fillWords(sa, sAmt, ba, bAmt, pre = 'Filled') {
+function fillWords(sa, sAmt, ba, bAmt, pre = 'Filled', short4 = false) {
   // Priced the way markets quote it: in dollars when a dollar coin is involved (XLM @ 0.1700 USDC), then euros, then XLM.
   const rank = (c) => (['USDC', 'USD', 'PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0);
   let side, base, bq, q, qq;
@@ -15362,7 +15362,8 @@ function fillWords(sa, sAmt, ba, bAmt, pre = 'Filled') {
   else if (rank(ba) > rank(sa)) { side = 'sold'; base = sa; bq = sAmt; q = ba; qq = bAmt; }
   else return null;
   if (!(bq > 0)) return null;
-  return `${pre} · ${side} ${fx(bq)} ${base} @ ${pxF(qq / bq)}${q === 'USDC' ? '' : ' ' + q}`;
+  const px = qq / bq;   // trade fills keep book precision (0.169407); swaps read like a quote (0.1694)
+  return `${pre ? pre + ' · ' + side : side[0].toUpperCase() + side.slice(1)} ${fx(bq)} ${base} @ ${short4 ? (px >= 0.01 ? px.toFixed(4) : px.toPrecision(4)) : pxF(px)}${q === 'USDC' ? '' : ' ' + q}`;
 }
 /* Address poisoning: right after you pay or create an address, scam bots send dust (e.g. 0.0001 XLM) from a LOOK-ALIKE address
    (same first 4 and last 4 characters) hoping you'll copy it from your history later. Known = your wallets, saved addresses,
