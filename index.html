@@ -159,7 +159,7 @@ details.more>div{display:flex;flex-direction:column;gap:14px;padding-top:14px}
 .scanrow{display:flex;gap:8px;align-items:stretch}.scanrow input{flex:1;min-width:0}.scanrow button{flex:none;width:auto;padding:0 14px;display:flex;align-items:center;gap:6px;font-size:14px}
 .qrbox{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1;max-height:320px}.qrbox video{width:100%;height:100%;object-fit:cover;display:block}.qrbox i{position:absolute;inset:16%;border:2px solid rgba(255,255,255,.85);border-radius:12px}
 .swrow input::-webkit-inner-spin-button,.swrow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.swrow input{-moz-appearance:textfield}
-.swrow{display:flex;gap:10px;align-items:center}.swrow input{flex:1;min-width:0;font-size:22px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600}.swrow select{flex:none;width:auto;min-width:104px;font-weight:600}
+.swrow{display:flex;gap:10px;align-items:center}.swrow input{flex:1;min-width:0;font-size:22px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600}.swrow select{flex:0 1 auto;width:auto;min-width:104px;max-width:42%;font-weight:600;text-overflow:ellipsis}.swrow #wOut{flex:1 0 auto!important;min-width:5ch!important}
 .secw{position:relative}.secw textarea{padding-right:48px;width:100%}textarea.sec,.secmask{font:500 15px/1.5 'IBM Plex Mono',ui-monospace,Menlo,monospace;letter-spacing:0;white-space:pre-wrap;word-break:break-all;overflow-wrap:anywhere;font-variant-ligatures:none}textarea.sec{resize:none;overflow:hidden}textarea.sec:not(.show){color:transparent;caret-color:var(--tx)}.secmask{position:absolute;inset:0;padding:12px 48px 12px 14px;border:1px solid transparent;pointer-events:none;color:var(--tx);overflow:hidden}textarea.sec.show+.eyeb,textarea.sec.show~.eyeb{}.secw:has(textarea.sec.show) .secmask{display:none}.eyeb{position:absolute;right:6px;top:6px;width:38px;height:38px;min-height:0;padding:0;border:none;background:transparent;color:var(--mu);display:flex;align-items:center;justify-content:center}.eyeb.on{color:var(--acc)}
 .actrow{border-bottom:1px solid var(--bd)}.actrow:last-child{border-bottom:none}.actrow summary{list-style:none;cursor:pointer}.actrow summary::-webkit-details-marker{display:none}.actd{display:flex;flex-direction:column;gap:6px;padding:0 0 12px 54px;font-size:12.5px;color:var(--mu)}.actd>div{display:flex;justify-content:space-between;gap:10px}.actd>div>:last-child{white-space:nowrap;flex:none}.actd a{color:var(--acc);white-space:nowrap}
 .recrow summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;cursor:pointer}.recrow summary::-webkit-details-marker{display:none}.recrow+.recrow{border-top:1px solid var(--bd)}.recd{display:flex;flex-direction:column;gap:6px;padding:0 0 12px;font-size:12.5px;color:var(--mu)}.recd>div{display:flex;justify-content:space-between;gap:12px}.recd a{color:var(--acc);white-space:nowrap}
@@ -14569,10 +14569,11 @@ async function drawSwap() {
   priceAssets(a).then(() => { if (cur === 'swap') swapPaintOut(); });
   const held = a ? a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares' && !isNFT(b) && +b.balance > 0).map(akey) : [];
   const keepF = $('#wFrom').value, keepT = $('#wTo').value;
-  const fromL = held.length ? held : ['XLM'];
-  $('#wFrom').innerHTML = fromL.map((k) => `<option value="${esc(k)}">${esc(kName(k))}</option>`).join('');
+  const rank = (k) => (k === 'XLM' ? 0 : k === uKey() ? 1 : 2);   // XLM first, then USDC, then the rest (Stellar lists XLM last)
+  const fromL = (held.length ? held : ['XLM']).slice().sort((x, y) => rank(x) - rank(y));
+  $('#wFrom').innerHTML = fromL.map((k) => `<option value="${esc(k)}">${esc(kName(k))}${k !== 'XLM' && !isTrusted(kName(k), k.split(':')[1]) ? ' · ' + short(k.split(':')[1]) : ''}</option>`).join('');
   if (fromL.includes(keepF)) $('#wFrom').value = keepF;
-  const toL = [...new Set([...swapKnown(), ...held])];
+  const toL = [...new Set([...swapKnown(), ...held])].sort((x, y) => rank(x) - rank(y));
   $('#wTo').innerHTML = toL.map((k) => `<option value="${esc(k)}">${esc(kName(k))}${k !== 'XLM' && !isTrusted(kName(k), k.split(':')[1]) ? ' · ' + short(k.split(':')[1]) : ''}</option>`).join('');
   const fk = $('#wFrom').value; $('#wTo').value = toL.includes(keepT) && keepT !== fk ? keepT : (toL.find((k) => k !== fk && (fk === 'XLM' ? kName(k) === 'USDC' : k === 'XLM')) || toL.find((k) => k !== fk));
   if (!a) { $('#wAvail').innerHTML = '<span class="amb">This wallet is not funded yet.</span>'; $('#wGo').disabled = true; }
