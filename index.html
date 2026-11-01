@@ -287,6 +287,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="list" id="bPers" style="display:flex;flex-direction:column;gap:10px"></div>
   <div class="list" id="bXrp" style="display:flex;flex-direction:column;gap:10px"></div>
   <button class="b-out" data-act="addAcct">+ Add wallet</button>
+  <button class="b-out" data-go="act" id="bAct">Activity · all wallets</button>
   <div id="bTrade" style="display:flex;flex-direction:column;gap:12px">
     <div id="pHero" style="display:none"></div>
   <span class="lbl" id="pByL">By bot</span>
@@ -310,7 +311,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- ACTIVITY: recent buys and sells on every account -->
 <section class="scr" id="s-act">
-  <div class="top"><div><h1>Activity</h1><span class="mu" style="font-size:12px" id="aUpd">Buys and sells · all accounts</span></div><button class="ico" data-act="actRefresh" aria-label="Refresh">↻</button></div>
+  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back to accounts">‹</button><div><h1>Activity</h1><span class="mu" style="font-size:12px" id="aUpd">Buys and sells · all accounts</span></div></div><button class="ico" data-act="actRefresh" aria-label="Refresh">↻</button></div>
   <div id="aFil" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px"></div>
   <div id="aList" style="display:flex;flex-direction:column;gap:8px"></div>
   <button class="b-out" data-act="actMore" id="aMore" style="display:none">Load more</button>
@@ -471,6 +472,14 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <p class="mu" style="font-size:12px;margin:0">Swaps on the Stellar network at the best route right now: the order book and the AMM pools. If the price moves and you'd get less than the minimum shown, nothing trades.</p>
 </section>
 
+<section class="scr" id="s-earn">
+  <div class="top"><div><h1>Earn</h1><span class="mu" style="font-size:12px">Pools built into Stellar and the XRP Ledger</span></div><button class="ico" data-act="earnRefresh" aria-label="Refresh">↻</button></div>
+  <div class="mu" style="font-size:13px">Add to a pool and earn a share of the fees traders pay it. The pool shares stay in your own wallet, and you can withdraw any time. No Liquidfi fee.</div>
+  <label id="eWalW">Stellar wallet<select id="eWal"></select></label>
+  <div id="ePend" style="display:none;flex-direction:column;gap:8px"></div>
+  <div id="eList" style="display:flex;flex-direction:column;gap:12px"></div>
+  <p class="mu" style="font-size:12px;margin:0">Yield = the trading fees each pool earned over the last 7 days, as a yearly rate. It is not a promise: it goes up and down with trading. The value of what you put in also moves with the prices of the two coins.</p>
+</section>
 <section class="scr" id="s-receive">
   <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Receive</h2></div></div>
   <label>Account<select id="rAcct"></select></label>
@@ -517,7 +526,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 </div>
 
-<nav id="nav"><button data-go="mkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Markets</button><button data-go="bots"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M16 14.5h2"/></svg>Accounts</button><button data-go="act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Activity</button></nav>
+<nav id="nav"><button data-go="mkt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Markets</button><button data-go="bots"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M16 14.5h2"/></svg>Accounts</button><button data-go="earn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>Earn</button></nav>
 <div id="sheet"><div id="sheetIn"></div></div>
 <div id="toast"></div>
 
@@ -13606,9 +13615,9 @@ function go(name) {
   cur = name;
   $$('.scr').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
   $('#nav').classList.toggle('on', !['lock', 'setup', 'backup'].includes(name));
-  $$('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.go === name || (['bot', 'home', 'trade', 'send', 'receive', 'trust', 'port', 'swap', 'xrp', 'xtrade'].includes(name) && b.dataset.go === 'bots') || (name === 'set' && b.dataset.go === setFrom) || (name === 'l2' && b.dataset.go === 'mkt')));
+  $$('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.go === name || (['bot', 'home', 'trade', 'send', 'receive', 'trust', 'port', 'swap', 'xrp', 'xtrade', 'act'].includes(name) && b.dataset.go === 'bots') || (name === 'set' && b.dataset.go === setFrom) || (name === 'l2' && b.dataset.go === 'mkt')));
   window.scrollTo(0, 0);
-  const f = { lock: drawLock, mkt: drawMkt, l2: drawL2, act: drawAct, home: drawHome, bots: drawBots, bot: drawBot, trade: drawTrade, send: drawSend, receive: drawReceive, trust: drawTrust, set: drawSet, port: drawPort, swap: drawSwap, xrp: drawXrp, xtrade: drawXTrade }[name];
+  const f = { lock: drawLock, mkt: drawMkt, l2: drawL2, act: drawAct, earn: drawEarn, home: drawHome, bots: drawBots, bot: drawBot, trade: drawTrade, send: drawSend, receive: drawReceive, trust: drawTrust, set: drawSet, port: drawPort, swap: drawSwap, xrp: drawXrp, xtrade: drawXTrade }[name];
   if (f) f();
 }
 function toast(msg, ms = 4000) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), ms); }
@@ -13693,7 +13702,12 @@ function portData() {
   for (const w of portAccts()) {
     if (w.a === undefined) pending = true; if (!w.a) continue;
     for (const b of w.a.balances) {
-      if (b.asset_type === 'liquidity_pool_shares' || !(+b.balance > 0)) continue;
+      if (!(+b.balance > 0)) continue;
+      if (b.asset_type === 'liquidity_pool_shares') {   // Earn pools: shown as one line each, by dollar value
+        const p = earnPools().find((x) => x.id === b.liquidity_pool_id), u = poolUsd(b); if (!p || u == null) continue;
+        const g = G['LP:' + p.id] || (G['LP:' + p.id] = { k: 'LP:' + p.id, code: p.name + ' pool', amt: 0, usd: 0, ord: 0, nft: false, cash: false, none: false, by: [] });
+        g.amt += +b.balance; g.usd += u; g.by.push({ name: w.name, amt: +b.balance, usd: u, watch: w.watch }); tot += u; continue;
+      }
       const k = akey(b), u = balUsd(b); if (u == null) pending = true;
       const g = G[k] || (G[k] = { k, code: b.asset_type === 'native' ? 'XLM' : b.asset_code, iss: b.asset_issuer, amt: 0, usd: 0, ord: 0, nft: isNFT(b), cash: isCash(b), none: b.asset_type !== 'native' && !!(AV[k] || {}).none, by: [] });
       g.amt += +b.balance; g.usd += u || 0; g.ord += +b.selling_liabilities || 0; g.by.push({ name: w.name, amt: +b.balance, usd: u || 0, watch: w.watch });
@@ -14678,6 +14692,258 @@ async function swapReview() {
   }, false, 'b-acc', 'Swapping…', true);
 }
 
+/* ---------- Earn: the liquidity pools built into Stellar and the XRP Ledger ----------
+   No smart contract, no partner, no server: the wallet adds to the network's own AMM pool and holds pool shares in its
+   own account; it can withdraw any time. Yield shown = trading fees the pool really earned over the last 7 days, as a
+   yearly rate (Stellar: from the pool's trades; XRP Ledger: from how much each pool share grew). No Liquidfi fee. */
+const EARN_SLIP = 0.01;   // if the pool price moves more than 1% before it lands, nothing happens
+const POOLC = {};   // Stellar pool id → { at, none, res, shares, fee, tvl, px, apr, aprAt }
+const RLUSD_HEX = '524C555344000000000000000000000000000000';
+const XAMM = {};    // XRP / RLUSD pool on the XRP Ledger
+let earnAddr = null, earnXr = null, EARN_ADD = null;
+const EARN_RISK = {
+  stable: 'Both sides are dollar coins, so the value barely moves. Lowest risk here.',
+  eur: 'Half is in euros: the value moves with the euro-dollar rate.',
+  vol: 'Half is in the coin. If its price moves a lot, you end up with more of the side that fell (impermanent loss) and can have less than if you had just held.',
+};
+const hexOf = (h) => (typeof h === 'string' ? h : Array.from(h, (v) => v.toString(16).padStart(2, '0')).join(''));   // pool id bytes → hex (the browser SDK's Buffer may be a plain Uint8Array)
+const hzAk = (t, c, i) => (t === 'native' ? 'XLM' : c + ':' + i);
+function earnPools() {   // the Stellar pools offered on this network: each paired with USDC
+  const u = uKey(), kn = (c) => { const k = (KNOWN[S.net] || []).find((x) => x.code === c); return k ? c + ':' + k.issuer : null; };
+  return [['PYUSD', 'stable'], ['EURC', 'eur'], ['XLM', 'vol']].map(([c, risk]) => ({ a: c === 'XLM' ? 'XLM' : kn(c), b: u, risk })).filter((p) => p.a)
+    .map((p) => { const [x, y] = SDK.Asset.compare(asOf(p.a), asOf(p.b)) <= 0 ? [p.a, p.b] : [p.b, p.a];
+      return { ...p, x, y, name: kName(p.a) + ' / ' + kName(p.b), id: hexOf(SDK.getLiquidityPoolId('constant_product', { assetA: asOf(x), assetB: asOf(y), fee: SDK.LiquidityPoolFeeV18 })) }; });
+}
+const poolAsset = (p) => new SDK.LiquidityPoolAsset(asOf(p.x), asOf(p.y), SDK.LiquidityPoolFeeV18);
+async function poolLoad(p, fees = true) {
+  const c = POOLC[p.id] || (POOLC[p.id] = {});
+  if (!c.at || Date.now() - c.at > 60000) {
+    let j; try { j = await H('/liquidity_pools/' + p.id); } catch (e) { if (e.status === 404) { Object.assign(c, { at: Date.now(), none: true }); return c; } throw e; }
+    const res = {}; for (const r of j.reserves || []) res[r.asset === 'native' ? 'XLM' : r.asset] = +r.amount;
+    const u = res[p.b] || 0, o = res[p.a] || 0;
+    Object.assign(c, { at: Date.now(), none: !(+j.total_shares > 0), res, shares: +j.total_shares, fee: (+j.fee_bp || 30) / 1e4, n: +j.total_trustlines || 0, tvl: 2 * u, px: o > 0 ? u / o : 0 });
+  }
+  if (fees && !c.none && (!c.aprAt || Date.now() - c.aprAt > 600000)) {
+    try {   // fees = 0.30% of everything traders paid INTO the pool over the last 7 days
+      const since = Date.now() - 7 * 864e5; let fee = 0, cu = '', oldest = Date.now(), done = false;
+      for (let pg = 0; pg < 25 && !done; pg++) {
+        const j = await H(`/liquidity_pools/${p.id}/trades?order=desc&limit=200${cu ? '&cursor=' + cu : ''}`);
+        const R = (j._embedded || {}).records || []; if (!R.length) { done = true; break; }
+        for (const t of R) {
+          const at = Date.parse(t.ledger_close_time); if (at < since) { done = true; break; } oldest = at;
+          const inBase = t.base_liquidity_pool_id === p.id ? !t.base_is_seller : t.base_is_seller;   // the side the pool received
+          const k = inBase ? hzAk(t.base_asset_type, t.base_asset_code, t.base_asset_issuer) : hzAk(t.counter_asset_type, t.counter_asset_code, t.counter_asset_issuer);
+          fee += +(inBase ? t.base_amount : t.counter_amount) * c.fee * (k === p.b ? 1 : c.px);
+        }
+        cu = R[R.length - 1].paging_token; if (R.length < 200) done = true;
+      }
+      const span = done ? 7 * 864e5 : Math.max(3600e3, Date.now() - oldest);   // busy pool: scale up from the part read
+      c.fee7 = fee * 7 * 864e5 / span; c.apr = c.tvl > 0 ? c.fee7 / c.tvl * 365 / 7 : null;
+    } catch (e) { c.apr = null; }
+    c.aprAt = Date.now();
+  }
+  return c;
+}
+// value of pool shares held (Accounts total, Portfolio): its share of the pool, priced from the USDC side
+function poolUsd(b) {
+  const p = earnPools().find((x) => x.id === b.liquidity_pool_id), c = POOLC[b.liquidity_pool_id];
+  return p && c && c.shares > 0 ? +b.balance / c.shares * c.tvl : null;
+}
+async function poolsPrice(a) {   // make sure every pool a wallet holds has its size loaded
+  const L = ((a && a.balances) || []).filter((b) => b.asset_type === 'liquidity_pool_shares' && +b.balance > 0 && !(POOLC[b.liquidity_pool_id] || {}).at);
+  let ch = false; for (const b of L) { const p = earnPools().find((x) => x.id === b.liquidity_pool_id); if (p) { await poolLoad(p, false).catch(() => null); ch = true; } }
+  return ch;
+}
+/* XRP / RLUSD: the XRP Ledger's own AMM */
+function xrPool() { const iss = (XRP_USD_ISS[S.net] || [])[0]; return iss ? { a1: { currency: 'XRP' }, a2: { currency: RLUSD_HEX, issuer: iss }, name: 'XRP / RLUSD', risk: 'vol' } : null; }
+async function xrAmmLoad(fees = true) {
+  const p = xrPool(); if (!p) return null;
+  if (XAMM.net !== S.net || Date.now() - XAMM.at > 60000) {
+    for (const k of Object.keys(XAMM)) delete XAMM[k];
+    const r = await xr('amm_info', { asset: p.a1, asset2: p.a2, ledger_index: 'validated' });
+    if (r.error || !r.amm) { Object.assign(XAMM, { net: S.net, at: Date.now(), none: true }); return XAMM; }
+    const m = r.amm, x = +m.amount / 1e6, u = +m.amount2.value;
+    Object.assign(XAMM, { net: S.net, at: Date.now(), none: !(+m.lp_token.value > 0), x, u, lp: +m.lp_token.value, lpc: m.lp_token.currency, lpi: m.lp_token.issuer, fee: (+m.trading_fee || 0) / 1e5, tvl: 2 * u, px: x > 0 ? u / x : 0, li: +r.ledger_index || 0 });
+  }
+  if (fees && !XAMM.none && (!XAMM.aprAt || Date.now() - XAMM.aprAt > 600000)) {
+    try {   // fees stay in the pool, so each pool share is worth a bit more pool every day: compare with ~7 days ago
+      const back = Math.round(7 * 86400 / 3.9), r = await xr('amm_info', { asset: p.a1, asset2: p.a2, ledger_index: Math.max(1, XAMM.li - back) });
+      if (r.amm && +r.amm.lp_token.value > 0) { const m = r.amm, g0 = Math.sqrt(+m.amount / 1e6 * +m.amount2.value) / +m.lp_token.value, g1 = Math.sqrt(XAMM.x * XAMM.u) / XAMM.lp; XAMM.apr = Math.max(0, g1 / g0 - 1) * 365 / 7; }
+      else XAMM.apr = null;
+    } catch (e) { XAMM.apr = null; }
+    XAMM.aprAt = Date.now();
+  }
+  return XAMM;
+}
+const xrLpOf = (d) => { const l = d && d.lines && XAMM.lpi ? d.lines.find((x) => x.account === XAMM.lpi && x.currency === XAMM.lpc) : null; return l ? +l.balance : 0; };
+const xrRl = (d) => { const l = d && d.lines ? d.lines.find((x) => xrIsUsd(x) && xrCur(x.currency) === 'RLUSD') : null; return l ? Math.max(0, +l.balance) : null; };
+const pctY = (v) => (v == null ? '–' : (v * 100 < 0.1 && v > 0 ? '<0.1' : (v * 100).toFixed(v * 100 < 10 ? 1 : 0)) + '%');
+
+async function drawEarn() {
+  const L = OWN(), XL = xrList().filter((w) => w.own);
+  if (L.length && !L.some((o) => o.addr === earnAddr)) earnAddr = L.some((o) => o.addr === homeAddr) ? homeAddr : firstWallet();
+  if (XL.length && !XL.some((w) => w.addr === earnXr)) earnXr = XL[0].addr;
+  $('#eWal').innerHTML = L.map((o) => `<option value="${o.addr}">${esc(o.name)} · ${short(o.addr)}</option>`).join(''); if (earnAddr) $('#eWal').value = earnAddr;
+  $('#eWalW').style.display = L.length > 1 ? '' : 'none';
+  const P = earnPools();
+  const paint = () => {
+    if (cur !== 'earn') return;
+    const a = earnAddr ? ACC[earnAddr] : null;
+    let h = P.map((p) => {
+      const c = POOLC[p.id] || {}, b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === p.id), sh = b ? +b.balance : 0;
+      const mine = sh > 0 && c.shares > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fx(sh / c.shares * c.tvl)}</b></span><span class="mu mono">${m2(sh / c.shares * c.res[p.a])} ${esc(kName(p.a))} + ${m2(sh / c.shares * c.res[p.b])} ${esc(kName(p.b))}</span></div>` : '';
+      return earnCard(p.name, 'Stellar pool', c, mine, !c.at ? 'Loading…' : c.none ? 'No one has opened this pool yet.' : '', EARN_RISK[p.risk],
+        `<button class="b-light" data-act="earnAdd" data-pid="${p.id}"${!a || c.none || !c.at ? ' disabled' : ''}>Add</button><button class="b-out" data-act="earnOut" data-pid="${p.id}"${sh > 0 ? '' : ' disabled'}>Withdraw</button>`);
+    }).join('');
+    if (!L.length) h = '<div class="card"><span class="mu">Add a Stellar wallet in Accounts to use these pools.</span></div>';
+    const xp = xrPool();
+    if (xp) {
+      const d = earnXr ? XRA[earnXr] : null, lp = xrLpOf(d);
+      const mine = lp > 0 && XAMM.lp > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fx(lp / XAMM.lp * XAMM.tvl)}</b></span><span class="mu mono">${m2(lp / XAMM.lp * XAMM.x)} XRP + ${m2(lp / XAMM.lp * XAMM.u)} RLUSD</span></div>` : '';
+      h += earnCard(xp.name, 'XRP Ledger pool', XAMM, mine, !XL.length ? 'Add an XRP wallet in Accounts to use this pool.' : !XAMM.at ? 'Loading…' : XAMM.none ? 'No one has opened this pool yet.' : '', EARN_RISK.vol,
+        `<button class="b-light" data-act="xrEarnAdd"${!XL.length || XAMM.none || !XAMM.at || !d || !d.a ? ' disabled' : ''}>Add</button><button class="b-out" data-act="xrEarnOut"${lp > 0 ? '' : ' disabled'}>Withdraw</button>`);
+    }
+    $('#eList').innerHTML = h;
+  };
+  paint(); tPendPaint();
+  const jobs = [...P.map((p) => poolLoad(p).then(paint).catch(() => null))];
+  if (earnAddr) jobs.push(refreshAcct(earnAddr).then(paint).catch(() => null));
+  if (xrPool()) jobs.push(xrAmmLoad().then(paint).catch(() => null), ...(earnXr ? [xrLoad(earnXr).then(paint).catch(() => null)] : []));
+  await Promise.all(jobs); paint();
+}
+function earnCard(name, where, c, mine, note, risk, btns) {
+  const ok = c && c.at && !c.none;
+  return `<div class="card" style="gap:8px"><div class="r"><div><b style="font-size:16px">${esc(name)}</b><div class="mu" style="font-size:12px">${esc(where)}</div></div>
+    <div style="text-align:right"><b class="mono grn" style="font-size:18px">${ok ? pctY(c.apr) : '–'}</b><div class="mu" style="font-size:11.5px">yearly, last 7 days</div></div></div>
+    ${ok ? `<div class="mu" style="font-size:12.5px">Pool size <span class="mono">$${fx(c.tvl)}</span> · traders pay ${(c.fee * 100).toFixed(2)}% to the pool</div>` : ''}
+    ${note ? `<div class="mu" style="font-size:13px">${esc(note)}</div>` : ''}${mine}
+    <div class="mu" style="font-size:12px">${esc(risk)}</div><div class="g2">${btns}</div></div>`;
+}
+/* Add: type the dollar side, the other side follows the pool's price */
+function earnAddSheet(pid) {
+  const p = earnPools().find((x) => x.id === pid), c = POOLC[pid], a = ACC[earnAddr]; if (!p || !c || !a) return;
+  const has = (k) => k === 'XLM' || a.balances.some((b) => akey(b) === k);
+  if (!has(p.a)) return sheet(`<h2>Add to ${esc(p.name)}</h2><div class="note">This pool takes ${esc(kName(p.a))} and ${esc(kName(p.b))} in equal value. This wallet doesn't hold ${esc(kName(p.a))} yet: swap some ${esc(kName(p.b))} into it first.</div><button class="b-light big" data-act="earnSwap">Go to Swap</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  const isNew = !a.balances.some((b) => b.asset_type === 'liquidity_pool_shares' && b.liquidity_pool_id === pid);
+  const avA = Math.max(0, swapAvail(a, p.a) - (p.a === 'XLM' && isNew ? 0.5 : 0)), avB = swapAvail(a, p.b);
+  EARN_ADD = { p, isNew, avA, avB, max: Math.max(0, Math.min(avB, avA * c.px) * 0.999) };
+  pending = null;
+  sheet(`<h2>Add to ${esc(p.name)}</h2><div class="mu" style="font-size:13px">Equal value of each side. ${esc(kName(p.a))} is added to match the ${esc(kName(p.b))} you enter.</div>
+    <div class="card" style="gap:8px"><div class="r"><span class="mu" style="font-size:13px">${esc(kName(p.b))} to add</span><button class="b-out sm" data-act="earnMax" style="width:auto;min-height:30px;padding:0 12px;font-size:12.5px">Max</button></div>
+    <input id="eAmt" type="number" inputmode="decimal" placeholder="0.00" min="0" step="any"><div class="mu" id="eEst" style="font-size:13px"></div></div>
+    ${isNew ? `<div class="mu" style="font-size:12px">First time in this pool: 0.5 XLM is set aside while you're in it. It comes back when you withdraw everything.</div>` : ''}
+    <button class="b-light big" data-act="earnAddGo" id="eGo" disabled>Review</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  $('#eAmt').addEventListener('input', earnEst); earnEst();
+}
+function earnEst() {
+  const E = EARN_ADD, c = POOLC[E.p.id], u = +$('#eAmt').value, o = c.px > 0 ? u / c.px : 0;
+  let msg = `Available: ${m2(E.avB)} ${esc(kName(E.p.b))} · ${m2(E.avA)} ${esc(kName(E.p.a))}`, ok = u > 0;
+  if (u > 0) { msg = `+ ${m2(o)} ${esc(kName(E.p.a))} · about $${fx(2 * u)} in all`; if (u > E.avB + 1e-7) { ok = false; msg += `<br><span class="amb">Only ${m2(E.avB)} ${esc(kName(E.p.b))} available.</span>`; } else if (o > E.avA + 1e-7) { ok = false; msg += `<br><span class="amb">Needs ${m2(o)} ${esc(kName(E.p.a))}; this wallet has ${m2(E.avA)} available.</span>`; } }
+  $('#eEst').innerHTML = msg; $('#eGo').disabled = !ok;
+}
+function earnAddGo() {
+  const E = EARN_ADD, p = E.p, c = POOLC[p.id], u = +$('#eAmt').value, o = u / c.px, addr = earnAddr;
+  const amt = { [p.a]: o, [p.b]: u }, ratio = c.res[p.x] / c.res[p.y];
+  const ops = [];
+  if (E.isNew) ops.push(SDK.Operation.changeTrust({ asset: poolAsset(p) }));
+  ops.push(SDK.Operation.liquidityPoolDeposit({ liquidityPoolId: p.id, maxAmountA: amt7(amt[p.x]), maxAmountB: amt7(amt[p.y]), minPrice: (ratio * (1 - EARN_SLIP)).toFixed(7), maxPrice: (ratio * (1 + EARN_SLIP)).toFixed(7) }));
+  const nm = (OWN().find((x) => x.addr === addr) || {}).name || 'wallet';
+  confirmSheet(`Add to ${p.name}`, `${netPre()}${esc(nm)} · Stellar pool`, [
+    { t: `Add ${m2(o)} ${kName(p.a)} + ${m2(u)} ${kName(p.b)}`, hl: true, s: `about $${fx(2 * u)} · you get pool shares, kept in your wallet` },
+    { t: 'Price protection', s: `if the pool price moves more than ${EARN_SLIP * 100}% before it lands, nothing is added` },
+    ...(E.isNew ? [{ t: 'Join the pool', s: 'adds the pool to this wallet · 0.5 XLM reserve, back when you leave' }] : []),
+  ], 'Add', async () => {
+    const pnd = tPend(`Add ${m2(o)} ${kName(p.a)} + ${m2(u)} ${kName(p.b)}`, 'earn', addr);
+    try { const tx = await buildTx(addr, ops); tx.sign(kpFor(addr)); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(tx);
+      pnd.label = `Added to ${p.name} · $${fx(2 * u)}`; c.at = 0; tPendSet(pnd, '✓ Added', 'grn', `ledger ${r.ledger}`, true);
+    } catch (e) { tPendSet(pnd, 'Failed', 'red', niceErr(e) + ' Nothing was added.', true); }
+  }, false, 'b-acc', 'Adding…', true);
+}
+function earnOutSheet(pid) {
+  const p = earnPools().find((x) => x.id === pid), c = POOLC[pid], a = ACC[earnAddr]; if (!p || !c || !a) return;
+  const b = a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === pid); if (!b || !(+b.balance > 0)) return toast('Nothing in this pool.');
+  pending = null;
+  sheet(`<h2>Withdraw from ${esc(p.name)}</h2><div class="mu" style="font-size:13px">You have about $${fx(+b.balance / c.shares * c.tvl)} in this pool. You get both coins back at today's pool price.</div>
+    <div class="g3">${[25, 50, 100].map((v) => `<button class="b-out" data-act="earnOutGo" data-pid="${pid}" data-epct="${v}">${v === 100 ? 'All' : v + '%'}</button>`).join('')}</div><button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+function earnOutGo(pid, pct) {
+  const p = earnPools().find((x) => x.id === pid), c = POOLC[pid], addr = earnAddr, a = ACC[addr];
+  const b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === pid); if (!p || !c || !b) return;
+  const all = pct >= 100, sh = all ? +b.balance : +b.balance * pct / 100, f = sh / c.shares;
+  const gx = f * c.res[p.x], gy = f * c.res[p.y], ga = p.a === p.x ? gx : gy, gb = p.a === p.x ? gy : gx;
+  const ops = [SDK.Operation.liquidityPoolWithdraw({ liquidityPoolId: p.id, amount: all ? b.balance : amt7(sh), minAmountA: amt7(gx * (1 - EARN_SLIP)), minAmountB: amt7(gy * (1 - EARN_SLIP)) })];
+  if (all) ops.push(SDK.Operation.changeTrust({ asset: poolAsset(p), limit: '0' }));
+  const nm = (OWN().find((x) => x.addr === addr) || {}).name || 'wallet';
+  confirmSheet(`Withdraw ${all ? 'all' : pct + '%'} from ${p.name}`, `${netPre()}${esc(nm)} · Stellar pool`, [
+    { t: `Get about ${m2(ga)} ${kName(p.a)} + ${m2(gb)} ${kName(p.b)}`, hl: true, s: `about $${fx(f * c.tvl)}` },
+    { t: 'Price protection', s: `at least ${100 - EARN_SLIP * 100}% of that, or nothing happens` },
+    ...(all ? [{ t: 'Leave the pool', s: 'takes the pool off this wallet · 0.5 XLM reserve back' }] : []),
+  ], 'Withdraw', async () => {
+    const pnd = tPend(`Withdraw ${all ? 'all' : pct + '%'} from ${p.name}`, 'earn', addr);
+    try { const tx = await buildTx(addr, ops); tx.sign(kpFor(addr)); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(tx);
+      pnd.label = `Withdrew ${m2(ga)} ${kName(p.a)} + ${m2(gb)} ${kName(p.b)}`; c.at = 0; tPendSet(pnd, '✓ Withdrawn', 'grn', `ledger ${r.ledger}`, true);
+    } catch (e) { tPendSet(pnd, 'Failed', 'red', niceErr(e) + ' Nothing was withdrawn.', true); }
+  }, false, 'b-acc', 'Withdrawing…', true);
+}
+/* XRP / RLUSD: same idea with the XRP Ledger's AMMDeposit / AMMWithdraw */
+function xrEarnAddSheet() {
+  const o = xrOwn(earnXr), d = XRA[earnXr], xp = xrPool(); if (!o || !d || !d.a || !xp || XAMM.none) return;
+  const rl = xrRl(d);
+  if (rl == null) return sheet(`<h2>Add to XRP / RLUSD</h2><div class="note">This pool takes XRP and RLUSD in equal value. This wallet doesn't hold RLUSD yet: add RLUSD on its XRP page and trade some XRP into it first.</div><button class="b-out" data-act="closeSheet">OK</button>`);
+  const isNew = !(xrLpOf(d) > 0), sv = XRSV || { inc: 0.2 };
+  const avA = Math.max(0, xrSpend(d) - (isNew ? sv.inc : 0) - 0.01), avB = rl;
+  EARN_ADD = { xr: true, isNew, avA, avB, max: Math.max(0, Math.min(avB, avA * XAMM.px) * 0.999) };
+  pending = null;
+  sheet(`<h2>Add to XRP / RLUSD</h2><div class="mu" style="font-size:13px">Equal value of each side. XRP is added to match the RLUSD you enter.</div>
+    <div class="card" style="gap:8px"><div class="r"><span class="mu" style="font-size:13px">RLUSD to add</span><button class="b-out sm" data-act="earnMax" style="width:auto;min-height:30px;padding:0 12px;font-size:12.5px">Max</button></div>
+    <input id="eAmt" type="number" inputmode="decimal" placeholder="0.00" min="0" step="any"><div class="mu" id="eEst" style="font-size:13px"></div></div>
+    ${isNew ? `<div class="mu" style="font-size:12px">First time in this pool: ${m2(sv.inc)} XRP is set aside (the ledger's reserve) while you're in it.</div>` : ''}
+    <button class="b-light big" data-act="xrEarnAddGo" id="eGo" disabled>Review</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  $('#eAmt').addEventListener('input', xrEarnEst); xrEarnEst();
+}
+function xrEarnEst() {
+  const E = EARN_ADD, u = +$('#eAmt').value, x = XAMM.px > 0 ? u / XAMM.px : 0;
+  let msg = `Available: ${m2(E.avB)} RLUSD · ${m2(E.avA)} XRP`, ok = u > 0;
+  if (u > 0) { msg = `+ ${m2(x)} XRP · about $${fx(2 * u)} in all`; if (u > E.avB + 1e-9) { ok = false; msg += `<br><span class="amb">Only ${m2(E.avB)} RLUSD available.</span>`; } else if (x > E.avA + 1e-9) { ok = false; msg += `<br><span class="amb">Needs ${m2(x)} XRP; this wallet has ${m2(E.avA)} available.</span>`; } }
+  $('#eEst').innerHTML = msg; $('#eGo').disabled = !ok;
+}
+async function xrEarnAddGo() {
+  const o = xrOwn(earnXr), xp = xrPool(), u = +$('#eAmt').value, x = u / XAMM.px, E = EARN_ADD;
+  const tx = { TransactionType: 'AMMDeposit', Asset: xp.a1, Asset2: xp.a2, Amount: String(Math.floor(x * 1e6)), Amount2: { ...xp.a2, value: String(+u.toFixed(6)) }, Flags: 0x00100000 };   // tfTwoAsset: both sides at the pool's ratio, never more than these
+  confirmSheet('Add to XRP / RLUSD', `XRP Ledger pool · ${esc(o.name)}`, [
+    { t: `Add ${m2(x)} XRP + ${m2(u)} RLUSD`, hl: true, s: `about $${fx(2 * u)} · you get pool tokens, kept in your wallet` },
+    { t: 'Price protection', s: 'both sides go in at the pool\'s own ratio: never more than these amounts' },
+    ...(E.isNew ? [{ t: 'Join the pool', s: 'adds the pool token to this wallet (reserve)' }] : []),
+  ], 'Add', async () => {
+    const pnd = tPend(`Add ${m2(x)} XRP + ${m2(u)} RLUSD`, 'earn', o.w.classicAddress);
+    try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, tx, drops);
+      if (r.state === 'ok') { pnd.label = `Added to XRP / RLUSD · $${fx(2 * u)}`; XAMM.at = 0; tPendSet(pnd, '✓ Added', 'grn', `ledger ${r.ledger || ''}`, true); }
+      else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet. Check this pool again in a minute before trying again.' : xrErr(r.code) + ' Nothing was added.', true);
+    } catch (e) { tPendSet(pnd, 'Failed', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was added.', true); }
+  }, false, 'b-acc', 'Adding…', true);
+}
+function xrEarnOutSheet() {
+  const d = XRA[earnXr], lp = xrLpOf(d); if (!(lp > 0)) return toast('Nothing in this pool.');
+  pending = null;
+  sheet(`<h2>Withdraw from XRP / RLUSD</h2><div class="mu" style="font-size:13px">You have about $${fx(lp / XAMM.lp * XAMM.tvl)} in this pool. You get both coins back at today's pool price.</div>
+    <div class="g3">${[25, 50, 100].map((v) => `<button class="b-out" data-act="xrEarnOutGo" data-epct="${v}">${v === 100 ? 'All' : v + '%'}</button>`).join('')}</div><button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+function xrEarnOutGo(pct) {
+  const o = xrOwn(earnXr), xp = xrPool(), d = XRA[earnXr], lp = xrLpOf(d); if (!o || !(lp > 0)) return;
+  const all = pct >= 100, f = (all ? lp : lp * pct / 100) / XAMM.lp, gx = f * XAMM.x, gu = f * XAMM.u;
+  const tx = all ? { TransactionType: 'AMMWithdraw', Asset: xp.a1, Asset2: xp.a2, Flags: 0x00020000 }   // tfWithdrawAll
+    : { TransactionType: 'AMMWithdraw', Asset: xp.a1, Asset2: xp.a2, LPTokenIn: { currency: XAMM.lpc, issuer: XAMM.lpi, value: String(+(lp * pct / 100).toPrecision(15)) }, Flags: 0x00010000 };   // tfLPToken: both sides, in proportion
+  confirmSheet(`Withdraw ${all ? 'all' : pct + '%'} from XRP / RLUSD`, `XRP Ledger pool · ${esc(o.name)}`, [
+    { t: `Get about ${m2(gx)} XRP + ${m2(gu)} RLUSD`, hl: true, s: `about $${fx(f * XAMM.tvl)}` },
+  ], 'Withdraw', async () => {
+    const pnd = tPend(`Withdraw ${all ? 'all' : pct + '%'} from XRP / RLUSD`, 'earn', o.w.classicAddress);
+    try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, tx, drops);
+      if (r.state === 'ok') { pnd.label = `Withdrew ${m2(gx)} XRP + ${m2(gu)} RLUSD`; XAMM.at = 0; tPendSet(pnd, '✓ Withdrawn', 'grn', `ledger ${r.ledger || ''}`, true); }
+      else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet. Check this pool again in a minute before trying again.' : xrErr(r.code) + ' Nothing was withdrawn.', true);
+    } catch (e) { tPendSet(pnd, 'Failed', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was withdrawn.', true); }
+  }, false, 'b-acc', 'Withdrawing…', true);
+}
+
 /* ---------- typing a secret key or recovery phrase ----------
    Stellar secret keys are capital letters and digits 2–7 (S + 55 more), so lower case is turned into capitals.
    Recovery phrase words are matched in lower case, so capitals there are fine either way. */
@@ -14766,7 +15032,7 @@ async function closeWallet() {
   if (!a) return sheet(`<h2>Close ${esc(w.name)}</h2><div class="note">This wallet isn't open on Stellar, so there's nothing to move. To take it off this phone, use "Remove this wallet from the phone".</div><button class="b-out" data-act="closeSheet">OK</button>`);
   const block = [];
   if (+a.num_sponsoring > 0) block.push('It pays the reserve for another account or entry (sponsoring). End that first.');
-  if (a.balances.some((b) => b.asset_type === 'liquidity_pool_shares')) block.push('It is set up for a liquidity pool. Withdraw your shares and remove the pool from the wallet first (in the app where you added it).');
+  if (a.balances.some((b) => b.asset_type === 'liquidity_pool_shares')) block.push('It is in a liquidity pool. Earn → Withdraw → All first.');
   if (S.stopUrl) { try { const L = await stopList(addr); if (L.some((x) => stopLive(x))) block.push('It has stop orders on your stop server. Cancel them first (Open orders → Cancel all).'); } catch (e) {} }
   for (const [h, r] of Object.entries(hlpReg())) if (r.w === addr) { try { if (await acct(h)) { block.push('One of its stop helpers still holds 1.01 XLM. Settings → Stop orders → Return helper XLM first.'); break; } } catch (e) {} }
   if (block.length) return sheet(`<h2>Close ${esc(w.name)}</h2><div class="note amb">${block.map(esc).join('<br>')}</div><button class="b-out" data-act="closeSheet">OK</button>`);
@@ -15120,7 +15386,7 @@ function balUsd(b) {   // null = not priced yet
   return b.asset_code === 'EURC' ? +b.balance * 1.17 : null;
 }
 async function priceAssets(a) {
-  if (!a) return false; const u = NS().usdc; let changed = false;
+  if (!a) return false; const u = NS().usdc; let changed = await poolsPrice(a).catch(() => false);
   await Promise.all(a.balances.filter((b) => b.asset_type !== 'native' && b.asset_type !== 'liquidity_pool_shares' && stableUsd(b) == null && !isNFT(b) && +b.balance > 0).map(async (b) => {
     const k = akey(b), o = AV[k]; if (o && Date.now() - o.at < 60000 && o.amt === +b.balance) return;
     try {
@@ -15153,7 +15419,7 @@ function balRows(a) {
 }
 function usdVal(a) {
   if (!a) return 0; let t = 0;
-  for (const b of a.balances) { if (b.asset_type === 'liquidity_pool_shares') continue; const v = balUsd(b); if (v) t += v; }
+  for (const b of a.balances) { const v = b.asset_type === 'liquidity_pool_shares' ? poolUsd(b) : balUsd(b); if (v) t += v; }
   return t;
 }
 let homeAddr = null, rcvWant = null;
@@ -16150,26 +16416,27 @@ function tPend(label, scr = 'trade', addr = tradeAddr) {
   if (scr === 'swap') { if ($('#wAmt')) $('#wAmt').value = ''; if (typeof SWP !== 'undefined') SWP.q = null; }
   else if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false; if ($('#tDays')) $('#tDays').value = '1';   // stops default to 1 day
     T.mode = 'mkt'; T.side = 'buy';   // back to the normal order entry (Market · Buy), so it doesn't look like the order is still being entered
-    if (cur === 'trade') drawTrade(); } else if ($('#sAmt')) $('#sAmt').value = '';
-  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : scr === 'swap' ? '#wPend' : '#tPend'); if (el && el.firstElementChild && cur === scr) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (cur === 'trade') drawTrade(); } else if (scr === 'send' && $('#sAmt')) $('#sAmt').value = '';
+  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : scr === 'swap' ? '#wPend' : scr === 'earn' ? '#ePend' : '#tPend'); if (el && el.firstElementChild && cur === scr) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
   return p;
 }
 function tPendSet(p, st, cls, sub, done) {
   Object.assign(p, { st, cls: cls || '', busy: done ? 0 : 1 }); if (sub != null) p.sub = sub; if (done) p.t2 = Date.now();
   tPendPaint();
   if (done && cur === 'trade' && p.scr === 'trade') tradeLoadMine();
+  if (done && p.scr === 'earn' && cur === 'earn') drawEarn();
   if (done && (p.scr === 'send' || p.scr === 'swap') && !p.cls.includes('red')) refreshAcct(p.addr).then(() => { if (p.scr === 'swap' && cur === 'swap') drawSwap(); }).catch(() => {});
 }
 function tPendPaint() {
   const el = $('#tPend'); if (!el) return; const now = Date.now();
   for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : p.scr === 'trade' ? 20000 : 180000)) TPEND.splice(i, 1); }   // Trade has its history list below; Send / Swap keep the result 3 min   // done ones fade into the normal history below
   const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
-  for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
+  for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend'], ['earn', '#ePend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
   const L = TPEND.filter((p) => p.scr === 'trade' && p.addr === tradeAddr);
   el.style.display = L.length ? 'flex' : 'none';
   el.innerHTML = L.map((p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
 }
-setInterval(() => { if ((cur === 'trade' || cur === 'send' || cur === 'swap') && TPEND.length) tPendPaint(); }, 5000);
+setInterval(() => { if ((cur === 'trade' || cur === 'send' || cur === 'swap' || cur === 'earn') && TPEND.length) tPendPaint(); }, 5000);
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   if (back === 'trade') {   // market order: no Sending… screen, no result screen
     const p = tPend((what || okTitle).replace(/^Bought /, 'Buy ').replace(/^Sold /, 'Sell ').replace(/ · fee .*$/, ''));
@@ -17029,6 +17296,11 @@ document.addEventListener('click', async (e) => {
     swapMax: () => { const k = $('#wFrom').value, v = swapAvail(ACC[homeAddr], k); $('#wAmt').value = v > 0 ? amt7(v).replace(/\.?0+$/, '') : ''; swapQuote(); },
     swapFlip: () => { const f = $('#wFrom').value, t2 = $('#wTo').value; if (![...$('#wFrom').options].some((o) => o.value === t2)) return toast(`This wallet doesn't hold ${kName(t2)} yet.`); $('#wFrom').value = t2; $('#wTo').value = f; $('#wAmt').value = ''; swapQuote(); },
     swapReview: () => swapReview(),
+    earnRefresh: () => { for (const k of Object.keys(POOLC)) delete POOLC[k]; XAMM.at = 0; drawEarn(); },
+    earnAdd: () => earnAddSheet(t.dataset.pid), earnOut: () => earnOutSheet(t.dataset.pid), earnOutGo: () => earnOutGo(t.dataset.pid, +t.dataset.epct),
+    earnMax: () => { const v = EARN_ADD ? EARN_ADD.max : 0; $('#eAmt').value = v > 0 ? (+v.toFixed(6)).toString() : ''; (EARN_ADD && EARN_ADD.xr ? xrEarnEst : earnEst)(); },
+    earnAddGo: () => earnAddGo(), earnSwap: () => { closeSheet(); homeAddr = earnAddr; go('swap'); },
+    xrEarnAdd: () => xrEarnAddSheet(), xrEarnAddGo: () => xrEarnAddGo(), xrEarnOut: () => xrEarnOutSheet(), xrEarnOutGo: () => xrEarnOutGo(+t.dataset.epct),
     accTrade: () => {
       const L = OWN(); if (!L.length) return toast('Add a wallet first.');
       if (L.length === 1) { homeAddr = L[0].addr; return go('trade'); }
@@ -17194,6 +17466,7 @@ $('#tAmt').addEventListener('input', tradeEst); $('#tPx').addEventListener('inpu
 $('#tStop').addEventListener('input', () => { T.stopTyped = !!$('#tStop').value; stopDefaults(); tradeEst(); }); $('#tLim').addEventListener('input', () => { stopDefaults(); tradeEst(); }); $('#tFeed').addEventListener('change', tradeEst);
 $('#sTo').addEventListener('change', sendToChanged); $('#sFrom').addEventListener('change', sendAssets);
 $('#rAcct').addEventListener('change', drawReceive);
+$('#eWal').addEventListener('change', () => { earnAddr = $('#eWal').value; drawEarn(); });
 $('#wAmt').addEventListener('input', swapQuote); $('#wFrom').addEventListener('change', () => { if ($('#wFrom').value === $('#wTo').value) { const o = [...$('#wTo').options].find((x) => x.value !== $('#wFrom').value); if (o) $('#wTo').value = o.value; } swapQuote(); }); $('#wTo').addEventListener('change', swapQuote);
 $('#wWal').addEventListener('change', () => { homeAddr = $('#wWal').value; $('#wAmt').value = ''; drawSwap(); });
 $('#setBio').addEventListener('change', async (e) => {
