@@ -157,6 +157,7 @@ details.more>div{display:flex;flex-direction:column;gap:14px;padding-top:14px}
 .orow .ow{display:flex;justify-content:space-between;font-size:13px;padding:6px 0 6px 17px;color:var(--mu)}.orow[open] summary{padding-bottom:6px}.orow .owl{padding-bottom:10px}
 #oPer::-webkit-scrollbar{display:none}
 .scanrow{display:flex;gap:8px;align-items:stretch}.scanrow input{flex:1;min-width:0}.scanrow button{flex:none;width:auto;padding:0 14px;display:flex;align-items:center;gap:6px;font-size:14px}
+.scanov{position:fixed;left:0;right:0;top:0;z-index:20;margin:0 auto;max-width:480px;background:var(--bg);padding:calc(12px + env(safe-area-inset-top)) 16px 14px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--bd2);box-shadow:0 10px 30px rgba(0,0,0,.6)}   /* the camera sits at the top of the screen while scanning */
 .qrbox{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1;max-height:320px}.qrbox video{width:100%;height:100%;object-fit:cover;display:block}.qrbox i{position:absolute;inset:16%;border:2px solid rgba(255,255,255,.85);border-radius:12px}
 .swrow input::-webkit-inner-spin-button,.swrow input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.swrow input{-moz-appearance:textfield}
 .swrow{display:flex;gap:10px;align-items:center}.swrow input{flex:1;min-width:0;font-size:22px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600}.swrow select{flex:0 1 auto;width:auto;min-width:104px;max-width:42%;font-weight:600;text-overflow:ellipsis}.swrow #wOut{flex:1 0 auto!important;min-width:5ch!important}
@@ -13148,6 +13149,9 @@ const DEFAULT_BOTS = {
 };
 
 /* ---------- storage ---------- */
+// Liquidfi's own stop / buy server. Empty until the public server is up (Vultr, e.g. 'https://stops.liquidfi.com');
+// once set, every phone uses it with nothing to type. Settings → Stop orders can still point to your own server.
+const DEFAULT_STOP_URL = '';
 const SKEY = 'ksw1';
 let S;
 function loadS() {
@@ -13163,6 +13167,7 @@ function loadS() {
     if (!N.extraKnown) N.extraKnown = [];
     if (!N.hz) N.hz = { mode: 'sdf', url: '' };
   }
+  if (!S.stopUrl && DEFAULT_STOP_URL) S.stopUrl = DEFAULT_STOP_URL;   // the built-in server: nothing to set up
 }
 function saveS() { try { localStorage.setItem(SKEY, JSON.stringify(S)); return true; } catch (e) { toast('This browser will not save data here. Open the page another way (see notes).'); return false; } }
 const NET = () => NETS[S.net], NS = () => S.nets[S.net];
@@ -13314,6 +13319,7 @@ function niceErr(e) {
   const rc = e.j && e.j.extras && e.j.extras.result_codes;
   if (rc) { const all = [rc.transaction, ...(rc.operations || [])].filter((c) => c && c !== 'op_success' && c !== 'tx_failed'); return all.map((c) => CODES[c] || c).join(' ') || 'Stellar refused it.'; }
   const m = e.message || String(e);
+  if (/stop server is private/i.test(m)) return 'This wallet isn\'t on your stop server\'s allowed list yet. Add its address to allowed-wallets.txt and run set-allowlist.sh on the watcher box.';
   return /Failed to fetch|NetworkError|Load failed/i.test(m) ? "Can't reach Stellar right now. Check your connection and try again." : m;
 }
 async function submit(tx) {
@@ -13769,7 +13775,7 @@ async function qrFromImageFile(f) {
 async function scanInline(box, onAddr, parse = parseAddrQR, what = 'a Stellar address (G…)') {
   if (SCAN && SCAN.box === box) return scanStop();   // second tap on Scan closes it
   scanStop();
-  box.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px"><div class="qrbox"><video playsinline muted autoplay></video><i></i></div><div class="mu qrmsg" style="font-size:12.5px">Starting camera…</div><div class="g2"><label class="b-out sm" style="display:flex;align-items:center;justify-content:center;cursor:pointer">From a photo<input type="file" accept="image/*" style="display:none"></label><button class="b-out sm" data-act="scanClose">Close</button></div></div>`;
+  box.innerHTML = `<div class="scanov"><div class="r" style="align-items:center"><b style="font-size:16px">Scan the QR code</b></div><div class="qrbox"><video playsinline muted autoplay></video><i></i></div><div class="mu qrmsg" style="font-size:12.5px">Starting camera…</div><div class="g2"><label class="b-out sm" style="display:flex;align-items:center;justify-content:center;cursor:pointer">From a photo<input type="file" accept="image/*" style="display:none"></label><button class="b-out sm" data-act="scanClose">Close</button></div></div>`;
   const me = SCAN = { box, t: 0, stream: null }, msg = (t) => { const e = box.querySelector('.qrmsg'); if (e) e.textContent = t; };
   const done = (txt) => { const r = parse(txt); if (!r) { msg(`That QR code isn't ${what}.`); return false; } scanStop(); onAddr(r); return true; };
   box.querySelector('input[type=file]').addEventListener('change', async (e) => { const f = e.target.files[0]; if (!f) return; msg('Reading the picture…'); const t = await qrFromImageFile(f).catch(() => null); if (!t) return msg('No QR code found in that picture. Try a closer one.'); done(t); });
@@ -16279,7 +16285,7 @@ function stopEst(q, el) {
     + (fOn ? `<div><span class="mu">Fee ${SWAP_FEE.bps / 100}%</span><span class="mono">${sell ? m2(f) + ' XLM' : m2(f) + ' USDC'}</span></div>` : '');
 }
 async function stopReview(q, a, kp) {
-  if (!S.stopUrl) return toast('Set your stop server first: Settings → Stop orders.');
+  if (!S.stopUrl) return toast('Stops go through your Liquidfi server: add its address once in Settings → Stop orders.', 6000);
   const sell = T.side === 'sell', st = +$('#tStop').value, lim = +$('#tLim').value, feed = $('#tFeed').value, days = +$('#tDays').value, m = mid();
   if (!(st > 0)) return toast('Enter a stop price.'); if (!(lim > 0)) return toast('Enter a limit price.');
   if (sell ? lim > st : lim < st) return toast(`The limit must be ${sell ? 'at or below' : 'at or above'} the stop.`);
@@ -16454,7 +16460,7 @@ async function onrOpts(fresh) {
 const onrFor = (o, chain) => ((o && o.assets) || []).map((a) => ({ ...a, net: a.networks.find((n) => n.chain === chain) })).filter((a) => a.net);
 function onrWhy() {
   if (S.net !== 'public') return 'Coinbase buys are Mainnet only. Switch Settings → Network to Mainnet.';
-  if (!S.stopUrl) return 'Set your stop server first (Settings → Stop orders). It makes the Coinbase session.';
+  if (!S.stopUrl) return 'Buying goes through your Liquidfi server, and this phone doesn\'t have its address yet. Add it once in Settings → Stop orders.';
   return '';
 }
 const onrStat = (b) => b.status === 'CREATED' ? '<span class="mu">opened, not paid yet</span>' : b.status === 'SUCCESS' ? '<span class="grn">sent to your wallet</span>' : b.status === 'FAILED' ? `<span class="red">failed${b.failure === 'SEND_FAILED' ? ': bought but not sent (it stays in your Coinbase account; send it yourself)' : b.failure === 'BUY_FAILED' ? ': not bought' : ''}</span>` : '<span class="amb">in progress</span>';
@@ -16512,7 +16518,7 @@ async function onrHealth() {
 const PROV_NM = { stripe: 'Stripe', coinbase: 'Coinbase' };
 async function onrBuySheet(chain, addr) {
   ONR.chain = chain; ONR.addr = addr; pending = null;
-  const why = onrWhy(); if (why) return sheet(`<h2>Buy</h2><div class="note amb">${esc(why)}</div><button class="b-out" data-act="closeSheet">Close</button>`);
+  const why = onrWhy(); if (why) return sheet(`<h2>Buy</h2><div class="note amb">${esc(why)}</div>${!S.stopUrl && S.net === 'public' ? '<button class="b-light big" data-act="goStopSet">Open Settings → Stop orders</button>' : ''}<button class="b-out" data-act="closeSheet">Close</button>`);
   sheet(`<h2>Buy</h2><div class="mu">Checking what you can buy here…</div><button class="b-out" data-act="closeSheet">Cancel</button>`);
   let h; try { h = await onrHealth(); } catch (e) { return sheet(`<h2>Buy</h2><div class="note amb">${esc(niceErr(e))}</div><button class="b-out" data-act="closeSheet">Close</button>`); }
   const provs = [...(chain === 'stellar' && h.stripe ? ['stripe'] : []), ...(h.onramp ? ['coinbase'] : [])];
@@ -17051,6 +17057,7 @@ document.addEventListener('click', async (e) => {
     onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
     onrAddUsdc: () => onrAddUsdc(t),
     helperRecover: () => helperRecover(),
+    goStopSet: () => { closeSheet(); go('set'); setTimeout(() => { const i = $('#setStopUrl'); if (i) { i.scrollIntoView({ block: 'center', behavior: 'smooth' }); i.focus(); } }, 300); },
     tPendX: () => { const i = TPEND.findIndex((p) => p.id === +t.dataset.i); if (i >= 0) TPEND.splice(i, 1); tPendPaint(); },
     onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; ONR.usd = +(($('#onrAmt') || {}).value) || ONR.usd; onrBuySheet(ONR.chain, ONR.addr); },
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
