@@ -391,7 +391,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="mu" id="xtHave" style="font-size:12px"></div>
   <label id="xtPxW" style="display:none">Limit price (RLUSD per XRP)<input id="xtPx" inputmode="decimal"></label>
   <div class="card rows" id="xtEst" style="padding:4px 14px;font-size:14px"></div>
-  <button class="b-grn big" data-act="xtReview" id="xtGo">Review buy</button>
+  <button class="b-grn big" data-act="xtReview" id="xtGo">Buy</button>
   <div class="mu" style="font-size:12px">If a bot (like XRP Sweepr) trades from this wallet, pause it first so the two don't clash.</div>
   <span class="lbl">Open orders</span>
   <div id="xtOpen" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -426,7 +426,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   </div>
   <label id="tPxW" style="display:none"><span id="tPxL">Limit price (USDC per XLM)</span><input id="tPx" inputmode="decimal"></label>
   <div class="card rows" id="tEst" style="padding:4px 14px;font-size:14px"></div>
-  <button class="b-grn big" data-act="tradeReview" id="tGo">Review buy</button>
+  <button class="b-grn big" data-act="tradeReview" id="tGo">Buy</button>
   <span class="lbl">Open orders</span>
   <div id="tOpen" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl">Activity</span>
@@ -14214,7 +14214,7 @@ async function drawXTrade() {
   $$('#xtSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.side));
   $$('#xtMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.mode));
   $('#xtPxW').style.display = XT.mode === 'lim' ? '' : 'none';
-  const g = $('#xtGo'); g.textContent = 'Review ' + XT.side; g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
+  const g = $('#xtGo'); g.textContent = XT.side === 'buy' ? 'Buy' : 'Sell'; g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
   xtPaint(); xtEst();
   XT.fails = 0;
   xtPaintSales();
@@ -15226,8 +15226,13 @@ async function homeRecent(addr) {
     const g = G.get(k) || { opId, t: e.created_at, sold: 0, bought: 0, sa: effAsset(e.sold_asset_type, e.sold_asset_code), ba: effAsset(e.bought_asset_type, e.bought_asset_code), mine: ops.some((o) => o.id === opId) };
     g.sold += +e.sold_amount; g.bought += +e.bought_amount; G.set(k, g);
   }
-  const isDust = (o) => o.type === 'payment' && o.to === addr && !!lookAlike(o.from);   // scam look-alike dust: not shown at all (it only clutters the list)
-  const rows = [...ops.filter((o) => !isDust(o)).map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
+  const isDust = (o) => o.type === 'payment' && o.to === addr && !!lookAlike(o.from);
+  const fw = SWAP_FEE.to[S.net], isFee = (o) => fw && o.to === fw && o.from === addr && /^(payment|path_payment)/.test(o.type);
+  const feeTx = new Set();   // transactions whose fee folds into their trade line
+  for (const o of all.filter(isFee)) if (all.some((x) => x.transaction_hash === o.transaction_hash && !isFee(x))) {
+    feeTx.add(o.id); const an = (t, c) => (t === 'native' ? 'XLM' : c);
+    FEEOF[o.transaction_hash] = o.type === 'payment' ? `${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}` : `${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; }   // scam look-alike dust: not shown at all (it only clutters the list)
+  const rows = [...ops.filter((o) => !isDust(o) && !feeTx.has(o.id)).map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
   const was = new Set([...document.querySelectorAll('#hRec details[open]')].map((d) => d.dataset.tx || d.dataset.op));   // rows you opened stay open
   $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}>${esc(opText(r.o, addr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
     : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
@@ -15377,6 +15382,7 @@ async function mergeAmts(root, me) {
   await Promise.all(ids.map(async (id) => { try { const j = await H(`/operations/${id}/effects`); const c = (j._embedded.records || []).find((e) => e.type === 'account_credited'); if (c) MERGEAMT[id] = +c.amount; } catch (e) {} }));
   root.querySelectorAll('[data-mop]').forEach((e) => { const v = MERGEAMT[e.dataset.mop]; if (v == null) return; e.textContent = amtFmt(v) + ' XLM'; const sm = e.closest('details') && e.closest('details').querySelector('summary span'); if (sm) sm.textContent = sm.textContent.replace('all its XLM', fx(v) + ' XLM'); });
 }
+const FEEOF = {};   // tx hash → the Liquidfi fee paid in it (shown in that trade's details)
 function opDetail(o, me) {
   const an = (t, c, i) => (t === 'native' ? 'XLM' : c + (i ? ` <span class="mu">· ${short(i)}</span>` : '')), row = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
   const ad = (a) => (a === me ? 'this wallet' : `<span title="${esc(a)}">${esc(short(a))}</span>`), L = [];
@@ -15394,6 +15400,7 @@ function opDetail(o, me) {
     case 'account_merge': L.push(row('XLM moved', `<span class="mamt" data-mop="${esc(o.id)}">${MERGEAMT[o.id] != null ? amtFmt(MERGEAMT[o.id]) + ' XLM' : '…'}</span>`), row('From', ad(o.account)), row('To', ad(o.into)), row('What', o.account === me ? 'Wallet closed and deleted from Stellar (reserve included)' : 'Everything left in a closed wallet')); break;
     case 'set_options': if (o.signer_key) L.push(row('Signer', `${esc(short(o.signer_key))} · weight ${o.signer_weight}`)); if (o.med_threshold != null) L.push(row('Thresholds', `${o.low_threshold}/${o.med_threshold}/${o.high_threshold}`)); break;
   }
+  if (FEEOF[o.transaction_hash] && o.to !== SWAP_FEE.to[S.net]) L.push(row(`Liquidfi fee (${SWAP_FEE.bps / 100}%)`, esc(FEEOF[o.transaction_hash])));
   L.push(row('Time', esc(new Date(o.created_at).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))));
   return `<div class="recd">${L.join('')}<div class="recx"></div><div><span></span><a href="${NET().expert}/tx/${esc(o.transaction_hash)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a></div></div>`;
 }
@@ -15953,8 +15960,8 @@ async function drawTrade() {
   $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none'; $('#tStopW').style.display = T.mode === 'stop' ? 'flex' : 'none';
   if (T.mode === 'stop') stopDefaults();
   if (T.replace && (T.mode !== 'stop' || T.side !== T.replace.side || tradeAddr !== T.replace.w)) T.replace = null;   // left the stop being edited
-  { const eb = $('#tEditBar'); if (eb) { eb.style.display = T.replace ? '' : 'none'; eb.innerHTML = T.replace ? `<span><b>Editing your stop ${T.replace.side} ${fx(T.replace.xlm, 2)} XLM at ${p4(T.replace.stop)}.</b> Change anything, then Review replacement: the new stop is placed first, then the old one is cancelled.</span><button class="b-out sm" data-act="stopEditOff" style="margin-top:6px">Don't edit</button>` : ''; } }
-  const g = $('#tGo'); g.textContent = T.replace && T.mode === 'stop' ? 'Review replacement' : 'Review ' + (T.mode === 'stop' ? 'stop ' : '') + T.side; g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
+  { const eb = $('#tEditBar'); if (eb) { eb.style.display = T.replace ? '' : 'none'; eb.innerHTML = T.replace ? `<span><b>Editing your stop ${T.replace.side} ${fx(T.replace.xlm, 2)} XLM at ${p4(T.replace.stop)}.</b> Change anything, then tap Replace stop: the new stop is placed first, then the old one is cancelled.</span><button class="b-out sm" data-act="stopEditOff" style="margin-top:6px">Don't edit</button>` : ''; } }
+  const g = $('#tGo'); g.textContent = T.replace && T.mode === 'stop' ? 'Replace stop' : (T.side === 'buy' ? 'Buy' : 'Sell') + (T.mode === 'stop' ? ' stop' : ''); g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
   drawTradeBook(); tradeEst();
   if (feeTo(tradeAddr)) feeLive(feeTo(tradeAddr)).then(() => { if (cur === 'trade') tradeEst(); }).catch(() => {});
   await tradeLoadMine(); if (cur === 'trade') acctWatch(tradeAddr);   // not after you left (it would replace the wallet page's watch)
@@ -16106,6 +16113,16 @@ function tradeDone(msg) { closeSheet(); toast('✓ ' + msg, 6000); if (cur === '
 /* Orders sent from Trade: the sheet closes on the tap, and the order shows at the top of Activity as it goes:
    Sending → Sent (waiting for the ledger, ~5 s) → Filled / On the book / Stop armed, or Failed with the reason. No result screen. */
 const TPEND = []; let tPendN = 0;
+// what a trade really filled at: the trade operation (to yourself) of that transaction, in trader words
+async function fillPriceOf(hash, me) {
+  if (!hash) return null;
+  for (let i = 0; i < 3; i++) {
+    try { const j = await H(`/transactions/${hash}/operations`); const o = ((j._embedded || {}).records || []).find((x) => /^path_payment/.test(x.type) && x.to === me && x.from === me);
+      if (o) { const an = (t, c) => (t === 'native' ? 'XLM' : c); return fillWords(an(o.source_asset_type, o.source_asset_code), +o.source_amount, an(o.asset_type, o.asset_code), +o.amount); } } catch (e) {}
+    await sleep(1500);
+  }
+  return null;
+}
 function tPend(label, scr = 'trade', addr = tradeAddr) {
   const p = { id: ++tPendN, label, st: 'Sending…', cls: 'mu', busy: 1, addr, scr, t: Date.now() };
   TPEND.unshift(p); TPEND.splice(10); closeSheet();
@@ -16123,19 +16140,21 @@ function tPendSet(p, st, cls, sub, done) {
 }
 function tPendPaint() {
   const el = $('#tPend'); if (!el) return; const now = Date.now();
-  for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : 120000)) TPEND.splice(i, 1); }   // done ones fade into the normal history below
+  for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : 20000)) TPEND.splice(i, 1); }   // done ones fade into the normal history below
   const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
   const es = $('#sPend'); if (es) { const S2 = TPEND.filter((p) => p.scr === 'send'); es.style.display = S2.length ? 'flex' : 'none'; es.innerHTML = S2.map(row).join(''); }
   const L = TPEND.filter((p) => p.scr !== 'send' && p.addr === tradeAddr);
   el.style.display = L.length ? 'flex' : 'none';
   el.innerHTML = L.map((p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
 }
-setInterval(() => { if ((cur === 'trade' || cur === 'send') && TPEND.length) tPendPaint(); }, 15000);
+setInterval(() => { if ((cur === 'trade' || cur === 'send') && TPEND.length) tPendPaint(); }, 5000);
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   if (back === 'trade') {   // market order: no Sending… screen, no result screen
     const p = tPend((what || okTitle).replace(/^Bought /, 'Buy ').replace(/^Sold /, 'Sell ').replace(/ · fee .*$/, ''));
     try { const t = await buildTx(src, ops, memo); t.sign(kp); tPendSet(p, 'Sent', 'mu'); const r = await submit(t);
-      p.label = (what || okTitle).replace(/ · fee .*$/, ''); tPendSet(p, '✓ Filled', 'grn', what && / · fee /.test(what) ? what.replace(/^.* · fee /, 'fee ') + ' · ledger ' + r.ledger : 'ledger ' + r.ledger, true); }
+      p.label = (what || okTitle).replace(/ · fee .*$/, '');
+      tPendSet(p, '✓ Filled', 'grn', what && / · fee /.test(what) ? what.replace(/^.* · fee /, 'fee ') + ' · ledger ' + r.ledger : 'ledger ' + r.ledger, true);
+      fillPriceOf(r.hash, src).then((fp) => { if (fp) { p.label = fp; tPendPaint(); } }); }   // then the real fill: "Filled · bought 10.00 XLM @ 0.169407"
     catch (e) { tPendSet(p, 'Failed', 'red', niceErr(e) + ' Nothing traded.', true); }
     return;
   }
@@ -16328,17 +16347,19 @@ async function stopReview(q, a, kp) {
     }
   }, false, sell ? 'b-pur' : 'b-grn', 'Placing…', true);
 }
+const STOPPX = {};   // stop fill tx hash → "bought 10.00 XLM @ 0.169400" (loaded once)
 function stopCard(x, done) {   // done: a finished stop shown in Activity (full brightness, no buttons)
+  if (x.status === 'filled' && hexOk(x.hash, 64) && STOPPX[x.hash] === undefined) { STOPPX[x.hash] = null; fillPriceOf(x.hash, x.wallet || STOPS.addr).then((v) => { STOPPX[x.hash] = v; if (v && STOP_PAINT) STOP_PAINT(); }); }
   const sell = x.side === 'sell', live = stopLive(x), d = new Date((x.expires || 0) * 1000);
   const stTxt = { armed: `Waiting · ends ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })}${x.note ? ' · ' + esc(x.note) : ''}`, triggered: `Triggered at ${p4(+x.trig_px || 0)} · ${esc(x.note || 'sending…')}`, sending: 'Sending…', checking: 'Sent · confirming…', cancelling: 'Cancelling…', closing: 'Finishing…',
-    filled: 'Filled', failed: 'Not filled: ' + esc(x.err || ''), cancelled: 'Cancelled', expired: 'Ended without triggering' }[x.status] || esc(x.status);
+    filled: STOPPX[x.hash] ? STOPPX[x.hash] : 'Filled', failed: 'Not filled: ' + esc(x.err || ''), cancelled: 'Cancelled', expired: 'Ended without triggering' }[x.status] || esc(x.status);
   return `<div class="card ocard${live || done ? '' : ' gone'}"><div class="r"><span><span class="tag ${sell ? 't-sell' : 't-buy'}">STOP ${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(+x.xlm || 0, 2)} XLM</b> <span class="mu">stop</span> <b class="mono">${p4(+x.stop || 0)}</b> <span class="mu">${x.lim_mode === 'mkt' ? 'market, floor' : 'limit'}</span> <b class="mono">${p4(+x.limit || 0)}</b></span></div>
     <div class="r" style="font-size:12.5px"><span class="mu">${esc(x.feed_name || FEEDN[x.feed] || '')}${+x.px ? ` · now <b class="mono" style="color:var(--tx)">${p4(+x.px)}</b>` : ''}</span></div>
     <div class="r" style="font-size:12.5px"><span class="${x.status === 'failed' ? 'amb' : x.status === 'filled' ? 'grn' : x.status === 'cancelled' || x.status === 'expired' ? '' : 'mu'}" style="${done ? 'font-weight:700' : ''}">${stTxt}</span>${hexOk(x.hash, 64) && x.status === 'filled' ? `<a class="mono" style="font-size:12px" href="${NET().expert}/tx/${x.hash}" target="_blank" rel="noopener">${short(x.hash)}</a>` : ''}</div>
     ${live && x.status === 'armed' && hexOk(x.id, 32) ? `<div class="g2"><button class="b-out sm" data-sedit="${x.id}">Edit</button><button class="b-out sm" data-scancel="${x.id}">Cancel stop</button></div>`
       : live && x.status === 'triggered' && hexOk(x.id, 32) ? `<button class="b-out sm" data-scancel="${x.id}">Cancel stop</button>` : ''}</div>`;
 }
-/* Edit a waiting stop = replace it: the stop form opens filled with its values; "Review replacement" places the new stop
+/* Edit a waiting stop = replace it: the stop form opens filled with its values; "Replace stop" places the new stop
    first, then cancels the old one (so the position is never unprotected in between). A signed stop can't be changed in place. */
 function stopEdit(id) {
   const x = (STOPS.list || []).find((y) => y.id === id); if (!x || x.status !== 'armed') return toast('That stop is no longer waiting.');
@@ -16352,7 +16373,7 @@ function stopEdit(id) {
     if (S.stopLim === 'custom') $('#tLim').value = String(+(+x.limit).toFixed(7));
     if ($('#tFeed') && [...$('#tFeed').options].some((o) => o.value === x.feed)) $('#tFeed').value = x.feed;
     const left = Math.max(0, (x.expires || 0) - Date.now() / 1000) / 86400, opt = [1, 7, 30, 90].find((d) => d >= left - 0.01) || 90; $('#tDays').value = String(opt);
-    stopDefaults(); tradeEst(); const g = $('#tGo'); if (g) { g.textContent = 'Review replacement'; g.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    stopDefaults(); tradeEst(); const g = $('#tGo'); if (g) { g.textContent = 'Replace stop'; g.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   };
   if (cur !== 'trade') { go('trade'); setTimeout(fill, 400); } else { drawTrade(); fill(); }
 }
@@ -16709,11 +16730,14 @@ function drawSend() {
   const sv = NS().saved;
   $('#sTo').innerHTML = `<option value="">Choose…</option>` + sv.map((x, i) => `<option value="${i}">${esc(x.name)} · ${short(x.addr)}</option>`).join('') + `<option value="new">+ New address</option>`;
   $('#sNew').style.display = 'none';
+  $('#sAsset').innerHTML = '';   // a fresh Send starts on XLM
   sendAssets();
 }
 async function sendAssets() {
   const a = await refreshAcct($('#sFrom').value).catch(() => null);
-  $('#sAsset').innerHTML = a ? a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares').map((b) => `<option value="${esc(aKey(b))}">${esc(aName(b))} (${fx(+b.balance)})</option>`).join('') : '<option>not funded</option>';
+  { const rk = (k) => (k === 'XLM' ? 0 : k === uKey() ? 1 : 2), keep = $('#sAsset').value;   // XLM first, then USDC (Stellar lists XLM last)
+    $('#sAsset').innerHTML = a ? a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares').sort((x, y) => rk(aKey(x)) - rk(aKey(y))).map((b) => `<option value="${esc(aKey(b))}">${esc(aName(b))}${b.asset_type !== 'native' && !isTrusted(b.asset_code, b.asset_issuer) ? ' · ' + short(b.asset_issuer) : ''} (${fx(+b.balance)})</option>`).join('') : '<option>not funded</option>';
+    if (keep && [...$('#sAsset').options].some((o) => o.value === keep)) $('#sAsset').value = keep; }
 }
 async function saveAddr() {
   const name = $('#sNName').value.trim(), addr = $('#sNAddr').value.trim(), memo = $('#sNMemo').value.trim();
@@ -16934,7 +16958,7 @@ document.addEventListener('click', async (e) => {
     if (seg === 'tMode') { if (v === 'stop' && T.mode !== 'stop' && T.side === 'buy' && !T.stopTyped) T.side = 'sell'; T.mode = v; }   // most stops protect a position: Stop opens on Sell
     if (seg === 'tSide' && T.side !== v) { T.side = v; if (!T.pxTyped) $('#tPx').value = ''; }   // a limit price you typed stays; an untouched one restarts at the best bid (buy) / best ask (sell)
     if (seg === 'tMode' || seg === 'tSide') return drawTrade();
-    if (seg === 'xtSide' || seg === 'xtMode') { if (seg === 'xtSide' && XT.side !== v) $('#xtPx').value = ''; if (seg === 'xtSide') XT.side = v; else XT.mode = v; $$('#' + seg + ' button').forEach((b) => b.classList.toggle('on', b.dataset.v === v)); $('#xtPxW').style.display = XT.mode === 'lim' ? '' : 'none'; const g = $('#xtGo'); g.textContent = 'Review ' + XT.side; g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big'; xtPaint(); return xtEst(); }
+    if (seg === 'xtSide' || seg === 'xtMode') { if (seg === 'xtSide' && XT.side !== v) $('#xtPx').value = ''; if (seg === 'xtSide') XT.side = v; else XT.mode = v; $$('#' + seg + ' button').forEach((b) => b.classList.toggle('on', b.dataset.v === v)); $('#xtPxW').style.display = XT.mode === 'lim' ? '' : 'none'; const g = $('#xtGo'); g.textContent = XT.side === 'buy' ? 'Buy' : 'Sell'; g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big'; xtPaint(); return xtEst(); }
     if (seg === 'tLimMode') { S.stopLim = v; saveS(); if (v === 'custom' && !$('#tLim').value) stopDefaults(); stopDefaults(); return tradeEst(); }
     if (seg === 'oMode') { S.pMode = v; saveS(); return paintPort(); }
     if (seg === 'dKind') { const b = tradeAccts()[botSel]; if (b) { b.kind = v; saveS(); drawBot(); } return; }
