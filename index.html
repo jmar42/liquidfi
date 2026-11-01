@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Liquidfi</title>
-<style>html,body{overscroll-behavior-y:contain}@keyframes tpl{from{opacity:1}to{opacity:.35}}.tpl{animation:tpl .7s ease-in-out infinite alternate}
+<style>html,body{overscroll-behavior-y:contain}#bActs button{padding:0 2px;font-size:13.5px;min-width:0}@keyframes tpl{from{opacity:1}to{opacity:.35}}.tpl{animation:tpl .7s ease-in-out infinite alternate}
 :root{--buy:#60A5FA;--sell:#F472B6;--bg:#0B0E13;--s1:#151A22;--s2:#1D2430;--bd:#2A3240;--bd2:#4A5566;--tx:#E9EDF2;--mu:#9AA4B2;--red:#C9302C;--red2:#9E2420;--redt:#FF8A80;--grn:#3FB87F;--grnf:#1F6B47;--amb:#F0A030;--blu:#6EA8FF}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
@@ -282,7 +282,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- BOTS / KILL -->
 <section class="scr" id="s-bots">
-  <div class="tothero" id="bTot" data-go="port" style="cursor:pointer"><div class="r"><span class="mu" style="font-size:13px">Total balance</span><span id="bNet"></span></div><div style="display:flex;align-items:center;gap:10px"><span class="mono" id="bTotV">–</span><span class="mu" style="font-size:26px;line-height:1" aria-hidden="true">›</span></div><div id="bPnl" class="tpnl"></div><span class="mu" id="bTotSub" style="font-size:12.5px"></span><div id="pPer" hidden></div><div class="g4" id="bActs" style="margin-top:10px"><button class="b-light" data-act="accBuy">Buy</button><button class="b-out" data-act="accSwap">Swap</button><button class="b-out" data-act="accSend">Send</button><button class="b-out" data-act="accRcv">Receive</button></div></div>
+  <div class="tothero" id="bTot" data-go="port" style="cursor:pointer"><div class="r"><span class="mu" style="font-size:13px">Total balance</span><span id="bNet"></span></div><div style="display:flex;align-items:center;gap:10px"><span class="mono" id="bTotV">–</span><span class="mu" style="font-size:26px;line-height:1" aria-hidden="true">›</span></div><div id="bPnl" class="tpnl"></div><span class="mu" id="bTotSub" style="font-size:12.5px"></span><div id="pPer" hidden></div><div id="bActs" style="margin-top:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px"><button class="b-light" data-act="accBuy">Buy</button><button class="b-out" data-act="accSwap">Swap</button><button class="b-out" data-act="accTrade">Trade</button><button class="b-out" data-act="accSend">Send</button><button class="b-out" data-act="accRcv">Receive</button></div></div>
   <span class="lbl">Wallets</span>
   <div class="list" id="bPers" style="display:flex;flex-direction:column;gap:10px"></div>
   <div class="list" id="bXrp" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -466,7 +466,8 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <div class="swrow"><span class="mono" id="wOut" style="font-size:24px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">–</span><select id="wTo"></select></div>
     <span class="mu" id="wOutUsd" style="font-size:12.5px"></span></div>
   <div class="card rows" id="wInfo" style="padding:4px 14px;font-size:13.5px"></div>
-  <button class="b-acc big" data-act="swapReview" id="wGo">Review swap</button>
+  <button class="b-acc big" data-act="swapReview" id="wGo">Swap</button>
+  <div id="wPend" style="display:none;flex-direction:column;gap:8px"></div>
   <p class="mu" style="font-size:12px;margin:0">Swaps on the Stellar network at the best route right now: the order book and the AMM pools. If the price moves and you'd get less than the minimum shown, nothing trades.</p>
 </section>
 
@@ -14645,7 +14646,7 @@ function swapResult(r) {   // what actually came in, from the ledger result
 async function swapReview() {
   const q = SWP.q, a = ACC[homeAddr]; if (!a) return toast('This wallet is not funded yet.');
   if (!q || q.from !== $('#wFrom').value || q.to !== $('#wTo').value || q.amt !== +$('#wAmt').value) return toast('Enter an amount and wait for the price.');
-  if (Date.now() - q.at > 20000) { swapQuote(); return toast('Price refreshed. Check it and tap Review again.'); }
+  if (Date.now() - q.at > 20000) { swapQuote(); return toast('Price refreshed. Check it and tap Swap again.'); }
   if (q.amt > swapAvail(a, q.from) + 1e-7) return toast(`This wallet has ${m2(swapAvail(a, q.from))} ${kName(q.from)} available.`);
   const need = q.to !== 'XLM' && !a.balances.some((b) => akey(b) === q.to);
   if (need && spendable(a, true) < 0.5 + (q.from === 'XLM' ? q.amt : 0)) return toast(`Holding ${kName(q.to)} needs 0.5 XLM more reserve. Add some XLM first.`);
@@ -14656,12 +14657,13 @@ async function swapReview() {
     : SDK.Operation.pathPaymentStrictSend({ sendAsset: asOf(q.from), sendAmount: amt7(q.fee.amt), destination: q.feeTo, destAsset: SDK.Asset.native(), destMin: '0.0000001', path: q.fee.path.map(hAsset) }));
   const nm = (OWN().find((o) => o.addr === homeAddr) || {}).name || 'wallet', from = kName(q.from), to = kName(q.to);
   confirmSheet(`Swap ${m2(q.amt)} ${from} → ${to}`, `${NET().name} · ${esc(nm)}`, [{ t: `Pay ${m2(q.amt)} ${from}`, hl: true, s: q.fee ? `${m2(q.sw)} swap + ${m2(q.fee.amt)} fee (${SWAP_FEE.bps / 100}%)` : '' }, { t: `Get about ${m2(q.out)} ${to}`, s: `at least ${m2(q.min)} ${to} or nothing trades` }, ...(need ? [{ t: `Start holding ${to}`, s: 'adds a trustline · 0.5 XLM reserve' }] : [])], 'Swap', async () => {
+    const w0 = homeAddr, pnd = tPend(`Swap ${m2(q.amt)} ${from} → ${to}`, 'swap', w0);
     try {
-      const tx = await buildTx(homeAddr, ops); tx.sign(kpFor(homeAddr)); const r = await submit(tx);
-      const got = swapResult(r); refreshAcct(homeAddr).catch(() => null);
-      showResult(true, 'Swapped', [`<div class="card"><b>Paid ${m2(q.amt)} ${esc(from)}</b><b>Got ${got != null ? m2(got) : '≈ ' + m2(q.out)} ${esc(to)}</b>${got != null ? `<span class="mu" style="font-size:12.5px">${fx(got / q.sw, got / q.sw < 1 ? 6 : 4)} ${esc(to)} per ${esc(from)}${q.fee ? ` · fee ${m2(q.fee.amt)} ${esc(from)}` : ''}</span>` : ''}</div>`, `<div class="card"><a class="mono" style="font-size:12px" href="${NET().expert}/tx/${r.hash}" target="_blank" rel="noopener">${short(r.hash)} · ledger ${r.ledger}</a></div>`], 'bots');
-      $('#wAmt').value = '';
-    } catch (e) { showResult(false, 'Not swapped', [`<div class="card red">${esc(niceErr(e))}</div>`], 'swap'); }
+      const tx = await buildTx(w0, ops); tx.sign(kpFor(w0)); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(tx);
+      const got = swapResult(r), g = got != null ? got : q.out;
+      pnd.label = `Swapped ${m2(q.amt)} ${from} → ${got != null ? '' : '≈ '}${m2(g)} ${to}`;
+      tPendSet(pnd, '✓ Swapped', 'grn', `${got != null ? `rate ${fx(got / q.sw, got / q.sw < 1 ? 6 : 4)} ${to} per ${from} · ` : ''}${q.fee ? `fee ${m2(q.fee.amt)} ${from} · ` : ''}ledger ${r.ledger}`, true);
+    } catch (e) { tPendSet(pnd, 'Failed', 'red', niceErr(e) + ' Nothing was swapped.', true); }
   }, false, 'b-acc', 'Swapping…', true);
 }
 
@@ -16132,28 +16134,29 @@ async function fillPriceOf(hash, me) {
 function tPend(label, scr = 'trade', addr = tradeAddr) {
   const p = { id: ++tPendN, label, st: 'Sending…', cls: 'mu', busy: 1, addr, scr, t: Date.now() };
   TPEND.unshift(p); TPEND.splice(10); closeSheet();
-  if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false; if ($('#tDays')) $('#tDays').value = '1';   // stops default to 1 day
+  if (scr === 'swap') { if ($('#wAmt')) $('#wAmt').value = ''; if (typeof SWP !== 'undefined') SWP.q = null; }
+  else if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false; if ($('#tDays')) $('#tDays').value = '1';   // stops default to 1 day
     T.mode = 'mkt'; T.side = 'buy';   // back to the normal order entry (Market · Buy), so it doesn't look like the order is still being entered
     if (cur === 'trade') drawTrade(); } else if ($('#sAmt')) $('#sAmt').value = '';
-  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : '#tPend'); if (el && el.firstElementChild && cur === scr) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : scr === 'swap' ? '#wPend' : '#tPend'); if (el && el.firstElementChild && cur === scr) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
   return p;
 }
 function tPendSet(p, st, cls, sub, done) {
   Object.assign(p, { st, cls: cls || '', busy: done ? 0 : 1 }); if (sub != null) p.sub = sub; if (done) p.t2 = Date.now();
   tPendPaint();
-  if (done && cur === 'trade' && p.scr !== 'send') tradeLoadMine();
-  if (done && p.scr === 'send' && !p.cls.includes('red')) refreshAcct(p.addr).catch(() => {});
+  if (done && cur === 'trade' && p.scr === 'trade') tradeLoadMine();
+  if (done && (p.scr === 'send' || p.scr === 'swap') && !p.cls.includes('red')) refreshAcct(p.addr).then(() => { if (p.scr === 'swap' && cur === 'swap') drawSwap(); }).catch(() => {});
 }
 function tPendPaint() {
   const el = $('#tPend'); if (!el) return; const now = Date.now();
-  for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : 20000)) TPEND.splice(i, 1); }   // done ones fade into the normal history below
+  for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : p.scr === 'trade' ? 20000 : 180000)) TPEND.splice(i, 1); }   // Trade has its history list below; Send / Swap keep the result 3 min   // done ones fade into the normal history below
   const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
-  const es = $('#sPend'); if (es) { const S2 = TPEND.filter((p) => p.scr === 'send'); es.style.display = S2.length ? 'flex' : 'none'; es.innerHTML = S2.map(row).join(''); }
-  const L = TPEND.filter((p) => p.scr !== 'send' && p.addr === tradeAddr);
+  for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
+  const L = TPEND.filter((p) => p.scr === 'trade' && p.addr === tradeAddr);
   el.style.display = L.length ? 'flex' : 'none';
   el.innerHTML = L.map((p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
 }
-setInterval(() => { if ((cur === 'trade' || cur === 'send') && TPEND.length) tPendPaint(); }, 5000);
+setInterval(() => { if ((cur === 'trade' || cur === 'send' || cur === 'swap') && TPEND.length) tPendPaint(); }, 5000);
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   if (back === 'trade') {   // market order: no Sending… screen, no result screen
     const p = tPend((what || okTitle).replace(/^Bought /, 'Buy ').replace(/^Sold /, 'Sell ').replace(/ · fee .*$/, ''));
