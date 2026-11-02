@@ -225,7 +225,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.32</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.35</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -416,7 +416,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <label><span id="tAmtL">Amount (XLM)</span><input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
   <div class="mu" id="tMktNote" style="font-size:12px;display:none">Fills now at the best price (book or AMM pools), within your slippage cap. Includes a 0.25% fee; limit orders have no fee.</div>
-  <div class="note" id="tStopOff" style="display:none"><span>Stop orders work on XLM/USDC for now. Switch the pair to XLM/USDC to place one.</span></div>
+  <div class="note" id="tStopOff" style="display:none"><span>Stops work against USDC (or another dollar or euro coin), not against XLM. Switch the pair, for example to EURC/USDC or XLM/USDC.</span></div>
   <div class="note" id="tEditBar" style="display:none"></div>
   <div id="tStopW" style="display:none;flex-direction:column;gap:10px">
     <label>Stop price<input id="tStop" inputmode="decimal"></label>
@@ -475,10 +475,16 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <section class="scr" id="s-earn">
   <div class="top"><div><h1>Earn</h1><span class="mu" style="font-size:12px">Pools built into Stellar and the XRP Ledger</span></div><button class="ico" data-act="earnRefresh" aria-label="Refresh">↻</button></div>
   <div class="mu" style="font-size:13px">Add to a pool and earn a share of the fees traders pay it. The pool shares stay in your own wallet, and you can withdraw any time. No Liquidfi fee.</div>
-  <label id="eWalW">Stellar wallet<select id="eWal"></select></label>
   <div class="card" id="eTot" style="display:none;flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap"></div>
+  <h3 class="eSec" style="margin:6px 0 0">Stellar pools</h3>
+  <label id="eWalW">Stellar wallet<select id="eWal"></select></label>
   <div id="ePend" style="display:none;flex-direction:column;gap:8px"></div>
   <div id="eList" style="display:flex;flex-direction:column;gap:12px"></div>
+  <h3 class="eSec" id="eXHead" style="margin:10px 0 0">XRP Ledger pools</h3>
+  <label id="eXWalW">XRP wallet<select id="eXWal"></select></label>
+  <div class="mu" id="eXOne" style="font-size:13px;display:none"></div>
+  <div id="eXPend" style="display:none;flex-direction:column;gap:8px"></div>
+  <div id="eXList" style="display:flex;flex-direction:column;gap:12px"></div>
   <p class="mu" style="font-size:12px;margin:0">Yield = the trading fees each pool earned over the last 7 days, as a yearly rate. It is not a promise: it goes up and down with trading. The value of what you put in also moves with the prices of the two coins.</p>
 </section>
 <section class="scr" id="s-receive">
@@ -509,9 +515,9 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop helpers</span><div class="mu" style="font-size:12px">Each waiting stop has its own small helper account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your helpers from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return helper XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:12px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone).</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
-  <div class="card" id="setTax"><span class="lbl">Taxes</span><div class="mu" style="font-size:12px">A file of everything your wallets did in a year (trades, swaps, sends, receives, pools, fees) with dollar values at the time, ready for Koinly, CoinTracker or your tax pro. Made on this phone from the public ledgers; Liquidfi never sees it. Not tax advice.</div>
+  <div class="card" id="setTax"><span class="lbl">Taxes</span><div class="mu" style="font-size:12px">Everything your wallets did in a year (trades, swaps, sends, receives, pools, fees) with dollar values at the time, in two files: one for tax software (Koinly format) and a broker-style statement of buys, sells and totals for you or your tax pro. Made on this phone from the public ledgers; Liquidfi never sees it. Not tax advice.</div>
     <label>Year<select id="taxYear"></select></label><div id="taxW" style="display:flex;flex-direction:column;gap:8px"></div>
-    <button class="b-light" data-act="taxMake" id="taxGo">Make tax file</button><div class="mu" id="taxSt" style="font-size:13px"></div><div id="taxOut"></div>
+    <button class="b-light" data-act="taxMake" id="taxGo">Make tax files</button><div class="mu" id="taxSt" style="font-size:13px"></div><div id="taxOut"></div>
     <button class="b-out" data-act="advisor">Talk to our Wealth Advisors Today</button><div class="mu" style="font-size:12.5px">Treveri Capital helps tech-oriented individuals plan their financial future. Send us your name, phone and state, and a wealth advisor will contact you shortly.</div><div class="mu" style="font-size:11px">Treveri Capital LLC is a California registered investment adviser, owned by Liquidfi's founder. Opens your email app; nothing is sent until you send it.</div></div>
   <details class="card more" id="setEmCard" style="display:none"><summary>Advanced: this phone’s signer key</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">This is a signing key, not a wallet. It holds no funds; don't send coins to it. For wallets whose key stays somewhere else, like bots on a PC: add it to them as a signer and Cancel All can cancel their orders from this phone. PC bots: run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div></details>
   <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
@@ -526,7 +532,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.32 · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.35 · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14804,6 +14810,9 @@ async function drawEarn() {
   if (XL.length && !XL.some((w) => w.addr === earnXr)) earnXr = XL[0].addr;
   $('#eWal').innerHTML = L.map((o) => `<option value="${o.addr}">${esc(o.name)} · ${short(o.addr)}</option>`).join(''); if (earnAddr) $('#eWal').value = earnAddr;
   $('#eWalW').style.display = L.length > 1 ? '' : 'none';
+  $('#eXWal').innerHTML = XL.map((w) => `<option value="${w.addr}">${esc(w.name)} · ${short(w.addr)}</option>`).join(''); if (earnXr) $('#eXWal').value = earnXr;
+  $('#eXWalW').style.display = XL.length > 1 ? '' : 'none';
+  const xo = XL.find((w) => w.addr === earnXr); $('#eXOne').style.display = XL.length === 1 ? '' : 'none'; $('#eXOne').textContent = xo ? `Using ${xo.name} · ${short(xo.addr)}` : '';
   const P = earnPools();
   const paint = () => {
     if (cur !== 'earn') return;
@@ -14818,6 +14827,7 @@ async function drawEarn() {
         `<button class="b-light" data-act="earnAdd" data-pid="${p.id}"${!a || c.none || !c.at ? ' disabled' : ''}>Add</button><button class="b-out" data-act="earnOut" data-pid="${p.id}"${sh > 0 ? '' : ' disabled'}>Withdraw</button>`);
     }).join('');
     if (!L.length) h = '<div class="card"><span class="mu">Add a Stellar wallet in Accounts to use these pools.</span></div>';
+    $('#eList').innerHTML = h; h = '';
     for (const xp of xrPools()) {
       const A = XAM(xp.key), d = earnXr ? XRA[earnXr] : null, lp = xrLpOf(d, A);
       const XE = ((earnXr && XPL[earnXr]) || { pools: {} }).pools[xp.key], xnow = lp > 0 && A.lp > 0 ? lp / A.lp * A.tvl : 0;
@@ -14827,8 +14837,8 @@ async function drawEarn() {
       h += earnCard(xp.name, `XRP Ledger pool · ${xp.tok} by ${xp.who}`, A, mine, !XL.length ? 'Add an XRP wallet in Accounts to use this pool.' : !A.at ? 'Loading…' : A.none ? 'No one has opened this pool yet.' : '', EARN_RISK.vol,
         `<button class="b-light" data-act="xrEarnAdd" data-xp="${xp.key}"${!XL.length || A.none || !A.at || !d || !d.a ? ' disabled' : ''}>Add</button><button class="b-out" data-act="xrEarnOut" data-xp="${xp.key}"${lp > 0 ? '' : ' disabled'}>Withdraw</button>`);
     }
-    $('#eList').innerHTML = h;
-    $('#eTot').innerHTML = TOT.v > 0 ? `<span class="mu" style="font-size:13px">In pools</span><b class="mono" style="font-size:22px">$${fx(TOT.v)}</b><span class="mono ${TOT.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${TOT.pl >= 0 ? '+' : '−'}$${fx(Math.abs(TOT.pl))} P/L</span>` : '';
+    $('#eXList').innerHTML = h;
+    $('#eTot').innerHTML = TOT.v > 0 ? `<span class="mu" style="font-size:13px">In pools · all wallets</span><b class="mono" style="font-size:22px">$${fx(TOT.v)}</b><span class="mono ${TOT.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${TOT.pl >= 0 ? '+' : '−'}$${fx(Math.abs(TOT.pl))} P/L</span>` : '';
     $('#eTot').style.display = TOT.v > 0 ? 'flex' : 'none';
   };
   paint(); tPendPaint();
@@ -14953,7 +14963,7 @@ async function xrEarnAddGo() {
     { t: 'Price protection', s: 'both sides go in at the pool\'s own ratio: never more than these amounts' },
     ...(E.isNew ? [{ t: 'Join the pool', s: 'adds the pool token to this wallet (reserve)' }] : []),
   ], 'Add', async () => {
-    const pnd = tPend(`Add ${m2(x)} XRP + ${m2(u)} ${p.tok}`, 'earn', o.w.classicAddress);
+    const pnd = tPend(`Add ${m2(x)} XRP + ${m2(u)} ${p.tok}`, 'earnx', o.w.classicAddress);
     try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, tx, drops);
       if (r.state === 'ok') { pnd.label = `Added to ${p.name} · $${fx(2 * u)}`; A.at = 0; tPendSet(pnd, '✓ Added', 'grn', `ledger ${r.ledger || ''}`, true); }
       else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet. Check this pool again in a minute before trying again.' : xrErr(r.code) + ' Nothing was added.', true);
@@ -14963,7 +14973,7 @@ async function xrEarnAddGo() {
 function xrTokAdd(k) {   // let this XRP wallet hold the pool's dollar coin (TrustSet, no rippling)
   const p = xrPoolK(k), o = xrOwn(earnXr); if (!p || !o) return;
   confirmSheet(`Add ${p.tok} to this wallet`, `XRP Ledger · ${esc(o.name)}`, [{ t: `Hold ${p.tok} in this wallet`, s: `issuer ${p.a2.issuer} (${p.who})`, hl: 1 }, { t: 'Reserve', s: `${m2((XRSV || { inc: 0.2 }).inc)} XRP set aside while you hold it` }], `Add ${p.tok}`, async () => {
-    const pnd = tPend(`Add ${p.tok} to ${o.name}`, 'earn', o.w.classicAddress);
+    const pnd = tPend(`Add ${p.tok} to ${o.name}`, 'earnx', o.w.classicAddress);
     try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { ...p.a2, value: '1000000000' }, Flags: 0x00020000 }, drops);   // tfSetNoRipple
       if (r.state === 'ok') tPendSet(pnd, '✓ Added', 'grn', `this wallet can now receive ${p.tok} on the XRP Ledger`, true);
       else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet.' : xrErr(r.code), true);
@@ -14984,7 +14994,7 @@ function xrEarnOutGo(k, pct) {
   confirmSheet(`Withdraw ${all ? 'all' : pct + '%'} from ${p.name}`, `XRP Ledger pool · ${esc(o.name)}`, [
     { t: `Get about ${m2(gx)} XRP + ${m2(gu)} ${p.tok}`, hl: true, s: `about $${fx(f * A.tvl)}` },
   ], 'Withdraw', async () => {
-    const pnd = tPend(`Withdraw ${all ? 'all' : pct + '%'} from ${p.name}`, 'earn', o.w.classicAddress);
+    const pnd = tPend(`Withdraw ${all ? 'all' : pct + '%'} from ${p.name}`, 'earnx', o.w.classicAddress);
     try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, tx, drops);
       if (r.state === 'ok') { pnd.label = `Withdrew ${m2(gx)} XRP + ${m2(gu)} ${p.tok}`; A.at = 0; tPendSet(pnd, '✓ Withdrawn', 'grn', `ledger ${r.ledger || ''}`, true); }
       else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet. Check this pool again in a minute before trying again.' : xrErr(r.code) + ' Nothing was withdrawn.', true);
@@ -15119,8 +15129,10 @@ async function taxStellar(addr, t0, t1, mine, rows) {
     const meBase = tr.base_account === addr, meCounter = tr.counter_account === addr; if (!meBase && !meCounter) continue;
     const bk = an(tr.base_asset_type, tr.base_asset_code, tr.base_asset_issuer), ck = an(tr.counter_asset_type, tr.counter_asset_code, tr.counter_asset_issuer);
     const iSellBase = meBase ? tr.base_is_seller : !tr.base_is_seller;
-    rows.push({ t: Date.parse(tr.ledger_close_time), hash: null, sa: iSellBase ? tr.base_amount : tr.counter_amount, sk: iSellBase ? bk : ck, ra: iSellBase ? tr.counter_amount : tr.base_amount, rk: iSellBase ? ck : bk, desc: 'Order filled' });
+    rows.push({ t: Date.parse(tr.ledger_close_time), hash: null, opid, sa: iSellBase ? tr.base_amount : tr.counter_amount, sk: iSellBase ? bk : ck, ra: iSellBase ? tr.counter_amount : tr.base_amount, rk: iSellBase ? ck : bk, desc: 'Order filled' });
   }
+  { const need = rows.filter((r) => r.opid && !r.hash).slice(0, 300);   // fills: look up the transaction hash (Horizon trades don't carry it) so tax tools can match and de-duplicate
+    for (let i = 0; i < need.length; i += 5) await Promise.all(need.slice(i, i + 5).map(async (r) => { try { r.hash = (await H(`/operations/${r.opid}`)).transaction_hash || null; } catch (e) {} })); }
   const seen = new Set();   // network fees: once per transaction this wallet paid for
   for (const o of ops) {
     const tx = o.transaction || {}, h = o.transaction_hash; if (seen.has(h)) continue; seen.add(h);
@@ -15163,6 +15175,37 @@ async function xrpUsdHours(t0, t1) {   // Coinbase hourly XRP-USD closes, keyed 
   }
   return out;
 }
+// Broker-style statement: Buys and Sells (price in the quote coin), totals by asset, then everything else. Same rows as the tax file.
+function stmtMake(rows, year, pick) {
+  const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const ts = (t) => new Date(t).toISOString().replace('T', ' ').slice(0, 19) + ' UTC', n = (v) => (v == null || v === '' ? '' : n7(v));
+  const px = (v) => (v > 0 ? String(+v.toPrecision(7)) : '');
+  const comm = {}; rows.forEach((r) => { if (r.label === 'cost' && /^Liquidfi fee/.test(r.desc || '') && r.hash) comm[r.hash] = r; });   // our fee: shown on its trade line as commission
+  const isTrade = (r) => !r.label && +r.sa > 0 && +r.ra > 0 && r.sc && r.rc;
+  const used = new Set(), T = [], O = [], TOT = {};
+  for (const r of rows) {
+    if (isTrade(r)) {
+      const buy = qRank(r.rc) < qRank(r.sc) || (qRank(r.rc) === qRank(r.sc));
+      const coin = buy ? r.rc : r.sc, cur = buy ? r.sc : r.rc, qty = +(buy ? r.ra : r.sa), amt = +(buy ? r.sa : r.ra), c = r.hash && comm[r.hash];
+      if (c) used.add(c);
+      T.push([ts(r.t), buy ? 'Buy' : 'Sell', n(qty), coin, px(amt / qty), cur, n(amt), c ? n(c.sa) : '', c ? c.sc : '', r.fa || '', r.fa ? r.fk : '', r.usd, short(r.w), r.hash || '']);
+      const k = coin + '|' + cur, x = TOT[k] || (TOT[k] = { coin, cur, bq: 0, ba: 0, sq: 0, sa: 0, bu: 0, su: 0, nb: 0, ns: 0 });
+      if (buy) { x.bq += qty; x.ba += amt; x.bu += +r.usd || 0; x.nb++; } else { x.sq += qty; x.sa += amt; x.su += +r.usd || 0; x.ns++; }
+    }
+  }
+  for (const r of rows) {
+    if (isTrade(r) || used.has(r)) continue;
+    const type = r.label === 'liquidity in' ? 'Pool deposit' : r.label === 'liquidity out' ? 'Pool withdrawal' : r.label === 'cost' ? 'Fee' : +r.ra > 0 && !(+r.sa > 0) ? 'Received' : 'Sent';
+    const qty = +r.ra > 0 && type !== 'Fee' && type !== 'Pool deposit' && type !== 'Sent' ? r.ra : r.sa, cur = qty === r.ra ? r.rc : r.sc;
+    O.push([ts(r.t), type, n(qty), cur, r.usd, r.desc || '', short(r.w), r.hash || '']);
+  }
+  const L = [['Liquidfi account statement', year], ['Wallets', pick.map(short).join(' ')], ['Times', 'UTC'], [],
+    ['TRADES'], ['Date', 'Action', 'Quantity', 'Asset', 'Price', 'Price Currency', 'Amount', 'Commission (Liquidfi fee)', 'Commission Currency', 'Network Fee', 'Network Fee Currency', 'USD Value', 'Wallet', 'TxHash'], ...T,
+    [], ['TOTALS BY ASSET'], ['Asset', 'Price Currency', 'Buys', 'Total Bought', 'Total Cost', 'Avg Buy Price', 'Sells', 'Total Sold', 'Total Proceeds', 'Avg Sell Price', 'Net Quantity', 'Bought USD', 'Sold USD'],
+    ...Object.values(TOT).sort((a, b) => (a.coin + a.cur).localeCompare(b.coin + b.cur)).map((x) => [x.coin, x.cur, x.nb, n(x.bq), n(x.ba), px(x.bq ? x.ba / x.bq : 0), x.ns, n(x.sq), n(x.sa), px(x.sq ? x.sa / x.sq : 0), n(+(x.bq - x.sq).toFixed(7)), x.bu.toFixed(2), x.su.toFixed(2)]),
+    [], ['OTHER ACTIVITY (deposits / withdrawals / pools / fees)'], ['Date', 'Type', 'Quantity', 'Asset', 'USD Value', 'Description', 'Wallet', 'TxHash'], ...O];
+  return { csv: L.map((l) => l.map(q).join(',')).join('\n') + '\n', trades: T.length };
+}
 async function taxMake() {
   const year = +$('#taxYear').value, t0 = Date.UTC(year, 0, 1), t1 = Date.UTC(year + 1, 0, 1);
   const pick = $$('#taxW input:checked').map((i) => i.value); if (!pick.length) return toast('Pick at least one wallet.');
@@ -15179,27 +15222,30 @@ async function taxMake() {
     const XP = rows.some((r) => r.sc === 'XRP' || r.rc === 'XRP') ? await xrpUsdHours(t0, t1) : {};
     const xrpAt = (t) => { for (let h = Math.floor(t / 3600e3) * 3600e3, i = 0; i < 48; i++, h -= 3600e3) if (XP[h]) return XP[h]; return 0; };
     const usdOf = (amt, sym, key, t) => { if (!(amt > 0)) return null; if (STABLE_SYMS.includes(sym)) return amt; if (sym === 'XRP') { const p = xrpAt(t); return p ? amt * p : null; } if (key) { const p = priceAt(key, t); return p ? amt * p : null; } return null; };
-    for (const r of rows) { const v = usdOf(+r.ra, r.rc, r.rk, r.t); const s2 = usdOf(+r.sa, r.sc, r.sk, r.t); const u = STABLE_SYMS.includes(r.rc) ? v : STABLE_SYMS.includes(r.sc) ? s2 : (s2 != null ? s2 : v); r.usd = u != null ? u.toFixed(2) : ''; }
+    for (const r of rows) { const v = usdOf(+r.ra, r.rc, r.rk, r.t); const s2 = usdOf(+r.sa, r.sc, r.sk, r.t); const u = STABLE_SYMS.includes(r.rc) ? v : STABLE_SYMS.includes(r.sc) ? s2 : (s2 != null ? s2 : v); r.usd = u == null ? '' : u >= 0.01 || u === 0 ? u.toFixed(2) : u.toFixed(8).replace(/0+$/, '').replace(/\.$/, '.00'); }   // under a cent: keep up to 8 decimals so tiny fees don't show as 0.00
     rows.sort((a, b) => a.t - b.t);
     const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
     const ts = (t) => new Date(t).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-    const csv = [TAXCOLS.join(',')].concat(rows.map((r) => [ts(r.t), r.sa != null ? n7(r.sa) : '', r.sc || '', r.ra != null ? n7(r.ra) : '', r.rc || '', r.fa || '', r.fa ? r.fk : '', r.usd, r.usd ? 'USD' : '', r.label || '', `${r.desc || ''} · wallet ${short(r.w)}`, r.hash || ''].map(q).join(','))).join('\n') + '\n';
-    TAX.name = `liquidfi-taxes-${year}.csv`; TAX.file = new Blob([csv], { type: 'text/csv' });
+    const csv = [TAXCOLS.join(',')].concat(rows.map((r) => [ts(r.t), r.sa != null ? n7(r.sa) : '', r.sc || '', r.ra != null ? n7(r.ra) : '', r.rc || '', r.fa || '', r.fa ? r.fk : '', r.usd, r.usd ? 'USD' : '', r.label || '', `${r.desc || ''} - wallet ${short(r.w)}`, r.hash || ''].map(q).join(','))).join('\n') + '\n';
+    const ascii = (x) => x.replace(/\u2026/g, '...').replace(/\u00b7/g, '-').replace(/[^\x00-\x7e]/g, '?');
+    const SM = stmtMake(rows, year, pick); TAX.sname = `liquidfi-statement-${year}.csv`; TAX.sfile = new Blob([ascii(SM.csv)], { type: 'text/csv' });
+    TAX.name = `liquidfi-taxes-${year}.csv`; TAX.file = new Blob([csv.replace(/\u2026/g, '...').replace(/\u00b7/g, '-').replace(/[^\x00-\x7e]/g, '?')], { type: 'text/csv' });   // plain ASCII: Excel on Windows garbles UTF-8 symbols
     const noUsd = rows.filter((r) => !r.usd).length;
     taxSt(`<span class="grn">Ready: ${rows.length} lines for ${year}.</span>${noUsd ? ` ${noUsd} without a dollar value (tokens with no market); your tax tool can price them.` : ''}`);
-    $('#taxOut').innerHTML = `<div class="g2"><button class="b-light" data-act="taxShare">Share</button><button class="b-out" data-act="taxSave">Save to phone</button></div>`;
+    $('#taxOut').innerHTML = `<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:14px"><b>Tax software file</b> <span class="mu" style="font-size:12px">Koinly format · every line</span></div><div class="g2"><button class="b-light" data-act="taxShare">Share</button><button class="b-out" data-act="taxSave">Save to phone</button></div>
+      <div style="font-size:14px;margin-top:6px"><b>Statement</b> <span class="mu" style="font-size:12px">broker style · ${SM.trades} buys and sells, totals by asset</span></div><div class="g2"><button class="b-light" data-act="taxShare" data-f="s">Share</button><button class="b-out" data-act="taxSave" data-f="s">Save to phone</button></div></div>`;
   } catch (e) { taxSt(`<span class="red">${esc(niceErr(e))}</span> Try again in a minute.`); }
   $('#taxGo').disabled = false;
 }
-async function taxShare() {
-  if (!TAX.file) return;
-  const f = new File([TAX.file], TAX.name, { type: 'text/csv' });
-  try { if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: TAX.name }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
-  taxSave();
+async function taxShare(w) {
+  const F = w === 's' ? TAX.sfile : TAX.file, N = w === 's' ? TAX.sname : TAX.name; if (!F) return;
+  const f = new File([F], N, { type: 'text/csv' });
+  try { if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: N }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  taxSave(w);
 }
-function taxSave() {
-  if (!TAX.file) return; const u = URL.createObjectURL(TAX.file), a = document.createElement('a');
-  a.href = u; a.download = TAX.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 30000);
+function taxSave(w) {
+  const F = w === 's' ? TAX.sfile : TAX.file, N = w === 's' ? TAX.sname : TAX.name; if (!F) return; const u = URL.createObjectURL(F), a = document.createElement('a');
+  a.href = u; a.download = N; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 30000);
 }
 function drawTax() {
   const y = new Date().getFullYear(), el = $('#taxYear'); if (!el) return;
@@ -16512,7 +16558,8 @@ async function drawTrade() {
   tradeAddr = homeAddr || firstWallet();
   $('#tFrom').textContent = (allAccts().find((x) => x.addr === tradeAddr) || {}).name || '';
   { const p = TP(), nB = kName(p.b), nQ = kName(p.q); $('#tPair').textContent = `${nB}/${nQ} ▾`; $('#tSideB').textContent = 'Buy'; $('#tSideS').textContent = 'Sell'; $('#tAmtL').textContent = `Amount (${nB})`; $('#tPxL').textContent = `Limit price (${nQ} per ${nB})`;
-    const sb = $('#tMode [data-v=stop]'); if (sb) sb.style.opacity = isDefPair() ? '' : '.45'; $('#tStopOff').style.display = 'none'; tStream(); tBalPaint(ACC[tradeAddr]); }
+    if (!stopPairOK() && T.mode === 'stop') T.mode = 'mkt';
+    const sb = $('#tMode [data-v=stop]'); if (sb) sb.style.display = stopPairOK() ? '' : 'none';   /* no Stop button on pairs it can't run on (e.g. against XLM) */ feedOpts(); $('#tStopOff').style.display = 'none'; tStream(); tBalPaint(ACC[tradeAddr]); }
   $$('#tMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.mode));
   $$('#tSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === T.side));
   $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none'; $('#tStopW').style.display = T.mode === 'stop' ? 'flex' : 'none';
@@ -16556,6 +16603,12 @@ function tBalPaint(a) {   // Available on the current pair: spendable base + quo
 const uKey = () => NS().usdc.code + ':' + NS().usdc.issuer;
 const TP = () => { const p = NS().tPair; return p && p.b && p.q && p.b !== p.q ? p : { b: 'XLM', q: uKey() }; };
 const isDefPair = () => { const p = TP(); return p.b === 'XLM' && p.q === uKey(); };
+const stopPairOK = () => { const p = TP(); return p.q !== 'XLM' && p.b !== p.q; };   // stops: any Stellar coin against USDC (or another non-XLM quote)
+const stopMid = () => (isDefPair() ? mid() : tMid());
+function feedOpts() {   // XLM can trigger on the big exchanges; other coins only on Stellar trades (their own market)
+  const el = $('#tFeed'); if (!el) return; const x = TP().b === 'XLM', want = x ? 'avg,trades3,stellar,cb,kr,bn' : 'trades3';
+  if (el.dataset.set !== want) { el.dataset.set = want; const keep = el.value; el.innerHTML = want.split(',').map((k) => `<option value="${k}">${{ avg: '3-exchange avg', trades3: 'Stellar: 3 trades of 1+', stellar: 'Stellar last sale', cb: 'Coinbase', kr: 'Kraken', bn: 'Binance' }[k]}</option>`).join(''); el.value = want.includes(keep) && keep ? keep : want.split(',')[0]; }
+}
 const TB = { key: null, bids: [], asks: [], tr: [], last: null, es1: null, es2: null };
 const TBK = () => (isDefPair() ? MK : TB);
 const tMid = () => { const m = TBK(); return m.bids[0] && m.asks[0] ? (m.bids[0][0] + m.asks[0][0]) / 2 : (m.last || (m.tr[0] && m.tr[0].px) || 0); };
@@ -16601,7 +16654,7 @@ function tPairSheet() {
 function tPairSet(b, q) {
   if (!b || !q || b === q) return toast('Pick two different tokens.');
   NS().tPair = { b, q }; saveS(); $('#tPx').value = ''; $('#tAmt').value = ''; T.pxTyped = false;
-  if (!isDefPair() && T.mode === 'stop') T.mode = 'mkt';
+  if (!stopPairOK() && T.mode === 'stop') T.mode = 'mkt';
   closeSheet(); drawTrade();
 }
 function drawTradeBook() {
@@ -16638,7 +16691,7 @@ async function tradeReview() {
   const PR = TP(), nB = kName(PR.b), nQ = kName(PR.q), AB = asOf(PR.b), AQ = asOf(PR.q), avail = (k) => swapAvail(a, k), holds = (k) => k === 'XLM' || a.balances.some((b) => akey(b) === k);
   for (const k of [PR.q, PR.b]) if (!holds(k)) return toast(`Add ${kName(k)} first (Assets), so this wallet can hold it.`);
   const kp = kpFor(tradeAddr);
-  if (T.mode === 'stop') { if (!isDefPair()) return toast('Stop orders work on XLM/USDC for now.'); return stopReview(q, a, kp); }
+  if (T.mode === 'stop') { if (!stopPairOK()) return toast('Stops work against USDC (or another dollar or euro coin), not against XLM.'); return stopReview(q, a, kp); }
   if (T.mode === 'lim') {
     const p = +$('#tPx').value; if (!(p > 0)) return toast('Enter a limit price.');
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: AQ, buying: AB, buyAmount: amt7(q), price: p.toFixed(7) })
@@ -16689,21 +16742,21 @@ function tPend(label, scr = 'trade', addr = tradeAddr) {
   else if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false; if ($('#tDays')) $('#tDays').value = '1';   // stops default to 1 day
     T.mode = 'mkt'; T.side = 'buy';   // back to the normal order entry (Market · Buy), so it doesn't look like the order is still being entered
     if (cur === 'trade') drawTrade(); } else if (scr === 'send' && $('#sAmt')) $('#sAmt').value = '';
-  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : scr === 'swap' ? '#wPend' : scr === 'earn' ? '#ePend' : '#tPend'); if (el && el.firstElementChild && cur === scr) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : scr === 'swap' ? '#wPend' : scr === 'earn' ? '#ePend' : scr === 'earnx' ? '#eXPend' : '#tPend'); if (el && el.firstElementChild && (cur === scr || (scr === 'earnx' && cur === 'earn'))) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
   return p;
 }
 function tPendSet(p, st, cls, sub, done) {
   Object.assign(p, { st, cls: cls || '', busy: done ? 0 : 1 }); if (sub != null) p.sub = sub; if (done) p.t2 = Date.now();
   tPendPaint();
   if (done && cur === 'trade' && p.scr === 'trade') tradeLoadMine();
-  if (done && p.scr === 'earn') { delete EPL[p.addr]; delete XPL[p.addr]; if (cur === 'earn') drawEarn(); }
+  if (done && (p.scr === 'earn' || p.scr === 'earnx')) { delete EPL[p.addr]; delete XPL[p.addr]; if (cur === 'earn') drawEarn(); }
   if (done && (p.scr === 'send' || p.scr === 'swap') && !p.cls.includes('red')) refreshAcct(p.addr).then(() => { if (p.scr === 'swap' && cur === 'swap') drawSwap(); }).catch(() => {});
 }
 function tPendPaint() {
   const el = $('#tPend'); if (!el) return; const now = Date.now();
   for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : p.scr === 'trade' ? 20000 : 180000)) TPEND.splice(i, 1); }   // Trade has its history list below; Send / Swap keep the result 3 min   // done ones fade into the normal history below
   const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
-  for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend'], ['earn', '#ePend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
+  for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend'], ['earn', '#ePend'], ['earnx', '#eXPend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
   const L = TPEND.filter((p) => p.scr === 'trade' && p.addr === tradeAddr);
   el.style.display = L.length ? 'flex' : 'none';
   el.innerHTML = L.map((p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
@@ -16732,7 +16785,7 @@ async function personalTx(kp, src, ops, okTitle, back, memo, what) {
    while the wallet does other things. Cancel = the server burns that sequence number. */
 const STOPS = { addr: null, list: [], err: null };
 let STOP_PAINT = null;
-const FEEDN = { avg: 'Avg Coinbase · Kraken · Binance', stellar: 'Stellar last sale', cb: 'Coinbase', kr: 'Kraken', bn: 'Binance' };
+const FEEDN = { trades3: 'Stellar: 3 trades of 1+ at your stop', avg: 'Avg Coinbase · Kraken · Binance', stellar: 'Stellar last sale', cb: 'Coinbase', kr: 'Kraken', bn: 'Binance' };
 const stopLive = (x) => ['armed', 'triggered', 'sending', 'checking', 'cancelling', 'closing'].includes(x.status);
 const hexOk = (h, n) => typeof h === 'string' && new RegExp(`^[0-9a-f]{${n}}$`).test(h);
 const stopSig = (kp, msg) => b64(kp.sign(new TextEncoder().encode(msg)));
@@ -16815,9 +16868,10 @@ const STOP_MKT = 5;
 const limMode = () => (['0.5', '1', '2', 'mkt', 'custom'].includes(String(S.stopLim)) ? String(S.stopLim) : 'mkt');   // Market is the default
 const limPct = () => (limMode() === 'mkt' ? STOP_MKT : +limMode());
 function stopDefaults() {
-  const m = mid(), mode = limMode(), sell = T.side === 'sell';
+  feedOpts();
+  const m = stopMid(), mode = limMode(), sell = T.side === 'sell';
   if (m && (!$('#tStop').value || (T.stopSide !== T.side && !T.stopTyped))) {   // a price you typed stays when you switch Buy/Sell
-    const st = sell ? m * 0.95 : m * 1.05; $('#tStop').value = st.toFixed(4); T.stopSide = T.side; if (mode === 'custom') $('#tLim').value = ''; }
+    const gap = TP().b === 'XLM' ? 0.05 : 0.005, st = sell ? m * (1 - gap) : m * (1 + gap);   /* XLM 5% away; steadier coins (EURC…) 0.5% */ $('#tStop').value = st.toFixed(4); T.stopSide = T.side; if (mode === 'custom') $('#tLim').value = ''; }
   $$('#tLimMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === mode));
   $('#tLimLbl').textContent = sell ? 'Sell no lower than' : 'Buy no higher than';
   $('#tLimW').style.display = mode === 'custom' ? '' : 'none';
@@ -16828,43 +16882,45 @@ function stopDefaults() {
     : `Limit ${p4(lim)} · ${(Math.abs(lim / st - 1) * 100).toFixed(2)}% ${sell ? 'below' : 'above'} the stop`;
 }
 function stopEst(q, el) {
-  const st = +$('#tStop').value || 0, lim = +$('#tLim').value || 0, sell = T.side === 'sell', m = mid();
+  const st = +$('#tStop').value || 0, lim = +$('#tLim').value || 0, sell = T.side === 'sell', m = stopMid(), nB = kName(TP().b), nQ = kName(TP().q);
   $('#tStopNote').innerHTML = !S.stopUrl ? '<span class="amb">Set your stop server first: Settings → Stop orders.</span>'
-    : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? 'XLM stays' : 'USDC stays'} in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
+    : `${$('#tFeed').value === 'trades3' ? `When 3 trades of 1+ ${esc(nB)} happen on Stellar at <b>${st ? p4(st) : 'the stop'}</b> or ${sell ? 'lower' : 'higher'}` : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}`}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? esc(nB) : esc(nQ)} stays in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
   if (!el) return;
   const fOn = !!feeTo(tradeAddr) && (FEEOK[feeTo(tradeAddr)] || { ok: 1 }).ok, f = fOn ? feeOf(sell ? q : q * st) : 0;
   const warn = st && m && (sell ? st >= m : st <= m) ? `<div><span class="amb">The price is ${p4(m)} now: a ${sell ? 'sell' : 'buy'} stop goes ${sell ? 'below' : 'above'} it.</span></div>` : '';
   const badLim = st && lim && (sell ? lim > st : lim < st) ? `<div><span class="amb">The limit should be ${sell ? 'at or below' : 'at or above'} the stop.</span></div>` : '';
   el.innerHTML = warn + badLim + `<div><span class="mu">Now</span><span class="mono">${m ? p4(m) : '–'}</span></div>`
-    + (sell ? `<div><span class="mu">If it fills, at least</span><span class="mono">${fx(q * lim)} USDC</span></div>` : `<div><span class="mu">If it fills, pay at most</span><span class="mono">${fx(q * lim)} USDC</span></div>`)
-    + (fOn ? `<div><span class="mu">Fee ${SWAP_FEE.bps / 100}%</span><span class="mono">${sell ? m2(f) + ' XLM' : m2(f) + ' USDC'}</span></div>` : '');
+    + (sell ? `<div><span class="mu">If it fills, at least</span><span class="mono">${fx(q * lim)} ${esc(nQ)}</span></div>` : `<div><span class="mu">If it fills, pay at most</span><span class="mono">${fx(q * lim)} ${esc(nQ)}</span></div>`)
+    + (fOn ? `<div><span class="mu">Fee ${SWAP_FEE.bps / 100}%</span><span class="mono">${sell ? m2(f) + ' ' + esc(nB) : m2(f) + ' ' + esc(nQ)}</span></div>` : '');
 }
 async function stopReview(q, a, kp) {
   if (!S.stopUrl) return toast('Stops go through your Liquidfi server: add its address once in Settings → Stop orders.', 6000);
-  const sell = T.side === 'sell', st = +$('#tStop').value, lim = +$('#tLim').value, feed = $('#tFeed').value, days = +$('#tDays').value, m = mid();
+  const sell = T.side === 'sell', st = +$('#tStop').value, lim = +$('#tLim').value, feed = $('#tFeed').value, days = +$('#tDays').value, m = stopMid();
+  const P = TP(), bK = P.b, qK = P.q, nB = kName(bK), nQ = kName(qK), bA = asOf(bK), qA = asOf(qK), isX = bK === 'XLM';
   if (!(st > 0)) return toast('Enter a stop price.'); if (!(lim > 0)) return toast('Enter a limit price.');
   if (sell ? lim > st : lim < st) return toast(`The limit must be ${sell ? 'at or below' : 'at or above'} the stop.`);
   if (m && (sell ? st >= m : st <= m)) return toast(`The price is ${p4(m)} now. A ${sell ? 'sell stop goes below' : 'buy stop goes above'} it.`);
-  const uK = NS().usdc.code + ':' + NS().usdc.issuer;
-  let fee = null; try { fee = await feeLegFor(sell ? 'XLM' : uK, feeOf(sell ? q : q * st), tradeAddr); } catch (e) { return toast(niceErr(e)); }
+  let fee = null; try { fee = await feeLegFor(sell ? bK : qK, feeOf(sell ? q : q * st), tradeAddr); } catch (e) { return toast(niceErr(e)); }
   const sq = q, usd = q * lim;   // the amount entered is what sells; the fee is paid on top
-  if (sell && spendable(a, true) < q + (fee ? fee.amt : 0) + 1.02) return toast(`Not enough spendable XLM: ${fx(q, 2)} to sell + ${fee ? m2(fee.amt) + ' fee + ' : ''}1.01 held by its helper (have ${fx(spendable(a, true))}).`);
-  if (!sell && spendable(a, true) < 1.02) return toast(`A stop needs 1.01 XLM free for its helper (have ${fx(spendable(a, true))}). It comes back when the stop ends.`);
-  if (!sell && spendable(a, false) < usd + (fee ? fee.amt : 0)) return toast(`Not enough USDC (have ${fx(spendable(a, false))}, need ${fx(usd + (fee ? fee.amt : 0))}).`);
+  if (sell && isX && spendable(a, true) < q + (fee ? fee.amt : 0) + 1.02) return toast(`Not enough spendable XLM: ${fx(q, 2)} to sell + ${fee ? m2(fee.amt) + ' fee + ' : ''}1.01 held by its helper (have ${fx(spendable(a, true))}).`);
+  if (sell && !isX && swapAvail(a, bK) < q + (fee ? fee.amt : 0)) return toast(`Not enough ${nB}: ${fx(q, 2)} to sell${fee ? ' + ' + m2(fee.amt) + ' fee' : ''} (have ${fx(swapAvail(a, bK))}).`);
+  if ((!sell || !isX) && spendable(a, true) < 1.02) return toast(`A stop needs 1.01 XLM free for its helper (have ${fx(spendable(a, true))}). It comes back when the stop ends.`);
+  if (!sell && swapAvail(a, qK) < usd + (fee ? fee.amt : 0)) return toast(`Not enough ${nQ} (have ${fx(swapAvail(a, qK))}, need ${fx(usd + (fee ? fee.amt : 0))}).`);
   const end = new Date(Date.now() + days * 86400e3);
-  const items = [{ t: `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}`, hl: 1 },
-    { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} XLM at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} XLM at ${p4(lim)} or better` : `Buy ${fx(q, 2)} XLM at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} USDC${fee ? ` · fee ${m2(fee.amt)} XLM on top (${SWAP_FEE.bps / 100}%)` : ''}` : `pay at most ${fx(usd)} USDC${fee ? ` + ${m2(fee.amt)} USDC fee (${SWAP_FEE.bps / 100}%)` : ''}` },
-    { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` },
+  const items = [{ t: feed === 'trades3' ? `When 3 trades of 1+ ${nB} on Stellar are at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}${feed === 'trades3' ? ' · only trades after you place it count' : ''}`, hl: 1 },
+    { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} ${nB} at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} ${nB} at ${p4(lim)} or better` : `Buy ${fx(q, 2)} ${nB} at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} ${nQ}${fee ? ` · fee ${m2(fee.amt)} ${nB} on top (${SWAP_FEE.bps / 100}%)` : ''}` : `pay at most ${fx(usd)} ${nQ}${fee ? ` + ${m2(fee.amt)} ${nQ} fee (${SWAP_FEE.bps / 100}%)` : ''}` },
+    { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${isX && stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` },
     { t: 'Helper holds 1.01 XLM from this wallet', s: 'Your own helper account sends the order (made and signed on this phone; the stop server holds no keys). The 1.01 XLM comes back when the stop fills, is cancelled or ends.' }];
   const RP = T.replace && T.replace.w === tradeAddr ? { ...T.replace } : null;
-  if (RP) items.push({ t: `Then cancels your old stop: ${RP.side} ${fx(RP.xlm, 2)} XLM at ${p4(RP.stop)}`, s: 'The new stop is placed first, so you are never without one. The old stop\'s helper XLM comes back.' });
-  confirmSheet(RP ? `Replace stop: ${T.side} ${fx(q)} XLM` : `Stop ${T.side} ${fx(q)} XLM`, `${netPre()}signed now, sent when the price hits`, items, RP ? 'Place new stop, cancel old' : `Place stop ${T.side}`, async () => {
-    const pnd = tPend(`${RP ? 'Replace stop' : 'Stop'} ${T.side} ${fx(q, 2)} XLM at ${p4(st)}`); T.replace = null;
+  if (RP) items.push({ t: `Then cancels your old stop: ${RP.side} ${fx(RP.xlm, 2)} ${RP.coin || 'XLM'} at ${p4(RP.stop)}`, s: 'The new stop is placed first, so you are never without one. The old stop\'s helper XLM comes back.' });
+  confirmSheet(RP ? `Replace stop: ${T.side} ${fx(q)} ${nB}` : `Stop ${T.side} ${fx(q)} ${nB}`, `${netPre()}signed now, sent when the price hits`, items, RP ? 'Place new stop, cancel old' : `Place stop ${T.side}`, async () => {
+    const pnd = tPend(`${RP ? 'Replace stop' : 'Stop'} ${T.side} ${fx(q, 2)} ${nB} at ${p4(st)}`); T.replace = null;
     let hh = null;
     try {
       const w = tradeAddr, ts = Date.now();
       const hl = await stopHealth().catch(() => ({}));
       if (!hl.own) throw new Error('Update your stop server to v1.5 (own helpers): copy the new stopd.py to the watcher box and run install-stops.sh again.');
+      if ((feed === 'trades3' || !isX) && !hl.trades3) throw new Error('Update your stop server to v1.6 (stops on any coin, Stellar trades trigger): copy the new stopd.py to the watcher box and run install-stops.sh again.');
       // a) the wallet makes and funds its own helper
       tPendSet(pnd, 'Setting up…', 'mu', 'making its helper account (1.01 XLM from this wallet, comes back)');
       const { h, k } = await helperFree(kp, w); hh = h; const ha = h.publicKey();
@@ -16874,8 +16930,8 @@ async function stopReview(q, a, kp) {
       if (!hx) throw new Error('The helper account did not show up on Stellar. Try again.');
       const s0 = BigInt(hx.sequence);
       // b) the order: N copies from the helper (min sequence s0), each ends by closing the helper into the wallet
-      const ops = [sell ? SDK.Operation.pathPaymentStrictSend({ source: w, sendAsset: SDK.Asset.native(), sendAmount: amt7(sq), destination: w, destAsset: USDC(), destMin: amt7(usd), path: [] })
-        : SDK.Operation.pathPaymentStrictReceive({ source: w, sendAsset: USDC(), sendMax: amt7(usd), destination: w, destAsset: SDK.Asset.native(), destAmount: amt7(q), path: [] })];
+      const ops = [sell ? SDK.Operation.pathPaymentStrictSend({ source: w, sendAsset: bA, sendAmount: amt7(sq), destination: w, destAsset: qA, destMin: amt7(usd), path: [] })
+        : SDK.Operation.pathPaymentStrictReceive({ source: w, sendAsset: qA, sendMax: amt7(usd), destination: w, destAsset: bA, destAmount: amt7(q), path: [] })];
       if (fee) { ops.push(SDK.Operation[fee.direct ? 'payment' : 'pathPaymentStrictSend'](fee.direct ? { source: w, destination: fee.to, asset: asOf(fee.k), amount: amt7(fee.amt) } : { source: w, sendAsset: asOf(fee.k), sendAmount: amt7(fee.amt), destination: fee.to, destAsset: SDK.Asset.native(), destMin: '0.0000001', path: fee.path.map(hAsset) })); }
       ops.push(SDK.Operation.accountMerge({ source: ha, destination: w }));
       const xdrs = [];
@@ -16899,7 +16955,7 @@ async function stopReview(q, a, kp) {
         catch (e) { oldNote = ` · old stop NOT cancelled (${niceErr(e)}): cancel it in Open orders`; }
       }
       stopList(w).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {});
-      tPendSet(pnd, RP ? (oldNote.includes('NOT') ? '✓ New stop armed' : '✓ Stop replaced') : '✓ Stop armed', oldNote.includes('NOT') ? 'amb' : 'grn', `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)} · 1.01 XLM in its helper until it ends${oldNote}`, true);
+      tPendSet(pnd, RP ? (oldNote.includes('NOT') ? '✓ New stop armed' : '✓ Stop replaced') : '✓ Stop armed', oldNote.includes('NOT') ? 'amb' : 'grn', `${feed === 'trades3' ? `waits for 3 trades of 1+ ${nB} at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)}`} · 1.01 XLM in its helper until it ends${oldNote}`, true);
     } catch (e) {
       let why = niceErr(e);
       if (hh) { try { if ((await helperClose(tradeAddr, hh)) === 'closed') why += ' Its helper was closed, so the 1.01 XLM is back.'; } catch (x) { why += ' Its helper will be closed and the XLM returned next time you open Trade.'; } }
@@ -16912,9 +16968,9 @@ const STOPPX = {};   // stop fill tx hash → "bought 10.00 XLM @ 0.169400" (loa
 function stopCard(x, done) {   // done: a finished stop shown in Activity (full brightness, no buttons)
   if (x.status === 'filled' && hexOk(x.hash, 64) && STOPPX[x.hash] === undefined) { STOPPX[x.hash] = null; fillPriceOf(x.hash, x.wallet || STOPS.addr).then((v) => { STOPPX[x.hash] = v; if (v && STOP_PAINT) STOP_PAINT(); }); }
   const sell = x.side === 'sell', live = stopLive(x), d = new Date((x.expires || 0) * 1000);
-  const stTxt = { armed: `Waiting · ends ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })}${x.note ? ' · ' + esc(x.note) : ''}`, triggered: `Triggered at ${p4(+x.trig_px || 0)} · ${esc(x.note || 'sending…')}`, sending: 'Sending…', checking: 'Sent · confirming…', cancelling: 'Cancelling…', closing: 'Finishing…',
+  const stTxt = { armed: `Waiting · ends ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })}${x.feed === 'trades3' ? ` · ${+x.t3n || 0} of 3 trades` : x.note ? ' · ' + esc(x.note) : ''}`, triggered: `Triggered at ${p4(+x.trig_px || 0)} · ${esc(x.note || 'sending…')}`, sending: 'Sending…', checking: 'Sent · confirming…', cancelling: 'Cancelling…', closing: 'Finishing…',
     filled: STOPPX[x.hash] ? STOPPX[x.hash] : 'Filled', failed: 'Not filled: ' + esc(x.err || ''), cancelled: 'Cancelled', expired: 'Ended without triggering' }[x.status] || esc(x.status);
-  return `<div class="card ocard${live || done ? '' : ' gone'}"><div class="r"><span><span class="tag ${sell ? 't-sell' : 't-buy'}">STOP ${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(+x.xlm || 0, 2)} XLM</b> <span class="mu">stop</span> <b class="mono">${p4(+x.stop || 0)}</b> <span class="mu">${x.lim_mode === 'mkt' ? 'market, floor' : 'limit'}</span> <b class="mono">${p4(+x.limit || 0)}</b></span></div>
+  return `<div class="card ocard${live || done ? '' : ' gone'}"><div class="r"><span><span class="tag ${sell ? 't-sell' : 't-buy'}">STOP ${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(+x.xlm || 0, 2)} ${esc(x.coin || 'XLM')}</b> <span class="mu">stop</span> <b class="mono">${p4(+x.stop || 0)}</b> <span class="mu">${x.lim_mode === 'mkt' ? 'market, floor' : 'limit'}</span> <b class="mono">${p4(+x.limit || 0)}</b></span></div>
     <div class="r" style="font-size:12.5px"><span class="mu">${esc(x.feed_name || FEEDN[x.feed] || '')}${+x.px ? ` · now <b class="mono" style="color:var(--tx)">${p4(+x.px)}</b>` : ''}</span></div>
     <div class="r" style="font-size:12.5px"><span class="${x.status === 'failed' ? 'amb' : x.status === 'filled' ? 'grn' : x.status === 'cancelled' || x.status === 'expired' ? '' : 'mu'}" style="${done ? 'font-weight:700' : ''}">${stTxt}</span>${hexOk(x.hash, 64) && x.status === 'filled' ? `<a class="mono" style="font-size:12px" href="${NET().expert}/tx/${x.hash}" target="_blank" rel="noopener">${short(x.hash)}</a>` : ''}</div>
     ${live && x.status === 'armed' && hexOk(x.id, 32) ? `<div class="g2"><button class="b-out sm" data-sedit="${x.id}">Edit</button><button class="b-out sm" data-scancel="${x.id}">Cancel stop</button></div>`
@@ -16925,8 +16981,8 @@ function stopCard(x, done) {   // done: a finished stop shown in Activity (full 
 function stopEdit(id) {
   const x = (STOPS.list || []).find((y) => y.id === id); if (!x || x.status !== 'armed') return toast('That stop is no longer waiting.');
   const w = STOPS.addr; homeAddr = w;
-  if (!isDefPair()) { NS().tPair = { b: 'XLM', q: uKey() }; saveS(); }
-  T.mode = 'stop'; T.side = x.side; T.replace = { id: x.id, xlm: +x.xlm, stop: +x.stop, side: x.side, w, guard: x.guard != null ? +x.guard : null };   // the replacement keeps the old stop's price guard (Settings stays as it is)
+  { const b = x.base || 'XLM', q = x.quote || uKey(); if (TP().b !== b || TP().q !== q) { NS().tPair = { b, q }; saveS(); } }
+  T.mode = 'stop'; T.side = x.side; T.replace = { id: x.id, xlm: +x.xlm, coin: x.coin || 'XLM', stop: +x.stop, side: x.side, w, guard: x.guard != null ? +x.guard : null };   // the replacement keeps the old stop's price guard (Settings stays as it is)
   if (['0.5', '1', '2', 'mkt', 'custom'].includes(String(x.lim_mode))) S.stopLim = String(x.lim_mode); else S.stopLim = 'custom';
   saveS();
   const fill = () => {
@@ -17519,7 +17575,7 @@ document.addEventListener('click', async (e) => {
   if (t.dataset.xedit) return xtEditSheet(+t.dataset.xedit);
   if (t.parentElement && t.parentElement.classList.contains('seg')) {
     const seg = t.parentElement.id, v = t.dataset.v;
-    if (seg === 'tMode' && v === 'stop' && !isDefPair()) { $('#tStopOff').style.display = ''; return; }
+    if (seg === 'tMode' && v === 'stop' && !stopPairOK()) return;
     if (seg === 'tMode') { if (v === 'stop' && T.mode !== 'stop' && T.side === 'buy' && !T.stopTyped) T.side = 'sell'; T.mode = v; }   // most stops protect a position: Stop opens on Sell
     if (seg === 'tSide' && T.side !== v) { T.side = v; if (!T.pxTyped) $('#tPx').value = ''; }   // a limit price you typed stays; an untouched one restarts at the best bid (buy) / best ask (sell)
     if (seg === 'tMode' || seg === 'tSide') return drawTrade();
@@ -17571,7 +17627,7 @@ document.addEventListener('click', async (e) => {
     swapMax: () => { const k = $('#wFrom').value, v = swapAvail(ACC[homeAddr], k); $('#wAmt').value = v > 0 ? amt7(v).replace(/\.?0+$/, '') : ''; swapQuote(); },
     swapFlip: () => { const f = $('#wFrom').value, t2 = $('#wTo').value; if (![...$('#wFrom').options].some((o) => o.value === t2)) return toast(`This wallet doesn't hold ${kName(t2)} yet.`); $('#wFrom').value = t2; $('#wTo').value = f; $('#wAmt').value = ''; swapQuote(); },
     swapReview: () => swapReview(),
-    taxMake: () => taxMake(), taxShare: () => taxShare(), taxSave: () => taxSave(),
+    taxMake: () => taxMake(), taxShare: () => taxShare(t.dataset.f), taxSave: () => taxSave(t.dataset.f),
     advisor: () => { location.href = 'mailto:jeff@trevericapital.com?subject=' + encodeURIComponent('Wealth advisor request') + '&body=' + encodeURIComponent('Please have a wealth advisor contact me.\n\nName:\nPhone:\nState:\n'); },
     earnRefresh: () => { for (const k of Object.keys(EPL)) delete EPL[k]; for (const k of Object.keys(XPL)) delete XPL[k]; for (const k of Object.keys(POOLC)) delete POOLC[k]; for (const k of Object.keys(XAMMS)) delete XAMMS[k]; drawEarn(); },
     earnAdd: () => earnAddSheet(t.dataset.pid), earnOut: () => earnOutSheet(t.dataset.pid), earnOutGo: () => earnOutGo(t.dataset.pid, +t.dataset.epct),
@@ -17746,6 +17802,7 @@ $('#tStop').addEventListener('input', () => { T.stopTyped = !!$('#tStop').value;
 $('#sTo').addEventListener('change', sendToChanged); $('#sFrom').addEventListener('change', sendAssets);
 $('#rAcct').addEventListener('change', drawReceive);
 $('#eWal').addEventListener('change', () => { earnAddr = $('#eWal').value; drawEarn(); });
+$('#eXWal').addEventListener('change', () => { earnXr = $('#eXWal').value; drawEarn(); });
 $('#wAmt').addEventListener('input', swapQuote); $('#wFrom').addEventListener('change', () => { if ($('#wFrom').value === $('#wTo').value) { const o = [...$('#wTo').options].find((x) => x.value !== $('#wFrom').value); if (o) $('#wTo').value = o.value; } swapQuote(); }); $('#wTo').addEventListener('change', swapQuote);
 $('#wWal').addEventListener('change', () => { homeAddr = $('#wWal').value; $('#wAmt').value = ''; drawSwap(); });
 $('#setBio').addEventListener('change', async (e) => {
