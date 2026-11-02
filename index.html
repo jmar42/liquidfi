@@ -19,6 +19,7 @@ html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,
 .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
 .buy{color:var(--buy)}.sell{color:var(--sell)}
 body.gr{--buy:#3FB87F;--sell:#FF8A80}
+.mbub{display:block;margin-top:6px;padding:6px 10px;border-left:3px solid var(--blu);background:var(--s2);border-radius:8px;color:var(--tx);font-size:14px;line-height:1.35;overflow-wrap:anywhere;font-weight:500}.mbub .ml{display:block;font-size:11px;color:var(--mu);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:1px}.mbub.pv{border-left-color:var(--grn)}.mbub.nr{border-left-color:var(--bd2);color:var(--mu)}
 .mu{color:var(--mu)}.grn{color:var(--grn)}.red{color:var(--redt)}.amb{color:var(--amb)}.blu{color:var(--blu)}
 #app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .scr{display:none;flex:1;flex-direction:column;gap:14px;padding:16px 16px 96px}
@@ -449,7 +450,8 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <button class="b-out" data-act="saveAddr">Check and save address</button>
   </div>
   <div class="g2"><label>Asset<select id="sAsset"></select></label><label>Amount<input id="sAmt" inputmode="decimal" placeholder="0"></label></div>
-  <label id="sMemoW">Memo<input id="sMemo" autocomplete="off"></label>
+  <div id="sMemoW" style="display:flex;flex-direction:column;gap:8px"><label><span id="sMemoL">Memo (optional, public: anyone can see it on the ledger)</span><input id="sMemo" autocomplete="off" maxlength="28"></label>
+    <label style="flex-direction:row;align-items:center;gap:10px;font-size:14px"><input type="checkbox" id="sPriv" style="width:20px;height:20px"><span>Private memo <span class="mu" style="font-size:12px">only you and the receiver can read it, in Liquidfi (up to 31 characters)</span></span></label></div>
   <div class="note"><span>Only saved, confirmed addresses can be sent to. Sends from bot accounts are off unless you turn them on in Settings.</span></div>
   <button class="b-light big" data-act="sendReview">Review send</button>
   <div id="sPend" style="display:none;flex-direction:column;gap:8px"></div>
@@ -13331,8 +13333,54 @@ const isUSDC = (a) => a.asset_type !== 'native' && a.asset_code === NS().usdc.co
 async function feeNow() {
   try { const f = await H('/fee_stats'), c = f.fee_charged || {}, v = +c.p95 || +c.p90 || +c.max || 0; return v > 0 ? String(Math.min(200000, Math.max(1000, 2 * v))) : '5000'; } catch (e) { return '5000'; }
 }
+// Private memos: X25519 from the wallets' own Stellar (ed25519) keys, no extra library.
+const PM = (() => {
+  const P = 2n ** 255n - 19n, A24 = 121665n, te = new TextEncoder();
+  const md = (a) => ((a % P) + P) % P;
+  const pw = (b, e) => { let r = 1n; b = md(b); while (e > 0n) { if (e & 1n) r = (r * b) % P; b = (b * b) % P; e >>= 1n; } return r; };
+  const le = (u) => { let n = 0n; for (let i = u.length - 1; i >= 0; i--) n = (n << 8n) + BigInt(u[i]); return n; };
+  const tole = (n) => { const o = new Uint8Array(32); for (let i = 0; i < 32; i++) { o[i] = Number(n & 255n); n >>= 8n; } return o; };
+  function x25519(k, u) {
+    const kk = Uint8Array.from(k); kk[0] &= 248; kk[31] &= 127; kk[31] |= 64;
+    const uu = Uint8Array.from(u); uu[31] &= 127;
+    const s = le(kk), x1 = md(le(uu)); let x2 = 1n, z2 = 0n, x3 = x1, z3 = 1n, sw = 0n;
+    for (let t = 254n; t >= 0n; t--) {
+      const b = (s >> t) & 1n; sw ^= b; if (sw) { [x2, x3] = [x3, x2]; [z2, z3] = [z3, z2]; } sw = b;
+      const A = md(x2 + z2), AA = (A * A) % P, B = md(x2 - z2), BB = (B * B) % P, E = md(AA - BB), C = md(x3 + z3), D = md(x3 - z3), DA = (D * A) % P, CB = (C * B) % P;
+      x3 = (md(DA + CB) ** 2n) % P; z3 = (x1 * ((md(DA - CB) ** 2n) % P)) % P; x2 = (AA * BB) % P; z2 = (E * md(AA + A24 * E)) % P;
+    }
+    if (sw) { [x2, x3] = [x3, x2]; [z2, z3] = [z3, z2]; }
+    return tole((x2 * pw(z2, P - 2n)) % P);
+  }
+  const edPkToX = (pk) => { const y = le(pk) & (2n ** 255n - 1n); return tole(md((1n + y) * pw(md(1n - y), P - 2n))); };   // Edwards y → Montgomery u
+  const edSkToX = async (seed) => new Uint8Array(await crypto.subtle.digest('SHA-512', seed)).slice(0, 32);   // the ed25519 scalar (clamped in x25519)
+  const cat = (...a) => { const o = new Uint8Array(a.reduce((s, x) => s + x.length, 0)); let i = 0; for (const x of a) { o.set(x, i); i += x.length; } return o; };
+  // the 31-byte key stream for one transaction: the two wallets' shared secret + the sender's account and sequence (never repeats)
+  async function stream(seed, otherPk, src, seq) {
+    const sh = x25519(await edSkToX(seed), edPkToX(otherPk)); if (sh.every((b) => b === 0)) throw new Error('bad key');
+    const k = new Uint8Array(await crypto.subtle.digest('SHA-256', cat(te.encode('liquidfi-pmemo-v1'), sh, te.encode(src + ':' + seq))));
+    const h = await crypto.subtle.importKey('raw', k, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    return new Uint8Array(await crypto.subtle.sign('HMAC', h, new Uint8Array([1]))).slice(0, 31);
+  }
+  const TAG = 0xf1, MAX = 31;
+  const fits = (txt) => te.encode(txt).length <= MAX;
+  async function seal(txt, seed, otherPk, src, seq) {   // → 32 bytes for a hash memo
+    const m = te.encode(txt); if (!m.length || m.length > MAX) throw new Error('Private memo: 1 to 31 characters.');
+    const pt = new Uint8Array(MAX); pt.set(m); const ks = await stream(seed, otherPk, src, seq);
+    return cat(new Uint8Array([TAG]), pt.map((b, i) => b ^ ks[i]));
+  }
+  const isSealed = (b) => b && b.length === 32 && b[0] === TAG;
+  async function open(b, seed, otherPk, src, seq) {   // → text, or null if it isn't one of ours for this pair
+    if (!isSealed(b)) return null; const ks = await stream(seed, otherPk, src, seq);
+    let pt = b.slice(1).map((x, i) => x ^ ks[i]), n = pt.length; while (n && pt[n - 1] === 0) n--; pt = pt.slice(0, n);
+    if (!n || pt.includes(0)) return null;
+    try { const s = new TextDecoder('utf-8', { fatal: true }).decode(pt); return /[\u0000-\u001f\u007f]/.test(s) ? null : s; } catch (e) { return null; }
+  }
+  return { x25519, edPkToX, edSkToX, seal, open, isSealed, fits, MAX };
+})();
 async function buildTx(src, ops, memo) {
   const a = await H('/accounts/' + src);
+  if (typeof memo === 'function') memo = await memo((BigInt(a.sequence) + 1n).toString());   // a private memo is sealed to this transaction's own sequence number
   const b = new SDK.TransactionBuilder(new SDK.Account(src, a.sequence), { fee: await feeNow(), networkPassphrase: NET().pass });
   ops.forEach((o) => b.addOperation(o));
   if (memo) b.addMemo(memo);
@@ -14600,10 +14648,24 @@ function swapKnown() {   // tokens you can swap into even without holding them y
   const L = ['XLM', ...(S.net === 'public' ? KNOWN.public : [{ code: NS().usdc.code, issuer: NS().usdc.issuer }]).map((k) => k.code + ':' + k.issuer), ...(NS().extraKnown || []).map((k) => k.code + ':' + k.issuer)];
   return [...new Set(L)];
 }
+// What this wallet's live stop orders will need when they fire: sell stops hold the coin, buy stops hold the quote (at the limit), plus the fee.
+// Kept out of Available so another order can't spend it (the stop would just fail). The stop being edited doesn't count against its replacement.
+const STOPSBY = {};
+function stopHold(a, k) {
+  const w = a && (a.account_id || a.id), L = (w && STOPSBY[w]) || []; if (!L.length) return 0;
+  const f = 1 + (feeTo(w) ? SWAP_FEE.bps / 10000 : 0); let h = 0;
+  for (const x of L) {
+    if (!stopLive(x) || (T.replace && T.replace.id === x.id)) continue;
+    if (x.side === 'sell' && (x.base || 'XLM') === k) h += (+x.xlm || 0) * f;
+    if (x.side === 'buy' && x.quote === k) h += (+x.xlm || 0) * (+x.limit || 0) * f;
+  }
+  return h;
+}
+const holdNote = (a, k) => { const h = stopHold(a, k); return h > 1e-7 ? ` ${fx(h, 2)} ${k === 'XLM' ? 'XLM' : kName(k)} is held for your stop orders.` : ''; };
 function swapAvail(a, k) {
   if (!a) return 0;
   if (k === 'XLM') return spendable(a, true);
-  const b = a.balances.find((x) => akey(x) === k); return b ? Math.max(0, +b.balance - +b.selling_liabilities) : 0;
+  const b = a.balances.find((x) => akey(x) === k); return b ? Math.max(0, +b.balance - +b.selling_liabilities - stopHold(a, k)) : 0;
 }
 async function drawSwap() {
   netBadge($('#wNet'));
@@ -14688,7 +14750,7 @@ async function swapReview() {
   const q = SWP.q, a = ACC[homeAddr]; if (!a) return toast('This wallet is not funded yet.');
   if (!q || q.from !== $('#wFrom').value || q.to !== $('#wTo').value || q.amt !== +$('#wAmt').value) return toast('Enter an amount and wait for the price.');
   if (Date.now() - q.at > 20000) { swapQuote(); return toast('Price refreshed. Check it and tap Swap again.'); }
-  if (q.amt > swapAvail(a, q.from) + 1e-7) return toast(`This wallet has ${m2(swapAvail(a, q.from))} ${kName(q.from)} available.`);
+  if (q.amt > swapAvail(a, q.from) + 1e-7) return toast(`This wallet has ${m2(swapAvail(a, q.from))} ${kName(q.from)} available.${holdNote(a, q.from)}`, 7000);
   const need = q.to !== 'XLM' && !a.balances.some((b) => akey(b) === q.to);
   if (need && spendable(a, true) < 0.5 + (q.from === 'XLM' ? q.amt : 0)) return toast(`Holding ${kName(q.to)} needs 0.5 XLM more reserve. Add some XLM first.`);
   const ops = [];
@@ -14821,7 +14883,7 @@ async function drawEarn() {
       const c = POOLC[p.id] || {}, b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === p.id), sh = b ? +b.balance : 0;
       const E = ((earnAddr && EPL[earnAddr]) || { pools: {} }).pools[p.id], now = sh > 0 && c.shares > 0 ? sh / c.shares * c.tvl : 0;
       if (E && E.in > 0) { TOT.v += now; TOT.pl += now + E.out - E.in; }
-      const mine = (sh > 0 && c.shares > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fx(now)}</b></span><span class="mu mono">${m2(sh / c.shares * c.res[p.a])} ${esc(kName(p.a))} + ${m2(sh / c.shares * c.res[p.b])} ${esc(kName(p.b))}</span></div>` : '')
+      const mine = (sh > 0 && c.shares > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fxv(now)}</b></span><span class="mu mono">${m2(sh / c.shares * c.res[p.a])} ${esc(kName(p.a))} + ${m2(sh / c.shares * c.res[p.b])} ${esc(kName(p.b))}</span></div>` : '')
         + (sh > 0 && E ? plLine(now, E, (E.net[p.a] || 0) * c.px + (E.net[p.b] || 0)) : '');
       return earnCard(p.name, 'Stellar pool', c, mine, !c.at ? 'Loading…' : c.none ? 'No one has opened this pool yet.' : '', EARN_RISK[p.risk],
         `<button class="b-light" data-act="earnAdd" data-pid="${p.id}"${!a || c.none || !c.at ? ' disabled' : ''}>Add</button><button class="b-out" data-act="earnOut" data-pid="${p.id}"${sh > 0 ? '' : ' disabled'}>Withdraw</button>`);
@@ -14832,13 +14894,13 @@ async function drawEarn() {
       const A = XAM(xp.key), d = earnXr ? XRA[earnXr] : null, lp = xrLpOf(d, A);
       const XE = ((earnXr && XPL[earnXr]) || { pools: {} }).pools[xp.key], xnow = lp > 0 && A.lp > 0 ? lp / A.lp * A.tvl : 0;
       if (XE && XE.in > 0) { TOT.v += xnow; TOT.pl += xnow + XE.out - XE.in; }
-      const mine = (lp > 0 && A.lp > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fx(xnow)}</b></span><span class="mu mono">${m2(lp / A.lp * A.x)} XRP + ${m2(lp / A.lp * A.u)} ${esc(xp.tok)}</span></div>` : '')
+      const mine = (lp > 0 && A.lp > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fxv(xnow)}</b></span><span class="mu mono">${m2(lp / A.lp * A.x)} XRP + ${m2(lp / A.lp * A.u)} ${esc(xp.tok)}</span></div>` : '')
         + (lp > 0 && XE ? plLine(xnow, XE, XE.net.x * A.px + XE.net.u) : '');
       h += earnCard(xp.name, `XRP Ledger pool · ${xp.tok} by ${xp.who}`, A, mine, !XL.length ? 'Add an XRP wallet in Accounts to use this pool.' : !A.at ? 'Loading…' : A.none ? 'No one has opened this pool yet.' : '', EARN_RISK.vol,
         `<button class="b-light" data-act="xrEarnAdd" data-xp="${xp.key}"${!XL.length || A.none || !A.at || !d || !d.a ? ' disabled' : ''}>Add</button><button class="b-out" data-act="xrEarnOut" data-xp="${xp.key}"${lp > 0 ? '' : ' disabled'}>Withdraw</button>`);
     }
     $('#eXList').innerHTML = h;
-    $('#eTot').innerHTML = TOT.v > 0 ? `<span class="mu" style="font-size:13px">In pools · all wallets</span><b class="mono" style="font-size:22px">$${fx(TOT.v)}</b><span class="mono ${TOT.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${TOT.pl >= 0 ? '+' : '−'}$${fx(Math.abs(TOT.pl))} P/L</span>` : '';
+    $('#eTot').innerHTML = TOT.v > 0 ? `<span class="mu" style="font-size:13px">In pools · all wallets</span><b class="mono" style="font-size:22px">$${fxv(TOT.v)}</b><span class="mono ${TOT.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${TOT.pl >= 0 ? '+' : '−'}$${fxd(TOT.pl)} P/L</span>` : '';
     $('#eTot').style.display = TOT.v > 0 ? 'flex' : 'none';
   };
   paint(); tPendPaint();
@@ -15057,10 +15119,14 @@ async function earnHistXr(addr) {
   }
   return (XPL[addr] = { at: Date.now(), pools: P });
 }
+// small dollar amounts keep their digits: $1.23 · $0.0421 · $0.000183 (pool earnings on small positions are fractions of a cent)
+const fxv = (v) => (v < 100 ? v.toFixed(4) : fx(v));   // a position's value: under $100 shows 4 decimals so fee growth is visible
+const fxd = (v) => { const a = Math.abs(v); return a >= 1 ? fx(a) : a >= 0.01 ? a.toFixed(4) : a > 0 ? a.toFixed(6) : '0.00'; };
+const pctd = (v) => { const a = Math.abs(v); return (a >= 0.01 || a === 0 ? a.toFixed(2) : a.toFixed(4)); };
 function plLine(now, E, holdNow) {   // "Put in $X · taken out $Y · P/L +$Z (+n%) · vs just holding +$W"
   if (!E || !(E.in > 0)) return '';
-  const pl = now + E.out - E.in, vs = now - holdNow, c = (v) => (v >= 0 ? 'grn' : 'red'), sg = (v) => (v >= 0 ? '+' : '−') + '$' + fx(Math.abs(v));
-  return `<div class="mu" style="font-size:12.5px">Put in $${fx(E.in)}${E.out > 0 ? ` · taken out $${fx(E.out)}` : ''} · P/L <b class="${c(pl)}">${sg(pl)} (${pl >= 0 ? '+' : ''}${(pl / E.in * 100).toFixed(2)}%)</b> · vs just holding <span class="${c(vs)}">${sg(vs)}</span></div>`;
+  const pl = now + E.out - E.in, vs = now - holdNow, c = (v) => (v >= 0 ? 'grn' : 'red'), sg = (v) => (v >= 0 ? '+' : '−') + '$' + fxd(v);
+  return `<div class="mu" style="font-size:12.5px">Put in $${fx(E.in)}${E.out > 0 ? ` · taken out $${fx(E.out)}` : ''} · P/L <b class="${c(pl)}">${sg(pl)} (${pl >= 0 ? '+' : '−'}${pctd(pl / E.in * 100)}%)</b> · vs just holding <span class="${c(vs)}">${sg(vs)}</span></div>`;
 }
 
 /* ---------- Taxes: a file of everything the wallets did in one year, with dollar values ----------
@@ -15813,7 +15879,7 @@ function fillText(sold, sa, bought, ba) {
 async function homeRecent(addr) {
   // Recent = what this wallet did (its own operations, payments in) + its orders that FILLED (trade effects, grouped per operation).
   // Another trader's order that took ours is listed as "Order filled", not as their order.
-  const [opsR, effR] = await Promise.all([H(`/accounts/${addr}/operations?order=desc&limit=10`), H(`/accounts/${addr}/effects?order=desc&limit=40`).catch(() => null)]);
+  const [opsR, effR] = await Promise.all([H(`/accounts/${addr}/operations?order=desc&limit=10&join=transactions`), H(`/accounts/${addr}/effects?order=desc&limit=40`).catch(() => null)]);
   if (cur !== 'home' || homeAddr !== addr) return;
   const all = opsR._embedded.records, ops = all.filter((o) => o.source_account === addr || !/offer/.test(o.type));
   knownAddrs(all.filter((o) => o.type === 'create_account' && o.funder === addr).map((o) => o.account).concat(all.filter((o) => o.type === 'payment' && o.from === addr).map((o) => o.to)));
@@ -15835,9 +15901,10 @@ async function homeRecent(addr) {
     FEEOF[o.transaction_hash] = o.type === 'payment' ? `${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}` : `${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; }   // scam look-alike dust: not shown at all (it only clutters the list)
   const rows = [...ops.filter((o) => !isDust(o) && !feeTx.has(o.id)).map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
   const was = new Set([...document.querySelectorAll('#hRec details[open]')].map((d) => d.dataset.tx || d.dataset.op));   // rows you opened stay open
-  $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}>${esc(opText(r.o, addr))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
+  $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}>${esc(opText(r.o, addr))}${memoLine(r.o, addr)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
     : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
     : '<div><span class="mu">Nothing yet</span></div>';
+  pmFill($('#hRec')).catch(() => {});
   if (was.size) document.querySelectorAll('#hRec details').forEach((d) => { if (was.has(d.dataset.tx || d.dataset.op)) { d.dataset.loaded = d.dataset.loaded || ''; d.open = true; } });
   mergeAmts($('#hRec'), addr);
 }
@@ -15989,6 +16056,25 @@ async function mergeAmts(root, me) {
   await Promise.all(ids.map(async (id) => { try { const j = await H(`/operations/${id}/effects`); const c = (j._embedded.records || []).find((e) => e.type === 'account_credited'); if (c) MERGEAMT[id] = +c.amount; } catch (e) {} }));
   root.querySelectorAll('[data-mop]').forEach((e) => { const v = MERGEAMT[e.dataset.mop]; if (v == null) return; e.textContent = amtFmt(v) + ' XLM'; const sm = e.closest('details') && e.closest('details').querySelector('summary span'); if (sm) sm.textContent = sm.textContent.replace('all its XLM', fx(v) + ' XLM'); });
 }
+// a transaction's memo under its line in Recent (payments and sends carry them; exchanges use them to know whose deposit it is)
+const b64u8 = (s) => { try { return Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); } catch (e) { return null; } };
+const pmOther = (o, me) => (o.type === 'create_account' ? (o.funder === me ? o.account : o.funder) : o.from != null ? (o.from === me ? o.to : o.from) : null);   // the other wallet on a send / receive
+const PMC = {};   // tx hash + wallet → opened text ('' = not readable here)
+const memoLine = (o, me) => { const t = o && o.transaction; if (!t || !t.memo_type || t.memo_type === 'none' || t.memo == null || t.memo === '') return '';
+  if (t.memo_type === 'hash' && PM.isSealed(b64u8(t.memo))) { const k = t.hash + me, v = PMC[k];
+    return `<span class="mbub pmemo${v === '' ? ' nr' : ' pv'}" data-k="${esc(k)}" data-m="${esc(t.memo)}" data-src="${esc(t.source_account)}" data-seq="${esc(t.source_account_sequence)}" data-other="${esc(pmOther(o, me) || '')}" data-me="${esc(me)}">${pmTxt(v)}</span>`; }
+  return `<span class="mbub"><span class="ml">Memo${t.memo_type !== 'text' ? ' · ' + esc(t.memo_type) : ''}</span>${esc(String(t.memo))}</span>`; };
+const pmTxt = (v) => `<span class="ml">🔒 Private memo</span>${v == null ? 'opening…' : v ? esc(v) : 'not readable on this wallet'}`;
+async function pmFill(root) {   // open the private memos shown in a list, with this phone's own key for that wallet
+  for (const el of root.querySelectorAll('.pmemo')) {
+    const k = el.dataset.k; if (PMC[k] == null) {
+      const kp = (OWN().find((o) => o.addr === el.dataset.me) || {}).kp; let v = '';
+      try { if (kp && el.dataset.other) v = (await PM.open(b64u8(el.dataset.m), Uint8Array.from(kp.rawSecretKey()), Uint8Array.from(SDK.StrKey.decodeEd25519PublicKey(el.dataset.other)), el.dataset.src, el.dataset.seq)) || ''; } catch (e) { v = ''; }
+      PMC[k] = v;
+    }
+    el.innerHTML = pmTxt(PMC[k]); el.classList.toggle('nr', PMC[k] === ''); el.classList.toggle('pv', PMC[k] !== '');
+  }
+}
 const FEEOF = {};   // tx hash → the Liquidfi fee paid in it (shown in that trade's details)
 function opDetail(o, me) {
   const an = (t, c, i) => (t === 'native' ? 'XLM' : c + (i ? ` <span class="mu">· ${short(i)}</span>` : '')), row = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
@@ -16016,7 +16102,7 @@ document.addEventListener('toggle', async (e) => {   // memo + network fee from 
   const x = d.querySelector('.recx'); if (!x) return;
   try {
     const t = await H('/transactions/' + d.dataset.tx);
-    const memo = t.memo_type && t.memo_type !== 'none' ? `${esc(String(t.memo))}${t.memo_type !== 'text' ? ` <span class="mu">(${esc(t.memo_type)})</span>` : ''}` : '';
+    const memo = t.memo_type === 'hash' && PM.isSealed(b64u8(t.memo)) ? 'private (encrypted on the ledger, shown above)' : t.memo_type && t.memo_type !== 'none' ? `${esc(String(t.memo))}${t.memo_type !== 'text' ? ` <span class="mu">(${esc(t.memo_type)})</span>` : ''}` : '';
     x.outerHTML = (memo ? `<div><span>Memo</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${memo}</span></div>` : '') + `<div><span>Network fee</span><span class="mono">${(+t.fee_charged / 1e7).toFixed(7).replace(/0+$/, '').replace(/\.$/, '')} XLM</span></div>`;
   } catch (er) { x.remove(); }
 }, true);
@@ -16583,7 +16669,7 @@ async function tradeLoadMine() {   // open orders, stops and fills of the Trade 
     const dn = $('#tStopDone'); if (dn) { dn.style.display = old.length ? 'flex' : 'none'; dn.innerHTML = old.map((x) => stopCard(x, true)).join(''); } };   // finished stops (filled / cancelled / ended) live in Activity, not Open orders
   STOP_PAINT = paintOpen;
   paintOpen(); drawFills(tradeAddr, off); tPendPaint();
-  if (S.stopUrl) stopList(tradeAddr).then(paintOpen).catch((e) => { STOPS.err = niceErr(e); });
+  if (S.stopUrl) stopList(tradeAddr).then(() => { paintOpen(); tBalPaint(ACC[tradeAddr]); }).catch((e) => { STOPS.err = niceErr(e); });
   Promise.all(off.map(async (o) => { const f = await offerFilled(o); if (f != null) FILLED[o.id] = f; })).then(paintOpen);
 }
 let TRADE_OFF = [];
@@ -16595,7 +16681,8 @@ function tBalPaint(a) {   // Available on the current pair: spendable base + quo
   const p = TP(), nB = kName(p.b), nQ = kName(p.q), vb = swapAvail(a, p.b), vq = swapAvail(a, p.q), key = tradeAddr + p.b + p.q;
   const ch = (v, old) => (old == null || Math.abs(v - old) < 1e-7 ? '' : ` <span class="${v > old ? 'up' : 'sell'}">${v > old ? '+' : '−'}${fx(Math.abs(v - old), 2)}</span>`);
   const same = TBAL.pair === key, ob = same ? TBAL.b : null, oq = same ? TBAL.q : null;
-  el.innerHTML = `<span>Available</span><span><b>${fx(vb, 2)}</b> ${esc(nB)}${ch(vb, ob)} · <b>${fx(vq, 2)}</b> ${esc(nQ)}${ch(vq, oq)}</span>`;
+  const hB = stopHold(a, p.b), hQ = stopHold(a, p.q), hl = [hB > 1e-7 ? `${fx(hB, 2)} ${esc(nB)}` : '', hQ > 1e-7 ? `${fx(hQ, 2)} ${esc(nQ)}` : ''].filter(Boolean).join(' · ');
+  el.innerHTML = `<span>Available${hl ? `<br><span class="mu" style="font-size:11.5px" id="tHold">${hl} held for stops</span>` : ''}</span><span><b>${fx(vb, 2)}</b> ${esc(nB)}${ch(vb, ob)} · <b>${fx(vq, 2)}</b> ${esc(nQ)}${ch(vq, oq)}</span>`;
   if (!same || Date.now() - TBAL.at > 120000) Object.assign(TBAL, { pair: key, b: vb, q: vq, at: Date.now() });   // the +/− shows what the last trade changed for 2 minutes
 }
 /* ---------- Trade pair: any token against any token. Price = quote per base. XLM/USDC is the default and uses the always-on MK stream;
@@ -16681,8 +16768,8 @@ function tradeEst() {
 }
 function spendable(a, isXLM) {
   if (!a) return 0;
-  if (isXLM) { const b = a.balances.find((x) => x.asset_type === 'native'); const res = 1 + 0.5 * (a.subentry_count + (a.num_sponsoring || 0) - (a.num_sponsored || 0)); return Math.max(0, +b.balance - +b.selling_liabilities - res - 0.5); }
-  const b = a.balances.find(isUSDC); return b ? Math.max(0, +b.balance - +b.selling_liabilities) : 0;
+  if (isXLM) { const b = a.balances.find((x) => x.asset_type === 'native'); const res = 1 + 0.5 * (a.subentry_count + (a.num_sponsoring || 0) - (a.num_sponsored || 0)); return Math.max(0, +b.balance - +b.selling_liabilities - res - 0.5 - stopHold(a, 'XLM')); }
+  const b = a.balances.find(isUSDC); return b ? Math.max(0, +b.balance - +b.selling_liabilities - stopHold(a, uKey())) : 0;
 }
 async function tradeReview() {
   const q = +$('#tAmt').value; if (!(q > 0)) return toast('Enter an amount.');
@@ -16694,6 +16781,11 @@ async function tradeReview() {
   if (T.mode === 'stop') { if (!stopPairOK()) return toast('Stops work against USDC (or another dollar or euro coin), not against XLM.'); return stopReview(q, a, kp); }
   if (T.mode === 'lim') {
     const p = +$('#tPx').value; if (!(p > 0)) return toast('Enter a limit price.');
+    // the network only accepts an offer it can cover: check here (after what stop orders hold) instead of letting it fail
+    if (T.side === 'sell' && avail(PR.b) < q - 1e-7) return toast(`Not enough spendable ${nB} (have ${fx(avail(PR.b))}).${holdNote(a, PR.b)}`, 7000);
+    if (T.side === 'buy' && avail(PR.q) < q * p - 1e-7) return toast(`Not enough ${nQ} (have ${fx(avail(PR.q))}, need ${fx(q * p)}).${holdNote(a, PR.q)}`, 7000);
+    { const xNeed = 0.5 + (T.side === 'sell' && PR.b === 'XLM' ? q : 0) + (T.side === 'buy' && PR.q === 'XLM' ? q * p : 0);   // a new offer adds 0.5 XLM reserve
+      if (avail('XLM') < xNeed - 1e-7) return toast(`Not enough XLM: an open order needs 0.5 XLM reserve${xNeed > 0.5 ? ' on top of what it sells' : ''} (have ${fx(avail('XLM'))}).${holdNote(a, 'XLM')}`, 7000); }
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: AQ, buying: AB, buyAmount: amt7(q), price: p.toFixed(7) })
       : SDK.Operation.manageSellOffer({ selling: AB, buying: AQ, amount: amt7(q), price: p.toFixed(7) });
     return confirmSheet(`Limit ${T.side} ${fx(q)} ${nB}`, `${netPre()}stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} ${nB} @ ${pxF(p)} ${nQ}`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} ${nQ}` }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
@@ -16701,15 +16793,15 @@ async function tradeReview() {
   // Market = path payment to self + the Liquidfi fee in the same transaction (all or nothing). The amount entered is exactly what trades;
   // the fee is paid on top (buy: in the quote token, sell: in the base token).
   const buy = T.side === 'buy';
-  if (!buy && avail(PR.b) < q) return toast(`Not enough spendable ${nB} (have ${fx(avail(PR.b))}).`);
+  if (!buy && avail(PR.b) < q) return toast(`Not enough spendable ${nB} (have ${fx(avail(PR.b))}).${holdNote(a, PR.b)}`, 7000);
   let qt, fee = null, sq = q;
   try {
-    if (!buy) { fee = await feeLegFor(PR.b, feeOf(q), tradeAddr); if (fee && avail(PR.b) < q + fee.amt) return toast(`Not enough ${nB} (have ${fx(avail(PR.b))}, need ${fx(q + fee.amt)} with the ${SWAP_FEE.bps / 100}% fee).`); }
+    if (!buy) { fee = await feeLegFor(PR.b, feeOf(q), tradeAddr); if (fee && avail(PR.b) < q + fee.amt) return toast(`Not enough ${nB} (have ${fx(avail(PR.b))}, need ${fx(q + fee.amt)} with the ${SWAP_FEE.bps / 100}% fee).${holdNote(a, PR.b)}`, 7000); }
     qt = await quote(T.side, sq);
     if (buy) fee = await feeLegFor(PR.q, feeOf(qt.usd), tradeAddr);
   } catch (e) { return toast(niceErr(e)); }
   const fU = buy && fee ? fee.amt : 0;
-  if (buy && avail(PR.q) < qt.usd + fU) return toast(`Not enough ${nQ} (have ${fx(avail(PR.q))}, need ${fx(qt.usd + fU)} with the fee).`);
+  if (buy && avail(PR.q) < qt.usd + fU) return toast(`Not enough ${nQ} (have ${fx(avail(PR.q))}, need ${fx(qt.usd + fU)} with the fee).${holdNote(a, PR.q)}`, 7000);
   const cap = buy ? qt.usd * (1 + S.slip / 100) : qt.usd * (1 - S.slip / 100);
   const capU = buy ? Math.min(cap, avail(PR.q) - fU) : cap;
   const ops = [buy ? SDK.Operation.pathPaymentStrictReceive({ sendAsset: AQ, sendMax: amt7(capU), destination: tradeAddr, destAsset: AB, destAmount: amt7(q), path: qt.path })
@@ -16736,7 +16828,7 @@ async function fillPriceOf(hash, me) {
   return null;
 }
 function tPend(label, scr = 'trade', addr = tradeAddr) {
-  const p = { id: ++tPendN, label, st: 'Sending…', cls: 'mu', busy: 1, addr, scr, t: Date.now() };
+  const p = { id: ++tPendN, label, st: 'Sending…', cls: 'amb', busy: 1, addr, scr, t: Date.now() };
   TPEND.unshift(p); TPEND.splice(10); closeSheet();
   if (scr === 'swap') { if ($('#wAmt')) $('#wAmt').value = ''; if (typeof SWP !== 'undefined') SWP.q = null; }
   else if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false; if ($('#tDays')) $('#tDays').value = '1';   // stops default to 1 day
@@ -16746,7 +16838,7 @@ function tPend(label, scr = 'trade', addr = tradeAddr) {
   return p;
 }
 function tPendSet(p, st, cls, sub, done) {
-  Object.assign(p, { st, cls: cls || '', busy: done ? 0 : 1 }); if (sub != null) p.sub = sub; if (done) p.t2 = Date.now();
+  Object.assign(p, { st, cls: !done && (!cls || cls === 'mu') ? 'amb' : cls || '', busy: done ? 0 : 1 });   /* still working (Sending…, Sent…): yellow so it stands out */ if (sub != null) p.sub = sub; if (done) p.t2 = Date.now();
   tPendPaint();
   if (done && cur === 'trade' && p.scr === 'trade') tradeLoadMine();
   if (done && (p.scr === 'earn' || p.scr === 'earnx')) { delete EPL[p.addr]; delete XPL[p.addr]; if (cur === 'earn') drawEarn(); }
@@ -16858,7 +16950,7 @@ async function helperRecover() {
 async function stopList(addr) {
   const kp = kpFor(addr), ts = Date.now();
   const j = await stopApi('/list', { net: S.net, wallet: addr, ts, sig: stopSig(kp, `liquidfi-stops:list:${S.net}:${addr}:${ts}`) });
-  STOPS.addr = addr; STOPS.list = j.stops || []; STOPS.err = null;
+  STOPS.addr = addr; STOPS.list = j.stops || []; STOPS.err = null; STOPSBY[addr] = STOPS.list;
   if (Object.values(hlpReg()).some((r) => r.w === addr)) helperSweep(addr, STOPS.list).catch(() => {});
   return STOPS.list;
 }
@@ -16902,10 +16994,10 @@ async function stopReview(q, a, kp) {
   if (m && (sell ? st >= m : st <= m)) return toast(`The price is ${p4(m)} now. A ${sell ? 'sell stop goes below' : 'buy stop goes above'} it.`);
   let fee = null; try { fee = await feeLegFor(sell ? bK : qK, feeOf(sell ? q : q * st), tradeAddr); } catch (e) { return toast(niceErr(e)); }
   const sq = q, usd = q * lim;   // the amount entered is what sells; the fee is paid on top
-  if (sell && isX && spendable(a, true) < q + (fee ? fee.amt : 0) + 1.02) return toast(`Not enough spendable XLM: ${fx(q, 2)} to sell + ${fee ? m2(fee.amt) + ' fee + ' : ''}1.01 held by its helper (have ${fx(spendable(a, true))}).`);
-  if (sell && !isX && swapAvail(a, bK) < q + (fee ? fee.amt : 0)) return toast(`Not enough ${nB}: ${fx(q, 2)} to sell${fee ? ' + ' + m2(fee.amt) + ' fee' : ''} (have ${fx(swapAvail(a, bK))}).`);
+  if (sell && isX && spendable(a, true) < q + (fee ? fee.amt : 0) + 1.02) return toast(`Not enough spendable XLM: ${fx(q, 2)} to sell + ${fee ? m2(fee.amt) + ' fee + ' : ''}1.01 held by its helper (have ${fx(spendable(a, true))}).${holdNote(a, 'XLM')}`, 7000);
+  if (sell && !isX && swapAvail(a, bK) < q + (fee ? fee.amt : 0)) return toast(`Not enough ${nB}: ${fx(q, 2)} to sell${fee ? ' + ' + m2(fee.amt) + ' fee' : ''} (have ${fx(swapAvail(a, bK))}).${holdNote(a, bK)}`, 7000);
   if ((!sell || !isX) && spendable(a, true) < 1.02) return toast(`A stop needs 1.01 XLM free for its helper (have ${fx(spendable(a, true))}). It comes back when the stop ends.`);
-  if (!sell && swapAvail(a, qK) < usd + (fee ? fee.amt : 0)) return toast(`Not enough ${nQ} (have ${fx(swapAvail(a, qK))}, need ${fx(usd + (fee ? fee.amt : 0))}).`);
+  if (!sell && swapAvail(a, qK) < usd + (fee ? fee.amt : 0)) return toast(`Not enough ${nQ} (have ${fx(swapAvail(a, qK))}, need ${fx(usd + (fee ? fee.amt : 0))}).${holdNote(a, qK)}`, 7000);
   const end = new Date(Date.now() + days * 86400e3);
   const items = [{ t: feed === 'trades3' ? `When 3 trades of 1+ ${nB} on Stellar are at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}${feed === 'trades3' ? ' · only trades after you place it count' : ''}`, hl: 1 },
     { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} ${nB} at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} ${nB} at ${p4(lim)} or better` : `Buy ${fx(q, 2)} ${nB} at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} ${nQ}${fee ? ` · fee ${m2(fee.amt)} ${nB} on top (${SWAP_FEE.bps / 100}%)` : ''}` : `pay at most ${fx(usd)} ${nQ}${fee ? ` + ${m2(fee.amt)} ${nQ} fee (${SWAP_FEE.bps / 100}%)` : ''}` },
@@ -17348,7 +17440,7 @@ function drawSend() {
   $('#sFrom').value = homeAddr || firstWallet();
   const sv = NS().saved;
   $('#sTo').innerHTML = `<option value="">Choose…</option>` + sv.map((x, i) => `<option value="${i}">${esc(x.name)} · ${short(x.addr)}</option>`).join('') + `<option value="new">+ New address</option>`;
-  $('#sNew').style.display = 'none';
+  $('#sNew').style.display = 'none'; $('#sMemoW').style.display = 'flex'; $('#sPriv').checked = false; sPrivPaint();
   $('#sAsset').innerHTML = '';   // a fresh Send starts on XLM
   sendAssets();
 }
@@ -17381,8 +17473,12 @@ function saveAddrOk() {
   NS().saved.push(n); saveS(); closeSheet(); drawSend(); $('#sTo').value = String(NS().saved.length - 1); sendToChanged(); toast('Saved.');
 }
 function sendToChanged() {
-  const v = $('#sTo').value; $('#sNew').style.display = v === 'new' ? 'flex' : 'none';
+  const v = $('#sTo').value; $('#sNew').style.display = v === 'new' ? 'flex' : 'none'; $('#sMemoW').style.display = v === 'new' ? 'none' : 'flex';   // adding an address has its own memo box: show one at a time
   const s = NS().saved[+v]; $('#sMemo').value = s && s.memo ? s.memo : '';
+}
+function sPrivPaint() {
+  const on = $('#sPriv').checked; $('#sMemo').maxLength = on ? 31 : 28;
+  $('#sMemoL').textContent = on ? 'Private memo (encrypted: only you and the receiver can read it)' : 'Memo (optional, public: anyone can see it on the ledger)';
 }
 async function sendReview() {
   const from = $('#sFrom').value, v = $('#sTo').value, to = NS().saved[+v];
@@ -17390,21 +17486,30 @@ async function sendReview() {
   const amt = +$('#sAmt').value; if (!(amt > 0)) return toast('Enter an amount.');
   const key = $('#sAsset').value, asset = key === 'XLM' ? SDK.Asset.native() : new SDK.Asset(key.split(':')[0], key.split(':')[1]);
   const memoS = $('#sMemo').value.trim();
+  { const sa = ACC[from]; if (sa && stopHold(sa, key) > 1e-7 && amt > swapAvail(sa, key) + 1e-7) return toast(`This wallet has ${fx(swapAvail(sa, key))} ${key === 'XLM' ? 'XLM' : kName(key)} free to send.${holdNote(sa, key)} Cancel or change a stop to use it.`, 8000); }
   let dest = null; try { dest = await acct(to.addr); } catch (e) {}
   if (dest && dest.data && dest.data['config.memo_required'] === 'MQ==' && !memoS) return toast('This receiver requires a memo.');
   let op;
   if (!dest) { if (key !== 'XLM') return toast('That account does not exist yet; only XLM (1+) can create it.'); if (amt < 1) return toast('Creating an account needs at least 1 XLM.'); op = SDK.Operation.createAccount({ destination: to.addr, startingBalance: amt7(amt) }); }
   else { if (key !== 'XLM' && !dest.balances.some((b) => aKey(b) === key)) return toast('The receiver has no trustline for this asset.'); op = SDK.Operation.payment({ destination: to.addr, asset, amount: amt7(amt) }); }
-  const memo = memoS ? (/^\d{1,19}$/.test(memoS) ? SDK.Memo.id(memoS) : SDK.Memo.text(memoS.slice(0, 28))) : null;
+  const priv = $('#sPriv').checked, myKp = (OWN().find((o) => o.addr === from) || {}).kp;
+  if (priv) {
+    if (!memoS) return toast('Type the private memo, or turn Private off.');
+    if (!PM.fits(memoS)) return toast('A private memo fits 31 characters (fewer with emoji).');
+    if (dest && dest.data && dest.data['config.memo_required'] === 'MQ==') return toast('This address needs a normal memo (exchanges read it to credit you). Turn Private off.', 7000);
+    if (!myKp) return toast('This wallet can\'t sign here.');
+  }
+  const memo = priv ? async (seq) => { const b = await PM.seal(memoS, Uint8Array.from(myKp.rawSecretKey()), Uint8Array.from(SDK.StrKey.decodeEd25519PublicKey(to.addr)), from, seq); return SDK.Memo.hash([...b].map((x) => x.toString(16).padStart(2, '0')).join('')); }
+    : memoS ? (/^\d{1,19}$/.test(memoS) ? SDK.Memo.id(memoS) : SDK.Memo.text(memoS.slice(0, 28))) : null;
   const mine = allAccts().some((x) => x.addr === to.addr), what = `Send ${fx(amt, 2)} ${key.split(':')[0]} to ${to.name}`;
   // between your own wallets: one tap. To anyone else: hold (money leaving you can't be undone)
-  confirmSheet(what, `${netPre()}${mine ? 'between your own wallets' : 'cannot be undone'}`, [{ t: `To ${to.name}`, s: to.addr }, { t: 'Memo', s: memoS || '(none)' }, { t: 'From', s: from }], mine ? 'Send' : 'Hold to send', () => sendTx(kpFor(from), from, [op], memo, what), !mine, mine ? 'b-light' : null, 'Sending…', mine);
+  confirmSheet(what, `${netPre()}${mine ? 'between your own wallets' : 'cannot be undone'}`, [{ t: `To ${to.name}`, s: to.addr }, { t: priv ? '🔒 Private memo' : 'Memo', s: priv ? `${memoS} · encrypted: only you and ${to.name} can read it, in Liquidfi` : memoS || '(none)' }, { t: 'From', s: from }], mine ? 'Send' : 'Hold to send', () => sendTx(kpFor(from), from, [op], memo, what, memoS ? (priv ? '🔒 private memo: ' : 'memo: ') + memoS : ''), !mine, mine ? 'b-light' : null, 'Sending…', mine);
 }
 // a send: the sheet closes on the tap, the Send screen shows it go Sending → Sent (no result screen)
-async function sendTx(kp, from, ops, memo, what) {
+async function sendTx(kp, from, ops, memo, what, mtxt) {
   const p = tPend(what, 'send', from);
   try { const t = await buildTx(from, ops, memo); t.sign(kp); tPendSet(p, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(t);
-    tPendSet(p, '✓ Sent', 'grn', 'confirmed · ledger ' + r.ledger, true); }
+    tPendSet(p, '✓ Sent', 'grn', 'confirmed · ledger ' + r.ledger + (mtxt ? ' · ' + mtxt : ''), true); }
   catch (e) { tPendSet(p, 'Failed', 'red', niceErr(e) + ' Nothing was sent.', true); }
 }
 
@@ -17799,7 +17904,7 @@ $('#sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') clos
 $('#xtAmt').addEventListener('input', xtEst); $('#xtPx').addEventListener('input', xtEst);
 $('#tAmt').addEventListener('input', tradeEst); $('#tPx').addEventListener('input', () => { T.pxTyped = !!$('#tPx').value; tradeEst(); });
 $('#tStop').addEventListener('input', () => { T.stopTyped = !!$('#tStop').value; stopDefaults(); tradeEst(); }); $('#tLim').addEventListener('input', () => { stopDefaults(); tradeEst(); }); $('#tFeed').addEventListener('change', tradeEst);
-$('#sTo').addEventListener('change', sendToChanged); $('#sFrom').addEventListener('change', sendAssets);
+$('#sTo').addEventListener('change', sendToChanged); $('#sPriv').addEventListener('change', sPrivPaint); $('#sFrom').addEventListener('change', sendAssets);
 $('#rAcct').addEventListener('change', drawReceive);
 $('#eWal').addEventListener('change', () => { earnAddr = $('#eWal').value; drawEarn(); });
 $('#eXWal').addEventListener('change', () => { earnXr = $('#eXWal').value; drawEarn(); });
