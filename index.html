@@ -14652,7 +14652,7 @@ function swapKnown() {   // tokens you can swap into even without holding them y
 // Kept out of Available so another order can't spend it (the stop would just fail). The stop being edited doesn't count against its replacement.
 const STOPSBY = {};
 function stopHold(a, k) {
-  const w = a && (a.account_id || a.id), L = (w && STOPSBY[w]) || []; if (!L.length) return 0;
+  const w = a && (a.account_id || a.id), L = (w && STOPSBY[S.net + ':' + w]) || []; if (!L.length) return 0;
   const f = 1 + (feeTo(w) ? SWAP_FEE.bps / 10000 : 0); let h = 0;
   for (const x of L) {
     if (!stopLive(x) || (T.replace && T.replace.id === x.id)) continue;
@@ -14660,6 +14660,10 @@ function stopHold(a, k) {
     if (x.side === 'buy' && x.quote === k) h += (+x.xlm || 0) * (+x.limit || 0) * f;
   }
   return h;
+}
+async function stopsKnown(addr) {   // fetch this wallet's stops (holds only) if we haven't yet; Trade's own list is left alone
+  if (!S.stopUrl || !addr || STOPSBY[S.net + ':' + addr]) return;
+  try { const kp = kpFor(addr), ts = Date.now(); const j = await stopApi('/list', { net: S.net, wallet: addr, ts, sig: stopSig(kp, `liquidfi-stops:list:${S.net}:${addr}:${ts}`) }); STOPSBY[S.net + ':' + addr] = j.stops || []; } catch (e) {}
 }
 const holdNote = (a, k) => { const h = stopHold(a, k); return h > 1e-7 ? ` ${fx(h, 2)} ${k === 'XLM' ? 'XLM' : kName(k)} is held for your stop orders.` : ''; };
 function swapAvail(a, k) {
@@ -14748,6 +14752,7 @@ function swapResult(r) {   // what actually came in, from the ledger result
 }
 async function swapReview() {
   const q = SWP.q, a = ACC[homeAddr]; if (!a) return toast('This wallet is not funded yet.');
+  await stopsKnown(homeAddr);
   if (!q || q.from !== $('#wFrom').value || q.to !== $('#wTo').value || q.amt !== +$('#wAmt').value) return toast('Enter an amount and wait for the price.');
   if (Date.now() - q.at > 20000) { swapQuote(); return toast('Price refreshed. Check it and tap Swap again.'); }
   if (q.amt > swapAvail(a, q.from) + 1e-7) return toast(`This wallet has ${m2(swapAvail(a, q.from))} ${kName(q.from)} available.${holdNote(a, q.from)}`, 7000);
@@ -14900,7 +14905,7 @@ async function drawEarn() {
         `<button class="b-light" data-act="xrEarnAdd" data-xp="${xp.key}"${!XL.length || A.none || !A.at || !d || !d.a ? ' disabled' : ''}>Add</button><button class="b-out" data-act="xrEarnOut" data-xp="${xp.key}"${lp > 0 ? '' : ' disabled'}>Withdraw</button>`);
     }
     $('#eXList').innerHTML = h;
-    $('#eTot').innerHTML = TOT.v > 0 ? `<span class="mu" style="font-size:13px">In pools · all wallets</span><b class="mono" style="font-size:22px">$${fxv(TOT.v)}</b><span class="mono ${TOT.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${TOT.pl >= 0 ? '+' : '−'}$${fxd(TOT.pl)} P/L</span>` : '';
+    $('#eTot').innerHTML = TOT.v > 0 ? `<span class="mu" style="font-size:13px">In pools · wallets shown</span><b class="mono" style="font-size:22px">$${fxv(TOT.v)}</b><span class="mono ${TOT.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${TOT.pl >= 0 ? '+' : '−'}$${fxd(TOT.pl)} P/L</span>` : '';
     $('#eTot').style.display = TOT.v > 0 ? 'flex' : 'none';
   };
   paint(); tPendPaint();
@@ -14918,7 +14923,8 @@ function earnCard(name, where, c, mine, note, risk, btns) {
     <div class="mu" style="font-size:12px">${esc(risk)}</div><div class="g2">${btns}</div></div>`;
 }
 /* Add: type the dollar side, the other side follows the pool's price */
-function earnAddSheet(pid) {
+async function earnAddSheet(pid) {
+  await stopsKnown(earnAddr);
   const p = earnPools().find((x) => x.id === pid), c = POOLC[pid], a = ACC[earnAddr]; if (!p || !c || !a) return;
   const has = (k) => k === 'XLM' || a.balances.some((b) => akey(b) === k);
   EARN_ADD = { p, avA: 0, avB: 0 };   // so "Go to Swap" knows the pool even before the coin is held
@@ -15263,13 +15269,13 @@ function stmtMake(rows, year, pick) {
     if (isTrade(r) || used.has(r)) continue;
     const type = r.label === 'liquidity in' ? 'Pool deposit' : r.label === 'liquidity out' ? 'Pool withdrawal' : r.label === 'cost' ? 'Fee' : +r.ra > 0 && !(+r.sa > 0) ? 'Received' : 'Sent';
     const qty = +r.ra > 0 && type !== 'Fee' && type !== 'Pool deposit' && type !== 'Sent' ? r.ra : r.sa, cur = qty === r.ra ? r.rc : r.sc;
-    O.push([ts(r.t), type, n(qty), cur, r.usd, r.desc || '', short(r.w), r.hash || '']);
+    O.push([ts(r.t), type, n(qty), cur, r.fa || '', r.fa ? r.fk : '', r.usd, r.desc || '', short(r.w), r.hash || '']);
   }
   const L = [['Liquidfi account statement', year], ['Wallets', pick.map(short).join(' ')], ['Times', 'UTC'], [],
     ['TRADES'], ['Date', 'Action', 'Quantity', 'Asset', 'Price', 'Price Currency', 'Amount', 'Commission (Liquidfi fee)', 'Commission Currency', 'Network Fee', 'Network Fee Currency', 'USD Value', 'Wallet', 'TxHash'], ...T,
     [], ['TOTALS BY ASSET'], ['Asset', 'Price Currency', 'Buys', 'Total Bought', 'Total Cost', 'Avg Buy Price', 'Sells', 'Total Sold', 'Total Proceeds', 'Avg Sell Price', 'Net Quantity', 'Bought USD', 'Sold USD'],
     ...Object.values(TOT).sort((a, b) => (a.coin + a.cur).localeCompare(b.coin + b.cur)).map((x) => [x.coin, x.cur, x.nb, n(x.bq), n(x.ba), px(x.bq ? x.ba / x.bq : 0), x.ns, n(x.sq), n(x.sa), px(x.sq ? x.sa / x.sq : 0), n(+(x.bq - x.sq).toFixed(7)), x.bu.toFixed(2), x.su.toFixed(2)]),
-    [], ['OTHER ACTIVITY (deposits / withdrawals / pools / fees)'], ['Date', 'Type', 'Quantity', 'Asset', 'USD Value', 'Description', 'Wallet', 'TxHash'], ...O];
+    [], ['OTHER ACTIVITY (deposits / withdrawals / pools / fees)'], ['Date', 'Type', 'Quantity', 'Asset', 'Network Fee', 'Network Fee Currency', 'USD Value', 'Description', 'Wallet', 'TxHash'], ...O];
   return { csv: L.map((l) => l.map(q).join(',')).join('\n') + '\n', trades: T.length };
 }
 async function taxMake() {
@@ -15290,9 +15296,10 @@ async function taxMake() {
     const usdOf = (amt, sym, key, t) => { if (!(amt > 0)) return null; if (STABLE_SYMS.includes(sym)) return amt; if (sym === 'XRP') { const p = xrpAt(t); return p ? amt * p : null; } if (key) { const p = priceAt(key, t); return p ? amt * p : null; } return null; };
     for (const r of rows) { const v = usdOf(+r.ra, r.rc, r.rk, r.t); const s2 = usdOf(+r.sa, r.sc, r.sk, r.t); const u = STABLE_SYMS.includes(r.rc) ? v : STABLE_SYMS.includes(r.sc) ? s2 : (s2 != null ? s2 : v); r.usd = u == null ? '' : u >= 0.01 || u === 0 ? u.toFixed(2) : u.toFixed(8).replace(/0+$/, '').replace(/\.$/, '.00'); }   // under a cent: keep up to 8 decimals so tiny fees don't show as 0.00
     rows.sort((a, b) => a.t - b.t);
+    { const nH = {}; rows.forEach((r) => { if (!r.hash) return; const n = (nH[r.hash] = (nH[r.hash] || 0) + 1); r.txid = n > 1 ? `${r.hash}-${n}` : r.hash; }); }   // tax tools de-duplicate on TxHash
     const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
     const ts = (t) => new Date(t).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-    const csv = [TAXCOLS.join(',')].concat(rows.map((r) => [ts(r.t), r.sa != null ? n7(r.sa) : '', r.sc || '', r.ra != null ? n7(r.ra) : '', r.rc || '', r.fa || '', r.fa ? r.fk : '', r.usd, r.usd ? 'USD' : '', r.label || '', `${r.desc || ''} - wallet ${short(r.w)}`, r.hash || ''].map(q).join(','))).join('\n') + '\n';
+    const csv = [TAXCOLS.join(',')].concat(rows.map((r) => [ts(r.t), r.sa != null ? n7(r.sa) : '', r.sc || '', r.ra != null ? n7(r.ra) : '', r.rc || '', r.fa || '', r.fa ? r.fk : '', r.usd, r.usd ? 'USD' : '', r.label || '', `${r.desc || ''} - wallet ${short(r.w)}`, r.txid || r.hash || ''].map(q).join(','))).join('\n') + '\n';
     const ascii = (x) => x.replace(/\u2026/g, '...').replace(/\u00b7/g, '-').replace(/[^\x00-\x7e]/g, '?');
     const SM = stmtMake(rows, year, pick); TAX.sname = `liquidfi-statement-${year}.csv`; TAX.sfile = new Blob([ascii(SM.csv)], { type: 'text/csv' });
     TAX.name = `liquidfi-taxes-${year}.csv`; TAX.file = new Blob([csv.replace(/\u2026/g, '...').replace(/\u00b7/g, '-').replace(/[^\x00-\x7e]/g, '?')], { type: 'text/csv' });   // plain ASCII: Excel on Windows garbles UTF-8 symbols
@@ -15901,7 +15908,7 @@ async function homeRecent(addr) {
     FEEOF[o.transaction_hash] = o.type === 'payment' ? `${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}` : `${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; }   // scam look-alike dust: not shown at all (it only clutters the list)
   const rows = [...ops.filter((o) => !isDust(o) && !feeTx.has(o.id)).map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
   const was = new Set([...document.querySelectorAll('#hRec details[open]')].map((d) => d.dataset.tx || d.dataset.op));   // rows you opened stay open
-  $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}>${esc(opText(r.o, addr))}${memoLine(r.o, addr)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
+  $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}><span class="optx">${esc(opText(r.o, addr))}</span>${memoLine(r.o, addr)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
     : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
     : '<div><span class="mu">Nothing yet</span></div>';
   pmFill($('#hRec')).catch(() => {});
@@ -16054,7 +16061,7 @@ const MERGEAMT = {};   // merge op id → XLM moved (from its account_credited e
 async function mergeAmts(root, me) {
   const ids = [...new Set([...root.querySelectorAll('[data-mop]')].map((e) => e.dataset.mop))].filter((id) => MERGEAMT[id] == null);
   await Promise.all(ids.map(async (id) => { try { const j = await H(`/operations/${id}/effects`); const c = (j._embedded.records || []).find((e) => e.type === 'account_credited'); if (c) MERGEAMT[id] = +c.amount; } catch (e) {} }));
-  root.querySelectorAll('[data-mop]').forEach((e) => { const v = MERGEAMT[e.dataset.mop]; if (v == null) return; e.textContent = amtFmt(v) + ' XLM'; const sm = e.closest('details') && e.closest('details').querySelector('summary span'); if (sm) sm.textContent = sm.textContent.replace('all its XLM', fx(v) + ' XLM'); });
+  root.querySelectorAll('[data-mop]').forEach((e) => { const v = MERGEAMT[e.dataset.mop]; if (v == null) return; e.textContent = amtFmt(v) + ' XLM'; const sm = e.closest('details') && e.closest('details').querySelector('summary .optx'); if (sm) sm.textContent = sm.textContent.replace('all its XLM', fx(v) + ' XLM'); });
 }
 // a transaction's memo under its line in Recent (payments and sends carry them; exchanges use them to know whose deposit it is)
 const b64u8 = (s) => { try { return Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); } catch (e) { return null; } };
@@ -16651,7 +16658,7 @@ async function drawTrade() {
   $('#tPxW').style.display = T.mode === 'lim' ? '' : 'none'; $('#tMktNote').style.display = T.mode === 'mkt' ? '' : 'none'; $('#tStopW').style.display = T.mode === 'stop' ? 'flex' : 'none';
   if (T.mode === 'stop') stopDefaults();
   if (T.replace && (T.mode !== 'stop' || T.side !== T.replace.side || tradeAddr !== T.replace.w)) T.replace = null;   // left the stop being edited
-  { const eb = $('#tEditBar'); if (eb) { eb.style.display = T.replace ? '' : 'none'; eb.innerHTML = T.replace ? `<span><b>Editing your stop ${T.replace.side} ${fx(T.replace.xlm, 2)} XLM at ${p4(T.replace.stop)}.</b> Change anything, then tap Replace stop: the new stop is placed first, then the old one is cancelled.</span><button class="b-out sm" data-act="stopEditOff" style="margin-top:6px">Don't edit</button>` : ''; } }
+  { const eb = $('#tEditBar'); if (eb) { eb.style.display = T.replace ? '' : 'none'; eb.innerHTML = T.replace ? `<span><b>Editing your stop ${T.replace.side} ${fx(T.replace.xlm, 2)} ${esc(T.replace.coin || 'XLM')} at ${p4(T.replace.stop)}.</b> Change anything, then tap Replace stop: the new stop is placed first, then the old one is cancelled.</span><button class="b-out sm" data-act="stopEditOff" style="margin-top:6px">Don't edit</button>` : ''; } }
   const g = $('#tGo'); g.textContent = T.replace && T.mode === 'stop' ? 'Replace stop' : (T.side === 'buy' ? 'Buy' : 'Sell') + (T.mode === 'stop' ? ' stop' : ''); g.className = (T.side === 'buy' ? 'b-grn' : 'b-pur') + ' big';
   drawTradeBook(); tradeEst();
   if (feeTo(tradeAddr)) feeLive(feeTo(tradeAddr)).then(() => { if (cur === 'trade') tradeEst(); }).catch(() => {});
@@ -16692,8 +16699,10 @@ const TP = () => { const p = NS().tPair; return p && p.b && p.q && p.b !== p.q ?
 const isDefPair = () => { const p = TP(); return p.b === 'XLM' && p.q === uKey(); };
 const stopPairOK = () => { const p = TP(); return p.q !== 'XLM' && p.b !== p.q; };   // stops: any Stellar coin against USDC (or another non-XLM quote)
 const stopMid = () => (isDefPair() ? mid() : tMid());
+// exchange prices (Coinbase, Kraken, Binance) are XLM in US dollars: only comparable when the pair is XLM against a dollar coin
+const stopExOK = () => { const p = TP(); return p.b === 'XLM' && STABLE_SYMS.includes(kName(p.q)); };
 function feedOpts() {   // XLM can trigger on the big exchanges; other coins only on Stellar trades (their own market)
-  const el = $('#tFeed'); if (!el) return; const x = TP().b === 'XLM', want = x ? 'avg,trades3,stellar,cb,kr,bn' : 'trades3';
+  const el = $('#tFeed'); if (!el) return; const x = stopExOK(), want = x ? 'avg,trades3,stellar,cb,kr,bn' : 'trades3';
   if (el.dataset.set !== want) { el.dataset.set = want; const keep = el.value; el.innerHTML = want.split(',').map((k) => `<option value="${k}">${{ avg: '3-exchange avg', trades3: 'Stellar: 3 trades of 1+', stellar: 'Stellar last sale', cb: 'Coinbase', kr: 'Kraken', bn: 'Binance' }[k]}</option>`).join(''); el.value = want.includes(keep) && keep ? keep : want.split(',')[0]; }
 }
 const TB = { key: null, bids: [], asks: [], tr: [], last: null, es1: null, es2: null };
@@ -16774,6 +16783,7 @@ function spendable(a, isXLM) {
 async function tradeReview() {
   const q = +$('#tAmt').value; if (!(q > 0)) return toast('Enter an amount.');
   const a = ACC[tradeAddr]; if (!a) return toast('Account not funded.');
+  await stopsKnown(tradeAddr);
   { const p0 = TP(); Object.assign(TBAL, { pair: tradeAddr + p0.b + p0.q, b: swapAvail(a, p0.b), q: swapAvail(a, p0.q), at: Date.now() }); }   // baseline: the balance line shows what this trade changes
   const PR = TP(), nB = kName(PR.b), nQ = kName(PR.q), AB = asOf(PR.b), AQ = asOf(PR.q), avail = (k) => swapAvail(a, k), holds = (k) => k === 'XLM' || a.balances.some((b) => akey(b) === k);
   for (const k of [PR.q, PR.b]) if (!holds(k)) return toast(`Add ${kName(k)} first (Assets), so this wallet can hold it.`);
@@ -16784,8 +16794,8 @@ async function tradeReview() {
     // the network only accepts an offer it can cover: check here (after what stop orders hold) instead of letting it fail
     if (T.side === 'sell' && avail(PR.b) < q - 1e-7) return toast(`Not enough spendable ${nB} (have ${fx(avail(PR.b))}).${holdNote(a, PR.b)}`, 7000);
     if (T.side === 'buy' && avail(PR.q) < q * p - 1e-7) return toast(`Not enough ${nQ} (have ${fx(avail(PR.q))}, need ${fx(q * p)}).${holdNote(a, PR.q)}`, 7000);
-    { const xNeed = 0.5 + (T.side === 'sell' && PR.b === 'XLM' ? q : 0) + (T.side === 'buy' && PR.q === 'XLM' ? q * p : 0);   // a new offer adds 0.5 XLM reserve
-      if (avail('XLM') < xNeed - 1e-7) return toast(`Not enough XLM: an open order needs 0.5 XLM reserve${xNeed > 0.5 ? ' on top of what it sells' : ''} (have ${fx(avail('XLM'))}).${holdNote(a, 'XLM')}`, 7000); }
+    { const xNeed = 0.001 + (T.side === 'sell' && PR.b === 'XLM' ? q : 0) + (T.side === 'buy' && PR.q === 'XLM' ? q * p : 0);   // Available already keeps 0.5 XLM back, which covers the new order's 0.5 reserve; 0.001 for the network fee
+      if (avail('XLM') < xNeed - 1e-7) return toast(`Not enough XLM for this order and its network fee (have ${fx(avail('XLM'))}).${holdNote(a, 'XLM')}`, 7000); }
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: AQ, buying: AB, buyAmount: amt7(q), price: p.toFixed(7) })
       : SDK.Operation.manageSellOffer({ selling: AB, buying: AQ, amount: amt7(q), price: p.toFixed(7) });
     return confirmSheet(`Limit ${T.side} ${fx(q)} ${nB}`, `${netPre()}stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} ${nB} @ ${pxF(p)} ${nQ}`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} ${nQ}` }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
@@ -16950,7 +16960,7 @@ async function helperRecover() {
 async function stopList(addr) {
   const kp = kpFor(addr), ts = Date.now();
   const j = await stopApi('/list', { net: S.net, wallet: addr, ts, sig: stopSig(kp, `liquidfi-stops:list:${S.net}:${addr}:${ts}`) });
-  STOPS.addr = addr; STOPS.list = j.stops || []; STOPS.err = null; STOPSBY[addr] = STOPS.list;
+  STOPS.addr = addr; STOPS.list = j.stops || []; STOPS.err = null; STOPSBY[S.net + ':' + addr] = STOPS.list;
   if (Object.values(hlpReg()).some((r) => r.w === addr)) helperSweep(addr, STOPS.list).catch(() => {});
   return STOPS.list;
 }
@@ -17038,7 +17048,7 @@ async function stopReview(q, a, kp) {
       const ctx = cb.build(); ctx.sign(h);
       tPendSet(pnd, 'Sent', 'mu', 'handing the signed order to your stop server');
       const ts2 = Date.now();
-      const r = await stopApi('/arm_own', { net: S.net, wallet: w, helper: ha, ts: ts2, sig: stopSig(kp, `liquidfi-stops:armown:${S.net}:${w}:${ha}:${ts2}`), xdrs, cleanup: ctx.toXDR(), feed, stop: st, lim_mode: limMode(), guard: RP && RP.guard != null ? RP.guard : stopGuard() });
+      const r = await stopApi('/arm_own', { net: S.net, wallet: w, helper: ha, ts: ts2, sig: stopSig(kp, `liquidfi-stops:armown:${S.net}:${w}:${ha}:${ts2}`), xdrs, cleanup: ctx.toXDR(), feed, stop: st, lim_mode: limMode(), guard: !stopExOK() ? 0 : RP && RP.guard != null ? RP.guard : stopGuard() });
       Object.assign(hlpReg()[ha], { sid: r.id, exp: end.getTime() }); saveS(); hh = null;
       let oldNote = '';
       if (RP) {   // the new stop is armed: now cancel the old one
@@ -17486,6 +17496,7 @@ async function sendReview() {
   const amt = +$('#sAmt').value; if (!(amt > 0)) return toast('Enter an amount.');
   const key = $('#sAsset').value, asset = key === 'XLM' ? SDK.Asset.native() : new SDK.Asset(key.split(':')[0], key.split(':')[1]);
   const memoS = $('#sMemo').value.trim();
+  await stopsKnown(from);
   { const sa = ACC[from]; if (sa && stopHold(sa, key) > 1e-7 && amt > swapAvail(sa, key) + 1e-7) return toast(`This wallet has ${fx(swapAvail(sa, key))} ${key === 'XLM' ? 'XLM' : kName(key)} free to send.${holdNote(sa, key)} Cancel or change a stop to use it.`, 8000); }
   let dest = null; try { dest = await acct(to.addr); } catch (e) {}
   if (dest && dest.data && dest.data['config.memo_required'] === 'MQ==' && !memoS) return toast('This receiver requires a memo.');
@@ -17697,7 +17708,7 @@ document.addEventListener('click', async (e) => {
     if (seg === 'setNet') return setNet(v);
     if (seg === 'setHz') return hzSet(v);
   }
-  if (t.dataset.pct) { const a = ACC[tradeAddr]; if (!a) return; const p = +t.dataset.pct / 100, PR = TP(); const m = tMid() || 1; const fR = (T.mode === 'mkt' || T.mode === 'stop') && feeTo(tradeAddr) ? SWAP_FEE.bps / 10000 : 0, x = T.side === 'sell' ? Math.max(0, swapAvail(a, PR.b) - (T.mode === 'stop' && PR.b === 'XLM' ? 1.02 : 0)) * p / (1 + fR) : swapAvail(a, PR.q) * p / (m * (1 + S.slip / 100) * (1 + (T.mode === 'mkt' && feeTo(tradeAddr) ? SWAP_FEE.bps / 10000 : 0))); $('#tAmt').value = (Math.floor(x * 100) / 100).toString(); return tradeEst(); }
+  if (t.dataset.pct) { const a = ACC[tradeAddr]; if (!a) return; const p = +t.dataset.pct / 100, PR = TP(); const m = tMid() || 1; const fR = (T.mode === 'mkt' || T.mode === 'stop') && feeTo(tradeAddr) ? SWAP_FEE.bps / 10000 : 0, x = T.side === 'sell' ? Math.max(0, swapAvail(a, PR.b) - (T.mode === 'stop' && PR.b === 'XLM' ? 1.02 : 0) - (PR.b === 'XLM' ? 0.01 : 0)) * p / (1 + fR) : Math.max(0, swapAvail(a, PR.q) - (PR.q === 'XLM' ? 0.01 : 0)) * p / (m * (1 + S.slip / 100) * (1 + (T.mode === 'mkt' && feeTo(tradeAddr) ? SWAP_FEE.bps / 10000 : 0))); $('#tAmt').value = (Math.floor(x * 100) / 100).toString(); return tradeEst(); }
   if (t.dataset.scancel) return stopCancel(t);
   if (t.dataset.sedit) return stopEdit(t.dataset.sedit);
   if (t.dataset.act === 'stopEditOff') { T.replace = null; return drawTrade(); }
