@@ -20,6 +20,7 @@ html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,
 .buy{color:var(--buy)}.sell{color:var(--sell)}
 body.gr{--buy:#3FB87F;--sell:#FF8A80}
 .mbub{display:block;margin-top:6px;padding:6px 10px;border-left:3px solid var(--blu);background:var(--s2);border-radius:8px;color:var(--tx);font-size:14px;line-height:1.35;overflow-wrap:anywhere;font-weight:500}.mbub .ml{display:block;font-size:11px;color:var(--mu);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:1px}.mbub.pv{border-left-color:var(--grn)}.mbub.nr{border-left-color:var(--bd2);color:var(--mu)}
+.etot{flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap;cursor:pointer}.elbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);font-weight:700;margin:2px 0 -4px}.echips{display:flex;gap:6px;flex-wrap:wrap}.echips button{min-height:32px;font-size:13px;padding:4px 12px;border-radius:999px;border:1px solid var(--bd);background:transparent;color:var(--mu)}.echips button.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}.ekv{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:3px 0}.ekv>span:first-child{color:var(--mu)}.etr{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--bd)}
 .mu{color:var(--mu)}.grn{color:var(--grn)}.red{color:var(--redt)}.amb{color:var(--amb)}.blu{color:var(--blu)}
 #app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .scr{display:none;flex:1;flex-direction:column;gap:14px;padding:16px 16px 96px}
@@ -477,16 +478,24 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <section class="scr" id="s-earn">
   <div class="top"><div><h1>Earn</h1><span class="mu" style="font-size:12px">Pools built into Stellar and the XRP Ledger</span></div><button class="ico" data-act="earnRefresh" aria-label="Refresh">↻</button></div>
   <div class="mu" style="font-size:13px">Add to a pool and earn a share of the fees traders pay it. The pool shares stay in your own wallet, and you can withdraw any time. No Liquidfi fee.</div>
-  <div class="card" id="eTot" style="display:none;flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap"></div>
-  <h3 class="eSec" style="margin:6px 0 0">Stellar pools</h3>
-  <label id="eWalW">Stellar wallet<select id="eWal"></select></label>
-  <div id="ePend" style="display:none;flex-direction:column;gap:8px"></div>
-  <div id="eList" style="display:flex;flex-direction:column;gap:12px"></div>
-  <h3 class="eSec" id="eXHead" style="margin:10px 0 0">XRP Ledger pools</h3>
-  <label id="eXWalW">XRP wallet<select id="eXWal"></select></label>
-  <div class="mu" id="eXOne" style="font-size:13px;display:none"></div>
-  <div id="eXPend" style="display:none;flex-direction:column;gap:8px"></div>
-  <div id="eXList" style="display:flex;flex-direction:column;gap:12px"></div>
+  <button class="b-out" id="eAdvTop" data-act="advForm" data-src="Earn top" style="display:flex;justify-content:space-between;align-items:center;font-size:14px;text-align:left"><span>Want a customized portfolio? <b>Talk to an advisor</b></span><span class="mu">›</span></button>
+  <div class="seg" id="eChain"><button data-v="st" class="on">Stellar</button><button data-v="xr">XRP Ledger</button></div>
+  <div id="eSt" style="display:flex;flex-direction:column;gap:12px">
+    <label id="eWalW">Stellar wallet<select id="eWal"></select></label>
+    <div class="card etot" id="eTot" data-act="earnSum" data-ch="st" style="display:none;flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap"></div>
+    <div id="ePend" style="display:none;flex-direction:column;gap:8px"></div>
+    <div id="eList" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+  <div id="eXr" style="display:none;flex-direction:column;gap:12px">
+    <label id="eXWalW">XRP wallet<select id="eXWal"></select></label>
+    <div class="mu" id="eXOne" style="font-size:13px;display:none"></div>
+    <div class="card etot" id="eXTot" data-act="earnSum" data-ch="xr" style="display:none;flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap"></div>
+    <div id="eXPend" style="display:none;flex-direction:column;gap:8px"></div>
+    <div id="eXList" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+  <div class="card" id="eAdv" style="gap:10px;margin-top:6px"><div><b style="font-size:18px">Customized Portfolios</b><div class="mu" style="font-size:13.5px;margin-top:2px">Want more than a pool? Treveri Capital builds portfolios around your goals.</div></div>
+    <button class="b-light big" data-act="advForm" data-src="Earn">Talk to our Wealth Advisors</button>
+    <div class="mu" style="font-size:11px;line-height:1.45">Pools in this app are self-directed and are not advice from Treveri Capital. Treveri Capital LLC is a California registered investment adviser, owned by Liquidfi's founder.</div></div>
   <p class="mu" style="font-size:12px;margin:0">Yield = the trading fees each pool earned over the last 7 days, as a yearly rate. It is not a promise: it goes up and down with trading. The value of what you put in also moves with the prices of the two coins.</p>
 </section>
 <section class="scr" id="s-receive">
@@ -520,7 +529,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setTax"><span class="lbl">Taxes</span><div class="mu" style="font-size:12px">Everything your wallets did in a year (trades, swaps, sends, receives, pools, fees) with dollar values at the time, in two files: one for tax software (Koinly format) and a broker-style statement of buys, sells and totals for you or your tax pro. Made on this phone from the public ledgers; Liquidfi never sees it. Not tax advice.</div>
     <label>Year<select id="taxYear"></select></label><div id="taxW" style="display:flex;flex-direction:column;gap:8px"></div>
     <button class="b-light" data-act="taxMake" id="taxGo">Make tax files</button><div class="mu" id="taxSt" style="font-size:13px"></div><div id="taxOut"></div>
-    <button class="b-out" data-act="advisor">Talk to our Wealth Advisors Today</button><div class="mu" style="font-size:12.5px">Treveri Capital helps tech-oriented individuals plan their financial future. Send us your name, phone and state, and a wealth advisor will contact you shortly.</div><div class="mu" style="font-size:11px">Treveri Capital LLC is a California registered investment adviser, owned by Liquidfi's founder. Opens your email app; nothing is sent until you send it.</div></div>
+    <button class="b-out" data-act="advForm" data-src="Taxes">Talk to our Wealth Advisors Today</button><div class="mu" style="font-size:12.5px">Treveri Capital helps tech-oriented individuals plan their financial future. Send us your name, phone and state, and a wealth advisor will contact you shortly.</div><div class="mu" style="font-size:11px">Treveri Capital LLC is a California registered investment adviser, owned by Liquidfi's founder. Opens your email app; nothing is sent until you send it.</div></div>
   <details class="card more" id="setEmCard" style="display:none"><summary>Advanced: this phone’s signer key</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"><div class="addr" id="setEm"></div><div class="g2"><button class="b-out sm" data-act="copyEm">Copy address</button><button class="b-out sm" data-act="checkSig">Check signers</button></div><div class="mu" style="font-size:13px">This is a signing key, not a wallet. It holds no funds; don't send coins to it. For wallets whose key stays somewhere else, like bots on a PC: add it to them as a signer and Cancel All can cancel their orders from this phone. PC bots: run <b>Add-Emergency-Signer.bat</b> and paste this address. Lost phone: run <b>Remove-Emergency-Signer.bat</b>.</div><div class="rows" id="setSig" style="font-size:14px"></div></div></details>
   <div class="card"><span class="lbl">Wallets with keys on this phone</span><div class="rows" id="setX" style="font-size:14px"></div></div>
   <div class="card"><span class="lbl">Watched wallets<span id="setBNet"></span></span><div class="mu" style="font-size:12px">View only: wallets added by address, without their key. Saved on this device only.</div><div id="setBots" style="display:flex;flex-direction:column;gap:10px"></div><div class="g2"><button class="b-out sm" data-act="addBot">+ Watch a wallet</button><button class="b-out sm" data-act="saveBots">Save list</button></div></div>
@@ -14784,7 +14793,7 @@ const EARN_SLIP = 0.01;   // if the pool price moves more than 1% before it land
 const POOLC = {};   // Stellar pool id → { at, none, res, shares, fee, tvl, px, apr, aprAt }
 const RLUSD_HEX = RLUSD_CUR;
 const XAMMS = {};   // XRP Ledger pools by key (rl = XRP/RLUSD, uc = XRP/USDC)
-let earnAddr = null, earnXr = null, EARN_ADD = null, SWAP_PRE = null;
+let earnAddr = null, earnXr = null, EARN_ADD = null, SWAP_PRE = null; const EARN_SMALL = {};
 const EARN_RISK = {
   stable: 'Both sides are dollar coins, so the value barely moves. Lowest risk here.',
   eur: 'Half is in euros: the value moves with the euro-dollar rate.',
@@ -14851,11 +14860,11 @@ const XAM = (k) => XAMMS[k] || (XAMMS[k] = {});
 async function xrAmmLoad(p, fees = true) {
   const A = XAM(p.key);
   if (A.net !== S.net || Date.now() - (A.at || 0) > 60000) {
-    for (const k of Object.keys(A)) delete A[k];
     const r = await xr('amm_info', { asset: p.a1, asset2: p.a2, ledger_index: 'validated' });
+    for (const k of Object.keys(A)) delete A[k];   /* cleared only once the new answer is here, so the pool never looks empty mid-refresh */
     if (r.error || !r.amm) { Object.assign(A, { net: S.net, at: Date.now(), none: true }); return A; }
     const m = r.amm, x = +m.amount / 1e6, u = +m.amount2.value;
-    Object.assign(A, { net: S.net, at: Date.now(), none: !(+m.lp_token.value > 0), x, u, lp: +m.lp_token.value, lpc: m.lp_token.currency, lpi: m.lp_token.issuer, fee: (+m.trading_fee || 0) / 1e5, tvl: 2 * u, px: x > 0 ? u / x : 0, li: +r.ledger_index || 0 });
+    Object.assign(A, { acct: m.account, net: S.net, at: Date.now(), none: !(+m.lp_token.value > 0), x, u, lp: +m.lp_token.value, lpc: m.lp_token.currency, lpi: m.lp_token.issuer, fee: (+m.trading_fee || 0) / 1e5, tvl: 2 * u, px: x > 0 ? u / x : 0, li: +r.ledger_index || 0 });
   }
   if (fees && !A.none && (!A.aprAt || Date.now() - A.aprAt > 600000)) {
     try {   // fees stay in the pool, so each pool token is worth a bit more pool every day: compare with ~7 days ago
@@ -14880,33 +14889,44 @@ async function drawEarn() {
   $('#eXWal').innerHTML = XL.map((w) => `<option value="${w.addr}">${esc(w.name)} · ${short(w.addr)}</option>`).join(''); if (earnXr) $('#eXWal').value = earnXr;
   $('#eXWalW').style.display = XL.length > 1 ? '' : 'none';
   const xo = XL.find((w) => w.addr === earnXr); $('#eXOne').style.display = XL.length === 1 ? '' : 'none'; $('#eXOne').textContent = xo ? `Using ${xo.name} · ${short(xo.addr)}` : '';
-  const P = earnPools();
+  const P = earnPools(), ch = S.earnChain === 'xr' ? 'xr' : 'st';
+  $$('#eChain button').forEach((x) => x.classList.toggle('on', x.dataset.v === ch));
+  $('#eSt').style.display = ch === 'st' ? 'flex' : 'none'; $('#eXr').style.display = ch === 'xr' ? 'flex' : 'none';
+  const SMALL = 1000;   /* pools under $1,000 sit behind "Show small pools" (nobody should add where nothing trades) */
+  const group = (items, which) => {   /* items: { held, small, html, name, tvl } → Your pools / More pools / small pools */
+    const mine = items.filter((x) => x.held), rest = items.filter((x) => !x.held && !x.small), sm = items.filter((x) => !x.held && x.small);
+    const open = !!(EARN_SMALL[which]);
+    return (mine.length ? `<div class="elbl">Your pools</div>` + mine.map((x) => x.html).join('') : '')
+      + (rest.length ? `<div class="elbl">${mine.length ? 'More pools' : 'Pools'}</div>` + rest.map((x) => x.html).join('') : '')
+      + (sm.length ? `<button class="b-out" data-act="earnSmall" data-ch="${which}" style="font-size:13px">${open ? 'Hide' : 'Show'} small pools (${sm.length}): ${sm.map((x) => `${esc(x.name)} $${fx(x.tvl)}`).join(' · ')} ${open ? '▴' : '▾'}</button>` + (open ? sm.map((x) => x.html).join('') : '') : '');
+  };
+  const totCard = (el, label, T) => { el.innerHTML = T.v > 0 ? `<span class="mu" style="font-size:13px">${label}</span><b class="mono" style="font-size:22px">$${fxv(T.v)}</b>${T.has ? `<span class="mono ${T.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${T.pl >= 0 ? '+' : '−'}$${fxd(T.pl)} P/L</span>` : ''}<span class="mu" style="margin-left:auto;font-size:18px">›</span>` : ''; el.style.display = T.v > 0 ? 'flex' : 'none'; };
   const paint = () => {
     if (cur !== 'earn') return;
-    const a = earnAddr ? ACC[earnAddr] : null, TOT = { v: 0, pl: 0 };
-    let h = P.map((p) => {
+    const a = earnAddr ? ACC[earnAddr] : null, TS = { v: 0, pl: 0 }, TX = { v: 0, pl: 0 };
+    const items = P.map((p) => {
       const c = POOLC[p.id] || {}, b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === p.id), sh = b ? +b.balance : 0;
       const E = ((earnAddr && EPL[earnAddr]) || { pools: {} }).pools[p.id], now = sh > 0 && c.shares > 0 ? sh / c.shares * c.tvl : 0;
-      if (E && E.in > 0) { TOT.v += now; TOT.pl += now + E.out - E.in; }
+      if (E && E.in > 0) { TS.v += now; TS.pl += now + E.out - E.in; TS.has = true; } else if (now > 0) TS.v += now;
       const mine = (sh > 0 && c.shares > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fxv(now)}</b></span><span class="mu mono">${m2(sh / c.shares * c.res[p.a])} ${esc(kName(p.a))} + ${m2(sh / c.shares * c.res[p.b])} ${esc(kName(p.b))}</span></div>` : '')
         + (sh > 0 && E ? plLine(now, E, (E.net[p.a] || 0) * c.px + (E.net[p.b] || 0)) : '');
-      return earnCard(p.name, 'Stellar pool', c, mine, !c.at ? 'Loading…' : c.none ? 'No one has opened this pool yet.' : '', EARN_RISK[p.risk],
-        `<button class="b-light" data-act="earnAdd" data-pid="${p.id}"${!a || c.none || !c.at ? ' disabled' : ''}>Add</button><button class="b-out" data-act="earnOut" data-pid="${p.id}"${sh > 0 ? '' : ' disabled'}>Withdraw</button>`);
-    }).join('');
-    if (!L.length) h = '<div class="card"><span class="mu">Add a Stellar wallet in Accounts to use these pools.</span></div>';
-    $('#eList').innerHTML = h; h = '';
-    for (const xp of xrPools()) {
+      return { held: sh > 0, small: !!(c.at && !c.none && c.tvl < SMALL) || !!c.none, name: p.name, tvl: c.tvl || 0,
+        html: earnCard(p.name, 'Stellar pool', c, mine, !c.at ? 'Loading…' : c.none ? 'No one has opened this pool yet.' : '', EARN_RISK[p.risk],
+          `<button class="b-light" data-act="earnAdd" data-pid="${p.id}"${!a || c.none || !c.at ? ' disabled' : ''}>Add</button><button class="b-out" data-act="earnOut" data-pid="${p.id}"${sh > 0 ? '' : ' disabled'}>Withdraw</button>`, `data-act="earnPool" data-ch="st" data-k="${p.id}"`) };
+    });
+    $('#eList').innerHTML = L.length ? group(items, 'st') : '<div class="card"><span class="mu">Add a Stellar wallet in Accounts to use these pools.</span></div>';
+    const xitems = xrPools().map((xp) => {
       const A = XAM(xp.key), d = earnXr ? XRA[earnXr] : null, lp = xrLpOf(d, A);
       const XE = ((earnXr && XPL[earnXr]) || { pools: {} }).pools[xp.key], xnow = lp > 0 && A.lp > 0 ? lp / A.lp * A.tvl : 0;
-      if (XE && XE.in > 0) { TOT.v += xnow; TOT.pl += xnow + XE.out - XE.in; }
+      if (XE && XE.in > 0) { TX.v += xnow; TX.pl += xnow + XE.out - XE.in; TX.has = true; } else if (xnow > 0) TX.v += xnow;
       const mine = (lp > 0 && A.lp > 0 ? `<div class="r" style="font-size:13px"><span>You have <b class="mono">$${fxv(xnow)}</b></span><span class="mu mono">${m2(lp / A.lp * A.x)} XRP + ${m2(lp / A.lp * A.u)} ${esc(xp.tok)}</span></div>` : '')
         + (lp > 0 && XE ? plLine(xnow, XE, XE.net.x * A.px + XE.net.u) : '');
-      h += earnCard(xp.name, `XRP Ledger pool · ${xp.tok} by ${xp.who}`, A, mine, !XL.length ? 'Add an XRP wallet in Accounts to use this pool.' : !A.at ? 'Loading…' : A.none ? 'No one has opened this pool yet.' : '', EARN_RISK.vol,
-        `<button class="b-light" data-act="xrEarnAdd" data-xp="${xp.key}"${!XL.length || A.none || !A.at || !d || !d.a ? ' disabled' : ''}>Add</button><button class="b-out" data-act="xrEarnOut" data-xp="${xp.key}"${lp > 0 ? '' : ' disabled'}>Withdraw</button>`);
-    }
-    $('#eXList').innerHTML = h;
-    $('#eTot').innerHTML = TOT.v > 0 ? `<span class="mu" style="font-size:13px">In pools · wallets shown</span><b class="mono" style="font-size:22px">$${fxv(TOT.v)}</b><span class="mono ${TOT.pl >= 0 ? 'grn' : 'red'}" style="font-size:14px">${TOT.pl >= 0 ? '+' : '−'}$${fxd(TOT.pl)} P/L</span>` : '';
-    $('#eTot').style.display = TOT.v > 0 ? 'flex' : 'none';
+      return { held: lp > 0, small: !!(A.at && !A.none && A.tvl < SMALL) || !!A.none, name: xp.name, tvl: A.tvl || 0,
+        html: earnCard(xp.name, `XRP Ledger pool · ${xp.tok} by ${xp.who}`, A, mine, !XL.length ? 'Add an XRP wallet in Accounts to use this pool.' : !A.at ? 'Loading…' : A.none ? 'No one has opened this pool yet.' : '', EARN_RISK.vol,
+          `<button class="b-light" data-act="xrEarnAdd" data-xp="${xp.key}"${!XL.length || A.none || !A.at || !d || !d.a ? ' disabled' : ''}>Add</button><button class="b-out" data-act="xrEarnOut" data-xp="${xp.key}"${lp > 0 ? '' : ' disabled'}>Withdraw</button>`, `data-act="earnPool" data-ch="xr" data-k="${xp.key}"`) };
+    });
+    $('#eXList').innerHTML = group(xitems, 'xr');
+    totCard($('#eTot'), 'In Stellar pools', TS); totCard($('#eXTot'), 'In XRP Ledger pools', TX);
   };
   paint(); tPendPaint();
   const jobs = [...P.map((p) => poolLoad(p).then(paint).catch(() => null))];
@@ -14914,9 +14934,158 @@ async function drawEarn() {
   jobs.push(...xrPools().map((xp) => xrAmmLoad(xp).then(paint).catch(() => null)), ...(earnXr ? [xrLoad(earnXr).then(paint).catch(() => null), earnHistXr(earnXr).then(paint).catch(() => null)] : []));
   await Promise.all(jobs); paint();
 }
-function earnCard(name, where, c, mine, note, risk, btns) {
+/* ---------- Earned: what each trade through a pool paid YOUR share ----------
+   Pools don't pay out; every trade leaves its fee inside the pool. Your cut of one trade = trade size × pool fee × your share
+   of the pool at that time. Your shares over time come from your own deposits / withdrawals; the pool's total shares are taken
+   as today's (an estimate). Counted over the last 62 days, up to 5,000 trades per pool. */
+const EFEES = {};   // net:chain:key:wallet → { at, trades: [{ t, usd, cut, txt }], capped, windowed, err }
+const EWIN = 62 * 864e5, EFETCH = {};   // EFETCH: loads in flight, so a repaint never starts the same one twice
+const efeesDrop = (w) => { for (const k of Object.keys(EFEES)) if (!w || k.endsWith(':' + w)) delete EFEES[k]; };
+function sharesAt(ev, now, t) {   // your shares just after time t: today's, minus every change made after t
+  let s = now; for (const e of ev || []) if (e.t > t) s -= e.d; return Math.max(0, s);
+}
+const firstDep = (ev) => { const d = (ev || []).filter((e) => e.d > 0).map((e) => e.t); return d.length ? Math.min(...d) : 0; };   // 0 = no deposit on record (shares received some other way): count the whole window
+async function earnTrades(ch, k) {
+  const w = ch === 'st' ? earnAddr : earnXr, key = `${S.net}:${ch}:${k}:${w}`, c0 = EFEES[key];
+  if (c0 && Date.now() - c0.at < (c0.err ? 20000 : 120000)) return c0;
+  try {
+    // the wallet's own deposit / withdrawal history first: without it every trade would look like it was made with today's shares
+    if (ch === 'st') await earnHistStellar(w); else await earnHistXr(w);
+    const since = Date.now() - EWIN, out = []; let capped = false, windowed = false;
+    if (ch === 'st') {
+      const p = earnPools().find((x) => x.id === k); if (p && !(POOLC[k] && POOLC[k].at)) await poolLoad(p, false);
+      const c = POOLC[k], a = ACC[w], b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === k);
+      const sh = b ? +b.balance : 0, E = ((EPL[w] || {}).pools || {})[k] || { ev: [] }, first = firstDep(E.ev);
+      if (!p || !c || !(c.shares > 0)) throw new Error('pool not loaded');
+      windowed = !first || first < since;
+      let cu = '', stop = false;
+      for (let pg = 0; pg < 25 && !stop; pg++) {
+        const j = await H(`/liquidity_pools/${k}/trades?order=desc&limit=200${cu ? '&cursor=' + cu : ''}`), Rr = (j._embedded || {}).records || [];
+        for (const t of Rr) {
+          const at = Date.parse(t.ledger_close_time); if (at < since || (first && at < first)) { stop = true; break; }
+          const bk = hzAk(t.base_asset_type, t.base_asset_code, t.base_asset_issuer), usd = bk === p.b ? +t.base_amount : +t.counter_amount;   /* the dollar-coin side of the trade */
+          const ck = hzAk(t.counter_asset_type, t.counter_asset_code, t.counter_asset_issuer), coin = bk === p.b ? +t.counter_amount : +t.base_amount;
+          const poolGot = t.base_liquidity_pool_id === k ? !t.base_is_seller : t.base_is_seller, gotK = poolGot ? bk : ck;   /* the side the pool received = what the trader sold */
+          out.push({ t: at, usd, cut: usd * c.fee * sharesAt(E.ev, sh, at) / c.shares, txt: `${gotK === p.b ? 'bought' : 'sold'} ${m2(coin)} ${esc(kName(p.a))} ($${fx(usd)})` });
+        }
+        if (stop || Rr.length < 200) break; cu = Rr[Rr.length - 1].paging_token; if (pg === 24) capped = true;
+      }
+    } else {
+      const p = xrPoolK(k); if (p && !XAM(k).acct) await xrAmmLoad(p, false);
+      const A = XAM(k), lp = xrLpOf(XRA[w], A), E = ((XPL[w] || {}).pools || {})[k] || { ev: [] }, first = firstDep(E.ev);
+      if (!p || !A.acct || !(A.lp > 0)) throw new Error('pool not loaded');
+      windowed = !first || first < since;
+      let marker, stop = false;
+      for (let pg = 0; pg < 25 && !stop; pg++) {
+        const r = await xr('account_tx', { account: A.acct, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(marker ? { marker } : {}) });
+        for (const x of r.transactions || []) {
+          const { t, m } = xrTxOf(x); if (m.TransactionResult !== 'tesSUCCESS') continue;
+          const at = ((t.date || 0) + 946684800) * 1000; if (at < since || (first && at < first)) { stop = true; break; }
+          const dd = xrDeltas(m, A.acct), dx = dd.XRP || 0, du = dd[p.a2.currency + '.' + p.a2.issuer] || 0;
+          if (!(dx * du < 0)) continue;   /* a swap moves the two sides in opposite directions; deposits and withdrawals move them together */
+          const usd = Math.abs(du);
+          out.push({ t: at, usd, cut: usd * A.fee * sharesAt(E.ev, lp, at) / A.lp, txt: `${dx < 0 ? 'bought' : 'sold'} ${m2(Math.abs(dx))} XRP ($${fx(usd)})` });
+        }
+        marker = r.marker; if (stop || !marker) break; if (pg === 24) capped = true;
+      }
+    }
+    return (EFEES[key] = { at: Date.now(), trades: out, capped, windowed });
+  } catch (e) { return (EFEES[key] = { at: Date.now(), trades: [], err: true }); }
+}
+// period starts: real midnights in the app's time zone (daylight-saving safe), weeks start Monday
+const ePartsOf = (t) => Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: TZ, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23', weekday: 'short' }).formatToParts(t).map((x) => [x.type, x.value]));
+function eMidnight(y, m, d) {   // epoch ms of 00:00 on that calendar date in TZ (m 1-12; d may run over, Date.UTC rolls it)
+  const want = Date.UTC(y, m - 1, d); let t = want;
+  for (let i = 0; i < 3; i++) { const p = ePartsOf(t), wall = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second); t += want - wall; }
+  return t;
+}
+function ePerStarts(now = Date.now()) {
+  const p = ePartsOf(now), y = +p.year, m = +p.month, d = +p.day, dow = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(p.weekday);
+  return { today: eMidnight(y, m, d), yday: eMidnight(y, m, d - 1), week: eMidnight(y, m, d - dow), month: eMidnight(y, m, 1), lastMonth: m === 1 ? eMidnight(y - 1, 12, 1) : eMidnight(y, m - 1, 1), all: 0, y, m, d };
+}
+const EPERS = [['today', 'Today'], ['yday', 'Yesterday'], ['week', 'This week'], ['month', 'This month'], ['lastMonth', 'Last month'], ['all', 'All']];
+const EPERS_POOL = ['today', 'week', 'month', 'all'];
+function ePerSum(trades, per) {   // → { cut, n } for one period
+  const P0 = ePerStarts(), lo = P0[per], hi = per === 'yday' ? P0.today : per === 'lastMonth' ? P0.month : Infinity;
+  let cut = 0, n = 0; for (const t of trades) if (t.t >= lo && t.t < hi) { cut += t.cut; n++; } return { cut, n };
+}
+const EDET = { mode: null, ch: 'st', k: null, per: 'week', gen: 0 };
+const esg = (v) => (v >= 0 ? '+' : '−') + '$' + fxd(v);
+// one pool's numbers: value now, put in/out, P/L since joined
+function poolPos(ch, k) {
+  if (ch === 'st') {
+    const p = earnPools().find((x) => x.id === k), c = POOLC[k] || {}, a = ACC[earnAddr], b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === k), sh = b ? +b.balance : 0;
+    const E = ((EPL[earnAddr] || {}).pools || {})[k];
+    return { p, name: p && p.name, where: 'Stellar pool', mine: sh, total: c.shares || 0, hold: c.res && p ? [[c.res[p.a], kName(p.a)], [c.res[p.b], kName(p.b)]] : null, now: sh > 0 && c.shares > 0 ? sh / c.shares * c.tvl : 0, E, add: `data-act="earnAdd" data-pid="${k}"`, out: `data-act="earnOut" data-pid="${k}"` };
+  }
+  const p = xrPoolK(k), A = XAM(k), lp = xrLpOf(XRA[earnXr], A), E = ((XPL[earnXr] || {}).pools || {})[k];
+  return { p, name: p && p.name, where: `XRP Ledger pool · ${p ? p.tok + ' by ' + p.who : ''}`, mine: lp, total: A.lp || 0, hold: A.at && !A.none && p ? [[A.x, 'XRP'], [A.u, p.tok]] : null, now: lp > 0 && A.lp > 0 ? lp / A.lp * A.tvl : 0, E, add: `data-act="xrEarnAdd" data-xp="${k}"`, out: `data-act="xrEarnOut" data-xp="${k}"` };
+}
+const heldKeys = (ch) => (ch === 'st' ? earnPools().map((p) => p.id) : xrPools().map((p) => p.key)).filter((k) => poolPos(ch, k).mine > 0);
+function earnSum(ch) { Object.assign(EDET, { mode: 'sum', ch, k: null }); earnDetPaint(true); }
+function earnPoolSheet(ch, k) { Object.assign(EDET, { mode: 'pool', ch, k }); if (!EPERS_POOL.includes(EDET.per)) EDET.per = 'week'; earnDetPaint(true); }
+const eDetOpen = (gen) => $('#sheet').classList.contains('on') && !!$(`#sheetIn [data-edet="${gen}"]`);   // still showing THIS Earn sheet (not an Add / Withdraw / confirm sheet opened since)
+function earnDetPaint(load) {
+  if (load) EDET.gen++;
+  const { mode, ch, k, gen } = EDET, per = EDET.per, keys = mode === 'pool' ? [k] : heldKeys(ch), F = keys.map((x) => EFEES[`${S.net}:${ch}:${x}:${ch === 'st' ? earnAddr : earnXr}`]);
+  const chips = (list) => `<div class="echips">${list.map(([v, l]) => `<button data-act="earnPer" data-eper="${v}" class="${v === per ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  const perName = per === 'all' ? 'since you joined' : (EPERS.find((x) => x[0] === per) || EPERS[2])[1].toLowerCase();
+  const loading = F.some((f) => !f), failed = F.some((f) => f && f.err), win = F.some((f) => f && f.windowed), capped = F.some((f) => f && f.capped);
+  const allPL = (pos) => (pos.E && pos.E.in > 0 ? pos.now + pos.E.out - pos.E.in : null);
+  const earnedAll = (f) => (f && !f.err ? f.trades.reduce((s2, t) => s2 + t.cut, 0) : 0);
+  const v = (txt) => (loading ? '…' : failed ? '–' : txt);   // a number, or … while loading, or – if it couldn't load
+  const note = `<div class="mu" style="font-size:11px;line-height:1.45">Earned = what the pool's trading fees paid your share, counted trade by trade (an estimate: it uses the pool's shares today). Profit / Loss also counts price moves, so it's shown since you joined.${win ? ' Earned covers the last 62 days.' : ''}${capped ? ' Busy pool: counted from its most recent 5,000 trades.' : ''}${failed ? ' <span class="amb">Couldn\'t load the trades right now. Close and reopen to try again.</span>' : ''}</div>`;
+  const pcOK = !win && !capped && !failed;   // price change = P/L − Earned only makes sense when Earned covers the whole time you've been in
+  let h;
+  if (mode === 'sum') {
+    const pos = keys.map((x) => poolPos(ch, x)), now = pos.reduce((s2, x) => s2 + x.now, 0), sums = F.map((f) => (f && !f.err ? ePerSum(f.trades, per) : { cut: 0, n: 0 }));
+    const withPL = pos.map((x, i) => ({ pl: allPL(x), ea: earnedAll(F[i]) })).filter((x) => x.pl != null), pl = withPL.reduce((s2, x) => s2 + x.pl, 0), eaPL = withPL.reduce((s2, x) => s2 + x.ea, 0);
+    const ea = F.reduce((s2, f) => s2 + earnedAll(f), 0), P0 = ePerStarts(), days = [];
+    for (let i = 0; i < 7; i++) { const lo = eMidnight(P0.y, P0.m, P0.d - i), hi = i ? eMidnight(P0.y, P0.m, P0.d - i + 1) : Infinity; let c = 0, n = 0; F.forEach((f) => (f && !f.err ? f.trades : []).forEach((t) => { if (t.t >= lo && t.t < hi) { c += t.cut; n++; } })); days.push({ lo, c, n }); }
+    h = `<h2 style="margin-bottom:0">${ch === 'st' ? 'Stellar' : 'XRP Ledger'} pools</h2>${chips(EPERS)}
+      <div class="card" style="gap:2px"><div class="ekv"><span>Worth now</span><b class="mono">$${fxv(now)}</b></div>
+        <div class="ekv"><span>Earned ${perName}</span><b class="mono grn">${v(esg(sums.reduce((s2, x) => s2 + x.cut, 0)))}</b></div>
+        <div class="ekv"><span>Trades through your pools ${perName}</span><span class="mono">${v(sums.reduce((s2, x) => s2 + x.n, 0).toLocaleString())}</span></div></div>
+      <div class="elbl">Since you joined</div>
+      <div class="card" style="gap:2px"><div class="ekv"><span>Earned${win ? ' (last 62 days)' : ''}</span><b class="mono grn">${v(esg(ea))}</b></div>
+        <div class="ekv"><span>Price change</span><b class="mono ${pl - eaPL >= 0 ? 'grn' : 'red'}">${loading || !withPL.length || !pcOK ? '–' : esg(pl - eaPL)}</b></div>
+        <div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${withPL.length ? esg(pl) : '–'}</b></div></div>
+      <div class="elbl">Earned by pool, ${perName}</div>
+      <div class="card" style="gap:2px">${pos.length ? pos.map((x, i) => `<div class="ekv" data-act="earnPool" data-ch="${ch}" data-k="${esc(keys[i])}" style="cursor:pointer"><span>${esc(x.name)} ›</span><b class="mono grn">${!F[i] ? '…' : F[i].err ? '–' : esg(sums[i].cut)}</b></div>`).join('') : '<span class="mu">You are not in any pool on this chain yet.</span>'}</div>
+      <div class="elbl">By day</div>
+      <div class="card" style="gap:2px">${days.map((d2) => `<div class="ekv"><span>${esc(new Date(d2.lo + 12 * HR).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }))}</span><span class="mono">${v(`${esg(d2.c)} · ${d2.n} trade${d2.n === 1 ? '' : 's'}`)}</span></div>`).join('')}</div>
+      ${note}<button class="b-out" data-act="closeSheet">Close</button>`;
+  } else {
+    const x = poolPos(ch, k), f = F[0], ok = f && !f.err, sum = ok ? ePerSum(f.trades, per) : null, ea = earnedAll(f), pl = allPL(x), my = x.total > 0 ? x.mine / x.total : 0;
+    h = `<div class="r"><h2 style="margin:0">${esc(x.name || '')}</h2><span class="mu" style="font-size:12.5px">${esc(x.where)}</span></div>
+      <div class="card" style="gap:2px"><div class="ekv"><span>Your shares</span><b class="mono">${x.mine ? (+x.mine).toFixed(7).replace(/\.?0+$/, '') : '0'}</b></div>
+        <div class="ekv"><span>Total shares</span><span class="mono">${x.total ? x.total.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '–'}</span></div>
+        <div class="ekv"><span>Your share of the pool</span><b class="mono">${my ? (my * 100 < 0.01 ? (my * 100).toFixed(6) : (my * 100).toFixed(4)) + '%' : '0%'}</b></div>
+        ${x.hold ? `<div class="ekv"><span>Pool holds</span><span class="mono">${x.hold.map(([a, n]) => `${fx(a, 0)} ${esc(n)}`).join(' + ')}</span></div>` : ''}
+        ${x.hold && my ? `<div class="ekv"><span>Yours</span><b class="mono">${x.hold.map(([a, n]) => `${m2(a * my)} ${esc(n)}`).join(' + ')} · $${fxv(x.now)}</b></div>` : ''}</div>
+      ${x.mine > 0 ? `${chips(EPERS.filter(([p0]) => EPERS_POOL.includes(p0)))}
+      <div class="card" style="gap:2px">${x.E && x.E.in > 0 ? `<div class="ekv"><span>Put in</span><span class="mono">$${fx(x.E.in)}${x.E.out > 0 ? ` · taken out $${fx(x.E.out)}` : ''}</span></div>` : ''}
+        <div class="ekv"><span>Earned ${perName}${per === 'all' && win ? ' (last 62 days)' : ''}</span><b class="mono grn">${v(ok ? esg(sum.cut) : '')}</b></div>
+        <div class="ekv"><span>Trades ${perName}</span><span class="mono">${v(ok ? sum.n.toLocaleString() : '')}</span></div>
+        ${pl != null ? `<div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Since you joined: price change</span><b class="mono ${pl - ea >= 0 ? 'grn' : 'red'}">${ok && pcOK ? esg(pl - ea) : loading ? '…' : '–'}</b></div>
+        <div class="ekv"><span>Since you joined: Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${esg(pl)}</b></div>` : ''}</div>
+      <div class="elbl">Recent trades through the pool · your cut</div>
+      <div class="card" style="gap:0">${!f ? '<span class="mu">Loading…</span>' : f.err ? '<span class="amb">Couldn\'t load the trades right now.</span>' : (f.trades.slice(0, 12).map((t) => `<div class="etr"><span class="mu">${esc(new Date(t.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }))}</span><span>${t.txt}</span><span class="mono grn">+$${t.cut < 1e-7 ? t.cut.toExponential(1) : fxd(t.cut)}</span></div>`).join('') || '<span class="mu">No trades since you joined yet.</span>')}</div>
+      ${note}` : `<div class="note"><span>You're not in this pool yet. Add to it to start earning a share of its trading fees.</span></div>`}
+      <div class="g2"><button class="b-light" ${x.add}>Add</button><button class="b-out" ${x.out}${x.mine > 0 ? '' : ' disabled'}>Withdraw</button></div><button class="b-out" data-act="closeSheet">Close</button>`;
+  }
+  h = `<div data-edet="${gen}" style="display:flex;flex-direction:column;gap:12px">${h}</div>`;
+  if (load) { pending = null; sheet(h); }
+  else { if (!eDetOpen(gen)) return; $(`#sheetIn [data-edet="${gen}"]`).outerHTML = h; }
+  // only fetch trades for pools you're in (nothing is shown for the others)
+  const stale = (f) => !f || Date.now() - f.at > (f.err ? 20000 : 120000);   /* expired answers reload too (old numbers stay on screen meanwhile) */
+  const need = keys.filter((x, i) => stale(F[i]) && poolPos(ch, x).mine > 0 && !EFETCH[`${S.net}:${ch}:${x}`]);
+  need.forEach((x) => (EFETCH[`${S.net}:${ch}:${x}`] = 1));
+  if (need.length) Promise.all(need.map((x) => earnTrades(ch, x).catch(() => null).finally(() => delete EFETCH[`${S.net}:${ch}:${x}`]))).then(() => { if (eDetOpen(gen)) earnDetPaint(); });
+}
+function earnCard(name, where, c, mine, note, risk, btns, tap) {
   const ok = c && c.at && !c.none;
-  return `<div class="card" style="gap:8px"><div class="r"><div><b style="font-size:16px">${esc(name)}</b><div class="mu" style="font-size:12px">${esc(where)}</div></div>
+  return `<div class="card" style="gap:8px"><div class="r"><div ${ok && tap ? tap + ' style="cursor:pointer"' : ''}><b style="font-size:16px">${esc(name)}${ok && tap ? ' <span class="mu" style="font-weight:400">›</span>' : ''}</b><div class="mu" style="font-size:12px">${esc(where)}</div></div>
     <div style="text-align:right"><b class="mono grn" style="font-size:18px">${ok ? pctY(c.apr) : '–'}</b><div class="mu" style="font-size:11.5px">yearly, last 7 days</div></div></div>
     ${ok ? `<div class="mu" style="font-size:12.5px">Pool size <span class="mono">$${fx(c.tvl)}</span> · traders pay ${(c.fee * 100).toFixed(2)}% to the pool</div>` : ''}
     ${note ? `<div class="mu" style="font-size:13px">${esc(note)}</div>` : ''}${mine}
@@ -15084,7 +15253,8 @@ async function earnHistStellar(addr) {
     for (const o of R) {
       if (o.type !== 'liquidity_pool_deposit' && o.type !== 'liquidity_pool_withdraw') continue;
       const p = earnPools().find((x) => x.id === o.liquidity_pool_id); if (!p) continue;
-      const E = P[p.id] || (P[p.id] = { in: 0, out: 0, net: {} }), dep = o.type === 'liquidity_pool_deposit';
+      const E = P[p.id] || (P[p.id] = { in: 0, out: 0, net: {}, ev: [] }), dep = o.type === 'liquidity_pool_deposit';
+      E.ev.push({ t: Date.parse(o.created_at), d: dep ? +o.shares_received || 0 : -(+o.shares || 0) });
       for (const r of (dep ? o.reserves_deposited : o.reserves_received) || []) { const k = r.asset === 'native' ? 'XLM' : r.asset; E.net[k] = (E.net[k] || 0) + (dep ? 1 : -1) * +r.amount; if (k === p.b) E[dep ? 'in' : 'out'] += 2 * +r.amount; }
     }
     if (R.length < 200) break; url = rel(j._links.next.href);
@@ -15118,7 +15288,8 @@ async function earnHistXr(addr) {
       if (t.Account !== addr || (t.TransactionType !== 'AMMDeposit' && t.TransactionType !== 'AMMWithdraw') || m.TransactionResult !== 'tesSUCCESS' || !t.Asset2) continue;
       const p = xrPools().find((q) => q.a2.currency === t.Asset2.currency && q.a2.issuer === t.Asset2.issuer); if (!p) continue;
       const d = xrDeltas(m, addr, t), dx = d.XRP || 0, du = d[p.a2.currency + '.' + p.a2.issuer] || 0;
-      const E = P[p.key] || (P[p.key] = { in: 0, out: 0, net: { x: 0, u: 0 } });
+      const E = P[p.key] || (P[p.key] = { in: 0, out: 0, net: { x: 0, u: 0 }, ev: [] });
+      E.ev.push({ t: ((t.date || 0) + 946684800) * 1000, d: Object.entries(d).filter(([k]) => /^03/.test(k)).reduce((s2, [, v]) => s2 + v, 0) });   /* the pool tokens it got or gave back */
       E.net.x -= dx; E.net.u -= du; if (du < 0) E.in += -2 * du; else E.out += 2 * du;
     }
     marker = r.marker; if (!marker) break;
@@ -16580,6 +16751,34 @@ window.addEventListener('popstate', () => {
   if ($('#sheet').classList.contains('on')) closeSheet(true);
   if (e.t === 'scr' && e.prev && e.prev !== cur) { navHold = true; go(e.prev); navHold = false; }
 });
+// "Talk to our Wealth Advisors": a short form; Send opens the phone's email app with it filled in (nothing leaves the phone until the person sends it)
+const US_STATES = 'Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District of Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New Hampshire,New Jersey,New Mexico,New York,North Carolina,North Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode Island,South Carolina,South Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West Virginia,Wisconsin,Wyoming,Outside the US'.split(',');
+const ADV_TO = 'jeff@trevericapital.com';
+function advForm(src) {
+  pending = null; window._advSrc = src || 'app';
+  const f = (id, l, t = 'text', extra = '') => `<label>${l}<input id="${id}" type="${t}" autocomplete="off" ${extra}></label>`;
+  sheet(`<h2 style="margin-bottom:0">Customized Portfolios</h2><div class="mu" style="font-size:13.5px">Talk to our Wealth Advisors. Tell us how to reach you and a wealth advisor will contact you shortly.</div>
+    ${f('advName', 'Name', 'text', 'autocomplete="name"')}${f('advPhone', 'Phone', 'tel', 'inputmode="tel" autocomplete="tel"')}${f('advEmail', 'Email', 'email', 'autocomplete="email"')}
+    <div class="g2"><label>State<select id="advState"><option value="">Choose…</option>${US_STATES.map((x) => `<option>${x}</option>`).join('')}</select></label>
+      <label>Best time<select id="advTime"><option>Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label></div>
+    <label>Message (optional)<textarea id="advMsg" rows="3" style="resize:vertical;background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:10px;font:inherit"></textarea></label>
+    <button class="b-light big" data-act="advSend">Send to Treveri Capital</button><button class="b-out" data-act="closeSheet">Cancel</button>
+    <div class="mu" style="font-size:11px;line-height:1.45">Opens your email app with this filled in; nothing is sent until you tap Send there. Treveri Capital LLC is a California registered investment adviser, owned by Liquidfi's founder. Not an offer of advice where it isn't registered or exempt.</div>`);
+}
+function advMail(v, src) {   // the email it opens
+  const body = ['Please have a wealth advisor contact me about a customized portfolio.', '', `Name: ${v.name}`, `Phone: ${v.phone || '-'}`, `Email: ${v.email || '-'}`, `State: ${v.state}`, `Best time: ${v.time}`]
+    .concat(v.msg ? ['', 'Message:', v.msg] : []).concat(['', `(Sent from Liquidfi · ${src})`]).concat(['California', 'Texas'].includes(v.state) ? [] : ['Note: state outside CA/TX: check registration or exemption before advising.']);
+  return `mailto:${ADV_TO}?subject=${encodeURIComponent('Customized portfolio request (' + src + ')')}&body=${encodeURIComponent(body.join('\n'))}`;
+}
+function advSend() {
+  const g = (id) => ($('#' + id).value || '').trim(), v = { name: g('advName'), phone: g('advPhone'), email: g('advEmail'), state: g('advState'), time: g('advTime'), msg: g('advMsg') };
+  if (!v.name) return toast('Add your name.');
+  if (!v.phone && !v.email) return toast('Add a phone number or an email so we can reach you.');
+  if (v.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) return toast('That email doesn\'t look right.');
+  if (!v.state) return toast('Choose your state.');
+  const u = advMail(v, window._advSrc || 'app'); window._advLast = u; closeSheet();
+  location.href = u; toast('Opening your email app… tap Send there.', 6000);
+}
 function sheet(html) { if (!$('#sheet').classList.contains('on')) navPush({ t: 'sheet' }); $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
 function closeSheet(fromBack) { scanStop(); const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if ($('#wkSec') || $('#phW') || $('#sheetIn [data-act=secShow], #sheetIn [data-act=xrSecShow], #sheetIn [data-act=phShow]')) $('#sheetIn').innerHTML = ''; /* never leave a shown key or phrase in the page */ if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
 let pending = null;
@@ -16851,7 +17050,7 @@ function tPendSet(p, st, cls, sub, done) {
   Object.assign(p, { st, cls: !done && (!cls || cls === 'mu') ? 'amb' : cls || '', busy: done ? 0 : 1 });   /* still working (Sending…, Sent…): yellow so it stands out */ if (sub != null) p.sub = sub; if (done) p.t2 = Date.now();
   tPendPaint();
   if (done && cur === 'trade' && p.scr === 'trade') tradeLoadMine();
-  if (done && (p.scr === 'earn' || p.scr === 'earnx')) { delete EPL[p.addr]; delete XPL[p.addr]; if (cur === 'earn') drawEarn(); }
+  if (done && (p.scr === 'earn' || p.scr === 'earnx')) { delete EPL[p.addr]; delete XPL[p.addr]; efeesDrop(p.addr); if (cur === 'earn') drawEarn(); }
   if (done && (p.scr === 'send' || p.scr === 'swap') && !p.cls.includes('red')) refreshAcct(p.addr).then(() => { if (p.scr === 'swap' && cur === 'swap') drawSwap(); }).catch(() => {});
 }
 function tPendPaint() {
@@ -16966,9 +17165,10 @@ async function stopList(addr) {
 }
 const p4 = (x) => (+x).toFixed(x < 1 ? 6 : 4);
 // how far past the stop it may fill: 0.5 / 1 / 2 %, Market (= up to STOP_MKT % so a flash crash can't sell for almost nothing), or Custom
-const STOP_MKT = 5;
+const STOP_MKT = 5, STOP_MKT_STABLE = 1;   // XLM moves a lot; EURC and other coins against a dollar coin barely do, so a market stop goes at most 1% past
+const stopMkt = () => (TP().b === 'XLM' ? STOP_MKT : STOP_MKT_STABLE);
 const limMode = () => (['0.5', '1', '2', 'mkt', 'custom'].includes(String(S.stopLim)) ? String(S.stopLim) : 'mkt');   // Market is the default
-const limPct = () => (limMode() === 'mkt' ? STOP_MKT : +limMode());
+const limPct = () => (limMode() === 'mkt' ? stopMkt() : +limMode());
 function stopDefaults() {
   feedOpts();
   const m = stopMid(), mode = limMode(), sell = T.side === 'sell';
@@ -16980,13 +17180,13 @@ function stopDefaults() {
   const st = +$('#tStop').value;
   if (mode !== 'custom' && st > 0) $('#tLim').value = (sell ? st * (1 - limPct() / 100) : st * (1 + limPct() / 100)).toFixed(6);
   const lim = +$('#tLim').value;
-  $('#tLimTxt').textContent = !(st > 0 && lim > 0) ? '' : mode === 'mkt' ? `Market: fills at the best price on the book, down to ${p4(lim)} (${STOP_MKT}% ${sell ? 'below' : 'above'} the stop) as a safety floor`
+  $('#tLimTxt').textContent = !(st > 0 && lim > 0) ? '' : mode === 'mkt' ? `Market: fills at the best price on the book, down to ${p4(lim)} (${stopMkt()}% ${sell ? 'below' : 'above'} the stop) as a safety floor`
     : `Limit ${p4(lim)} · ${(Math.abs(lim / st - 1) * 100).toFixed(2)}% ${sell ? 'below' : 'above'} the stop`;
 }
 function stopEst(q, el) {
   const st = +$('#tStop').value || 0, lim = +$('#tLim').value || 0, sell = T.side === 'sell', m = stopMid(), nB = kName(TP().b), nQ = kName(TP().q);
   $('#tStopNote').innerHTML = !S.stopUrl ? '<span class="amb">Set your stop server first: Settings → Stop orders.</span>'
-    : `${$('#tFeed').value === 'trades3' ? `When 3 trades of 1+ ${esc(nB)} happen on Stellar at <b>${st ? p4(st) : 'the stop'}</b> or ${sell ? 'lower' : 'higher'}` : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}`}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? esc(nB) : esc(nQ)} stays in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
+    : `${$('#tFeed').value === 'trades3' ? `When 3 trades of 1+ ${esc(nB)} happen on Stellar at <b>${st ? p4(st) : 'the stop'}</b> or ${sell ? 'lower' : 'higher'} (a jump over 0.5% past it must be confirmed by the last 100 ${esc(nB)} traded)` : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}`}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? esc(nB) : esc(nQ)} stays in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
   if (!el) return;
   const fOn = !!feeTo(tradeAddr) && (FEEOK[feeTo(tradeAddr)] || { ok: 1 }).ok, f = fOn ? feeOf(sell ? q : q * st) : 0;
   const warn = st && m && (sell ? st >= m : st <= m) ? `<div><span class="amb">The price is ${p4(m)} now: a ${sell ? 'sell' : 'buy'} stop goes ${sell ? 'below' : 'above'} it.</span></div>` : '';
@@ -17009,7 +17209,7 @@ async function stopReview(q, a, kp) {
   if ((!sell || !isX) && spendable(a, true) < 1.02) return toast(`A stop needs 1.01 XLM free for its helper (have ${fx(spendable(a, true))}). It comes back when the stop ends.`);
   if (!sell && swapAvail(a, qK) < usd + (fee ? fee.amt : 0)) return toast(`Not enough ${nQ} (have ${fx(swapAvail(a, qK))}, need ${fx(usd + (fee ? fee.amt : 0))}).${holdNote(a, qK)}`, 7000);
   const end = new Date(Date.now() + days * 86400e3);
-  const items = [{ t: feed === 'trades3' ? `When 3 trades of 1+ ${nB} on Stellar are at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}${feed === 'trades3' ? ' · only trades after you place it count' : ''}`, hl: 1 },
+  const items = [{ t: feed === 'trades3' ? `When 3 trades of 1+ ${nB} on Stellar are at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `When ${FEEDN[feed]} ${sell ? 'falls to' : 'rises to'} ${p4(st)}`, s: `now ${m ? p4(m) : '–'}${feed === 'trades3' ? ` · only trades after you place it count · if they're more than 0.5% past ${p4(st)}, the last 100 ${nB} traded must confirm it (no 1-trade blips)` : ''}`, hl: 1 },
     { t: limMode() === 'mkt' ? `${sell ? 'Sell' : 'Buy'} ${fx(q, 2)} ${nB} at market (no ${sell ? 'lower' : 'higher'} than ${p4(lim)})` : sell ? `Sell ${fx(q, 2)} ${nB} at ${p4(lim)} or better` : `Buy ${fx(q, 2)} ${nB} at ${p4(lim)} or better`, s: sell ? `at least ${fx(usd)} ${nQ}${fee ? ` · fee ${m2(fee.amt)} ${nB} on top (${SWAP_FEE.bps / 100}%)` : ''}` : `pay at most ${fx(usd)} ${nQ}${fee ? ` + ${m2(fee.amt)} ${nQ} fee (${SWAP_FEE.bps / 100}%)` : ''}` },
     { t: `Ends ${end.toLocaleDateString([], { month: 'short', day: 'numeric' })}`, s: `Your stop server sends it.${isX && stopGuard() ? ` Price guard ${stopGuard()}%: never fills further than that from the Coinbase, Kraken, Binance average.` : ''} Funds stay in your wallet until then. If they are not there when it triggers, the stop fails.` },
     { t: 'Helper holds 1.01 XLM from this wallet', s: 'Your own helper account sends the order (made and signed on this phone; the stop server holds no keys). The 1.01 XLM comes back when the stop fills, is cancelled or ends.' }];
@@ -17695,6 +17895,7 @@ document.addEventListener('click', async (e) => {
     if (seg === 'tMode') { if (v === 'stop' && T.mode !== 'stop' && T.side === 'buy' && !T.stopTyped) T.side = 'sell'; T.mode = v; }   // most stops protect a position: Stop opens on Sell
     if (seg === 'tSide' && T.side !== v) { T.side = v; if (!T.pxTyped) $('#tPx').value = ''; }   // a limit price you typed stays; an untouched one restarts at the best bid (buy) / best ask (sell)
     if (seg === 'tMode' || seg === 'tSide') return drawTrade();
+    if (seg === 'eChain') { S.earnChain = v; saveS(); return drawEarn(); }
     if (seg === 'xtSide' || seg === 'xtMode') { if (seg === 'xtSide' && XT.side !== v) $('#xtPx').value = ''; if (seg === 'xtSide') XT.side = v; else XT.mode = v; $$('#' + seg + ' button').forEach((b) => b.classList.toggle('on', b.dataset.v === v)); $('#xtPxW').style.display = XT.mode === 'lim' ? '' : 'none'; const g = $('#xtGo'); g.textContent = XT.side === 'buy' ? 'Buy' : 'Sell'; g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big'; xtPaint(); return xtEst(); }
     if (seg === 'tLimMode') { S.stopLim = v; saveS(); if (v === 'custom' && !$('#tLim').value) stopDefaults(); stopDefaults(); return tradeEst(); }
     if (seg === 'oMode') { S.pMode = v; saveS(); return paintPort(); }
@@ -17744,8 +17945,11 @@ document.addEventListener('click', async (e) => {
     swapFlip: () => { const f = $('#wFrom').value, t2 = $('#wTo').value; if (![...$('#wFrom').options].some((o) => o.value === t2)) return toast(`This wallet doesn't hold ${kName(t2)} yet.`); $('#wFrom').value = t2; $('#wTo').value = f; $('#wAmt').value = ''; swapQuote(); },
     swapReview: () => swapReview(),
     taxMake: () => taxMake(), taxShare: () => taxShare(t.dataset.f), taxSave: () => taxSave(t.dataset.f),
+    advForm: () => advForm(t.dataset.src), advSend: () => advSend(),
+    earnSmall: () => { EARN_SMALL[t.dataset.ch] = !EARN_SMALL[t.dataset.ch]; drawEarn(); }, earnSum: () => earnSum(t.dataset.ch), earnPool: () => earnPoolSheet(t.dataset.ch, t.dataset.k),
+    earnPer: () => { EDET.per = t.dataset.eper; earnDetPaint(); },
     advisor: () => { location.href = 'mailto:jeff@trevericapital.com?subject=' + encodeURIComponent('Wealth advisor request') + '&body=' + encodeURIComponent('Please have a wealth advisor contact me.\n\nName:\nPhone:\nState:\n'); },
-    earnRefresh: () => { for (const k of Object.keys(EPL)) delete EPL[k]; for (const k of Object.keys(XPL)) delete XPL[k]; for (const k of Object.keys(POOLC)) delete POOLC[k]; for (const k of Object.keys(XAMMS)) delete XAMMS[k]; drawEarn(); },
+    earnRefresh: () => { efeesDrop(); for (const k of Object.keys(EPL)) delete EPL[k]; for (const k of Object.keys(XPL)) delete XPL[k]; for (const k of Object.keys(POOLC)) delete POOLC[k]; for (const k of Object.keys(XAMMS)) delete XAMMS[k]; drawEarn(); },
     earnAdd: () => earnAddSheet(t.dataset.pid), earnOut: () => earnOutSheet(t.dataset.pid), earnOutGo: () => earnOutGo(t.dataset.pid, +t.dataset.epct),
     earnMax: () => { const v = EARN_ADD ? EARN_ADD.max : 0; $('#eAmt').value = v > 0 ? (+v.toFixed(6)).toString() : ''; (EARN_ADD && EARN_ADD.xr ? xrEarnEst : earnEst)(); },
     earnAddGo: () => earnAddGo(), earnSwap: () => { const E = EARN_ADD, p = E && E.p, c = p && POOLC[p.id], u = +(($('#eAmt') || {}).value || 0);
