@@ -388,18 +388,22 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <!-- TRADE XRP (XRP Ledger DEX) -->
 <section class="scr" id="s-xtrade">
   <div class="top"><div class="l"><button class="ico back" data-go="xrp" aria-label="Back">‹</button><h2>Trade XRP</h2></div><span class="mu" style="font-size:12px" id="xtFrom"></span></div>
-  <div class="card"><div class="top"><span class="lbl">XRP / RLUSD · XRP Ledger DEX</span><span class="grn" style="font-size:11px;font-weight:700" id="xtUpd"></span></div><div class="book" id="xtBook"></div><div class="mu" id="xtSpread" style="font-size:12px"></div></div>
+  <div class="seg" id="xtQ"><button class="on" data-v="rl">XRP / RLUSD</button><button data-v="uc">XRP / USDC</button></div>
+  <div class="card"><div class="top"><span class="lbl" id="xtPairL">XRP / RLUSD · XRP Ledger DEX</span><span class="grn" style="font-size:11px;font-weight:700" id="xtUpd"></span></div><div class="book" id="xtBook"></div><div class="mu" id="xtSpread" style="font-size:12px"></div></div>
   <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="mu" style="font-size:11px">order book + AMM</span></div><div id="xtLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
   <div class="seg" id="xtSide"><button class="on" data-v="buy">Buy XRP</button><button data-v="sell">Sell XRP</button></div>
   <div class="seg" id="xtMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button></div>
   <label>Amount (XRP)<input id="xtAmt" inputmode="decimal" placeholder="0"></label>
+  <div class="g4"><button class="b-out sm" data-xpct="25">25%</button><button class="b-out sm" data-xpct="50">50%</button><button class="b-out sm" data-xpct="75">75%</button><button class="b-out sm" data-xpct="100">Max</button></div>
   <div class="mu" id="xtHave" style="font-size:12px"></div>
-  <label id="xtPxW" style="display:none">Limit price (RLUSD per XRP)<input id="xtPx" inputmode="decimal"></label>
+  <label id="xtPxW" style="display:none"><span id="xtPxL">Limit price (RLUSD per XRP)</span><input id="xtPx" inputmode="decimal"></label>
   <div class="card rows" id="xtEst" style="padding:4px 14px;font-size:14px"></div>
   <button class="b-grn big" data-act="xtReview" id="xtGo">Buy</button>
   <div class="mu" style="font-size:12px">If a bot (like XRP Sweepr) trades from this wallet, pause it first so the two don't clash.</div>
   <span class="lbl">Open orders</span>
   <div id="xtOpen" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div class="top" style="align-items:baseline"><span class="lbl">Your fills</span><span class="mu" style="font-size:11px" id="xtFillsL"></span></div>
+  <div class="card" id="xtFills" style="padding:8px 14px;font-size:13px"><div class="mu">loading…</div></div>
 </section>
 
 <section class="scr" id="s-result">
@@ -14013,24 +14017,27 @@ async function drawXrp() {
 function xrAmt(a) { if (a == null) return '?'; if (typeof a === 'string') return m2(+a / 1e6) + ' XRP'; return m2(+a.value) + ' ' + xrCur(a.currency); }
 /* What a transaction did to MY XRP and RLUSD (from the ledger's before/after), fee put back for my own transactions.
    → { x: XRP change, u: RLUSD change } ; a trade = the two move in opposite directions. */
-function xrMyDelta(meta, me, tx) {
-  let x = 0, u = 0; const iss = rlusdIss();
+function xrMyDelta(meta, me, tx) {   /* u = the dollar coin (RLUSD or Circle USDC) that moved the most, tok = its name */
+  let x = 0; const U = {};
+  const C = xrCoins();
   for (const n of (meta && meta.AffectedNodes) || []) {
     const k = Object.keys(n)[0], v = n[k] || {}, F = v.FinalFields || v.NewFields || {}, P = v.PreviousFields || {};
     if (v.LedgerEntryType === 'AccountRoot' && F.Account === me && P.Balance != null) x += (+F.Balance - +P.Balance) / 1e6;
-    if (v.LedgerEntryType === 'RippleState' && F.Balance && F.Balance.currency === RLUSD_CUR && P.Balance) {
+    if (v.LedgerEntryType === 'RippleState' && F.Balance && P.Balance) {
       const lo = (F.LowLimit || {}).issuer, hi = (F.HighLimit || {}).issuer;
-      if (!((lo === me && hi === iss) || (hi === me && lo === iss))) continue;
-      const sg = lo === me ? 1 : -1; u += sg * (+F.Balance.value - +P.Balance.value);
+      const c = C.find((q) => q.cur === F.Balance.currency && ((lo === me && hi === q.iss) || (hi === me && lo === q.iss))); if (!c) continue;
+      const sg = lo === me ? 1 : -1; U[c.tok] = (U[c.tok] || 0) + sg * (+F.Balance.value - +P.Balance.value);
     }
   }
   if (tx && tx.Account === me && tx.Fee) x += +tx.Fee / 1e6;
-  return { x, u };
+  let tok = 'RLUSD', u = 0; for (const [t2, v] of Object.entries(U)) if (Math.abs(v) > Math.abs(u)) { u = v; tok = t2; }
+  return { x, u, tok };
 }
-function xrTradeText(d) {   // null if this wasn't an XRP/RLUSD trade
+const xq4 = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });   /* fills: enough decimals that parts add up */
+function xrTradeText(d) {   // null if this wasn't an XRP / dollar-coin trade
   if (!(Math.abs(d.x) > 1e-6 && Math.abs(d.u) > 1e-6) || Math.sign(d.x) === Math.sign(d.u)) return null;
-  const px = Math.abs(d.u / d.x);
-  return d.x < 0 ? `sold ${m2(-d.x)} XRP for ${m2(d.u)} RLUSD @ ${px.toFixed(5)}` : `bought ${m2(d.x)} XRP for ${m2(-d.u)} RLUSD @ ${px.toFixed(5)}`;
+  const px = Math.abs(d.u / d.x), tk = d.tok || 'RLUSD';
+  return d.x < 0 ? `sold ${xq4(-d.x)} XRP for ${xq4(d.u)} ${tk} @ ${px.toFixed(5)}` : `bought ${xq4(d.x)} XRP for ${xq4(-d.u)} ${tk} @ ${px.toFixed(5)}`;
 }
 function xrTxText(x, me) {
   const t = x.tx, ok = (x.meta.TransactionResult || 'tesSUCCESS') === 'tesSUCCESS';
@@ -14242,7 +14249,9 @@ const xrCoins = () => [{ k: 'rl', tok: 'RLUSD', name: 'RLUSD (Ripple USD)', who:
 const xrCoinOf = (l) => xrCoins().find((c) => c.cur === l.currency && c.iss === l.account);
 const xrLineOf = (d, c) => (d && d.lines || []).find((l) => l.account === c.iss && l.currency === c.cur);
 async function xrTrustReview(k = 'rl') {
-  const c = xrCoins().find((x) => x.k === k), o = xrOwn(xrSel), d = XRA[xrSel]; if (!c) return; if (!o || !d || !d.a) return toast('This wallet is not activated yet.');
+  const c = xrCoins().find((x) => x.k === k), o = xrOwn(xrSel), back = cur === 'xtrade' ? 'xtrade' : 'xrp'; if (!c || !o) return;
+  let d = XRA[xrSel]; if (!d) { try { d = await xrLoad(xrSel); } catch (e) { return toast(e.message || String(e)); } }
+  if (!d || !d.a) return toast('This wallet is not activated yet.');
   if (xrLineOf(d, c)) return toast(`${c.tok} is already added.`);
   let sv, drops; try { sv = await xrServer(); drops = await xrFee(); } catch (e) { return toast(e.message || String(e)); }
   if (xrSpend(d) < sv.inc + drops / 1e6) return toast(`Needs ${m2(sv.inc)} XRP free for the reserve (${m2(xrSpend(d))} available).`);
@@ -14253,37 +14262,52 @@ async function xrTrustReview(k = 'rl') {
     { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], `Add ${c.tok}`, async () => {
     try {
       const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: c.cur, issuer: c.iss, value: '1000000000' }, Flags: 0x00020000 }, drops);   /* tfSetNoRipple */
-      xrOutcome(r, `${c.tok} added`, `${esc(o.name)} can now hold ${c.tok} · reserve +${m2(sv.inc)} XRP`, `${c.tok} not added`);
-    } catch (e) { showResult(false, `${c.tok} not added`, [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
+      if (r.state === 'ok') delete XRA[xrSel];   /* reload lines so the new coin shows */
+      xrOutcome(r, `${c.tok} added`, `${esc(o.name)} can now hold ${c.tok} · reserve +${m2(sv.inc)} XRP`, `${c.tok} not added`, back);
+    } catch (e) { showResult(false, `${c.tok} not added`, [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], back); }
   }, false, 'b-acc', 'Adding…', true);
 }
 /* Remove a trust line: only at 0 balance and with no open order on that coin (TrustSet limit 0, no rippling = the default state, so the line closes and its reserve comes back). */
-async function xrUntrustReview(cur, iss) {
-  const o = xrOwn(xrSel); if (!o || !cur || !iss) return;
-  const c = xrCoins().find((x) => x.cur === cur && x.iss === iss), tok = c ? c.tok : xrCur(cur);
+/* Our side of a line is "set" (holds our reserve and can be removed) when we put a limit on it, set a quality, or our no-ripple
+   flag differs from the account default. A 0-limit line in the default state was opened by the other account: we can't remove it. */
+const XR_DEF_RIPPLE = 0x00800000;   /* lsfDefaultRipple */
+const xrLineOurs = (l, d) => +l.limit !== 0 || +(l.quality_in || 0) !== 0 || +(l.quality_out || 0) !== 0 || !!l.no_ripple !== !((+(d && d.a && d.a.Flags) || 0) & XR_DEF_RIPPLE);
+async function xrUntrustReview(ccy, iss) {
+  const o = xrOwn(xrSel); if (!o || !ccy || !iss) return;
+  const c = xrCoins().find((x) => x.cur === ccy && x.iss === iss), tok = c ? c.tok : xrCur(ccy);
   let d, sv, drops, offs; try { d = await xrLoad(xrSel); sv = await xrServer(); drops = await xrFee(); offs = (await xr('account_offers', { account: xrSel, ledger_index: 'validated' })).offers || []; } catch (e) { return toast(e.message || String(e)); }
-  const l = d && d.lines.find((x) => x.account === iss && x.currency === cur); if (!l) return toast(`${tok} is not on this wallet.`);
+  const l = d && d.lines.find((x) => x.account === iss && x.currency === ccy); if (!l) return toast(`${tok} is not on this wallet.`);
   if (+l.balance !== 0) return toast(`This wallet still holds ${m2(+l.balance)} ${tok}. Send, swap or trade it to 0 first.`, 6000);
-  const uses = (a) => typeof a === 'object' && a.currency === cur && a.issuer === iss;
+  if (!xrLineOurs(l, d)) return toast(`This ${tok} line was opened by the other account (${short(iss)}), so only they can remove it. It doesn't use this wallet's reserve.`, 7000);
+  const uses = (a) => typeof a === 'object' && a.currency === ccy && a.issuer === iss;
   if (offs.some((f) => uses(f.taker_gets) || uses(f.taker_pays))) return toast(`An open order uses ${tok}. Cancel it first.`, 6000);
+  const defR = !!((+d.a.Flags || 0) & XR_DEF_RIPPLE);   /* default state: no-ripple ON for normal wallets, OFF if the wallet has DefaultRipple */
+  const tx = { TransactionType: 'TrustSet', LimitAmount: { currency: ccy, issuer: iss, value: '0' }, QualityIn: 0, QualityOut: 0, Flags: defR ? 0x00040000 : 0x00020000 };   /* tfClearNoRipple : tfSetNoRipple */
   const BZ = await xrBusy(xrSel);
   confirmSheet(`Remove ${c ? c.name : tok}`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · ${esc(o.name)}`, [...BZ,
     { t: `Stop holding ${tok} in this wallet`, s: `issuer ${iss}${c ? ' (' + c.who + ')' : ''} · balance 0`, hl: 1 },
     { t: `Reserve back: ${m2(sv.inc)} XRP`, s: 'the ledger frees it when the line closes. You can add it again any time.' },
     { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], `Remove ${tok}`, async () => {
     try {
-      const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: cur, issuer: iss, value: '0' }, Flags: 0x00020000 }, drops);   /* tfSetNoRipple */
+      const r = await xrSubmit(o, tx, drops);
+      if (r.state === 'ok') {   /* check the line really closed (the other side may still hold it open) */
+        let still = null; try { const d2 = await xrLoad(xrSel); still = d2.lines.some((x) => x.account === iss && x.currency === ccy); } catch (e) {}
+        if (still === null) return showResult(true, 'Sent', [`<div class="card">Confirmed on the ledger. Couldn't re-check the wallet just now: open Assets in a moment to see that ${esc(tok)} is gone.</div>`], 'xrp');
+        if (still) return showResult(true, `${tok} limit set to 0`, [`<div class="card amb">The line is still open because ${esc(short(iss))} keeps its side of it. This wallet's part is cleared; nothing else moved.</div>`], 'xrp');
+      }
       xrOutcome(r, `${tok} removed`, `${esc(o.name)} no longer holds ${esc(tok)}`, `${tok} not removed`);
     } catch (e) { showResult(false, `${tok} not removed`, [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
   }, false, 'b-acc', 'Removing…', true);
 }
 /* Assets sheet on the XRP wallet page (like Stellar's Assets): add or remove the dollar coins, and tidy up old 0-balance lines */
-function xrAssetsSheet() {
-  const o = xrOwn(xrSel), d = XRA[xrSel]; if (!o) return; if (!d || !d.a) return toast('This wallet is not activated yet. Send it XRP first.');
+async function xrAssetsSheet() {
+  const o = xrOwn(xrSel), addr = xrSel; if (!o) return; let d = XRA[xrSel];
+  if (!d) { try { d = await xrLoad(xrSel); } catch (e) { return toast(e.message || String(e)); } if (cur !== 'xrp' || xrSel !== addr) return; }
+  if (!d || !d.a) return toast('This wallet is not activated yet. Send it XRP first.');
   pending = null;
   const inc = m2((XRSV || { inc: 0.2 }).inc), C = xrCoins();
   const row = (name, sub, right) => `<div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 14px"><div><b>${name}</b><div class="mono mu" style="font-size:12px">${sub}</div></div>${right}</div>`;
-  const act = (l) => +l.balance === 0 ? `<button class="b-out sm" style="width:auto;padding:0 12px" data-act="xrUntrust" data-xc="${esc(l.currency)}" data-xi="${esc(l.account)}">Remove</button>` : '<span class="tag t-grn">added</span>';
+  const act = (l) => +l.balance === 0 && !xrLineOurs(l, d) ? '<span class="mu" style="font-size:12px">opened by them</span>' : +l.balance === 0 ? `<button class="b-out sm" style="width:auto;padding:0 12px" data-act="xrUntrust" data-xc="${esc(l.currency)}" data-xi="${esc(l.account)}">Remove</button>` : '<span class="tag t-grn">added</span>';
   const known = C.map((c) => { const l = xrLineOf(d, c);
     return row(`${esc(c.tok)} <span class="mu" style="font-weight:400">· ${esc(c.who)}</span>`, `${esc(short(c.iss))}${l ? ' · balance ' + m2(+l.balance) : ''}`, l ? act(l) : `<button class="b-light sm" style="width:auto;padding:0 14px" data-act="xrTrust" data-xk="${c.k}">Add</button>`); }).join('');
   const other = d.lines.filter((l) => !xrCoinOf(l));
@@ -14295,14 +14319,28 @@ function xrAssetsSheet() {
 /* ---------- Trade XRP on the XRP Ledger DEX (XRP / RLUSD) ----------
    Book: book_offers both ways. Market = OfferCreate Fill-or-Kill (fills now at your cap or not at all; the ledger also uses
    the AMM pool when it's better). Limit = OfferCreate that rests on the book (+0.2 XRP reserve while open). Cancel = OfferCancel. */
-const XT = { side: 'buy', mode: 'mkt', bids: [], asks: [], at: 0, offers: [], timer: 0, err: null, sales: [], salesAt: 0 };
+const XT = { side: 'buy', mode: 'mkt', bids: [], asks: [], at: 0, offers: [], timer: 0, err: null, sales: [], salesAt: 0, q: 'rl' };
+/* Which dollar coin XRP trades against on this screen: 'rl' (Ripple RLUSD) or 'uc' (Circle USDC). Remembered per wallet. */
+const xtC = () => xrCoins().find((c) => c.k === XT.q) || xrCoins()[0];
+const xtCoinOfAmt = (a) => a && typeof a === 'object' ? xrCoins().find((c) => c.cur === a.currency && c.iss === a.issuer) : null;
+const xtIsPairOffer = (f) => (typeof f.taker_gets === 'string' && xtCoinOfAmt(f.taker_pays)) || (typeof f.taker_pays === 'string' && xtCoinOfAmt(f.taker_gets));
+function xtPickQ(addr) {   /* last pair used on this wallet if it can hold that coin, else one it holds, else RLUSD */
+  const d = XRA[addr], m = (NS().xtq || {})[addr], held = xrCoins().filter((c) => xrLineOf(d, c));
+  XT.q = m && held.some((c) => c.k === m) ? m : held.length ? held[0].k : (m || 'rl');
+}
+function xtSetQ(k) {
+  if (XT.q === k) return; XT.q = k; const N = NS(); N.xtq = { ...(N.xtq || {}), [xrSel]: k }; saveS();
+  XT.bids = []; XT.asks = []; XT.at = 0; XT.sales = []; XT.salesAt = 0; XT.fails = 0; $('#xtPx').value = '';
+  drawXTrade();
+  xtLoadBook().then(() => { if (cur === 'xtrade') { xtPaint(); xtEst(); } }).catch(() => {});   /* new book right away (push or polling may be mid-wait) */
+}
 /* Last sales: the XRP Ledger has no trades feed, so read the RLUSD issuer's recent transactions (every RLUSD movement touches
    its trust lines) and keep the ones that swapped XRP <-> RLUSD: order-book fills (Offer nodes) and AMM pool swaps. */
 function xtSaleOf(t) {
-  const meta = t.meta || t.metaData, tx = t.tx || t.tx_json || t.transaction || {}, iss = rlusdIss();
+  const meta = t.meta || t.metaData, tx = t.tx || t.tx_json || t.transaction || {}, C = xtC(), iss = C.iss;
   if (!meta || meta.TransactionResult !== 'tesSUCCESS' || !Array.isArray(meta.AffectedNodes)) return null;
   const N = meta.AffectedNodes.map((n) => { const k = Object.keys(n)[0]; return { k, v: n[k] || {} }; });
-  const isR = (a) => a && typeof a === 'object' && a.currency === RLUSD_CUR && a.issuer === iss;
+  const isR = (a) => a && typeof a === 'object' && a.currency === C.cur && a.issuer === iss;
   let x = 0, u = 0, bought = 0, sold = 0;
   for (const { k, v } of N) {   // order-book fills: what each consumed offer gave up in this transaction
     if (v.LedgerEntryType !== 'Offer' || (k !== 'ModifiedNode' && k !== 'DeletedNode')) continue;
@@ -14314,7 +14352,7 @@ function xtSaleOf(t) {
     const F = v.FinalFields || {}, P = v.PreviousFields || {};
     if (v.LedgerEntryType !== 'AccountRoot' || !F.AMMID || P.Balance == null) continue;
     const amm = F.Account, dx = (+F.Balance - +P.Balance) / 1e6;
-    const rs = N.map((m) => m.v).find((w) => w.LedgerEntryType === 'RippleState' && w.FinalFields && w.PreviousFields && w.PreviousFields.Balance && w.FinalFields.Balance && w.FinalFields.Balance.currency === RLUSD_CUR
+    const rs = N.map((m) => m.v).find((w) => w.LedgerEntryType === 'RippleState' && w.FinalFields && w.PreviousFields && w.PreviousFields.Balance && w.FinalFields.Balance && w.FinalFields.Balance.currency === C.cur
       && [w.FinalFields.HighLimit.issuer, w.FinalFields.LowLimit.issuer].includes(amm) && [w.FinalFields.HighLimit.issuer, w.FinalFields.LowLimit.issuer].includes(iss));
     if (!rs || !dx) continue;
     const sgn = rs.FinalFields.LowLimit.issuer === amm ? 1 : -1, dHold = sgn * (+rs.FinalFields.Balance.value - +rs.PreviousFields.Balance.value);
@@ -14326,7 +14364,8 @@ function xtSaleOf(t) {
   return { t: iso ? Date.parse(iso) : 0, px: u / x, x, buy: bought >= sold, hash: t.hash || tx.hash };
 }
 async function xtLoadSales() {
-  const r = await xr('account_tx', { account: rlusdIss(), limit: 100, ledger_index_min: -1, ledger_index_max: -1 });
+  const q0 = XT.q, r = await xr('account_tx', { account: xtC().iss, limit: 100, ledger_index_min: -1, ledger_index_max: -1 });
+  if (XT.q !== q0) return;   /* switched pair while loading */
   XT.sales = (r.transactions || []).map(xtSaleOf).filter(Boolean).sort((a, b) => b.t - a.t).slice(0, 12);
   XT.salesAt = Date.now();
 }
@@ -14334,9 +14373,9 @@ function xtPaintSales() {
   const el = $('#xtLast'); if (!el) return;
   const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
   el.innerHTML = H3('Time (PT)') + H3('Price', 1) + H3('XRP', 1) + (XT.sales.length ? XT.sales.map((t) => `<span class="mu">${t.t ? new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false }) : ''}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(5)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
-    : `<span class="mu">${XT.salesAt ? 'No XRP/RLUSD trades in the latest RLUSD activity.' : 'loading…'}</span><span></span><span></span>`);
+    : `<span class="mu">${XT.salesAt ? `No XRP/${xtC().tok} trades in the latest ${xtC().tok} activity.` : 'loading…'}</span><span></span><span></span>`);
 }
-const xtPair = () => ({ currency: RLUSD_CUR, issuer: rlusdIss() });
+const xtPair = () => { const c = xtC(); return { currency: c.cur, issuer: c.iss }; };
 function xtLevels(list, side) {   // → [[price RLUSD per XRP, size XRP]] best first, using the funded amounts
   return (list || []).map((o) => {
     const g = o.taker_gets_funded || o.TakerGets, p = o.taker_pays_funded || o.TakerPays;
@@ -14345,10 +14384,11 @@ function xtLevels(list, side) {   // → [[price RLUSD per XRP, size XRP]] best 
   }).filter((l) => l && l[1] > 0 && isFinite(l[0]));
 }
 async function xtLoadBook(q = xr) {   // q: JSON-RPC (xr) or the push connection (xwQ)
-  const P = xtPair();
+  const P = xtPair(), q0 = XT.q;
   const [a, b] = await Promise.all([
     q('book_offers', { taker_gets: { currency: 'XRP' }, taker_pays: P, limit: 30, ledger_index: 'validated' }),
     q('book_offers', { taker_gets: P, taker_pays: { currency: 'XRP' }, limit: 30, ledger_index: 'validated' })]);
+  if (XT.q !== q0) return;   /* switched pair while loading: drop the old book */
   XT.asks = xtLevels(a.offers, 'ask').sort((x, y) => x[0] - y[0]);
   XT.bids = xtLevels(b.offers, 'bid').sort((x, y) => y[0] - x[0]);
   XT.at = Date.now();
@@ -14361,6 +14401,8 @@ function xtWalk(side, qty) {   // RLUSD to buy qty XRP (asks) or received for se
 async function drawXTrade() {
   const o = xrOwn(xrSel); if (!o) return go('xrp');
   $('#xtFrom').textContent = o.name;
+  const C = xtC(); $$('#xtQ button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.q));
+  $('#xtPairL').textContent = `XRP / ${C.tok} · XRP Ledger DEX`; $('#xtPxL').textContent = `Limit price (${C.tok} per XRP)`;
   $$('#xtSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.side));
   $$('#xtMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.mode));
   $('#xtPxW').style.display = XT.mode === 'lim' ? '' : 'none';
@@ -14372,7 +14414,7 @@ async function drawXTrade() {
   xtPollStart();   // fills the page right away; stops by itself once push updates are flowing
   xwStart();
   xrServer().catch(() => null); xrLoad(xrSel).then(() => { if (cur === 'xtrade') xtPaint(); }).catch(() => null);   // balances after a trade
-  xtLoadOpen();
+  xtLoadOpen(); xtLoadFills();
 }
 /* Polling fallback (JSON-RPC): book every 5 s, last sales every 3rd round. Runs only while push updates are down.
    A failed round keeps the last good numbers and waits longer (up to 30 s) so a busy public server isn't hammered. */
@@ -14382,7 +14424,7 @@ function xtPollStart() {
     if (cur !== 'xtrade' || XW.live) { XT.polling = false; return; }
     try { await xtLoadBook(); XT.fails = 0; XT.err = null; } catch (e) { XT.fails++; XT.err = e.message || String(e); }
     if (cur === 'xtrade' && !XW.live) { xtPaint(); xtEst(); }
-    if (!XT.fails && n++ % 3 === 0) { try { await xtLoadSales(); } catch (e) {} if (cur === 'xtrade') { xtPaintSales(); xtLoadOpen(); } }
+    if (!XT.fails && n++ % 3 === 0) { try { await xtLoadSales(); } catch (e) {} if (cur === 'xtrade') { xtPaintSales(); xtLoadOpen(); xtLoadFills(); } }
     if (cur === 'xtrade' && !XW.live) XT.timer = setTimeout(tick, Math.min(30000, 5000 * 2 ** Math.min(XT.fails, 3))); else XT.polling = false;
   };
   tick();
@@ -14413,7 +14455,7 @@ function xtMine(m) {   // a validated transaction from the push stream: did it t
 }
 let xtRefT = 0;
 function xtRefreshMine() {   // open orders + balances, at most once a second
-  clearTimeout(xtRefT); xtRefT = setTimeout(() => { if (cur !== 'xtrade') return; xtLoadOpen(); delete XRA[xrSel]; xrLoad(xrSel).then(() => { if (cur === 'xtrade') xtPaint(); }).catch(() => {}); }, 800);
+  clearTimeout(xtRefT); xtRefT = setTimeout(() => { if (cur !== 'xtrade') return; xtLoadOpen(); xtLoadFills(); delete XRA[xrSel]; xrLoad(xrSel).then(() => { if (cur === 'xtrade') xtPaint(); }).catch(() => {}); }, 800);
 }
 function xwFail() {   // drop to polling now, try push again later (5 s, 10 s, … up to 60 s), next server each time
   const was = XW.ws != null; xwStop(); XW.i++; XW.tries++;
@@ -14435,7 +14477,7 @@ function xwStart() {
   XW.ws = ws; XW.net = net; XW.lastLed = Date.now();
   ws.onopen = () => {
     if (XW.ws !== ws) return;
-    xwQ('subscribe', { streams: ['ledger'], accounts: [rlusdIss(), ...(xrSel ? [xrSel] : [])] })
+    xwQ('subscribe', { streams: ['ledger'], accounts: [xtC().iss, ...(xrSel ? [xrSel] : [])] })
       .then(() => { if (XW.ws !== ws) return; XW.live = true; XW.tries = 0; XW.lastLed = Date.now(); clearTimeout(XT.timer); XT.polling = false; xtPushBook(); })
       .catch(() => { if (XW.ws === ws) xwFail(); });
   };
@@ -14465,53 +14507,74 @@ function xtPaint() {
   if (!XT.fails) { u.className = 'grn'; u.textContent = XT.at ? 'live · ' + last : 'loading…'; }
   else if (XT.fails === 1) { u.className = 'mu'; u.textContent = XT.at ? 'updated ' + last : 'loading…'; }   // one missed refresh: not worth a warning
   else { u.className = 'amb'; u.textContent = XT.at ? `reconnecting… prices from ${last}` : "Can't reach the XRP Ledger. Retrying…"; }
-  $('#xtSpread').textContent = b && a ? `Mid ${((a[0] + b[0]) / 2).toFixed(5)} RLUSD · spread ${(((a[0] - b[0]) / ((a[0] + b[0]) / 2)) * 1e4).toFixed(0)} bps` : (XT.at ? 'No orders on one side of the book right now.' : '');
+  $('#xtSpread').textContent = b && a ? `Mid ${((a[0] + b[0]) / 2).toFixed(5)} ${xtC().tok} · spread ${(((a[0] - b[0]) / ((a[0] + b[0]) / 2)) * 1e4).toFixed(0)} bps` : (XT.at ? 'No orders on one side of the book right now.' : '');
   if (XT.mode === 'lim' && !$('#xtPx').value) { const t = XT.side === 'buy' ? b : a; if (t) $('#xtPx').value = t[0].toFixed(5); }
-  const d = XRA[xrSel]; const rl = d && d.lines.find((l) => l.account === rlusdIss() && l.currency === RLUSD_CUR);
-  $('#xtHave').textContent = d && d.a ? `Available: ${m2(xrSpend(d))} XRP · ${m2(rl ? Math.max(0, +rl.balance) : 0)} RLUSD` : '';
+  const d = XRA[xrSel], C = xtC(), rl = xrLineOf(d, C);
+  $('#xtHave').innerHTML = !(d && d.a) ? '' : rl ? `Available: ${m2(xrSpend(d))} XRP · ${m2(Math.max(0, +rl.balance))} ${C.tok}`
+    : `Available: ${m2(xrSpend(d))} XRP · this wallet can't hold ${C.tok} yet <button class="b-light sm" style="width:auto;min-height:30px;padding:0 12px;margin-left:6px" data-act="xrTrust" data-xk="${C.k}">+ Add ${C.tok}</button>`;
 }
 function xtEst() {
   const el = $('#xtEst'); if (!el) return; const q = +$('#xtAmt').value || 0;
   if (!q) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; return; }
-  if (XT.mode === 'lim') { const p = +$('#xtPx').value || 0; el.innerHTML = `<div><span class="mu">${XT.side === 'buy' ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p)} RLUSD</span></div><div><span class="mu">Ledger holds while open (not a fee, back when it closes)</span><span class="mono">${m2((XRSV || { inc: 0.2 }).inc)} XRP</span></div>`; return; }
+  if (XT.mode === 'lim') { const p = +$('#xtPx').value || 0; el.innerHTML = `<div><span class="mu">${XT.side === 'buy' ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p)} ${xtC().tok}</span></div><div><span class="mu">Ledger holds while open (not a fee, back when it closes)</span><span class="mono">${m2((XRSV || { inc: 0.2 }).inc)} XRP</span></div>`; return; }
   const c = xtWalk(XT.side, q), cap = +S.slip || 1;
   el.innerHTML = c == null ? '<div><span class="amb">Book too thin for this size (the AMM pool may still fill part of it)</span></div>'
-    : `<div><span class="mu">Est. ${XT.side === 'buy' ? 'cost' : 'proceeds'}</span><span class="mono">${fx(c)} RLUSD</span></div><div><span class="mu">Avg price</span><span class="mono">${(c / q).toFixed(5)}</span></div><div><span class="mu">${XT.side === 'buy' ? 'Max' : 'Min'} with ${cap}% cap</span><span class="mono">${fx(XT.side === 'buy' ? c * (1 + cap / 100) : c * (1 - cap / 100))} RLUSD</span></div>`;
+    : `<div><span class="mu">Est. ${XT.side === 'buy' ? 'cost' : 'proceeds'}</span><span class="mono">${fx(c)} ${xtC().tok}</span></div><div><span class="mu">Avg price</span><span class="mono">${(c / q).toFixed(5)}</span></div><div><span class="mu">${XT.side === 'buy' ? 'Max' : 'Min'} with ${cap}% cap</span><span class="mono">${fx(XT.side === 'buy' ? c * (1 + cap / 100) : c * (1 - cap / 100))} ${xtC().tok}</span></div>`;
 }
-const xtAmtStr = (v) => String(+(+v).toPrecision(15));   // issued-currency value: plain decimal, at most 15 significant digits
+const xtAmtStr = (v) => String(+(+v).toPrecision(15));
+/* 25% / 50% / 75% / Max: fill the XRP amount from what this wallet can use. Sell: free XRP (after the ledger reserve, the
+   order's own reserve if it's a limit, and a little for network fees). Buy: the dollar coin ÷ price (market: best ask + slippage cap). */
+function xtFillPct(pct) {
+  const d = XRA[xrSel], C = xtC(); if (!d || !d.a) return toast('Balances are still loading.');
+  const p = pct / 100, sv = XRSV || { inc: 0.2 }, lim = XT.mode === 'lim';
+  let x = 0;
+  if (XT.side === 'sell') x = Math.max(0, xrSpend(d) - (lim ? sv.inc : 0) - 0.01) * p;
+  else {
+    const l = xrLineOf(d, C); if (!l) return toast(`Add ${C.tok} to this wallet first.`);
+    const u = Math.max(0, +l.balance) * p, a = XT.asks[0], px = lim ? +$('#xtPx').value || (XT.bids[0] || [0])[0] : null;
+    if (lim) x = px > 0 ? u / px : 0;
+    else { if (!a) return toast('No sellers on the book right now.'); x = Math.min(u / (a[0] * (1 + (+S.slip || 1) / 100)), XT.asks.reduce((t2, l2) => t2 + l2[1], 0));   /* no more than the book shows */
+      for (let i = 0; i < 20 && x > 0; i++) { const c = xtWalk('buy', x); if (c != null && c * (1 + (+S.slip || 1) / 100) <= u + 1e-9) break; x *= 0.98; } }   /* deeper levels cost more: shrink until the capped cost fits */
+  }
+  x = Math.floor(x * 100) / 100;
+  $('#xtAmt').value = x > 0 ? String(x) : ''; xtEst();
+  if (!(x > 0)) toast(XT.side === 'sell' ? 'No free XRP to sell after the ledger reserve.' : `No ${C.tok} to spend.`);
+}   // issued-currency value: plain decimal, at most 15 significant digits
 async function xtReview() {
   const o = xrOwn(xrSel); let d = XRA[xrSel];
   if (!d) { try { d = await xrLoad(xrSel); } catch (e) { return toast(e.message || String(e)); } }
   if (!o || !d || !d.a) return toast('This wallet is not activated yet.');
-  if (!hasRlusd(d)) return toast('Add RLUSD to this wallet first (on its page).');
+  const C = xtC(), tk = C.tok; if (!xrLineOf(d, C)) return toast(`Add ${tk} to this wallet first (the + Add ${tk} button above).`);
   const q = +$('#xtAmt').value, buy = XT.side === 'buy'; if (!(q > 0)) return toast('Enter an amount.');
   let drops, sv; try { [drops, sv] = await Promise.all([xrFee(), xrServer(), xrLoad(xrSel)]).then(([f, s2]) => [f, s2]); } catch (e) { return toast(e.message || String(e)); }
+  if (XT.q !== C.k) return toast('You switched pairs. Review again.');
   const d2 = XRA[xrSel] || d, spend = xrSpend(d2), xd = Math.round(q * 1e6);
-  const rl = d2.lines.find((l) => l.account === rlusdIss() && l.currency === RLUSD_CUR), haveU = rl ? Math.max(0, +rl.balance) : 0;   // fresh balances (a bot may have traded)
+  const rl = xrLineOf(d2, C), haveU = rl ? Math.max(0, +rl.balance) : 0;   // fresh balances (a bot may have traded)
   if (spend < drops / 1e6) return toast('Not enough free XRP to pay the network fee.');
   let px, usd, flags, title, lines;
   if (XT.mode === 'lim') {
     px = +$('#xtPx').value; if (!(px > 0)) return toast('Enter a limit price.');
     usd = q * px; flags = 0;
-    if (buy && haveU < usd) return toast(`Not enough RLUSD (have ${m2(haveU)}).`);
+    if (buy && haveU < usd) return toast(`Not enough ${tk} (have ${m2(haveU)}).`);
     if (!buy && spend < q + sv.inc + drops / 1e6) return toast(`Not enough XRP (${m2(spend)} available; an open order also holds ${m2(sv.inc)} XRP of reserve).`);
     if (buy && spend < sv.inc + drops / 1e6) return toast(`Needs ${m2(sv.inc)} XRP free for the order's reserve.`);
     title = `Limit ${XT.side} ${m2(q)} XRP`;
-    lines = [{ t: `${buy ? 'Buy' : 'Sell'} ${m2(q)} XRP @ ${px.toFixed(5)} RLUSD`, s: `total ${fx(usd)} RLUSD · stays on the book until filled or cancelled`, hl: 1 }, { t: `Reserve +${m2(sv.inc)} XRP while open`, s: 'any part that fills right away fills now' }];
+    lines = [{ t: `${buy ? 'Buy' : 'Sell'} ${m2(q)} XRP @ ${px.toFixed(5)} ${tk}`, s: `total ${fx(usd)} ${tk} · stays on the book until filled or cancelled`, hl: 1 }, { t: `Reserve +${m2(sv.inc)} XRP while open`, s: 'any part that fills right away fills now' }];
   } else {
     await xtLoadBook().catch(() => null);
+    if (XT.q !== C.k) return toast('You switched pairs. Review again.');
     const c = xtWalk(XT.side, q); if (c == null) return toast('Not enough on the book for that size right now.');
     const cap = (+S.slip || 1) / 100; usd = buy ? c * (1 + cap) : c * (1 - cap); px = usd / q;
     flags = 0x00040000 | (buy ? 0 : 0x00080000);   // tfFillOrKill (+ tfSell: sell exactly this much XRP, take at least the minimum)
-    if (buy && haveU < usd) return toast(`Not enough RLUSD (have ${m2(haveU)}, need up to ${m2(usd)}).`);
+    if (buy && haveU < usd) return toast(`Not enough ${tk} (have ${m2(haveU)}, need up to ${m2(usd)}).`);
     if (!buy && spend < q + drops / 1e6) return toast(`Not enough XRP (${m2(spend)} available after the ledger reserve).`);
     title = `Market ${XT.side} ${m2(q)} XRP`;
-    lines = [{ t: `${buy ? 'Buy' : 'Sell'} ${m2(q)} XRP now`, s: `quote ${fx(c)} RLUSD (avg ${(c / q).toFixed(5)}) · ${buy ? 'pay at most' : 'receive at least'} ${fx(usd)} RLUSD`, hl: 1 }, { t: 'Fills now or not at all', s: 'the XRP Ledger uses the order book or its AMM pool, whichever is better' }];
+    lines = [{ t: `${buy ? 'Buy' : 'Sell'} ${m2(q)} XRP now`, s: `quote ${fx(c)} ${tk} (avg ${(c / q).toFixed(5)}) · ${buy ? 'pay at most' : 'receive at least'} ${fx(usd)} ${tk}`, hl: 1 }, { t: 'Fills now or not at all', s: 'the XRP Ledger uses the order book or its AMM pool, whichever is better' }];
   }
-  const R = { currency: RLUSD_CUR, issuer: rlusdIss(), value: xtAmtStr(usd) };
-  const tx = buy ? { TransactionType: 'OfferCreate', TakerPays: String(xd), TakerGets: R, Flags: flags }   // you pay RLUSD (TakerGets), get XRP
-    : { TransactionType: 'OfferCreate', TakerGets: String(xd), TakerPays: R, Flags: flags };              // you pay XRP, get RLUSD
-  lines.push({ t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }); lines.unshift(...await xrBusy(xrSel));
+  const R = { currency: C.cur, issuer: C.iss, value: xtAmtStr(usd) };
+  const tx = buy ? { TransactionType: 'OfferCreate', TakerPays: String(xd), TakerGets: R, Flags: flags }   // you pay ${tk} (TakerGets), get XRP
+    : { TransactionType: 'OfferCreate', TakerGets: String(xd), TakerPays: R, Flags: flags };              // you pay XRP, get ${tk}
+  lines.push({ t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }); lines.unshift(...await xrBusy(xrSel)); if (XT.q !== C.k) return toast('You switched pairs. Review again.');
   confirmSheet(title, `XRP Ledger DEX · ${S.net === 'public' ? '' : 'Testnet · '}${esc(o.name)}`, lines, `Send ${XT.mode === 'lim' ? 'order' : XT.side}`, async () => {
     try {
       const r = await xrSubmit(o, tx, drops);
@@ -14520,16 +14583,15 @@ async function xtReview() {
     } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xtrade'); }
   }, false, buy ? 'b-grn' : 'b-pur', 'Sending…', true);
 }
-// one open-order card. own = this phone holds the key (Edit / Cancel); Edit only for XRP/RLUSD orders.
+// one open-order card. own = this phone holds the key (Edit / Cancel); Edit for XRP/RLUSD and XRP/USDC (Circle) orders.
 function xtOfferCard(f, own) {
-  const isR = (a) => typeof a === 'object' && a.currency === RLUSD_CUR && a.issuer === rlusdIss();
-  const sell = typeof f.taker_gets === 'string', isX = sell || typeof f.taker_pays === 'string', pair = (sell && isR(f.taker_pays)) || (!sell && isX && isR(f.taker_gets));
+  const sell = typeof f.taker_gets === 'string', isX = sell || typeof f.taker_pays === 'string', pair = !!xtIsPairOffer(f);
   let txt;
-  if (isX) { const x = sell ? +f.taker_gets / 1e6 : +f.taker_pays / 1e6, oth = sell ? f.taker_pays : f.taker_gets, u = typeof oth === 'string' ? +oth / 1e6 : +oth.value, c2 = typeof oth === 'string' ? 'XRP' : (isR(oth) ? 'RLUSD' : xrCur(oth.currency));
+  if (isX) { const x = sell ? +f.taker_gets / 1e6 : +f.taker_pays / 1e6, oth = sell ? f.taker_pays : f.taker_gets, u = typeof oth === 'string' ? +oth / 1e6 : +oth.value, oc = xtCoinOfAmt(oth), c2 = typeof oth === 'string' ? 'XRP' : (oc ? oc.tok : xrCur(oth.currency));
     txt = `${sell ? 'Sell' : 'Buy'} ${m2(x)} XRP @ ${(u / x).toFixed(5)} ${esc(c2)}`; }
   else txt = `Sell ${esc(xrAmt(f.taker_gets))} for ${esc(xrAmt(f.taker_pays))}`;
   const btns = own ? `<div style="display:flex;gap:8px">${pair ? `<button class="b-out sm" data-xedit="${+f.seq}">Edit</button>` : ''}<button class="b-redout sm" data-xcancel="${+f.seq}">Cancel</button></div>` : '';
-  return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${sell ? 't-sell' : 't-buy'}">${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${txt}</b><div class="mono mu" style="font-size:12px">order #${+f.seq}</div></div>${btns}</div>`;
+  return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${sell || !isX ? 't-sell' : 't-buy'}">${sell || !isX ? 'SELL' : 'BUY'}</span> <b class="mono">${txt}</b><div class="mono mu" style="font-size:12px">order #${+f.seq}</div></div>${btns}</div>`;
 }
 // Open orders on the XRP wallet page: every order this address has on the XRP Ledger DEX (a bot's too), with Cancel
 let XRWT = 0, XRW_LAST = null;
@@ -14556,8 +14618,8 @@ async function xrLoadOpen(addr) {
   try {
     const r = await xr('account_offers', { account: addr, ledger_index: 'validated' });
     if (cur !== 'xrp' || xrSel !== addr) return;
-    const L = r.offers || [], own = !!xrOwn(addr), isR = (a) => typeof a === 'object' && a.currency === RLUSD_CUR && a.issuer === rlusdIss();
-    XT.offers = L.filter((f) => (typeof f.taker_gets === 'string' && isR(f.taker_pays)) || (typeof f.taker_pays === 'string' && isR(f.taker_gets)));   // Edit works from here too
+    const L = r.offers || [], own = !!xrOwn(addr);
+    XT.offers = L.filter(xtIsPairOffer);   // Edit works from here too
     $('#xrOffN').textContent = L.length ? ` (${L.length})` : ''; $('#xrCanAll').style.display = own && L.length ? '' : 'none';
     el.innerHTML = L.length ? L.map((f) => xtOfferCard(f, own)).join('') + (own ? `<div class="mu" style="font-size:12px">${XR_BOT_NOTE}</div>` : '<div class="mu" style="font-size:12px">Watch only: import this wallet\'s secret to cancel from here.</div>')
       : '<div class="note">No open orders.</div>';
@@ -14567,22 +14629,42 @@ async function xtLoadOpen() {
   const el = $('#xtOpen'); if (!el) return;
   try {
     const r = await xr('account_offers', { account: xrSel, ledger_index: 'validated' });
-    const isR = (a) => typeof a === 'object' && a.currency === RLUSD_CUR && a.issuer === rlusdIss();
-    XT.offers = (r.offers || []).filter((f) => (typeof f.taker_gets === 'string' && isR(f.taker_pays)) || (typeof f.taker_pays === 'string' && isR(f.taker_gets)));   // only XRP / RLUSD (Ripple) orders
+    XT.offers = (r.offers || []).filter(xtIsPairOffer);   // XRP / RLUSD and XRP / USDC (Circle) orders
     if (cur !== 'xtrade') return;
     el.innerHTML = XT.offers.length ? XT.offers.map((f) => xtOfferCard(f, true)).join('') : '<div class="note">No open orders.</div>';
   } catch (e) { el.innerHTML = `<div class="note">${esc(e.message || String(e))}</div>`; }
 }
+/* Your fills on this pair: from the wallet's own history. A fill is my OfferCreate that crossed, or someone else's transaction
+   that took my resting order. Amounts come from the ledger's before/after (xrMyDelta), so partial fills show separately. */
+async function xtLoadFills() {
+  const el = $('#xtFills'); if (!el) return; const me = xrSel, q0 = XT.q;
+  try {
+    const r = await xr('account_tx', { account: me, limit: 60, ledger_index_min: -1, ledger_index_max: -1 });
+    if (cur !== 'xtrade' || xrSel !== me || XT.q !== q0) return;
+    const C = xtC(), F = [];
+    for (const x of r.transactions || []) {
+      const tx = x.tx || x.tx_json || {}, meta = x.meta || {}; if ((meta.TransactionResult || 'tesSUCCESS') !== 'tesSUCCESS') continue;
+      if (tx.Account === me && tx.TransactionType !== 'OfferCreate') continue;
+      const dl = xrMyDelta(meta, me, tx); if (dl.tok !== C.tok || !xrTradeText(dl)) continue;
+      const iso = x.close_time_iso || (tx.date != null ? new Date((tx.date + 946684800) * 1000).toISOString() : null);
+      F.push({ t: iso ? Date.parse(iso) : 0, sell: dl.x < 0, x: Math.abs(dl.x), u: Math.abs(dl.u), hash: x.hash || tx.hash });
+      if (F.length >= 10) break;
+    }
+    $('#xtFillsL').textContent = F.length ? `XRP / ${C.tok} · latest ${F.length}` : '';
+    el.innerHTML = F.length ? F.map((f) => `<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)"><span><span class="tag ${f.sell ? 't-sell' : 't-buy'}">${f.sell ? 'SOLD' : 'BOUGHT'}</span> <b class="mono">${xq4(f.x)} XRP</b> <span class="mu mono">@ ${(f.u / f.x).toFixed(5)}</span><div class="mu mono" style="font-size:12px">${xq4(f.u)} ${esc(C.tok)}</div></span><a class="mu" style="font-size:12px;white-space:nowrap" href="${XRP_EXPL[S.net]}/transactions/${esc(f.hash)}" target="_blank" rel="noopener">${f.t ? esc(ago(new Date(f.t).toISOString())) : 'view'}</a></div>`).join('')
+      : `<div class="mu">No XRP / ${esc(C.tok)} fills on this wallet yet.</div>`;
+  } catch (e) { if (cur === 'xtrade') el.innerHTML = `<div class="mu">${esc(e.message || String(e))}</div>`; }
+}
 // Edit = one OfferCreate with OfferSequence: the ledger cancels the old order and places the new one in the same transaction
-function xtOfferInfo(f) { const sell = typeof f.taker_gets === 'string', x = sell ? +f.taker_gets / 1e6 : +f.taker_pays / 1e6, u = +(sell ? f.taker_pays : f.taker_gets).value; return { sell, x, u, px: u / x }; }
+function xtOfferInfo(f) { const sell = typeof f.taker_gets === 'string', x = sell ? +f.taker_gets / 1e6 : +f.taker_pays / 1e6, oa = sell ? f.taker_pays : f.taker_gets, u = +oa.value, c = xtCoinOfAmt(oa) || xrCoins()[0]; return { c, tok: c.tok, sell, x, u, px: u / x }; }
 function xtEditSheet(seq) {
   const f = XT.offers.find((o) => +o.seq === seq); if (!f) return; const i = xtOfferInfo(f); pending = null;
-  sheet(`<h2>Edit ${i.sell ? 'sell' : 'buy'} order</h2><div class="mu" style="font-size:13px">Order #${seq} · now ${i.sell ? 'sell' : 'buy'} ${m2(i.x)} XRP @ ${i.px.toFixed(5)} RLUSD. The change replaces it in one step (it gets a new order number). What already filled stays filled.</div>
-    <label>Limit price (RLUSD per XRP)<input id="xeoPx" inputmode="decimal" value="${i.px.toFixed(5)}"></label>
+  sheet(`<h2>Edit ${i.sell ? 'sell' : 'buy'} order</h2><div class="mu" style="font-size:13px">Order #${seq} · now ${i.sell ? 'sell' : 'buy'} ${m2(i.x)} XRP @ ${i.px.toFixed(5)} ${i.tok}. The change replaces it in one step (it gets a new order number). What already filled stays filled.</div>
+    <label>Limit price (${i.tok} per XRP)<input id="xeoPx" inputmode="decimal" value="${i.px.toFixed(5)}"></label>
     <label>XRP to ${i.sell ? 'sell' : 'buy'}<input id="xeoAmt" inputmode="decimal" value="${+i.x.toFixed(6)}"></label>
     <div class="mu" id="xeoNote" style="font-size:12.5px"></div>
     <button class="${i.sell ? 'b-pur' : 'b-grn'} big" data-act="xtEditOk" data-seq="${seq}">Review change</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
-  const upd = () => { const p = +$('#xeoPx').value, q = +$('#xeoAmt').value; $('#xeoNote').textContent = p > 0 && q > 0 ? `${i.sell ? 'Gets' : 'Uses up to'} ${fx(p * q)} RLUSD if it all fills` : ''; };
+  const upd = () => { const p = +$('#xeoPx').value, q = +$('#xeoAmt').value; $('#xeoNote').textContent = p > 0 && q > 0 ? `${i.sell ? 'Gets' : 'Uses up to'} ${fx(p * q)} ${i.tok} if it all fills` : ''; };
   $('#xeoPx').addEventListener('input', upd); $('#xeoAmt').addEventListener('input', upd); upd();
 }
 async function xtEditOk(seq) {
@@ -14590,17 +14672,17 @@ async function xtEditOk(seq) {
   const p = +$('#xeoPx').value, q = +$('#xeoAmt').value;
   if (!(p > 0)) return toast('Enter a price.'); if (!(q > 0)) return toast('Enter an amount, or use Cancel to remove the order.');
   let drops; try { [drops] = await Promise.all([xrFee(), xrLoad(xrSel)]); } catch (e) { return toast(e.message || String(e)); }
-  const d = XRA[xrSel], rl = d && d.lines.find((l) => l.account === rlusdIss() && l.currency === RLUSD_CUR), haveU = rl ? Math.max(0, +rl.balance) : 0;
-  if (!i.sell && haveU + 1e-9 < q * p) return toast(`Not enough RLUSD (have ${m2(haveU)}).`);
+  const d = XRA[xrSel], rl = xrLineOf(d, i.c), haveU = rl ? Math.max(0, +rl.balance) : 0;
+  if (!i.sell && haveU + 1e-9 < q * p) return toast(`Not enough ${i.tok} (have ${m2(haveU)}).`);
   if (i.sell && xrSpend(d) < q + drops / 1e6) return toast(`Not enough XRP (${m2(xrSpend(d))} available).`);   // XRP Ledger orders don't lock funds: the wallet must hold it
-  const R = { currency: RLUSD_CUR, issuer: rlusdIss(), value: xtAmtStr(q * p) }, xd = String(Math.round(q * 1e6));
+  const R = { currency: i.c.cur, issuer: i.c.iss, value: xtAmtStr(q * p) }, xd = String(Math.round(q * 1e6));
   const tx = i.sell ? { TransactionType: 'OfferCreate', TakerGets: xd, TakerPays: R, OfferSequence: seq } : { TransactionType: 'OfferCreate', TakerPays: xd, TakerGets: R, OfferSequence: seq };
   const BZ = await xrBusy(xrSel);
   confirmSheet(`Change order #${seq}`, `XRP Ledger DEX · ${esc(o.name)}`, [...BZ,
     { t: `Was: ${i.sell ? 'Sell' : 'Buy'} ${m2(i.x)} XRP @ ${i.px.toFixed(5)}`, s: 'open now' },
     { t: `New: ${i.sell ? 'Sell' : 'Buy'} ${m2(q)} XRP @ ${p.toFixed(5)}`, s: 'if the new price crosses the book, it fills right away', hl: 1 },
     { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], 'Send edit', async () => {
-    try { const r = await xrSubmit(o, tx, drops); xrOutcome(r, 'Edited', `${i.sell ? 'Sell' : 'Buy'} ${m2(q)} XRP @ ${p.toFixed(5)} RLUSD`, 'Not edited', back); }
+    try { const r = await xrSubmit(o, tx, drops); xrOutcome(r, 'Edited', `${i.sell ? 'Sell' : 'Buy'} ${m2(q)} XRP @ ${p.toFixed(5)} ${i.tok}`, 'Not edited', back); }
     catch (e) { showResult(false, 'Not edited', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], back); }
   }, false, i.sell ? 'b-pur' : 'b-grn', 'Editing…', true);
 }
@@ -17949,6 +18031,7 @@ document.addEventListener('click', async (e) => {
   if (t.dataset.xr) { xrSel = t.dataset.xr; return go('xrp'); }
   if (t.dataset.xcancel) return xtCancel(t);
   if (t.dataset.xedit) return xtEditSheet(+t.dataset.xedit);
+  if (t.dataset.xpct) return xtFillPct(+t.dataset.xpct);
   if (t.parentElement && t.parentElement.classList.contains('seg')) {
     const seg = t.parentElement.id, v = t.dataset.v;
     if (seg === 'tMode' && v === 'stop' && !stopPairOK()) return;
@@ -17956,6 +18039,7 @@ document.addEventListener('click', async (e) => {
     if (seg === 'tSide' && T.side !== v) { T.side = v; if (!T.pxTyped) $('#tPx').value = ''; }   // a limit price you typed stays; an untouched one restarts at the best bid (buy) / best ask (sell)
     if (seg === 'tMode' || seg === 'tSide') return drawTrade();
     if (seg === 'eChain') { S.earnChain = v; saveS(); return drawEarn(); }
+    if (seg === 'xtQ') return xtSetQ(v);
     if (seg === 'xtSide' || seg === 'xtMode') { if (seg === 'xtSide' && XT.side !== v) $('#xtPx').value = ''; if (seg === 'xtSide') XT.side = v; else XT.mode = v; $$('#' + seg + ' button').forEach((b) => b.classList.toggle('on', b.dataset.v === v)); $('#xtPxW').style.display = XT.mode === 'lim' ? '' : 'none'; const g = $('#xtGo'); g.textContent = XT.side === 'buy' ? 'Buy' : 'Sell'; g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big'; xtPaint(); return xtEst(); }
     if (seg === 'tLimMode') { S.stopLim = v; saveS(); if (v === 'custom' && !$('#tLim').value) stopDefaults(); stopDefaults(); return tradeEst(); }
     if (seg === 'oMode') { S.pMode = v; saveS(); return paintPort(); }
@@ -18050,7 +18134,7 @@ document.addEventListener('click', async (e) => {
     xrBackup: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i >= 0) walletKeySheet('xrp', i); },
     homeBackup: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i >= 0) walletKeySheet('xlm', i); },
     wkCopy: () => { const k = t.dataset.kind, i = +t.dataset.i, o = k === 'xrp' ? (K.xr || [])[i] : K.x[i]; if (!o) return; t.dataset.label = 'Copy key'; const sec = k === 'xrp' ? xrSecret(o) : o.kp.secret(); if (t.dataset.armed === '1') return copySecret(sec, t, 'wkCw'); needPin(() => copySecret(sec, document.querySelector('[data-act=wkCopy]') || t, 'wkCw')); },
-    xrTradeGo: () => { const d = XRA[xrSel]; if (d && d.a && !hasRlusd(d)) return toast('Add RLUSD to this wallet first (button on this page). XRP trades against RLUSD.'); go('xtrade'); },
+    xrTradeGo: async () => { let d = XRA[xrSel]; const a0 = xrSel; if (!d) { try { d = await xrLoad(xrSel); } catch (e) { return toast(e.message || String(e)); } if (cur !== 'xrp' || xrSel !== a0) return; } if (d && d.a && !xrCoins().some((c) => xrLineOf(d, c))) return toast('Add RLUSD or USDC to this wallet first (buttons on this page). XRP trades against a dollar coin.'); xtPickQ(xrSel); go('xtrade'); },
     xtReview, xtEditOk: () => xtEditOk(+t.dataset.seq),
     xrWatchTrade: () => { pending = null; sheet(`<h2>This wallet is watch only</h2><div class="mu" style="font-size:14px">Liquidfi has its address but not its key, so it can show balances but can't trade or send. To trade from it, add it with its key: Accounts → + Add wallet → XRP Ledger → Import, and paste its secret (s…). The screen shows "✓ Opens r…" so you can check it's this wallet. Then remove this watch-only copy.</div><div class="addr">${esc(xrSel)}</div><button class="b-light big" data-act="closeSheet">OK</button>`); },
     xrRemoveMe: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i < 0) return; t.dataset.i = i; A.rmXr(); },
