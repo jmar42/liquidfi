@@ -13975,8 +13975,8 @@ async function drawXrp() {
   const own = !!xrOwn(addr);
   $('#xrName').textContent = w.name; $('#xrAddr').textContent = short(addr) + ' · XRP Ledger' + (S.net === 'public' ? '' : ' Testnet'); $('#xrFull').textContent = addr;
   $('#xrBk').innerHTML = own ? '<div style="display:flex;flex-direction:column;gap:8px"><button class="b-out sm" data-act="xrBackup">Back up: show key and recovery phrase</button><button class="b-out sm" data-act="xrRemoveMe" style="color:var(--redt)">Remove this wallet from the phone</button></div>' : '';
-  $('#xrActs').className = 'g3';
-  $('#xrActs').innerHTML = own ? '<button class="b-out" data-act="xrTradeGo">Trade</button><button class="b-out" data-act="xrSend">Send</button><button class="b-out" data-act="xrRcv">Receive</button>' : '<button class="b-out" data-act="xrWatchTrade">Trade</button><button class="b-out" data-act="xrRcv">Receive</button><button class="b-out" data-act="xrRmWatch">Remove</button>';
+  $('#xrActs').className = own ? 'g4' : 'g3';
+  $('#xrActs').innerHTML = own ? '<button class="b-out" data-act="xrTradeGo" style="font-size:13px">Trade</button><button class="b-out" data-act="xrSend" style="font-size:13px">Send</button><button class="b-out" data-act="xrRcv" style="font-size:13px">Receive</button><button class="b-out" data-act="xrAssets" style="font-size:13px">Assets</button>' : '<button class="b-out" data-act="xrWatchTrade">Trade</button><button class="b-out" data-act="xrRcv">Receive</button><button class="b-out" data-act="xrRmWatch">Remove</button>';
   const paint = () => {
     const d = XRA[addr];
     $('#xrTot').textContent = !d ? '…' : d.a ? '$' + fx(xrUsd(d)) : 'Not activated';
@@ -13989,10 +13989,11 @@ async function drawXrp() {
     $('#xrFund').innerHTML = '';
     const sv = XRSV || { base: 1, inc: 0.2 }, res = sv.base + sv.inc * (+d.a.OwnerCount || 0);
     $('#xrBal').innerHTML = `<div><div><b>XRP</b><div class="mu" style="font-size:12px">${m2(xrSpend(d))} available · ${m2(res)} reserved by the ledger</div></div><div style="text-align:right"><div class="mono">${m2(xrXrp(d))}</div><div class="mu mono" style="font-size:12px">${XRPX.px ? '$' + fx(xrXrp(d) * XRPX.px) : ''}</div></div></div>`
-      + d.lines.map((l) => `<div><div><b>${esc(xrIsUsd(l) && l.currency === RLUSD_CUR ? 'RLUSD' : xrCur(l.currency))}</b><div class="mu mono" style="font-size:12px">${esc(short(String(l.account)))}</div></div><div style="text-align:right"><div class="mono">${m2(+l.balance)}</div><div class="mu mono" style="font-size:12px">${xrIsUsd(l) ? '$' + fx(+l.balance) : ''}</div></div></div>`).join('');
+      + d.lines.map((l) => { const c = xrCoinOf(l); return `<div><div><b>${esc(c ? c.tok : xrCur(l.currency))}</b><div class="mu mono" style="font-size:12px">${c ? esc(c.who) + ' · ' : ''}${esc(short(String(l.account)))}</div></div><div style="text-align:right"><div class="mono">${m2(+l.balance)}</div><div class="mu mono" style="font-size:12px">${xrIsUsd(l) ? '$' + fx(+l.balance) : ''}</div></div></div>`; }).join('');
   };
   paint();
-  const trustBtn = () => { const d = XRA[addr]; $('#xrTrust').innerHTML = own && d && d.a && !hasRlusd(d) ? `<button class="b-out" data-act="xrTrust">+ Add RLUSD (Ripple USD)</button><div class="mu" style="font-size:12px">Lets this wallet hold Ripple's dollar. Uses ${m2((XRSV || { inc: 0.2 }).inc)} XRP of reserve.</div>` : ''; };
+  const trustBtn = () => { const d = XRA[addr], miss = own && d && d.a ? xrCoins().filter((c) => !xrLineOf(d, c)) : [];
+    $('#xrTrust').innerHTML = miss.length ? `<div class="${miss.length > 1 ? 'g2' : ''}" style="${miss.length > 1 ? '' : 'display:flex;flex-direction:column'}">${miss.map((c) => `<button class="b-out" data-act="xrTrust" data-xk="${c.k}">+ Add ${c.tok}</button>`).join('')}</div><div class="mu" style="font-size:12px">Lets this wallet hold ${miss.map((c) => `${c.who}'s dollar (${c.tok})`).join(' and ')}. ${miss.length > 1 ? 'Each uses' : 'Uses'} ${m2((XRSV || { inc: 0.2 }).inc)} XRP of reserve.</div>` : ''; };
   trustBtn();
   try { await xrServer(); await xrpPrice(); await xrLoad(addr); } catch (e) { if (cur === 'xrp') $('#xrOff').innerHTML = ''; if (cur === 'xrp') $('#xrBal').innerHTML = `<div><span class="red">${esc(e.message || String(e))}</span></div>`; return; }
   if (cur !== 'xrp' || xrSel !== addr) return; paint(); trustBtn();
@@ -14236,21 +14237,59 @@ async function xrFaucet() {
 const RLUSD_CUR = '524C555344000000000000000000000000000000';
 const rlusdIss = () => (XRP_USD_ISS[S.net] || [])[0];
 const hasRlusd = (d) => !!(d && d.lines.some((l) => l.account === rlusdIss() && l.currency === RLUSD_CUR));
-async function xrTrustReview() {
-  const o = xrOwn(xrSel), d = XRA[xrSel]; if (!o || !d || !d.a) return toast('This wallet is not activated yet.');
-  if (hasRlusd(d)) return toast('RLUSD is already added.');
+/* The dollar coins an XRP wallet can add with one tap. Issuers are built in (never typed): Ripple's RLUSD and Circle's USDC. */
+const xrCoins = () => [{ k: 'rl', tok: 'RLUSD', name: 'RLUSD (Ripple USD)', who: 'Ripple', cur: RLUSD_CUR, iss: rlusdIss() }, { k: 'uc', tok: 'USDC', name: 'USDC (Circle)', who: 'Circle', cur: USDC_HEX, iss: XRP_USDC_ISS[S.net] }];
+const xrCoinOf = (l) => xrCoins().find((c) => c.cur === l.currency && c.iss === l.account);
+const xrLineOf = (d, c) => (d && d.lines || []).find((l) => l.account === c.iss && l.currency === c.cur);
+async function xrTrustReview(k = 'rl') {
+  const c = xrCoins().find((x) => x.k === k), o = xrOwn(xrSel), d = XRA[xrSel]; if (!c) return; if (!o || !d || !d.a) return toast('This wallet is not activated yet.');
+  if (xrLineOf(d, c)) return toast(`${c.tok} is already added.`);
   let sv, drops; try { sv = await xrServer(); drops = await xrFee(); } catch (e) { return toast(e.message || String(e)); }
   if (xrSpend(d) < sv.inc + drops / 1e6) return toast(`Needs ${m2(sv.inc)} XRP free for the reserve (${m2(xrSpend(d))} available).`);
   const BZ = await xrBusy(xrSel);
-  confirmSheet('Add RLUSD (Ripple USD)', `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · ${esc(o.name)}`, [...BZ,
-    { t: 'Hold RLUSD in this wallet', s: `issuer ${rlusdIss()} (Ripple)`, hl: 1 },
+  confirmSheet(`Add ${c.name}`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · ${esc(o.name)}`, [...BZ,
+    { t: `Hold ${c.tok} in this wallet`, s: `issuer ${c.iss} (${c.who})`, hl: 1 },
     { t: `Reserve +${m2(sv.inc)} XRP`, s: 'the ledger holds it while the trust line is open; you get it back if you remove the line at 0 balance' },
-    { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], 'Add RLUSD', async () => {
+    { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], `Add ${c.tok}`, async () => {
     try {
-      const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: RLUSD_CUR, issuer: rlusdIss(), value: '1000000000' }, Flags: 0x00020000 }, drops);   // tfSetNoRipple
-      xrOutcome(r, 'RLUSD added', `${esc(o.name)} can now hold RLUSD · reserve +${m2(sv.inc)} XRP`, 'RLUSD not added');
-    } catch (e) { showResult(false, 'RLUSD not added', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
+      const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: c.cur, issuer: c.iss, value: '1000000000' }, Flags: 0x00020000 }, drops);   /* tfSetNoRipple */
+      xrOutcome(r, `${c.tok} added`, `${esc(o.name)} can now hold ${c.tok} · reserve +${m2(sv.inc)} XRP`, `${c.tok} not added`);
+    } catch (e) { showResult(false, `${c.tok} not added`, [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
   }, false, 'b-acc', 'Adding…', true);
+}
+/* Remove a trust line: only at 0 balance and with no open order on that coin (TrustSet limit 0, no rippling = the default state, so the line closes and its reserve comes back). */
+async function xrUntrustReview(cur, iss) {
+  const o = xrOwn(xrSel); if (!o || !cur || !iss) return;
+  const c = xrCoins().find((x) => x.cur === cur && x.iss === iss), tok = c ? c.tok : xrCur(cur);
+  let d, sv, drops, offs; try { d = await xrLoad(xrSel); sv = await xrServer(); drops = await xrFee(); offs = (await xr('account_offers', { account: xrSel, ledger_index: 'validated' })).offers || []; } catch (e) { return toast(e.message || String(e)); }
+  const l = d && d.lines.find((x) => x.account === iss && x.currency === cur); if (!l) return toast(`${tok} is not on this wallet.`);
+  if (+l.balance !== 0) return toast(`This wallet still holds ${m2(+l.balance)} ${tok}. Send, swap or trade it to 0 first.`, 6000);
+  const uses = (a) => typeof a === 'object' && a.currency === cur && a.issuer === iss;
+  if (offs.some((f) => uses(f.taker_gets) || uses(f.taker_pays))) return toast(`An open order uses ${tok}. Cancel it first.`, 6000);
+  const BZ = await xrBusy(xrSel);
+  confirmSheet(`Remove ${c ? c.name : tok}`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · ${esc(o.name)}`, [...BZ,
+    { t: `Stop holding ${tok} in this wallet`, s: `issuer ${iss}${c ? ' (' + c.who + ')' : ''} · balance 0`, hl: 1 },
+    { t: `Reserve back: ${m2(sv.inc)} XRP`, s: 'the ledger frees it when the line closes. You can add it again any time.' },
+    { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], `Remove ${tok}`, async () => {
+    try {
+      const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: cur, issuer: iss, value: '0' }, Flags: 0x00020000 }, drops);   /* tfSetNoRipple */
+      xrOutcome(r, `${tok} removed`, `${esc(o.name)} no longer holds ${esc(tok)}`, `${tok} not removed`);
+    } catch (e) { showResult(false, `${tok} not removed`, [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
+  }, false, 'b-acc', 'Removing…', true);
+}
+/* Assets sheet on the XRP wallet page (like Stellar's Assets): add or remove the dollar coins, and tidy up old 0-balance lines */
+function xrAssetsSheet() {
+  const o = xrOwn(xrSel), d = XRA[xrSel]; if (!o) return; if (!d || !d.a) return toast('This wallet is not activated yet. Send it XRP first.');
+  pending = null;
+  const inc = m2((XRSV || { inc: 0.2 }).inc), C = xrCoins();
+  const row = (name, sub, right) => `<div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:12px 14px"><div><b>${name}</b><div class="mono mu" style="font-size:12px">${sub}</div></div>${right}</div>`;
+  const act = (l) => +l.balance === 0 ? `<button class="b-out sm" style="width:auto;padding:0 12px" data-act="xrUntrust" data-xc="${esc(l.currency)}" data-xi="${esc(l.account)}">Remove</button>` : '<span class="tag t-grn">added</span>';
+  const known = C.map((c) => { const l = xrLineOf(d, c);
+    return row(`${esc(c.tok)} <span class="mu" style="font-weight:400">· ${esc(c.who)}</span>`, `${esc(short(c.iss))}${l ? ' · balance ' + m2(+l.balance) : ''}`, l ? act(l) : `<button class="b-light sm" style="width:auto;padding:0 14px" data-act="xrTrust" data-xk="${c.k}">Add</button>`); }).join('');
+  const other = d.lines.filter((l) => !xrCoinOf(l));
+  sheet(`<h2>Assets</h2><div class="mu" style="font-size:13px">Coins this XRP wallet can hold. Each one sets aside ${inc} XRP of reserve, which comes back when you remove it at 0 balance.</div>${known}
+    ${other.length ? `<span class="lbl">Other trust lines</span>${other.map((l) => row(esc(xrCur(l.currency)), `${esc(short(String(l.account)))} · balance ${m2(+l.balance)}`, act(l))).join('')}<div class="mu" style="font-size:12px">Not issued by Ripple or Circle. Remove the ones you don't use to get their reserve back.</div>` : ''}
+    <button class="b-out" data-act="closeSheet">Done</button>`);
 }
 
 /* ---------- Trade XRP on the XRP Ledger DEX (XRP / RLUSD) ----------
@@ -18019,7 +18058,7 @@ document.addEventListener('click', async (e) => {
     vanCancel: () => { vanStop(); closeSheet(); toast('Stopped. Nothing was paid.'); }, vanPay: () => vanPay(), vanDrop: () => { VANHIT = null; closeSheet(); toast('Discarded.'); },
     clOpen: () => closeWallet(), clReview: () => closeReview(),
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
-    xrTrust: xrTrustReview, xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
+    xrTrust: () => xrTrustReview(t.dataset.xk || 'rl'), xrUntrust: () => xrUntrustReview(t.dataset.xc, t.dataset.xi), xrAssets: () => xrAssetsSheet(), xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
     onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value)), onrCheck,
     onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
     onrAddUsdc: () => onrAddUsdc(t),
