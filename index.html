@@ -98,6 +98,7 @@ nav button.on{color:var(--tx)}nav button.k{color:var(--redt)}
 #toast.on{display:block}
 .netb{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;border:1px solid var(--bd)}
 .addr{font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all;font-size:13px}
+.baddr{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px;line-height:1.55;font-weight:600;color:var(--tx);letter-spacing:.02em;word-break:break-all}.baddr span{margin-right:.45em;white-space:nowrap}
 .words{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;margin:0;padding:0;list-style:none;counter-reset:w;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
 .words li{counter-increment:w;white-space:nowrap}.words li::before{content:counter(w) '.';color:var(--mu);display:inline-block;width:2.2em;font-size:12px}
 .book .sz{text-align:right}.book .ap{padding-left:8px}.book .s2{grid-column:span 2}
@@ -14848,7 +14849,7 @@ async function xrAdd(how, name) {
   pinOkAt = Date.now(); drawBots(true);
   if (how !== 'new') { closeSheet(); return toast(name + ' added.'); }
   pending = null;
-  sheet(`<h2>${esc(name)} is ready</h2><div class="mu" style="font-size:14px">XRP Ledger address (safe to share): <span class="addr">${esc(w.classicAddress)}</span></div>
+  sheet(`<h2>${esc(name)} is ready</h2>${bigAddr(w.classicAddress, 'XRP Ledger address (safe to share)')}
     ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this XRP wallet and your Stellar wallets, here or in any wallet app that takes a 24-word XRP phrase (Ledger, Trust Wallet).</div>${phraseRow(true)}` : `<div class="note">It comes from your recovery phrase (XRP #${hd + 1}), so the words you saved already back it up.</div>`}
     <div class="mu" style="font-size:12px">${S.net === 'public' ? `Next it needs at least ${m2((XRSV || { base: 1 }).base)} XRP to open on the XRP Ledger. Send XRP to the address above.` : 'Next, tap "Get free test XRP" on its page.'}</div>
     <div class="mu" style="font-size:12px">Missed it? Open the wallet and tap "Back up: show key and recovery phrase", or Settings → Back up keys. Your PIN shows it again.</div>
@@ -16128,12 +16129,12 @@ function needPin(cb) {   // re-enter the PIN before showing or copying keys (goo
   sheet(`<h2>Enter your PIN</h2><div class="mu" style="font-size:14px">Needed to show or copy secret keys and the recovery phrase.</div><input id="pinChk" type="password" inputmode="numeric" autocomplete="off"><button class="b-acc big" data-act="pinChkOk">OK</button>${S.bio ? '<button class="b-out" data-act="pinChkBio">Use fingerprint / Face ID</button>' : ''}<button class="b-out" data-act="closeSheet">Cancel</button>`);
   setTimeout(() => { const e = $('#pinChk'); if (e) e.focus(); }, 50);
 }
-async function copySecret(text, btn, warnId) {   // first tap arms (shows the warning), second tap copies
-  if (btn.dataset.armed !== '1') { btn.dataset.armed = '1'; btn.textContent = 'Tap again to copy'; const w = $('#' + warnId); if (w) w.style.display = ''; setTimeout(() => { if (btn.isConnected) { btn.dataset.armed = ''; btn.textContent = btn.dataset.label; if (w) w.style.display = 'none'; } }, 8000); return; }
-  btn.dataset.armed = ''; btn.textContent = btn.dataset.label;
+async function copySecret(text, btn, warnId) {   /* one tap copies (the PIN check before it still applies); the clipboard warning shows next to the button */
+  const w = $('#' + warnId); if (w) w.style.display = '';
   try { await navigator.clipboard.writeText(text); } catch (e) { return toast('This browser blocked copying. Use Show and write it down.'); }
+  if (btn && btn.isConnected) { const lb = btn.dataset.label || btn.textContent; btn.dataset.armed = ''; btn.textContent = '✓ Copied'; clearTimeout(btn._ct); btn._ct = setTimeout(() => { if (btn.isConnected) btn.textContent = lb; }, 4000); }
   clearTimeout(clipT); clipT = setTimeout(clearClip, 300000);
-  toast('Copied. Paste it into your password manager. The clipboard clears in 5 minutes or when you lock.', 6000);
+  toast('Copied. Paste it into your password manager now. The clipboard clears in 5 minutes or when Liquidfi locks.', 7000);
 }
 function drawBkKeys() {
   const el = $('#bkKeys'); if (!el) return;
@@ -16146,7 +16147,7 @@ function clearClip() { clearTimeout(clipT); clipT = 0; try { navigator.clipboard
 let NWFRESH = false;
 function newWalletSheet(i, freshPh) {
   const o = K.x[i]; pending = null; NWFRESH = !!freshPh;
-  sheet(`<h2>${esc(o.name)} is ready</h2><div class="mu" style="font-size:14px">Address (safe to share): <span class="addr">${esc(o.kp.publicKey())}</span></div>
+  sheet(`<h2>${esc(o.name)} is ready</h2>${bigAddr(o.kp.publicKey(), 'Stellar address (safe to share)')}
     ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this wallet and every wallet you create later on this phone, in Liquidfi or LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(true)}`
       : o.hd != null && K.ph ? `<div class="note" id="nwPhOk"><span><b>✓ Backed up by your recovery phrase · Wallet #${o.hd + 1}</b><br><span style="font-size:12.5px">The same 24 words you saved for your other wallets restore this one too. No new words to write down.</span></span></div>${!S.phOk && !S.bk ? '<div class="note amb" id="nwPhWarn">You haven\'t confirmed saving your recovery phrase yet. Tap Show recovery phrase and write the 24 words on paper now.</div>' : ''}<button class="b-out" data-act="nwShowPh" data-i="${i}">Show recovery phrase</button><span class="lbl">Secret key (optional extra backup for this wallet only)</span>`
       : `<div class="note amb">Save the secret key now. Without it, a lost phone means a lost wallet.</div>`}
@@ -18263,7 +18264,7 @@ document.addEventListener('click', async (e) => {
     vanCancel: () => { vanStop(); closeSheet(); toast('Stopped. Nothing was paid.'); }, vanPay: () => vanPay(), vanDrop: () => { VANHIT = null; closeSheet(); toast('Discarded.'); },
     clOpen: () => closeWallet(), clReview: () => closeReview(),
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
-    xrTrust: () => xrTrustReview(t.dataset.xk || 'rl'), xrUntrust: () => xrUntrustReview(t.dataset.xc, t.dataset.xi), xrAssets: () => xrAssetsSheet(), xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
+    copyNewAddr: () => copy(t.dataset.addr), xrTrust: () => xrTrustReview(t.dataset.xk || 'rl'), xrUntrust: () => xrUntrustReview(t.dataset.xc, t.dataset.xi), xrAssets: () => xrAssetsSheet(), xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
     onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value)), onrCheck,
     onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
     onrAddUsdc: () => onrAddUsdc(t),
@@ -18397,6 +18398,8 @@ $('#setBio').addEventListener('change', async (e) => {
   else bioOff("Fingerprint / Face ID unlock is off. You can also delete the 'Liquidfi unlock' passkey in your phone's password settings.");
   drawSet();
 });
+/* A new wallet's address, big and in groups of 4 so it's easy to read and check (copying still gives one unbroken address) */
+const bigAddr = (a, label) => `<div class="card" style="gap:10px"><span class="mu" style="font-size:13px">${esc(label)}</span><div class="baddr">${String(a).match(/.{1,4}/g).map((g) => `<span>${esc(g)}</span>`).join('')}</div><button class="b-out" data-act="copyNewAddr" data-addr="${esc(a)}">Copy address</button></div>`;
 async function copy(t) { try { await navigator.clipboard.writeText(t); toast('Copied.'); } catch (e) { toast(t, 8000); } }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && K && cur === 'bots') drawBots(true); });
 
