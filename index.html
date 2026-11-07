@@ -15436,7 +15436,7 @@ async function xsRun(fw, tw, amt, b, v, drops, at) {
       const tx = { TransactionType: 'Payment', Destination: v.depositAddress, Amount: b.amount }; if (v.depositMemo) tx.DestinationTag = +v.depositMemo;
       tPendSet(p, 'Sending…', 'amb', `to NEAR Intents ${short(v.depositAddress)}`);
       const r = await xrSubmit(o, tx, drops);
-      if (r.state === 'ok') rec.dep.tx = r.hash;
+      if (r.state === 'ok') { rec.dep.tx = r.hash; xsMark(rec, 'sent'); }
       else if (r.state === 'pending') { rec.dep.tx = r.hash; rec.st = 'unsure'; saveS(); tPendSet(p, 'Not sure yet', 'amb', "The XRP Ledger hasn't confirmed it yet. Checking with NEAR Intents…"); xsWatch(rec, p); return; }
       else { rec.st = 'not sent'; saveS(); return tPendSet(p, 'Not sent', 'red', `${xrErr(r.code)} Nothing was sent.`, true); }
     } else {
@@ -15444,10 +15444,10 @@ async function xsRun(fw, tw, amt, b, v, drops, at) {
       const tx = await buildTx(fw.addr, [SDK.Operation.payment({ destination: v.depositAddress, asset: SDK.Asset.native(), amount: xsDec(b.amount, 7) })], SDK.Memo.text(v.depositMemo));
       tx.sign(kp); rec.dep.tx = tx.hash().toString('hex'); saveS();   // known before it goes out: if the answer is lost we still follow it
       tPendSet(p, 'Sent…', 'amb', 'waiting for the ledger');
-      const r = await submit(tx); rec.dep.tx = r.hash || rec.dep.tx;
+      const r = await submit(tx); rec.dep.tx = r.hash || rec.dep.tx; xsMark(rec, 'sent');
     }
     rec.st = 'PENDING_DEPOSIT'; saveS(); xsRecPaint();
-    tPendSet(p, 'Deposit sent · swapping…', 'amb', `${m2(amt)} ${fw.coin} to NEAR Intents · about ${m2(rec.est)} ${tw.coin} on the way`);
+    tPendSet(p, ...xsWords(rec));
     xsOC('/v0/deposit/submit', { txHash: rec.dep.tx, depositAddress: rec.dep.addr, ...(rec.dep.memo ? { memo: rec.dep.memo } : {}) }).catch(() => {});   // tells 1Click it's coming (faster); it finds it anyway
     xsWatch(rec, p);
   } catch (e) {
@@ -15456,10 +15456,38 @@ async function xsRun(fw, tw, amt, b, v, drops, at) {
     rec.st = 'not sent'; saveS(); xsRecPaint(); tPendSet(p, 'Not sent', 'red', `${niceErr(e)} Nothing was sent.`, true);
   }
 }
-const XS_WORDS = { PENDING_DEPOSIT: 'Waiting for the deposit…', KNOWN_DEPOSIT_TX: 'Deposit seen · swapping…', PROCESSING: 'Swapping…', INCOMPLETE_DEPOSIT: 'Deposit too small · being sent back' };
+const XS_WORDS = { PENDING_DEPOSIT: 'Waiting for the deposit…', KNOWN_DEPOSIT_TX: 'Waiting for indication…', PROCESSING: 'Waiting for indication…', INCOMPLETE_DEPOSIT: 'Deposit too small · being sent back' };
+/* The 4 steps a user sees while a swap runs (plain words, no "NEAR"): coin sent → deposited → indication filled → arrived.
+   rec.t holds when each step was seen (ms). */
+const xsMark = (rec, k) => { rec.t = rec.t || {}; if (!rec.t[k]) rec.t[k] = Date.now(); };
+const xsClock = (ms) => { const s2 = Math.max(0, Math.round(ms / 1000)); return Math.floor(s2 / 60) + ':' + String(s2 % 60).padStart(2, '0'); };
+function xsSteps(rec) {
+  const t = rec.t || {}, a = rec.from.coin, b = rec.to.coin, at = (k) => (t[k] ? xsClock(t[k] - rec.at) : '');
+  const L = [
+    { k: 'sent', done: 'XRP sent · confirmed'.replace('XRP', a), doing: `Sending ${a}…` },
+    { k: 'dep', done: `${a} deposited`, doing: 'Waiting for the deposit…' },
+    { k: 'fill', done: `Indication filled · ${a} → ${b}`, doing: 'Waiting for indication…' },
+    { k: 'got', done: `${b} arrived in ${rec.to.name}`, doing: `Sending ${b} to ${rec.to.name}…` },
+  ];
+  let cur = L.findIndex((x) => !t[x.k]); if (cur < 0) cur = L.length;
+  return L.map((x, i) => ({ text: i < cur ? x.done : x.doing, state: i < cur ? 'done' : i === cur ? 'now' : 'next', time: at(x.k) }));
+}
+function xsStepsHtml(id) {
+  const rec = xsRecs().find((r) => r.id === id); if (!rec) return '';
+  if (XS_FINAL.includes(rec.st) && rec.st !== 'SUCCESS') return '';   // refunds / failures: the row's words say it
+  const ic = { done: '<span class="grn">✓</span>', now: '<span class="amb tpl">◌</span>', next: '<span class="mu">○</span>' };
+  const rows = xsSteps(rec).map((x) => `<div class="r" style="gap:8px;font-size:12.5px"><span>${ic[x.state]} <span class="${x.state === 'next' ? 'mu' : ''}">${esc(x.text)}</span></span><span class="mu mono">${esc(x.time)}</span></div>`).join('');
+  const el = Date.now() - rec.at, done = rec.st === 'SUCCESS';
+  const foot = done ? `<div class="grn" style="font-size:12.5px;font-weight:700">✓ Done · ${m2(rec.got)} ${rec.to.coin} in ${esc(rec.to.name)}${rec.t && rec.t.got ? ' · ' + xsClock(rec.t.got - rec.at) : ''}</div>`
+    : `<div class="mu" style="font-size:12px">${xsClock(el)} so far · usually 1–2 minutes${el > 240000 ? `. Taking longer than usual: your ${rec.from.coin} is safe and comes back if the swap doesn't go through.` : ''}</div>`;
+  return `<div style="display:flex;flex-direction:column;gap:3px;margin-top:2px">${rows}${foot}</div>`;
+}
 function xsApply(rec, j) {   // a status answer → record (+ words for the row)
   const sd = j.swapDetails || {}, dp2 = XS.coins[rec.to.coin].dp, dp1 = XS.coins[rec.from.coin].dp;
   rec.st = j.status; rec.upd = Date.now();
+  if (['KNOWN_DEPOSIT_TX', 'PROCESSING', 'SUCCESS'].includes(j.status)) { xsMark(rec, 'sent'); xsMark(rec, 'dep'); }
+  if (j.status === 'SUCCESS' || (j.status === 'PROCESSING' && (sd.destinationChainTxHashes || []).length)) xsMark(rec, 'fill');
+  if (j.status === 'SUCCESS') xsMark(rec, 'got');
   if (Array.isArray(sd.destinationChainTxHashes)) rec.outTx = sd.destinationChainTxHashes.map((x) => String(x.hash || ''));
   if (j.status === 'SUCCESS') rec.got = sd.amountOut != null ? xsFmt(sd.amountOut, dp2) : rec.est;
   if (j.status === 'REFUNDED' || +sd.refundedAmount > 0) rec.back = xsFmt(sd.refundedAmount, dp1);
@@ -15467,13 +15495,14 @@ function xsApply(rec, j) {   // a status answer → record (+ words for the row)
   saveS();
 }
 function xsWords(rec) {
-  if (rec.st === 'SUCCESS') return ['✓ Delivered', 'grn', `${m2(rec.got)} ${rec.to.coin} in ${rec.to.name}`];
+  if (rec.st === 'SUCCESS') return ['✓ Done', 'grn', `${m2(rec.got)} ${rec.to.coin} in ${rec.to.name}`];
   if (rec.st === 'REFUNDED') return ['Sent back', 'amb', `${rec.back != null ? m2(rec.back) + ' ' + rec.from.coin : 'Your ' + rec.from.coin} returned to ${rec.from.name}${rec.why ? ' · ' + rec.why : ''}`];
   if (rec.st === 'FAILED') return ['Failed', 'red', `NEAR Intents couldn't finish it${rec.why ? ': ' + rec.why : ''}. Anything it holds goes back to ${rec.from.name}.`];
   if (rec.st === 'not sent') return ['Not sent', 'red', rec.why ? rec.why + '. Nothing was swapped.' : 'Nothing was sent.'];
   if (rec.st === 'stuck') return ['Ask NEAR Intents', 'red', `Your ${rec.from.coin} reached NEAR Intents (${short(rec.dep.addr)}, tx ${short(rec.dep.tx || '')}) but it hasn't credited it. Contact NEAR Intents support with these.`];
   if (rec.st === 'unsure' || rec.st === 'sending') return ['Checking…', 'amb', 'Waiting to hear from NEAR Intents'];
-  return [XS_WORDS[rec.st] || 'Swapping…', 'amb', `about ${m2(rec.est)} ${rec.to.coin} on the way to ${rec.to.name}`];
+  const st = xsSteps(rec), n = st.findIndex((x) => x.state === 'now');
+  return [n >= 0 ? `Step ${n + 1} of 4` : 'Swapping…', 'amb', `${n >= 0 ? st[n].text : ''} · about ${m2(rec.est)} ${rec.to.coin} to ${rec.to.name} · ${xsClock(Date.now() - rec.at)}`];
 }
 // The coins often land a minute or more before 1Click's status says SUCCESS: look at the receiving Stellar wallet itself.
 // A credit counts only if it came from a contract (C…, how NEAR Intents' bridge pays), after the deposit, and its amount fits this swap.
@@ -15506,8 +15535,9 @@ async function xsWatch(rec, p) {   // ask 1Click every 5 s until the swap is don
       }
       if (j && ['KNOWN_DEPOSIT_TX', 'PROCESSING'].includes(j.status) && !rec.early) {   // already in the wallet? say so now
         const got = await xsLanded(rec);
-        if (got) { rec.early = 1; rec.st = 'SUCCESS'; rec.got = got.amt; rec.outTx = [got.hash]; saveS(); if (p) tPendSet(p, ...xsWords(rec), true); xsRecPaint(); toast(`✓ Swap delivered: ${m2(rec.got)} ${rec.to.coin} in ${rec.to.name}`, 8000); return; }
+        if (got) { rec.early = 1; rec.st = 'SUCCESS'; rec.got = got.amt; rec.outTx = [got.hash]; xsMark(rec, 'dep'); xsMark(rec, 'fill'); xsMark(rec, 'got'); saveS(); if (p) tPendSet(p, ...xsWords(rec), true); xsRecPaint(); toast(`✓ Swap delivered: ${m2(rec.got)} ${rec.to.coin} in ${rec.to.name}`, 8000); return; }
       }
+      if (p && !XS_FINAL.includes(rec.st) && !unsure()) tPendSet(p, ...xsWords(rec));   // timer + current step
       if (j && j.status && !(j.status === 'PENDING_DEPOSIT' && unsure())) {   // not sure it was sent: keep "Checking…" until 1Click sees it
         const was = rec.st; xsApply(rec, j);
         const [w, c, s] = xsWords(rec), done = XS_FINAL.includes(rec.st);
@@ -17851,7 +17881,7 @@ function tPendSet(p, st, cls, sub, done) {
 function tPendPaint() {
   const el = $('#tPend'); if (!el) return; const now = Date.now();
   for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : p.scr === 'trade' ? 20000 : 180000)) TPEND.splice(i, 1); }   // Trade has its history list below; Send / Swap keep the result 3 min   // done ones fade into the normal history below
-  const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
+  const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:14px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:13px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.xs && xsStepsHtml(p.xs) ? xsStepsHtml(p.xs) : p.sub ? `<div class="mu" style="font-size:12px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
   for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend'], ['xswap', '#xsPend'], ['earn', '#ePend'], ['earnx', '#eXPend'], ['xtrade', '#xtPend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k && (k !== 'xtrade' || p.addr === xrSel)); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
   const L = TPEND.filter((p) => p.scr === 'trade' && p.addr === tradeAddr);
   el.style.display = L.length ? 'flex' : 'none';
