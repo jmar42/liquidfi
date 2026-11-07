@@ -409,6 +409,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <label><span id="xtStL">Stop price (RLUSD per XRP)</span><input id="xtStop" inputmode="decimal"></label>
     <div class="seg" id="xtSk"><button class="on" data-v="mkt">Market stop</button><button data-v="lim">Stop-limit</button></div>
     <label id="xtSlW" style="display:none"><span id="xtSlL">Worst price you'll accept</span><input id="xtSl" inputmode="decimal"></label>
+    <label>Ends after<select id="xtDays"><option value="1" selected>1 day</option><option value="7">7 days</option><option value="30">30 days</option></select></label>
     <div class="mu" id="xtStNote" style="font-size:12px"></div>
   </div>
   <div class="card rows" id="xtEst" style="padding:4px 14px;font-size:14px"></div>
@@ -445,7 +446,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px" id="tLimLbl">Fill no worse than</span><div class="seg" id="tLimMode" style="font-size:13.5px"><button data-v="mkt">Market</button><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="custom">Custom</button></div></div>
     <label id="tLimW" style="display:none">Limit price<input id="tLim" inputmode="decimal"></label>
     <div class="mu" id="tLimTxt" style="font-size:12.5px;line-height:1.5"></div>
-    <div class="g2"><label>Trigger on<select id="tFeed"><option value="avg">3-exchange avg</option><option value="stellar">Stellar last sale</option><option value="cb">Coinbase</option><option value="kr">Kraken</option><option value="bn">Binance</option></select></label><label>Ends after<select id="tDays"><option value="1" selected>1 day</option><option value="7">7 days</option><option value="30">30 days</option><option value="90">90 days</option></select></label></div>
+    <div class="g2"><label>Trigger on<select id="tFeed"><option value="avg">3-exchange avg</option><option value="stellar">Stellar last sale</option><option value="cb">Coinbase</option><option value="kr">Kraken</option><option value="bn">Binance</option></select></label><label>Ends after<select id="tDays"><option value="1" selected>1 day</option><option value="7">7 days</option><option value="30">30 days</option></select></label></div>
     <div class="mu" id="tStopNote" style="font-size:12px;line-height:1.5"></div>
   </div>
   <label id="tPxW" style="display:none"><span id="tPxL">Limit price (USDC per XLM)</span><input id="tPx" inputmode="decimal"></label>
@@ -14051,8 +14052,27 @@ async function drawXrp() {
       const L = FG.fills.has(x.hash) ? (FG.heads.get(x.hash) || []).map((g) => (g.own ? (g.fok ? 'Market: ' : 'Filled: ') : 'Order filled: ') + xrGroupText(g)) : [xrTxText(x, addr)];
       for (const t of L) { const q = /^(Order placed|Order cancelled)/.test(t), last = R[R.length - 1]; if (q && last && last.q) { last.m.push({ x, t }); continue; } R.push({ q, m: [{ x, t }] }); } }
     const rows = R.flatMap((g) => g.q && g.m.length >= 3 ? [{ x: g.m[0].x, t: `${g.m.length} orders placed / replaced (a bot re-quoting)` }] : g.m).slice(0, 12);   // runs of 1-2 stay as they are
-    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<div class="recrow" style="display:flex;justify-content:space-between;gap:10px;padding:8px 0"><span${/^Order filled|^Filled|^Market/.test(t) ? ' class="grn"' : ''}>${esc(t)}</span><a class="mu" style="font-size:12px;white-space:nowrap" href="${XRP_EXPL[S.net]}/transactions/${esc(x.hash)}" target="_blank" rel="noopener">${x.iso ? esc(ago(x.iso)) : 'view'}</a></div>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
+    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^Order filled|^Filled|^Market/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${esc(t)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
   } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
+}
+/* tap a Recent line: what it moved, who, the network fee, and a link to the explorer (like the Stellar wallet) */
+function xrDetail(x, me) {
+  const t = x.tx || {}, m = x.meta || {}, L = [], row = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
+  const ad = (a) => (a === me ? 'this wallet' : `<span title="${esc(a)}">${esc(short(a))}</span>`);
+  if (t.TransactionType === 'Payment') {
+    const amt = m.delivered_amount || m.DeliveredAmount || t.DeliverMax || t.Amount, rec = t.Account === me && xsDep(t.Destination);
+    L.push(row('Amount', esc(xrAmt(amt))), row('From', ad(t.Account)), row('To', ad(t.Destination) + (rec ? ' <span class="mu">· swap deposit address</span>' : '')));
+    if (t.DestinationTag != null) L.push(row('Destination tag', esc(String(t.DestinationTag))));
+    if (rec) { const [w, , sub] = xsWords(rec); L.push(row('Swap', `${esc(w)}${sub ? ' · ' + esc(sub) : ''}`)); }
+  } else {
+    L.push(row('Type', esc(t.TransactionType || 'Transaction')));
+    if (t.TransactionType === 'OfferCreate' && t.Account === me) L.push(row('Order', `${typeof t.TakerGets === 'string' ? 'Sell' : 'Buy'} ${esc(xrAmt(typeof t.TakerGets === 'string' ? t.TakerGets : t.TakerPays))} for ${esc(xrAmt(typeof t.TakerGets === 'string' ? t.TakerPays : t.TakerGets))}`));
+    if (t.Account !== me) L.push(row('Sent by', ad(t.Account)));
+  }
+  const res = m.TransactionResult || 'tesSUCCESS'; if (res !== 'tesSUCCESS') L.push(row('Result', `<span class="red">failed (${esc(res)})</span>`));
+  L.push(row('Network fee', t.Account === me && t.Fee ? `${(+t.Fee / 1e6).toFixed(6)} XRP` : 'paid by the sender'));
+  if (x.iso) L.push(row('Time', esc(new Date(x.iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))));
+  return `<div class="recd">${L.join('')}<div><span></span><a href="${XRP_EXPL[S.net]}/transactions/${esc(x.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a></div></div>`;
 }
 function xrAmt(a) { if (a == null) return '?'; if (typeof a === 'string') return m2(+a / 1e6) + ' XRP'; return m2(+a.value) + ' ' + xrCur(a.currency); }
 /* What a transaction did to MY XRP and RLUSD (from the ledger's before/after), fee put back for my own transactions.
@@ -14660,7 +14680,7 @@ function xtFormReset() {
   if ($('#xtAmt')) $('#xtAmt').value = ''; if ($('#xtPx')) $('#xtPx').value = ''; XT.mode = 'mkt'; XT.side = 'buy';
   if (!$('#xtGo')) return;
   $$('#xtSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === 'buy')); $$('#xtMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === 'mkt'));
-  if ($('#xtStop')) { $('#xtStop').value = ''; $('#xtSl').value = ''; } xtModeUI(); xtEst();
+  if ($('#xtStop')) { $('#xtStop').value = ''; $('#xtSl').value = ''; } if ($('#xtDays')) $('#xtDays').value = '1'; xtModeUI(); xtEst();   /* stops default to 1 day */
 }
 /* An XRP order's ledger result → the status row and banner (no result screen) */
 function xtOrderDone(p, r, o, lim, drops) {
@@ -14791,12 +14811,12 @@ async function xstSync(addr, force) {   /* ask the stop server how this wallet's
     if (x.st === 'cancelled' && xstLive({ st: v.status })) continue;   /* we used its ticket on the ledger: it can't apply, the server will catch up */
     if (x.st === v.status) { if ((v.fee_status || null) !== (x.feeSt || null) || (v.note || '') !== (x.note || '') || v.rest !== x.rest) { Object.assign(x, { note: v.note || '', rest: v.rest, feeSt: v.fee_status }); ch = true; } continue; }
     const was = x.st; Object.assign(x, { st: v.status, note: v.note || '', rest: v.rest, feeSt: v.fee_status }); if (!xstLive(x)) x.endAt = x.endAt || Date.now(); ch = true;
-    if (xstLive({ st: was }) && !xstLive(x)) toast(v.status === 'filled' ? `✓ Stop filled: ${x.side === 'sell' ? 'sold' : 'bought'} ${m2(x.q)} XRP` : v.status === 'placed' ? `Stop triggered: part of it waits on the book at ${(+x.lim).toFixed(4)}` : v.status === 'partial' ? `Stop triggered: ${v.note || 'part filled'}` : `Stop ${v.status}: ${v.note || ''}`, 9000); }
+    if (xstLive({ st: was }) && !xstLive(x)) toast(v.status === 'expired' ? `Stop ended: its time ran out (${x.side === 'sell' ? 'sell' : 'buy'} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}). The set-aside XRP comes back.` : v.status === 'filled' ? `✓ Stop filled: ${x.side === 'sell' ? 'sold' : 'bought'} ${m2(x.q)} XRP` : v.status === 'placed' ? `Stop triggered: part of it waits on the book at ${(+x.lim).toFixed(4)}` : v.status === 'partial' ? `Stop triggered: ${v.note || 'part filled'}` : `Stop ${v.status}: ${v.note || ''}`, 9000); }
   if (ch) saveS();
   for (const x of xstOf(addr)) {   /* ended without using every ticket (failed, part on the book, cancelled by the server): give the reserve back */
-    if (x.rel || xstLive(x) || !['failed', 'placed', 'partial', 'cancelled'].includes(x.st) || !xrOwn(addr)) continue;
+    if (x.rel || xstLive(x) || !(['failed', 'placed', 'partial', 'cancelled', 'expired'].includes(x.st) || (x.st === 'filled' && x.feeSt === 'expired')) || !xrOwn(addr)) continue;
     x.rel = true; saveS();
-    xstUseTickets(xrOwn(addr), x.tickets).then(({ mine: M }) => { const n = M.length; if (n) toast(`Released ${m2(n * (XRSV || { inc: 0.2 }).inc)} XRP from an ended stop.`, 6000); }).catch(() => {});
+    xstUseTickets(xrOwn(addr), x.tickets).then(({ mine: M }) => { const n = M.length; if (n) toast(x.st === 'expired' ? `Stop ended: its time ran out. Released ${m2(n * (XRSV || { inc: 0.2 }).inc)} XRP.` : `Released ${m2(n * (XRSV || { inc: 0.2 }).inc)} XRP from an ended stop.`, 7000); }).catch(() => {});
   }
 }
 async function xstTicketsLeft(addr) {   /* tickets still on the ledger for this wallet */
@@ -14806,14 +14826,15 @@ async function xstCards(addr) {
   const L = xstOf(addr).filter((x) => xstLive(x) || Date.now() - (x.endAt || 0) < 86400000); if (!L.length) return '';
   await xstSync(addr); const T = L.some((x) => !xstLive(x)) ? await xstTicketsLeft(addr) : null;
   return L.map((x) => { const live = xstLive(x), left = T ? x.tickets.filter((t) => T.has(t)) : [];
-    const stTxt = x.st === 'armed' ? 'waiting' : x.st === 'sending' ? 'triggered · sending' : x.st === 'filled' ? `✓ filled${x.feeSt === 'paid' ? ' · fee paid' : ''}` : x.st === 'placed' ? 'triggered · rest on the book' : x.st === 'partial' ? 'triggered · part filled' : x.st;
-    const btn = live ? `<button class="b-redout sm" data-act="xstCancel" data-xs="${esc(x.id)}">Cancel</button>` : left.length && !(x.st === 'filled' && x.feeSt !== 'paid' && x.feeSt !== 'failed') ? `<button class="b-out sm" data-act="xstRelease" data-xs="${esc(x.id)}">Release ${m2(left.length * (XRSV || { inc: 0.2 }).inc)} XRP</button>` : '';
-    return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${x.side === 'sell' ? 't-sell' : 't-buy'}">STOP</span> <b class="mono">${x.side === 'sell' ? 'Sell' : 'Buy'} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}</b><div class="mono mu" style="font-size:12px">${x.kind === 'mkt' ? 'market stop' : 'stop-limit'} · worst ${(+x.lim).toFixed(4)} ${esc(x.tok)} · <span class="${live ? 'amb' : x.st === 'filled' ? 'grn' : ''}">${esc(stTxt)}</span></div>${x.note && !live ? `<div class="mu" style="font-size:12px">${esc(x.note)}</div>` : ''}</div>${btn}</div>`; }).join('');
+    const stTxt = x.st === 'armed' ? `waiting${x.until ? ' · ends ' + xstEnds(x.until) : ''}` : x.st === 'expired' ? 'ended · time ran out' : x.st === 'sending' ? 'triggered · sending' : x.st === 'filled' ? `✓ filled${x.feeSt === 'paid' ? ' · fee paid' : ''}` : x.st === 'placed' ? 'triggered · rest on the book' : x.st === 'partial' ? 'triggered · part filled' : x.st;
+    const btn = live ? `<button class="b-redout sm" data-act="xstCancel" data-xs="${esc(x.id)}">Cancel</button>` : left.length && !(x.st === 'filled' && !['paid', 'failed', 'expired'].includes(x.feeSt)) ? `<button class="b-out sm" data-act="xstRelease" data-xs="${esc(x.id)}">Release ${m2(left.length * (XRSV || { inc: 0.2 }).inc)} XRP</button>` : '';
+    return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${x.side === 'sell' ? 't-sell' : 't-buy'}">STOP</span> <b class="mono">${x.side === 'sell' ? 'Sell' : 'Buy'} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}</b><div class="mono mu" style="font-size:12px">${x.kind === 'mkt' ? 'market stop' : 'stop-limit'} · worst ${(+x.lim).toFixed(4)} ${esc(x.tok)} · <span class="${live ? 'amb' : x.st === 'filled' ? 'grn' : ''}">${esc(stTxt)}</span></div>${x.note && !live && x.st !== 'expired' ? `<div class="mu" style="font-size:12px">${esc(x.note)}</div>` : ''}</div>${btn}</div>`; }).join('');
 }
 async function xtStopReview(o, C, q, buy) {
   if (!S.stopUrl) return toast('Stops need your stop server: Settings → Stop orders.');
   let h = null; try { h = await stopApi('/health'); } catch (e) { return toast(niceErr(e)); }
-  if (!h || !h.xrp) return toast('Your stop server needs the update for XRP stops (version 1.7). Install it on the watcher box first.', 8000);
+  if (!h || !h.xrp || !h.xexp) return toast('Your stop server needs the update for XRP stops (version 1.9). Install it on the watcher box first.', 8000);
+  const days = [1, 7, 30].includes(+($('#xtDays') || {}).value) ? +$('#xtDays').value : 1;
   const st = +$('#xtStop').value, lim = xtStopLim(), tk = C.tok;
   if (!(st > 0)) return toast('Enter a stop price.'); if (!(lim > 0)) return toast("Enter the worst price you'll accept.");
   if (buy ? lim < st : lim > st) return toast(buy ? 'For a buy stop the worst price must be at or above the stop.' : 'For a sell stop the worst price must be at or below the stop.');
@@ -14832,12 +14853,14 @@ async function xtStopReview(o, C, q, buy) {
     { t: `When XRP-USD ${buy ? 'rises' : 'falls'} to ${st.toFixed(4)}`, s: 'your stop server watches Coinbase, Kraken and Binance; it fires when two of them agree for 3 seconds', hl: 1 },
     { t: `${buy ? 'Buy' : 'Sell'} ${m2(q)} XRP at ${lim.toFixed(4)} ${tk} or better`, s: `${XT.sk === 'mkt' ? `market stop (up to ${XST_MKT}% past the stop)` : 'stop-limit'} · any part that can't fill right away waits on the book at that price` },
     ...(lf ? [{ t: `Liquidfi fee ${xq4(lf)} XRP (${XR_FEE.bps / 100}%)`, s: 'on top, only if the stop fills completely' }] : []),
+    { t: `Ends ${xstEnds(Date.now() + days * 86400000)}`, s: `good for ${days} day${days > 1 ? 's' : ''}. Your stop server stops watching then, and the end is also signed into the order, so even if the server is down it can't fill long after. The set-aside XRP comes back.` },
     { t: `${m2(nT * sv.inc)} XRP set aside while it waits`, s: `${nT} ledger ticket${nT > 1 ? 's' : ''}: the signed order${lf ? ' and fee' : ''} wait on them. You get it back when the stop ends or you cancel.` },
     { t: `Network fee about ${m2((nT + 1) * drops / 1e6 + 0.006)} XRP`, s: 'to reserve the tickets now, and for the order when it triggers' },
     { t: "Keep the XRP / dollars in this wallet", s: 'if they are spent before the stop fires, the order fails. ' + XR_BOT_NOTE }];
   const kind = XT.sk === 'mkt' ? 'mkt' : 'lim', side = buy ? 'buy' : 'sell';
-  confirmSheet(`${buy ? 'Buy' : 'Sell'} stop ${m2(q)} XRP`, `XRP Ledger · ${S.net === 'public' ? '' : 'Testnet · '}${esc(o.name)}`, lines, `Place ${side} stop`, () => xstArm(o, C, { q, st, lim, kind, side, lf, fTo, nT, drops }), false, buy ? 'b-grn' : 'b-pur', 'Placing…', true);
+  confirmSheet(`${buy ? 'Buy' : 'Sell'} stop ${m2(q)} XRP`, `XRP Ledger · ${S.net === 'public' ? '' : 'Testnet · '}${esc(o.name)}`, lines, `Place ${side} stop`, () => xstArm(o, C, { q, st, lim, kind, side, lf, fTo, nT, drops, days }), false, buy ? 'b-grn' : 'b-pur', 'Placing…', true);
 }
+const xstEnds = (t) => new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });   /* "Nov 8, 3:12 PM" */
 async function xstArm(o, C, a) {
   const me = o.w.classicAddress;
   const p = tPend(`Stop ${a.side} ${m2(a.q)} XRP at ${a.st.toFixed(4)}`, 'xtrade', me);
@@ -14850,15 +14873,16 @@ async function xstArm(o, C, a) {
     tickets.sort((x, y) => x - y);
     if (tickets.length < a.nT) return tPendSet(p, 'Not placed', 'red', "Couldn't read the new tickets. Check the wallet page.", true);
     tPendSet(p, 'Signing…', 'mu', 'the order and fee are signed on this phone');
+    const vl = await xrLedgerNow(), lls = vl + Math.ceil(a.days * 86400 / 3.5), until = Date.now() + a.days * 86400000;   /* the order can't apply after ledger lls (~3.5 s a ledger; the server also ends it at "until") */
     const xd = String(Math.round(a.q * 1e6)), U = { currency: C.cur, issuer: C.iss, value: xtAmtStr(a.q * a.lim) };
-    const ord = o.w.sign({ TransactionType: 'OfferCreate', Account: me, Sequence: 0, TicketSequence: tickets[0], Fee: '5000', ...(a.side === 'sell' ? { TakerGets: xd, TakerPays: U, Flags: 0x00080000 } : { TakerPays: xd, TakerGets: U, Flags: 0 }) });   /* tfSell: sell exactly this XRP, take at least the worst price */
-    const fee = a.lf ? o.w.sign({ TransactionType: 'Payment', Account: me, Destination: a.fTo, Amount: String(Math.round(a.lf * 1e6)), Sequence: 0, TicketSequence: tickets[1], Fee: '1000', Flags: 0 }) : null;
+    const ord = o.w.sign({ TransactionType: 'OfferCreate', Account: me, Sequence: 0, TicketSequence: tickets[0], Fee: '5000', LastLedgerSequence: lls, ...(a.side === 'sell' ? { TakerGets: xd, TakerPays: U, Flags: 0x00080000 } : { TakerPays: xd, TakerGets: U, Flags: 0 }) });   /* tfSell: sell exactly this XRP, take at least the worst price */
+    const fee = a.lf ? o.w.sign({ TransactionType: 'Payment', Account: me, Destination: a.fTo, Amount: String(Math.round(a.lf * 1e6)), Sequence: 0, TicketSequence: tickets[1], Fee: '1000', LastLedgerSequence: lls + 5000, Flags: 0 }) : null;   /* the fee goes right after a fill: a few hours of room past the order's end */
     tPendSet(p, 'Sending to your stop server…', 'mu', '');
-    const armBody = { net: S.net, wallet: me, side: a.side, coin: C.tok, amount: a.q, stop: a.st, limit: a.lim, kind: a.kind,
-      order: { blob: ord.tx_blob, hash: ord.hash, ticket: tickets[0] }, ...(fee ? { fee: { blob: fee.tx_blob, hash: fee.hash, ticket: tickets[1] } } : {}) };
+    const armBody = { net: S.net, wallet: me, side: a.side, coin: C.tok, amount: a.q, stop: a.st, limit: a.lim, kind: a.kind, lls, end_at: Math.floor(until / 1000),
+      order: { blob: ord.tx_blob, hash: ord.hash, ticket: tickets[0] }, ...(fee ? { fee: { blob: fee.tx_blob, hash: fee.hash, ticket: tickets[1], lls: lls + 5000 } } : {}) };
     let j; for (let i = 0; ; i++) { try { j = await stopApi('/xrp/arm', armBody); break; } catch (e) { if (i >= 3 || !/not on the ledger yet|reach the XRP Ledger/.test(e.message || '')) throw e; await sleep(4000); } }   /* a server a ledger behind may not see the new tickets yet */
-    xstAll().push({ id: j.id, token: j.token, addr: me, net: S.net, side: a.side, q: a.q, stop: a.st, lim: a.lim, kind: a.kind, tok: C.tok, k: C.k, tickets, fee: a.lf, st: 'armed', at: Date.now() }); saveS();
-    tPendSet(p, '✓ Stop armed', 'grn', `${a.side === 'sell' ? 'sells' : 'buys'} if XRP-USD ${a.side === 'sell' ? 'falls' : 'rises'} to ${a.st.toFixed(4)} · ${m2(a.nT * (XRSV || { inc: 0.2 }).inc)} XRP set aside`, true);
+    xstAll().push({ id: j.id, token: j.token, addr: me, net: S.net, side: a.side, q: a.q, stop: a.st, lim: a.lim, kind: a.kind, tok: C.tok, k: C.k, tickets, fee: a.lf, st: 'armed', at: Date.now(), until, lls }); saveS();
+    tPendSet(p, '✓ Stop armed', 'grn', `${a.side === 'sell' ? 'sells' : 'buys'} if XRP-USD ${a.side === 'sell' ? 'falls' : 'rises'} to ${a.st.toFixed(4)} · ends ${xstEnds(until)} · ${m2(a.nT * (XRSV || { inc: 0.2 }).inc)} XRP set aside`, true);
   } catch (e) {
     tPendSet(p, 'Not placed', 'red', (e && e.message ? e.message : String(e)) + (tickets.length ? ' Releasing the tickets…' : ''), true);
     if (tickets.length) xstUseTickets(o, tickets).then(({ n }) => toast(n ? `Released ${n} ticket${n > 1 ? 's' : ''}: the reserve is back.` : 'Could not release the tickets now. Use Release on the stop later.', 7000));
@@ -17386,7 +17410,7 @@ function paintPnl() {
 /* ---------- activity: recent fills on every account ---------- */
 // Horizon lists either asset of a pair as "base", so each fill is turned into what THIS account got and gave.
 // Checked on a real mainnet cover (path payment strict receive): the account is base, gives USDC, gets XLM = BUY.
-const ACT = { at: 0, net: null, fil: 'all', recs: {}, next: {}, busy: false };
+const ACT = { at: 0, net: null, fil: 'all', recs: {}, next: {}, xr: {}, xnext: {}, busy: false };
 function fillFor(r, addr) {
   const ba = r.base_asset_type === 'native' ? 'XLM' : r.base_asset_code, ca = r.counter_asset_type === 'native' ? 'XLM' : r.counter_asset_code;
   const gaveBase = r.base_account === addr;   // each side always gives its own asset; base_is_seller only says whose order was resting
@@ -17399,24 +17423,39 @@ function fillFor(r, addr) {
 async function actLoad(more) {
   if (ACT.busy) return; ACT.busy = true; $('#aMore').textContent = 'Loading…';
   const L = allAccts();
-  await Promise.all(L.map(async (a) => {
+  await Promise.all([...L.map(async (a) => {
     if (more && !ACT.next[a.addr]) return;
     try {
       const j = await H(more ? ACT.next[a.addr] : `/accounts/${a.addr}/trades?order=desc&limit=100`);
       const rs = j._embedded.records; ACT.recs[a.addr] = (more ? ACT.recs[a.addr] || [] : []).concat(rs);
       ACT.next[a.addr] = rs.length < 100 ? null : rel(j._links.next.href);
     } catch (e) { if (!more) { ACT.recs[a.addr] = []; ACT.next[a.addr] = null; } }
-  }));
+  }), ...xrList().map(async (w) => {   /* XRP wallets: their XRP ⇄ RLUSD / USDC trades from the ledger */
+    if (more && !ACT.xnext[w.addr]) return;
+    try {
+      const r = await xr('account_tx', { account: w.addr, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(more ? { marker: ACT.xnext[w.addr] } : {}) });
+      ACT.xr[w.addr] = (more ? ACT.xr[w.addr] || [] : []).concat((r.transactions || []).map((x) => xrActRow(x, w.addr)).filter(Boolean));
+      ACT.xnext[w.addr] = r.marker || null;
+    } catch (e) { if (!more) { ACT.xr[w.addr] = []; ACT.xnext[w.addr] = null; } }
+  })]);
   ACT.at = Date.now(); ACT.net = S.net; ACT.busy = false; $('#aMore').textContent = 'Load more';
   if (cur === 'act') paintAct();
 }
+function xrActRow(x, me) {   /* one XRP Ledger transaction → an Activity line if it traded XRP against a dollar coin for this wallet */
+  const t = x.tx || x.tx_json || {}, m = x.meta || {}; if ((m.TransactionResult || 'tesSUCCESS') !== 'tesSUCCESS') return null;
+  const d = xrMyDelta(m, me, t); if (!xrTradeText(d)) return null;
+  const buy = d.x > 0, qty = Math.abs(d.x), qamt = Math.abs(d.u), tm = x.close_time_iso ? Date.parse(x.close_time_iso) : ((+t.date || 0) + 946684800) * 1000;
+  const f = { t: tm, side: buy ? 'BUY' : 'SELL', got: buy ? ['XRP', qty] : [d.tok, qamt], gave: buy ? [d.tok, qamt] : ['XRP', qty], pool: false, ix: 0 };
+  return { ...f, op: 'x' + (x.hash || t.hash), hash: x.hash || t.hash, asset: 'XRP', qty, quote: d.tok, qamt, n: 1, xrp: true, fills: [f] };
+}
 function drawAct() {
-  if (!ACT.at || ACT.net !== S.net || Date.now() - ACT.at > 60000) { ACT.recs = {}; ACT.next = {}; paintAct(); actLoad(false); } else paintAct();
+  if (!ACT.at || ACT.net !== S.net || Date.now() - ACT.at > 60000) { ACT.recs = {}; ACT.next = {}; ACT.xr = {}; ACT.xnext = {}; paintAct(); actLoad(false); } else paintAct();
 }
 function paintAct() {
   const L = allAccts();
-  if (ACT.fil !== 'all' && !L.some((a) => a.addr === ACT.fil)) ACT.fil = 'all';
-  $('#aFil').innerHTML = [['all', 'All'], ...L.map((a) => [a.addr, a.name])].map(([k, n]) => `<button class="chip${k === ACT.fil ? ' on' : ''}" style="white-space:nowrap" data-afil="${k}">${esc(n)}</button>`).join('');
+  const XL = xrList().filter((w) => !L.some((a) => a.addr === w.addr));
+  if (ACT.fil !== 'all' && !L.some((a) => a.addr === ACT.fil) && !XL.some((w) => w.addr === ACT.fil)) ACT.fil = 'all';
+  $('#aFil').innerHTML = [['all', 'All'], ...L.map((a) => [a.addr, a.name]), ...XL.map((w) => [w.addr, w.name])].map(([k, n]) => `<button class="chip${k === ACT.fil ? ' on' : ''}" style="white-space:nowrap" data-afil="${k}">${esc(n)}</button>`).join('');
   $('#aUpd').innerHTML = `Buys and sells · ${ACT.at ? 'updated ' + new Date(ACT.at).toLocaleTimeString() + ' · ' : ''}${S.net === 'public' ? '' : '<span style="color:var(--amb);font-weight:700">TESTNET</span>'}`;
   if (!ACT.at) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
   // group fills of one operation on one account into a single line
@@ -17430,6 +17469,7 @@ function paintAct() {
       g = { ...f, acct: a.name, fills: [f] }; rows.push(g);
     }
   }
+  for (const w of XL) { if (ACT.fil !== 'all' && w.addr !== ACT.fil) continue; for (const r of ACT.xr[w.addr] || []) rows.push({ ...r, acct: w.name }); }
   // one operation that traded through more than one pair is a swap with steps (e.g. XLM → USDC → EURC): show it as one SWAP line
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i], same = rows.filter((x) => x !== r && x.acct === r.acct && x.op === r.op && !x.merged);
@@ -17449,17 +17489,17 @@ function paintAct() {
   for (const r of shown) {
     const d = ptDay(r.t, { year: 'numeric', month: 'short', day: 'numeric' });
     if (d !== day) { if (open) html += '</div>'; day = d; html += `<span class="lbl" style="margin-top:6px">${d === today ? 'Today' : d === yday ? 'Yesterday' : esc(ptDay(r.t, { weekday: 'short', month: 'short', day: 'numeric' }))}</span><div class="card" style="padding:0 14px;gap:0">`; open = true; }
-    const px = r.qamt / r.qty, dp = r.quote === 'USDC' && r.asset === 'XLM' ? 5 : 4;
+    const px = r.qamt / r.qty, dp = (r.quote === 'USDC' && r.asset === 'XLM') || r.xrp ? 5 : 4;
     const extra = [r.n > 1 ? r.n + ' fills' : '', r.pool ? 'pool' : ''].filter(Boolean).join(' · ');
     const steps = [];   // details: each step and where it filled (order book or AMM pool), in the order they happened
     for (const f of [...r.fills].sort((x, y) => x.t - y.t || x.ix - y.ix)) { const k = f.gave[0] + '→' + f.got[0] + (f.pool ? 'P' : 'B'), l = steps.find((x) => x.k === k); if (l) { l.g += f.gave[1]; l.o += f.got[1]; l.n++; } else steps.push({ k, a: f.gave[0], b: f.got[0], g: f.gave[1], o: f.got[1], pool: f.pool, n: 1 }); }
-    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span><a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a></div></div>`;
+    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>${r.xrp ? `<a href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a>` : `<a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>`}</div></div>`;
     const head = r.swap ? `${amtFmt(r.qamt)} ${esc(r.quote)} → ${amtFmt(r.qty)} ${esc(r.asset)}` : `${fx(r.qty, 2)} ${esc(r.asset)} @ ${px.toFixed(dp)}`;
     html += `<details class="actrow"><summary style="display:flex;align-items:center;gap:10px;padding:10px 0"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : r.side === 'SELL' ? '--sell' : '--blu'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:14px">${head}</span><span class="mu" style="font-size:12px">${esc(r.acct)}${r.swap ? ` · ${steps.length} steps` : ` · ${fx(r.qamt, 2)} ${esc(r.quote)}`}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:12px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></summary>${det}</details>`;
   }
   if (open) html += '</div>';
   $('#aList').innerHTML = html;
-  $('#aMore').style.display = L.some((a) => ACT.next[a.addr]) ? '' : 'none';
+  $('#aMore').style.display = L.some((a) => ACT.next[a.addr]) || XL.some((w) => ACT.xnext[w.addr]) ? '' : 'none';
 }
 
 /* ---------- kill plans ---------- */
@@ -18116,7 +18156,7 @@ function stopEdit(id) {
     $('#tAmt').value = String(+(+x.xlm).toFixed(7)); $('#tStop').value = String(+x.stop); T.stopTyped = true; T.stopSide = x.side;
     if (S.stopLim === 'custom') $('#tLim').value = String(+(+x.limit).toFixed(7));
     if ($('#tFeed') && [...$('#tFeed').options].some((o) => o.value === x.feed)) $('#tFeed').value = x.feed;
-    const left = Math.max(0, (x.expires || 0) - Date.now() / 1000) / 86400, opt = [1, 7, 30, 90].find((d) => d >= left - 0.01) || 90; $('#tDays').value = String(opt);
+    const left = Math.max(0, (x.expires || 0) - Date.now() / 1000) / 86400, opt = [1, 7, 30].find((d) => d >= left - 0.01) || 30; $('#tDays').value = String(opt);
     stopDefaults(); tradeEst(); const g = $('#tGo'); if (g) { g.textContent = 'Replace stop'; g.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   };
   if (cur !== 'trade') { go('trade'); setTimeout(fill, 400); } else { drawTrade(); fill(); }
