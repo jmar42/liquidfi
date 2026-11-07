@@ -14151,6 +14151,8 @@ function xrTxText(x, me) {
   if (t.TransactionType === 'Payment') {
     const amt = x.meta.delivered_amount || x.meta.DeliveredAmount || t.DeliverMax || t.Amount;
     const xsd = t.Account === me && xsDep(t.Destination), xso = t.Destination === me && xsOutTx(t.hash || x.hash);
+    const dust = t.Destination === me && t.Account !== me && typeof amt === 'string' && +amt <= 1000 && xsRecs().find((r) => r.dep && r.dep.addr !== t.Account && r.dep.addr.slice(0, 2) === t.Account.slice(0, 2) && Math.abs(r.at - ((+t.date || 0) + 946684800) * 1000) < 3600e3);
+    if (dust) return `⚠ Scam dust from a look-alike of ${short(dust.dep.addr)} · never send to it`;
     s = xsd ? `Swap ${xrAmt(amt)} → ${xsd.to.coin} · NEAR Intents` : xso ? `Received ${xrAmt(amt)} · swap from ${xso.from.coin}` : t.Account === me && t.Destination && t.Destination === XR_FEE.to[S.net] ? `Liquidfi fee ${xrAmt(amt)}` : t.Destination === me && t.Account !== me ? `Received ${xrAmt(amt)} from ${short(t.Account)}` : t.Account === me && t.Destination !== me ? `Sent ${xrAmt(amt)} to ${short(t.Destination)}${t.DestinationTag != null ? ' · tag ' + t.DestinationTag : ''}` : `Payment ${xrAmt(amt)}`;
   } else if (t.TransactionType === 'TrustSet') s = `Trust line ${xrCur((t.LimitAmount || {}).currency)}`;
   else if (t.Account !== me) { const tr = ok && xrTradeText(xrMyDelta(x.meta, me, t)); s = tr ? `Order filled: ${tr}` : (t.TransactionType || 'Transaction'); }   // someone else's transaction that touched this wallet: usually a fill of my order
@@ -15260,6 +15262,15 @@ const XS = {
   coins: { XRP: { id: 'nep141:xrp.omft.near', chain: 'xrp', dp: 6 }, XLM: { id: 'nep245:v2_1.omni.hot.tg:1100_111bzQBB5v7AhLyPMDwS8uJgQV24KaAPXtwyVWu2KXbbfQU6NXRCz', chain: 'stellar', dp: 7 } },
 };
 const XSW = { from: null, to: null, q: null, seq: 0, t: 0, poll: {}, busy: false, rseq: 0 };
+const XS_MIN = { XRP: 2 };   // NEAR's XRP bridge takes at least 2 XRP (it says "try at least 2000000" in drops)
+const xsMin = (coin) => Math.max(XS_MIN[coin] || 0, coin === 'XRP' ? ((XRSV && XRSV.base) || 1) + 0.5 : 0);
+function xsErrText(e, fw, tw) {   // 1Click's words → plain words, amounts in coins (never drops or stroops)
+  const m = String((e && e.message) || e || '');
+  if (/not available/i.test(m)) return `NEAR Intents isn't quoting ${fw.coin} → ${tw.coin} right now. Try again later.`;
+  const lo = m.match(/too low[^0-9]*?(\d{2,})/i);
+  if (lo) { const n = xsFmt(lo[1], XS.coins[fw.coin].dp); return `Swap at least ${+n.toFixed(4)} ${fw.coin}. That's the smallest amount NEAR Intents will take.`; }
+  return m.replace(/\b(\d{7,})\b/g, (d) => `${+xsFmt(d, XS.coins[fw.coin].dp).toFixed(4)} ${fw.coin}`);
+}
 const XS_FINAL = ['SUCCESS', 'REFUNDED', 'FAILED', 'not sent', 'stuck'];
 const xsOn = () => S.net === 'public' && /^(?=.{2,64}$)(?:(?:[a-z0-9]+[-_])*[a-z0-9]+\.)*(?:[a-z0-9]+[-_])*[a-z0-9]+$/.test(XS.fee);
 const xsRecs = () => { const N = NS(); if (!Array.isArray(N.xsw)) N.xsw = []; return N.xsw; };
@@ -15285,7 +15296,7 @@ async function drawXSwap() {
   const off = !xsOn() ? (S.net !== 'public' ? 'Swaps across networks work on the main network only.' : 'Swaps across networks are coming soon.') : !st.length || !xw.length ? 'You need a Stellar wallet and an XRP wallet here to swap between them.' : '';
   $('#xsOff').innerHTML = off ? `<div class="note amb">${esc(off)}</div>` : '';
   $('#xsGo').disabled = !!off || XSW.busy;
-  if (!XSW.from || !xsW(XSW.from)) XSW.from = (xw.find((w) => w.addr === xrSel) || st.find((w) => w.addr === homeAddr) || xw[0] || st[0] || {}).addr || null;
+  if (!XSW.from || !xsW(XSW.from)) XSW.from = (XS.from.XLM ? (xw.find((w) => w.addr === xrSel) || st.find((w) => w.addr === homeAddr) || xw[0] || st[0]) : (xw.find((w) => w.addr === xrSel) || xw[0] || st[0]) || {}).addr || null;   // XLM → XRP is off: open on XRP → XLM
   const fw = xsW(XSW.from);
   const opt = (w) => `<option value="${esc(w.addr)}">${w.chain === 'xrp' ? 'XRP' : 'Stellar'} · ${esc(w.name)} · ${short(w.addr)}</option>`;
   $('#xsFrom').innerHTML = L.map(opt).join(''); if (fw) $('#xsFrom').value = fw.addr;
@@ -15334,6 +15345,7 @@ function xsQuote() {
   if (!xsOn() || !fw || !tw || !XS.from[fw.coin]) return xsInfo('');
   if (!(amt > 0)) return xsInfo('');
   if (XSW.av != null && amt > XSW.av + 1e-9) return xsInfo(`<div><span class="red">More than this wallet has available (${m2(XSW.av)} ${fw.coin}).</span></div>`);
+  if (amt < xsMin(fw.coin)) return xsInfo(`<div><span class="amb">Swap at least ${xsMin(fw.coin)} ${fw.coin}. That's the smallest amount NEAR Intents will take.</span></div>`);
   xsInfo('<div><span class="mu">Getting the best price…</span></div>');
   XSW.t = setTimeout(async () => {
     try {
@@ -15347,7 +15359,7 @@ function xsQuote() {
         + `<div><span class="mu">Minimum you get</span><span class="mono">${m2(min)} ${tw.coin}</span></div>`
         + `<div><span class="mu">Arrives in</span><span>about ${Math.max(10, +j.quote.timeEstimate || 60)} seconds</span></div>`);
       xsPaintOut();
-    } catch (e) { if (seq === XSW.seq) xsInfo(`<div><span class="amb">${esc(/not available/i.test(e.message || '') ? `NEAR Intents isn't quoting ${fw.coin} → ${tw.coin} right now. Try again later.` : e.message || String(e))}</span></div>`); }
+    } catch (e) { if (seq === XSW.seq) xsInfo(`<div><span class="amb">${esc(xsErrText(e, fw, tw))}</span></div>`); }
   }, 500);
 }
 // Ask 1Click itself what this deposit address will do. Every field that decides where the coins go must be what we asked for.
@@ -15383,7 +15395,7 @@ async function xsReview() {
   if (!(amt > 0)) return toast('Enter an amount.');
   if (fw.chain === 'xrp' && !xrOwn(fw.addr)) return toast("This XRP wallet's key isn't on this phone.");
   if (fw.chain === 'stellar' && !OWN().some((o) => o.addr === fw.addr)) return toast("This wallet's key isn't on this phone.");
-  if (fw.chain === 'xrp' && amt < ((XRSV && XRSV.base) || 1) + 0.5) return toast(`Swap at least ${m2(((XRSV && XRSV.base) || 1) + 0.5)} XRP. (NEAR Intents' one-time XRP address needs the ledger's reserve to open.)`, 7000);
+  if (amt < xsMin(fw.coin)) return toast(`Swap at least ${xsMin(fw.coin)} ${fw.coin}. That's the smallest amount NEAR Intents will take.`, 7000);
   XSW.busy = true; $('#xsGo').disabled = true; $('#xsGo').textContent = 'Checking…';
   try {
     const av = await xsAvail(fw); XSW.av = av;
@@ -15408,7 +15420,7 @@ async function xsReview() {
       { t: 'Through NEAR Intents', s: `your wallet sends to its one-time address ${short(q.depositAddress)}${q.depositMemo ? ' · memo ' + q.depositMemo : ''} · checked with NEAR Intents: pays ${short(tw.addr)}, refunds to ${short(fw.addr)}` },
       { t: `Network fee ${fw.chain === 'xrp' ? m2(drops / 1e6) + ' XRP' : 'under 0.001 XLM'}`, s: fw.chain === 'xrp' ? XR_BOT_NOTE : '' }];
     confirmSheet(`Swap ${m2(amt)} ${fw.coin} → ${tw.coin}`, `Across networks · ${esc(fw.name)} → ${esc(tw.name)}`, items, 'Swap', () => xsRun(fw, tw, amt, b, v, drops, at), false, 'b-acc', 'Sending…', true);
-  } catch (e) { toast(/not available/i.test(e.message || '') ? `NEAR Intents isn't quoting ${fw.coin} → ${tw.coin} right now. Nothing was sent.` : niceErr(e), 8000); }
+  } catch (e) { toast(/not available|too low/i.test(e.message || '') ? xsErrText(e, fw, tw).replace('Try again later.', 'Nothing was sent.') : niceErr(e), 8000); }
   finally { XSW.busy = false; $('#xsGo').disabled = !xsOn() || !XS.from[(xsW(XSW.from) || {}).coin]; $('#xsGo').textContent = 'Review swap'; }
 }
 async function xsRun(fw, tw, amt, b, v, drops, at) {
@@ -15463,6 +15475,21 @@ function xsWords(rec) {
   if (rec.st === 'unsure' || rec.st === 'sending') return ['Checking…', 'amb', 'Waiting to hear from NEAR Intents'];
   return [XS_WORDS[rec.st] || 'Swapping…', 'amb', `about ${m2(rec.est)} ${rec.to.coin} on the way to ${rec.to.name}`];
 }
+// The coins often land a minute or more before 1Click's status says SUCCESS: look at the receiving Stellar wallet itself.
+// A credit counts only if it came from a contract (C…, how NEAR Intents' bridge pays), after the deposit, and its amount fits this swap.
+async function xsLanded(rec) {
+  if (rec.to.chain !== 'stellar' || !rec.dep || !rec.dep.tx) return null;
+  try {
+    const j = await H(`/accounts/${rec.to.addr}/operations?order=desc&limit=10`);
+    for (const o of (j._embedded || {}).records || []) {
+      if (Date.parse(o.created_at) < rec.at - 60000) break;
+      if (o.type !== 'invoke_host_function') continue;
+      const c = (o.asset_balance_changes || []).find((x) => x.to === rec.to.addr && x.asset_type === 'native' && /^C[A-Z2-7]{55}$/.test(x.from || ''));
+      if (c && +c.amount >= rec.min * 0.999 && +c.amount <= rec.est * 1.05 && !xsRecs().some((r) => r !== rec && (r.outTx || []).includes(o.transaction_hash))) return { amt: +c.amount, hash: o.transaction_hash };
+    }
+  } catch (e) {}
+  return null;
+}
 async function xsWatch(rec, p) {   // ask 1Click every 5 s until the swap is done (up to 2 h; picked up again when the app opens)
   if (XSW.poll[rec.id]) return; XSW.poll[rec.id] = 1;
   const unsure = () => rec.st === 'unsure' || rec.st === 'sending';   // we don't know if the deposit went out
@@ -15476,6 +15503,10 @@ async function xsWatch(rec, p) {   // ask 1Click every 5 s until the swap is don
         if (landed) { rec.st = 'stuck'; saveS(); if (p) tPendSet(p, 'Ask NEAR Intents', 'red', xsWords(rec)[2], true); xsRecPaint(); return; }
         rec.st = 'not sent'; rec.why = 'NEAR Intents never received it'; saveS();
         if (p) tPendSet(p, 'Not sent', 'red', 'NEAR Intents never received it. Nothing was swapped.', true); xsRecPaint(); return;
+      }
+      if (j && ['KNOWN_DEPOSIT_TX', 'PROCESSING'].includes(j.status) && !rec.early) {   // already in the wallet? say so now
+        const got = await xsLanded(rec);
+        if (got) { rec.early = 1; rec.st = 'SUCCESS'; rec.got = got.amt; rec.outTx = [got.hash]; saveS(); if (p) tPendSet(p, ...xsWords(rec), true); xsRecPaint(); toast(`✓ Swap delivered: ${m2(rec.got)} ${rec.to.coin} in ${rec.to.name}`, 8000); return; }
       }
       if (j && j.status && !(j.status === 'PENDING_DEPOSIT' && unsure())) {   // not sure it was sent: keep "Checking…" until 1Click sees it
         const was = rec.st; xsApply(rec, j);
@@ -16076,6 +16107,14 @@ async function taxStellar(addr, t0, t1, mine, rows) {
         if (o.from === addr && o.to === addr) add({ ...base, sa: o.source_amount, sk, ra: o.amount, rk, desc: 'Swap' });
         else if (o.from === addr) { if (!own(o.to)) add({ ...base, sa: o.source_amount, sk, desc: `Sent to ${o.to} (they got ${n7(o.amount)} ${sym(rk)})` }); }
         else if (o.to === addr && !own(o.from)) add({ ...base, ra: o.amount, rk, desc: `Received from ${o.from}` });
+        break;
+      }
+      case 'invoke_host_function': {   // contract transfers in/out of this wallet (e.g. XLM delivered by NEAR Intents' bridge)
+        for (const c of o.asset_balance_changes || []) {
+          const k = an(c.asset_type, c.asset_code, c.asset_issuer), xo = xsOutTx(h);
+          if (c.to === addr && c.from !== addr && !own(c.from)) add({ ...base, ra: c.amount, rk: k, desc: xo ? xsTaxIn(xo) : `Received from contract ${c.from}` });
+          else if (c.from === addr && c.to !== addr && !own(c.to)) add({ ...base, sa: c.amount, sk: k, desc: `Sent to ${c.to}` });
+        }
         break;
       }
       case 'create_account':
@@ -16951,6 +16990,11 @@ function opText(o, me) {
     case 'change_trust': if (o.asset_type === 'liquidity_pool_shares') return `${+o.limit === 0 ? 'Left' : 'Joined'} ${poolNm(o.liquidity_pool_id)}`; return (+o.limit === 0 ? 'Removed ' : 'Added ') + 'trustline ' + o.asset_code;
     case 'liquidity_pool_deposit': return `Added ${resTxt(o.reserves_deposited)} to ${poolNm(o.liquidity_pool_id)}`;
     case 'liquidity_pool_withdraw': return `Withdrew ${resTxt(o.reserves_received)} from ${poolNm(o.liquidity_pool_id)}`;
+    case 'invoke_host_function': {   // a smart-contract call: NEAR Intents' Stellar bridge delivers XLM this way
+      const c = (o.asset_balance_changes || []).find((x) => x.to === me || x.from === me); if (!c) return 'Smart contract call';
+      const a = an(c.asset_type, c.asset_code), sw = xsOutTx(o.transaction_hash);
+      return c.to === me ? `Received ${fx(c.amount)} ${a}${sw ? ` · swap from ${sw.from.coin} (NEAR Intents)` : ` from ${short(c.from)}`}` : `Sent ${fx(c.amount)} ${a} to ${short(c.to)}`;
+    }
     case 'set_options': return 'Changed account options/signers';
     case 'account_merge': { const nm = (a) => ((allAccts().find((x) => x.addr === a) || {}).name || short(a)), amt = MERGEAMT[o.id] != null ? fx(MERGEAMT[o.id]) + ' XLM' : 'all its XLM';
       return o.account === me ? `Closed this wallet · sent ${amt} to ${nm(o.into)}` : isHelper(o.account) ? `Stop helper closed · ${amt} back` : `Received ${amt} from closed wallet ${nm(o.account)}`; }
@@ -16990,6 +17034,7 @@ function opDetail(o, me) {
   const ad = (a) => (a === me ? 'this wallet' : `<span title="${esc(a)}">${esc(short(a))}</span>`), L = [];
   switch (o.type) {
     case 'payment': L.push(row('Amount', `${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code, o.asset_issuer)}`), row('From', ad(o.from)), row('To', ad(o.to))); break;
+    case 'invoke_host_function': for (const c of o.asset_balance_changes || []) L.push(row('Amount', `${amtFmt(+c.amount)} ${an(c.asset_type, c.asset_code, c.asset_issuer)}`), row('From', ad(c.from)), row('To', ad(c.to))); break;
     case 'path_payment_strict_send': case 'path_payment_strict_receive':
       L.push(row('Paid', `${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`), row('Got', `${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`));
       if ((o.path || []).length) L.push(row('Route', esc([an(o.source_asset_type, o.source_asset_code), ...o.path.map((x) => an(x.asset_type, x.asset_code)), an(o.asset_type, o.asset_code)].join(' → '))));
@@ -17012,7 +17057,7 @@ document.addEventListener('toggle', async (e) => {   // memo + network fee from 
   try {
     const t = await H('/transactions/' + d.dataset.tx);
     const memo = t.memo_type === 'hash' && PM.isSealed(b64u8(t.memo)) ? 'private (encrypted on the ledger, shown above)' : t.memo_type && t.memo_type !== 'none' ? `${esc(String(t.memo))}${t.memo_type !== 'text' ? ` <span class="mu">(${esc(t.memo_type)})</span>` : ''}` : '';
-    x.outerHTML = (memo ? `<div><span>Memo</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${memo}</span></div>` : '') + `<div><span>Network fee</span><span class="mono">${(+t.fee_charged / 1e7).toFixed(7).replace(/0+$/, '').replace(/\.$/, '')} XLM</span></div>`;
+    x.outerHTML = (memo ? `<div><span>Memo</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${memo}</span></div>` : '') + (OWN().some((w) => w.addr === (t.fee_account || t.source_account)) ? `<div><span>Network fee</span><span class="mono">${(+t.fee_charged / 1e7).toFixed(7).replace(/0+$/, '').replace(/\.$/, '')} XLM</span></div>` : `<div><span>Network fee</span><span class="mu">paid by the sender</span></div>`);   // only show a fee this wallet actually paid
   } catch (er) { x.remove(); }
 }, true);
 
@@ -18694,7 +18739,7 @@ document.addEventListener('click', async (e) => {
     accBuy: () => onrPickSheet(),
     onrPick: () => onrBuySheet(t.dataset.chain, t.dataset.addr),
     accSwap: () => { if (!OWN().length) return toast('Add a wallet first.'); go('swap'); },
-    xsOpen: () => { XSW.from = cur === 'xrp' ? xrSel : homeAddr; XSW.to = null; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
+    xsOpen: () => { XSW.from = cur === 'xrp' ? xrSel : (XS.from.XLM ? homeAddr : null); XSW.to = cur === 'xrp' || XS.from.XLM ? null : homeAddr; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
     xsMax: () => { if (XSW.av > 0) { const w = xsW(XSW.from); $('#xsAmt').value = String(+(+XSW.av).toFixed(w && w.chain === 'xrp' ? 6 : 7)); xsQuote(); } },
     xsFlip: () => { const f = XSW.from, t2 = XSW.to; if (!t2 || XSW.busy) return; ++XSW.rseq; XSW.from = t2; XSW.to = f; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); },
     xsReview: () => xsReview(),
@@ -18885,7 +18930,7 @@ $('#eXWal').addEventListener('change', () => { earnXr = $('#eXWal').value; drawE
 $('#wAmt').addEventListener('input', swapQuote); $('#wFrom').addEventListener('change', () => { if ($('#wFrom').value === $('#wTo').value) { const o = [...$('#wTo').options].find((x) => x.value !== $('#wFrom').value); if (o) $('#wTo').value = o.value; } swapQuote(); }); $('#wTo').addEventListener('change', swapQuote);
 $('#wWal').addEventListener('change', () => { homeAddr = $('#wWal').value; $('#wAmt').value = ''; drawSwap(); });
 $('#xsAmt').addEventListener('input', xsQuote);
-$('#xsFrom').addEventListener('change', () => { ++XSW.rseq; XSW.from = $('#xsFrom').value; XSW.to = null; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); });
+$('#xsFrom').addEventListener('change', () => { ++XSW.rseq; XSW.from = $('#xsFrom').value; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); });   // To stays what you picked (drawXSwap only changes it if it no longer fits)
 $('#xsTo').addEventListener('change', () => { ++XSW.rseq; XSW.to = $('#xsTo').value; xsQuote(); });
 $('#setBio').addEventListener('change', async (e) => {
   if (e.target.checked) { e.target.checked = false; await bioOn(); }
