@@ -591,9 +591,12 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
   <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader holding XLM and USDC with open orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel All and Cancel + Close Positions. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
   <div class="card"><span class="lbl">Backup</span><div id="setBk" style="font-size:13px"></div><button class="b-out sm" data-act="bkOpen">Back up keys</button></div>
-  <div class="card" id="setPush"><span class="lbl">Stop alerts</span><div class="top"><span>Notifications when a stop fills, fails or ends</span><input type="checkbox" id="setPushOn" style="width:28px;min-height:28px"></div>
+  <div class="card" id="setPush"><span class="lbl">Alerts</span><div class="top"><span>Notifications for stops and order fills</span><input type="checkbox" id="setPushOn" style="width:28px;min-height:28px"></div>
     <div class="top" id="setPushDetW"><span>Show amounts in alerts</span><input type="checkbox" id="setPushDet" style="width:28px;min-height:28px"></div>
-    <div class="mu" id="setPushSt" style="font-size:12px"></div><button class="b-out sm" data-act="pushTest" id="setPushTest" style="display:none">Send a test alert</button></div>
+    <div class="mu" id="setPushSt" style="font-size:12px"></div>
+    <div id="setPushFills" style="display:none;flex-direction:column;gap:6px"><span class="mu" style="font-size:12.5px">Order fills from</span><div id="setPushW" style="display:flex;flex-direction:column"></div><div class="mu" style="font-size:11.5px">Bot wallets trade all day: they start off.</div></div>
+    <div class="amb" id="setPushTip" style="display:none;font-size:12px">Tip: install Liquidfi (Chrome ⋮ → Add to home screen → Install) so alerts come from Liquidfi, not Chrome. If Chrome says "possible spam", tap Always allow.</div>
+    <button class="b-out sm" data-act="pushTest" id="setPushTest" style="display:none">Send a test alert</button></div>
   <div class="card" id="setStats"><span class="lbl">Help improve Liquidfi</span><div class="top"><span>Share anonymous usage</span><input type="checkbox" id="setStatsOn" style="width:28px;min-height:28px"></div></div>
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
@@ -14745,7 +14748,7 @@ async function xtReview() {
     if (!buy && spend < q + sv.inc + drops / 1e6) return toast(`Not enough XRP (${m2(spend)} available; an open order also holds ${m2(sv.inc)} XRP of reserve).`);
     if (buy && spend < sv.inc + drops / 1e6) return toast(`Needs ${m2(sv.inc)} XRP free for the order's reserve.`);
     title = `Limit ${XT.side} ${m2(q)} XRP`;
-    lines = [{ t: `${buy ? 'Buy' : 'Sell'} ${m2(q)} XRP @ ${px.toFixed(5)} ${tk}`, s: `total ${fx(usd)} ${tk} · stays on the book until filled or cancelled`, hl: 1 }, { t: `Reserve +${m2(sv.inc)} XRP while open`, s: 'any part that fills right away fills now' }];
+    lines = [{ k: buy ? 'Buy' : 'Sell', v: `${m2(q)} XRP`, hl: 1 }, { k: 'Limit price', v: `${px.toFixed(5)} ${tk}` }, { k: 'Total', v: `${fx(usd)} ${tk}` }, { k: 'Liquidfi fee', v: 'None', n: 'limit orders are free' }, { k: 'Set aside', v: `${m2(sv.inc)} XRP`, n: 'reserve while it is open' }];
   } else {
     await xtLoadBook().catch(() => null);
     if (XT.q !== C.k) return toast('You switched pairs. Review again.');
@@ -14758,14 +14761,14 @@ async function xtReview() {
     if (!buy && spend < q + lf + 2 * drops / 1e6) return toast(`Not enough XRP (${m2(spend)} available after the ledger reserve${lf ? `, need ${xq4(q + lf)} with the ${XR_FEE.bps / 100}% fee` : ''}).`);
     if (buy && lf && spend < 2 * drops / 1e6) return toast('Not enough free XRP for the network fees.');
     title = `Market ${XT.side} ${m2(q)} XRP`;
-    lines = [{ t: `${buy ? 'Buy' : 'Sell'} ${m2(q)} XRP now`, s: `quote ${fx(c)} ${tk} (avg ${(c / q).toFixed(5)}) · ${buy ? 'pay at most' : 'receive at least'} ${fx(usd)} ${tk}`, hl: 1 }, { t: 'Fills now or not at all', s: 'the XRP Ledger uses the order book or its AMM pool, whichever is better' }];
+    lines = [{ k: buy ? 'Buy' : 'Sell', v: `${m2(q)} XRP`, hl: 1 }, { k: 'Price now', v: `${(c / q).toFixed(5)} ${tk}`, n: 'book or AMM pool, whichever is better' }, { k: buy ? 'You pay' : 'You get', v: `≈ ${fx(c)} ${tk}`, n: `${buy ? 'at most' : 'at least'} ${fx(usd)}` }];
   }
   const R = { currency: C.cur, issuer: C.iss, value: xtAmtStr(usd) };
   const tx = buy ? { TransactionType: 'OfferCreate', TakerPays: String(xd), TakerGets: R, Flags: flags }   // you pay ${tk} (TakerGets), get XRP
     : { TransactionType: 'OfferCreate', TakerGets: String(xd), TakerPays: R, Flags: flags };              // you pay XRP, get ${tk}
-  if (lf) lines.push({ t: `Liquidfi fee ${xq4(lf)} XRP (${XR_FEE.bps / 100}%)`, s: `on top: ${m2(q)} XRP ${buy ? 'bought' : 'sold'} exactly, the fee is paid from this wallet right after it fills · nothing if it doesn't fill` });
-  lines.push({ t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }); lines.unshift(...await xrBusy(xrSel)); if (XT.q !== C.k) return toast('You switched pairs. Review again.');
-  confirmSheet(title, `XRP Ledger DEX · ${S.net === 'public' ? '' : 'Testnet · '}${esc(o.name)}`, lines, `Send ${XT.mode === 'lim' ? 'order' : XT.side}`, async () => {
+  if (lf) lines.push({ k: 'Liquidfi fee', v: `${xq4(lf)} XRP`, n: `${XR_FEE.bps / 100}% · on top, only if it fills` });
+  lines.push({ k: 'Network fee', v: `${m2(drops / 1e6)} XRP` }, { foot: XR_BOT_NOTE }); lines.unshift(...await xrBusy(xrSel)); if (XT.q !== C.k) return toast('You switched pairs. Review again.');
+  confirmSheet(title, `${XT.mode === 'lim' ? 'stays on the book until filled or cancelled' : 'fills now or not at all'} · ${S.net === 'public' ? '' : 'Testnet · '}${esc(o.name)}`, lines, `Send ${XT.mode === 'lim' ? 'order' : XT.side}`, async () => {
     const lim = XT.mode === 'lim';   /* read before tPend resets the form */
     const p = tPend(`${lim ? 'Limit' : 'Market'} ${buy ? 'buy' : 'sell'} ${m2(q)} XRP${lim ? ' @ ' + px.toFixed(5) + ' ' + tk : ''}`, 'xtrade', o.w.classicAddress);
     let r = null;
@@ -17948,7 +17951,7 @@ async function tradeReview() {
       if (avail('XLM') < xNeed - 1e-7) return toast(`Not enough XLM for this order and its network fee (have ${fx(avail('XLM'))}).${holdNote(a, 'XLM')}`, 7000); }
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: AQ, buying: AB, buyAmount: amt7(q), price: p.toFixed(7) })
       : SDK.Operation.manageSellOffer({ selling: AB, buying: AQ, amount: amt7(q), price: p.toFixed(7) });
-    return confirmSheet(`Limit ${T.side} ${fx(q)} ${nB}`, `${netPre()}stays open on the book until filled or cancelled`, [{ t: `${T.side === 'buy' ? 'Buy' : 'Sell'} ${fx(q, 2)} ${nB} @ ${pxF(p)} ${nQ}`, s: `${T.side === 'buy' ? 'manageBuyOffer' : 'manageSellOffer'} · total ${fx(q * p)} ${nQ}` }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
+    return confirmSheet(`Limit ${T.side} ${fx(q)} ${nB}`, `${netPre()}stays open on the book until filled or cancelled`, [{ k: T.side === 'buy' ? 'Buy' : 'Sell', v: `${fx(q, 2)} ${nB}`, hl: 1 }, { k: 'Limit price', v: `${pxF(p)} ${nQ}` }, { k: 'Total', v: `${fx(q * p)} ${nQ}` }, { k: 'Liquidfi fee', v: 'None', n: 'limit orders are free' }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
   }
   // Market = path payment to self + the Liquidfi fee in the same transaction (all or nothing). The amount entered is exactly what trades;
   // the fee is paid on top (buy: in the quote token, sell: in the base token).
@@ -17967,9 +17970,11 @@ async function tradeReview() {
   const ops = [buy ? SDK.Operation.pathPaymentStrictReceive({ sendAsset: AQ, sendMax: amt7(capU), destination: tradeAddr, destAsset: AB, destAmount: amt7(q), path: qt.path })
     : SDK.Operation.pathPaymentStrictSend({ sendAsset: AB, sendAmount: amt7(sq), destination: tradeAddr, destAsset: AQ, destMin: amt7(capU), path: qt.path })];
   if (fee) ops.push(feeOp(fee));
-  const feeTxt = fee ? (buy ? `fee ${m2(fee.amt)} ${nQ} (${SWAP_FEE.bps / 100}%)` : `${m2(sq)} sold · fee ${m2(fee.amt)} ${nB} on top (${SWAP_FEE.bps / 100}%)`) : '';
-  const items = [{ t: `${buy ? 'Buy' : 'Sell'} ${fx(q, 2)} ${nB}`, s: `${buy ? '' : feeTxt ? feeTxt + ' · ' : ''}quote ${fx(qt.usd)} ${nQ} (avg ${pxF(qt.usd / sq)}) · ${buy ? 'pay at most' : 'receive at least'} ${fx(capU)} ${nQ}`, hl: 1 }];
-  if (buy && fee) items.push({ t: `Fee ${m2(fee.amt)} ${nQ}`, s: `${SWAP_FEE.bps / 100}% of the cost · total about ${fx(qt.usd + fee.amt)} ${nQ}` });
+  const items = [{ k: buy ? 'Buy' : 'Sell', v: `${fx(q, 2)} ${nB}`, hl: 1 },
+    { k: 'Price now', v: `${pxF(qt.usd / sq)} ${nQ}`, n: 'live quote: book + AMM pools' },
+    { k: buy ? 'You pay' : 'You get', v: `≈ ${fx(qt.usd)} ${nQ}`, n: `${buy ? 'at most' : 'at least'} ${fx(capU)} (${S.slip}% cap)` },
+    ...(fee ? [{ k: 'Liquidfi fee', v: `${m2(fee.amt)} ${buy ? nQ : nB}`, n: `${SWAP_FEE.bps / 100}% · on top` }] : []),
+    ...(buy && fee ? [{ k: 'Total', v: `≈ ${fx(qt.usd + fee.amt)} ${nQ}` }] : [])];
   confirmSheet(`Market ${T.side} ${fx(q)} ${nB}`, `${netPre()}fills now or not at all`, items, `Send market ${T.side}`, () => personalTx(kp, tradeAddr, ops, 'Sent', 'trade', null, `${buy ? 'Bought' : 'Sold'} ${fx(buy ? q : sq, 2)} ${nB} at market${fee ? ` · fee ${m2(fee.amt)} ${buy ? nQ : nB}` : ''}`), false, buy ? 'b-grn' : 'b-pur', 'Sending…', true);
 }
 // a trade that went through: stay on Trade, say what happened in a message, refresh balances and orders (no extra screen to tap away)
@@ -19140,6 +19145,7 @@ $('#setPushOn').addEventListener('change', async (e) => {
   catch (er) { toast(er.message || String(er), 9000); }
   e.target.disabled = false; pushPaint();
 });
+$('#setPushW').addEventListener('change', async (e) => { const a = e.target.dataset.pushw; if (!a) return; S.push.watch = { ...(S.push.watch || {}), [a]: e.target.checked }; saveS(); await pushWatchSync(); pushPaint(); });
 $('#setPushDet').addEventListener('change', async (e) => { try { await pushDetail(e.target.checked); } catch (er) { toast(er.message || String(er)); } pushPaint(); });
 $('#setStatsOn').addEventListener('change', (e) => { S.noStats = !e.target.checked; saveS(); toast(S.noStats ? 'Usage count off. Nothing is sent.' : 'Usage count on. Thank you.'); });
 $('#setBio').addEventListener('change', async (e) => {
@@ -19169,7 +19175,7 @@ let PUSHSYNC = 0;
 async function pushResync() {   /* alerts on but the server lost the address (or the browser changed it): send it again, quietly */
   if (!S.push || !S.push.on || !pushCan() || Date.now() - PUSHSYNC < 60000) return; PUSHSYNC = Date.now();
   try { if (Notification.permission !== 'granted') return; const { key } = await stopApi('/push/key', {}), sub = await pushSubscription(key);
-    await stopApi('/push/sub', { pid: S.push.pid, sec: S.push.sec, sub: sub.toJSON(), detail: !!S.push.detail }); } catch (e) {}
+    await stopApi('/push/sub', { pid: S.push.pid, sec: S.push.sec, sub: sub.toJSON(), detail: !!S.push.detail }); await pushWatchSync(); } catch (e) {}
 }
 const pushRef = () => (S && S.push && S.push.on && S.push.pid ? { pid: S.push.pid, sec: S.push.sec } : null);
 function pushKeyBytes(s) { const b = atob(String(s).replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (String(s).length % 4)) % 4)); return Uint8Array.from(b, (c) => c.charCodeAt(0)); }
@@ -19202,7 +19208,7 @@ async function pushOn() {
     const { key } = await stopApi('/push/key', {}); sub = await pushSubscription(key);
   }
   await pushIds(); await stopApi('/push/sub', { pid: S.push.pid, sec: S.push.sec, sub: sub.toJSON(), detail: !!S.push.detail });
-  S.push.on = true; S.push.asked = true; saveS(); XST_AT = 0;
+  S.push.on = true; S.push.asked = true; saveS(); XST_AT = 0; await pushWatchSync();
   for (const o of OWN()) stopList(o.addr).catch(() => {});   /* stops already waiting get this phone's alert id now */
 }
 async function pushOff() {
@@ -19216,18 +19222,32 @@ async function pushDetail(on) {
   S.push.detail = !!on; saveS();
   toast(on ? 'Alerts will say what filled (visible on your lock screen).' : 'Alerts will only say a stop changed.');
 }
+function pushWallets() {   /* own wallets that can get fill alerts: [{c, a, n, on}] — personal on, bot (trading) wallets off unless chosen */
+  const C = (S.push && S.push.watch) || {}, d = (a, def) => (a in C ? !!C[a] : def);
+  return [...OWN().map((o) => ({ c: 'xlm', a: o.addr, n: o.name, on: d(o.addr, o.type !== 'trading') })), ...xrList().filter((w) => w.own).map((w) => ({ c: 'xrp', a: w.addr, n: w.name, on: d(w.addr, true) }))];
+}
+async function pushWatchSync() {   /* tell the stop server which wallets to watch for fills (needs stop server 2.1) */
+  if (!S.push || !S.push.on || !S.stopUrl) return false;
+  const W = pushWallets().filter((w) => w.on).slice(0, 12).map((w) => ({ c: w.c, net: S.net, a: w.a, n: w.n.slice(0, 24) }));
+  try { await stopApi('/push/watch', { pid: S.push.pid, sec: S.push.sec, wallets: W }); S.push.fillsOk = true; } catch (e) { S.push.fillsOk = !/not found|404/.test(e.message || '') ? S.push.fillsOk : false; }
+  saveS(); return S.push.fillsOk;
+}
 function pushPaint() {
   const P = S.push || {}; if (!$('#setPushOn')) return;
   $('#setPushOn').checked = !!P.on; $('#setPushDet').checked = !!P.detail; $('#setPushDetW').style.display = P.on ? '' : 'none'; $('#setPushTest').style.display = P.on ? '' : 'none';
-  $('#setPushSt').textContent = P.on ? (P.detail ? 'On. Alerts show the stop and amount (anyone holding your phone can read them).' : 'On. Alerts only say "A stop order changed": open Liquidfi to see it.')
+  $('#setPushSt').textContent = P.on ? (P.detail ? 'On. Alerts show the order and amount (anyone holding your phone can read them).' : 'On. Alerts only say an order changed: open Liquidfi to see it.')
     : !pushCan() && pushIOSHome() ? 'On iPhone: add Liquidfi to your Home Screen (Share → Add to Home Screen) and open it from there to use alerts.'
-    : 'Off. No pop-ups. Turn on to hear right away when a stop fills, fails or ends, even with Liquidfi closed.';
+    : 'Off. No pop-ups. Turn on to hear right away when a stop or order fills, even with Liquidfi closed.';
+  const standalone = navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  $('#setPushTip').style.display = P.on && !standalone && !pushIsIOS() ? '' : 'none';
+  $('#setPushFills').style.display = P.on ? 'flex' : 'none';
+  $('#setPushW').innerHTML = P.on ? (P.fillsOk === false ? '<span class="amb" style="font-size:12px">Your stop server needs version 2.1 for fill alerts.</span>' : pushWallets().map((w) => `<label style="flex-direction:row;align-items:center;justify-content:space-between;gap:10px;font-size:14px;padding:6px 0"><span>${esc(w.n)} <span class="mu" style="font-size:11.5px">· ${w.c === 'xrp' ? 'XRP' : 'Stellar'}</span></span><input type="checkbox" data-pushw="${esc(w.a)}" ${w.on ? 'checked' : ''} style="width:22px;height:22px"></label>`).join('')) : '';
 }
 function pushOffer() {   /* once, after the first stop is placed: offer alerts (never asks again after a yes or no) */
   if (!S.stopUrl || (S.push && (S.push.on || S.push.asked)) || !(pushCan() || pushIOSHome())) return;
   pushPrep();
   setTimeout(() => { if ($('#sheet').classList.contains('on')) return; pending = null;
-    sheet(`<h2>Get an alert when this stop fills?</h2><div class="mu" style="font-size:14px">A notification on this phone when a stop fills, fails or ends, even with Liquidfi closed. It only says "A stop order changed" unless you choose to show amounts. You can turn it off any time in Settings.</div>
+    sheet(`<h2>Get an alert when this stop fills?</h2><div class="mu" style="font-size:14px">A notification on this phone when a stop or order fills, even with Liquidfi closed. It only says an order changed unless you choose to show amounts. You can turn it off any time in Settings.</div>
       <button class="b-light big" data-act="pushYes">Turn on alerts</button><button class="b-out" data-act="pushNo">Not now</button>`); }, 1500);
 }
 /* ---------- anonymous usage count (GoatCounter) ----------
