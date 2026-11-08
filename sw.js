@@ -5,7 +5,7 @@ self.addEventListener('push', (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (x) {}
   const title = String(d.t || 'Liquidfi').slice(0, 80), body = String(d.b || 'A stop order changed. Open Liquidfi to see it.').slice(0, 240);
-  e.waitUntil(self.registration.showNotification(title, { body, tag: String(d.tag || 'liquidfi'), renotify: true, icon: 'icon-192.png', badge: 'icon-192.png' }));
+  e.waitUntil(self.registration.showNotification(title, { body, tag: String(d.tag || 'liquidfi'), renotify: true, icon: 'icon-192.png', badge: 'badge-96.png' }));
 });
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
