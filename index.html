@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
 <title>Liquidfi</title>
 <style>html,body{overscroll-behavior-y:contain}#bActs button{padding:0 2px;font-size:13.5px;min-width:0}@keyframes tpl{from{opacity:1}to{opacity:.35}}.tpl{animation:tpl .7s ease-in-out infinite alternate}
 :root{--buy:#60A5FA;--sell:#F472B6;--bg:#0B0E13;--s1:#151A22;--s2:#1D2430;--bd:#2A3240;--bd2:#4A5566;--tx:#E9EDF2;--mu:#9AA4B2;--red:#C9302C;--red2:#9E2420;--redt:#FF8A80;--grn:#3FB87F;--grnf:#1F6B47;--amb:#F0A030;--blu:#6EA8FF}
@@ -430,7 +431,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- TRADE -->
 <section class="scr" id="s-trade">
-  <div class="top" style="min-height:40px"><div class="l" style="gap:6px"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><button class="b-out sm" id="tPair" data-act="tPairPick" style="font-weight:700;font-size:15px;padding:6px 12px">XLM/USDC ▾</button></div><span class="mu" style="font-size:12px" id="tFrom"></span></div>
+  <div class="top" style="min-height:40px"><div class="l" style="gap:6px"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><button class="b-out sm" id="tPair" data-act="tPairPick" style="font-weight:700;font-size:15px;padding:6px 12px">XLM/USDC ▾</button></div><button class="b-out sm" id="tFrom" data-act="tWalPick" style="font-size:13px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
   <div class="card" style="padding:10px 14px"><div class="book" id="tBook"></div></div>
   <div class="card" style="padding:10px 14px;gap:6px"><div class="top"><span class="lbl" style="font-size:11px">Last sales</span><span class="grn" style="font-size:11px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
   <div class="trow"><div class="seg tsm" id="tSide"><button class="on" data-v="buy" id="tSideB">Buy</button><button data-v="sell" id="tSideS">Sell</button></div>
@@ -587,6 +588,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
   <div class="card" id="setSand"><span class="lbl">Testnet practice</span><div class="mu" style="font-size:13px">Makes fake test bots on Testnet (a trader holding XLM and USDC with open orders, a market maker with quotes) with this phone as signer, plus a test USDC market, so you can practise Cancel All and Cancel + Close Positions. Testnet coins are free and worthless.</div><button class="b-out" data-act="sandbox">Create practice bots</button></div>
   <div class="card"><span class="lbl">Backup</span><div id="setBk" style="font-size:13px"></div><button class="b-out sm" data-act="bkOpen">Back up keys</button></div>
+  <div class="card" id="setPush"><span class="lbl">Stop alerts</span><div class="top"><span>Notifications when a stop fills, fails or ends</span><input type="checkbox" id="setPushOn" style="width:28px;min-height:28px"></div>
+    <div class="top" id="setPushDetW"><span>Show amounts in alerts</span><input type="checkbox" id="setPushDet" style="width:28px;min-height:28px"></div>
+    <div class="mu" id="setPushSt" style="font-size:12px"></div><button class="b-out sm" data-act="pushTest" id="setPushTest" style="display:none">Send a test alert</button></div>
+  <div class="card" id="setStats"><div class="top"><span>Share anonymous usage count</span><input type="checkbox" id="setStatsOn" style="width:28px;min-height:28px"></div><div class="mu" style="font-size:12px">When the app opens it sends a count with your country / state, nothing else: no address, balance or key. Helps us see where Liquidfi is used.</div></div>
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
@@ -14882,6 +14887,7 @@ async function xstArm(o, C, a) {
       order: { blob: ord.tx_blob, hash: ord.hash, ticket: tickets[0] }, ...(fee ? { fee: { blob: fee.tx_blob, hash: fee.hash, ticket: tickets[1], lls: lls + 5000 } } : {}) };
     let j; for (let i = 0; ; i++) { try { j = await stopApi('/xrp/arm', armBody); break; } catch (e) { if (i >= 3 || !/not on the ledger yet|reach the XRP Ledger/.test(e.message || '')) throw e; await sleep(4000); } }   /* a server a ledger behind may not see the new tickets yet */
     xstAll().push({ id: j.id, token: j.token, addr: me, net: S.net, side: a.side, q: a.q, stop: a.st, lim: a.lim, kind: a.kind, tok: C.tok, k: C.k, tickets, fee: a.lf, st: 'armed', at: Date.now(), until, lls }); saveS();
+    pushOffer();
     tPendSet(p, '✓ Stop armed', 'grn', `${a.side === 'sell' ? 'sells' : 'buys'} if XRP-USD ${a.side === 'sell' ? 'falls' : 'rises'} to ${a.st.toFixed(4)} · ends ${xstEnds(until)} · ${m2(a.nT * (XRSV || { inc: 0.2 }).inc)} XRP set aside`, true);
   } catch (e) {
     tPendSet(p, 'Not placed', 'red', (e && e.message ? e.message : String(e)) + (tickets.length ? ' Releasing the tickets…' : ''), true);
@@ -16676,6 +16682,7 @@ async function doSetup() {
   S.vault = await seal(p1, { em: em.secret(), pe: null, ph, phN: ph ? 1 : 0, x: x.map((o) => ({ name: o.name, type: o.type, hd: o.hd, sec: o.kp.secret() })) });
   if (!saveS()) return;
   if (ph) S.phOk = Date.now();   /* restored from typed words: no check needed */
+  usagePing('/wallet-made', true);
   K = { em, pe: null, x, ph, phN: ph ? 1 : 0 }; PIN = p1; S.pinLen = p1.length; saveS(); $('#su1').value = $('#su2').value = $('#suImp').value = ''; bumpIdle(); startMarket();
   go('bots');
 }
@@ -17742,7 +17749,7 @@ const T = { mode: 'mkt', side: 'buy' };   // Market is the default
 let tradeAddr = null;
 async function drawTrade() {
   tradeAddr = homeAddr || firstWallet();
-  $('#tFrom').textContent = (allAccts().find((x) => x.addr === tradeAddr) || {}).name || '';
+  $('#tFrom').textContent = ((allAccts().find((x) => x.addr === tradeAddr) || {}).name || 'Wallet') + ' ▾';
   { const p = TP(), nB = kName(p.b), nQ = kName(p.q); $('#tPair').textContent = `${nB}/${nQ} ▾`; $('#tSideB').textContent = 'Buy'; $('#tSideS').textContent = 'Sell'; $('#tAmtL').textContent = `Amount (${nB})`; $('#tPxL').textContent = `Limit price (${nQ} per ${nB})`;
     if (!stopPairOK() && T.mode === 'stop') T.mode = 'mkt';
     const sb = $('#tMode [data-v=stop]'); if (sb) sb.style.display = stopPairOK() ? '' : 'none';   /* no Stop button on pairs it can't run on (e.g. against XLM) */ feedOpts(); $('#tStopOff').style.display = 'none'; tStream(); tBalPaint(ACC[tradeAddr]); }
@@ -18002,9 +18009,13 @@ const hexOk = (h, n) => typeof h === 'string' && new RegExp(`^[0-9a-f]{${n}}$`).
 const stopSig = (kp, msg) => b64(kp.sign(new TextEncoder().encode(msg)));
 async function stopApi(path, body) {
   if (!S.stopUrl) throw new Error('Set your stop server in Settings → Stop orders.');
-  let r; try { r = await fetch(S.stopUrl.replace(/\/+$/, '') + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); }
-  catch (e) { throw new Error("Can't reach your stop server."); }
-  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Stop server error ' + r.status); return j;
+  if (body && /^\/(arm|arm_own|list|xrp\/arm|xrp\/status)$/.test(path) && !('push' in body)) body = { ...body, push: pushRef() };   /* which alert id this phone's stops use (null = alerts off) */
+  let r; for (let i = 0; ; i++) {   /* a read (GET) is tried 3 times: the first request after the phone or the tunnel was idle sometimes drops */
+    try { r = await fetch(S.stopUrl.replace(/\/+$/, '') + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' }); break; }
+    catch (e) { if (body || i >= 2) throw new Error("Can't reach your stop server. Check your connection and try again."); await sleep(1500); } }
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Stop server error ' + r.status);
+  if (j && j.push_ok === false && body && body.push) pushResync();   /* the server lost this phone's alert address: send it again */
+  return j;
 }
 /* ---------- stop helpers the wallet owns (stop server v1.5+) ----------
    Each waiting stop has its own small helper account, made and funded (1.01 XLM) by the wallet, its key derived from the
@@ -18167,6 +18178,7 @@ async function stopReview(q, a, kp) {
         catch (e) { oldNote = ` · old stop NOT cancelled (${niceErr(e)}): cancel it in Open orders`; }
       }
       stopList(w).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {});
+      pushOffer();
       tPendSet(pnd, RP ? (oldNote.includes('NOT') ? '✓ New stop armed' : '✓ Stop replaced') : '✓ Stop armed', oldNote.includes('NOT') ? 'amb' : 'grn', `${feed === 'trades3' ? `waits for 3 trades of 1+ ${nB} at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)}`} · 1.01 XLM in its helper until it ends${oldNote}`, true);
     } catch (e) {
       let why = niceErr(e);
@@ -18691,6 +18703,8 @@ function drawSet() {
   drawHz(); drawStopSet();
   $('#setBk').innerHTML = !S.bk ? '<span class="amb">Not backed up yet.</span>' : bkOk() ? `<span class="grn">Backed up ${new Date(S.bk).toLocaleDateString()}</span>` : '<span class="amb">Accounts added since your last backup. Save a new file.</span>';
   $('#setEm').textContent = K.em.publicKey();
+  if ($('#setStatsOn')) $('#setStatsOn').checked = !S.noStats;
+  pushPaint(); pushPrep();
   $('#setBio').checked = !!S.bio; $('#setPinLen').textContent = S.pinLen || (PIN ? PIN.length : 6);
   bioCan().then((ok) => { $('#setBio').disabled = !ok && !S.bio; $('#setBioSt').textContent = S.bio ? 'On. Unlock with your fingerprint or face. The PIN always works too.' : ok ? 'Unlock with your fingerprint or face instead of typing the PIN.' : 'Not available in this browser. The PIN still works.'; });
   $('#setBNet').textContent = S.net === 'public' ? '' : ' · ' + NET().name; $('#setSand').style.display = S.net === 'testnet' ? '' : 'none';
@@ -18877,10 +18891,16 @@ document.addEventListener('click', async (e) => {
     xrEarnAdd: () => xrEarnAddSheet(t.dataset.xp), xrEarnAddGo: () => xrEarnAddGo(), xrEarnOut: () => xrEarnOutSheet(t.dataset.xp), xrEarnOutGo: () => xrEarnOutGo(t.dataset.xp, +t.dataset.epct), xrTokAdd: () => xrTokAdd(t.dataset.xp),
     accTrade: () => {
       const L = OWN(); if (!L.length) return toast('Add a wallet first.');
-      if (L.length === 1) { homeAddr = L[0].addr; return go('trade'); }
-      pending = null; sheet(`<h2>Trade from</h2>${L.map((x) => { const a = ACC[x.addr]; return `<button class="b-out" data-act="accTradeGo" data-addr="${x.addr}" style="text-align:left;display:flex;justify-content:space-between"><span>${esc(x.name)}</span><span class="mu mono" style="font-size:13px">${a ? '$' + fx(usdVal(a)) : a === null ? 'not funded' : ''}</span></button>`; }).join('')}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+      const last = L.find((x) => x.addr === S.tradeLast) || L.find((x) => x.addr === homeAddr) || L[0];
+      homeAddr = last.addr; return go('trade');   /* change the wallet with the button at the top right of Trade */
     },
     accTradeGo: () => { homeAddr = t.dataset.addr; closeSheet(); go('trade'); },
+    tWalPick: () => {   /* compact wallet list: name, value, a check on the one in use */
+      const L = OWN(); if (L.length < 2) return toast(L.length ? 'This is your only wallet.' : 'Add a wallet first.');
+      pending = null; sheet(`<h2>Trade from</h2><div class="card" style="padding:0 14px;gap:0">${L.map((x) => { const a = ACC[x.addr], on = x.addr === tradeAddr;
+        return `<button data-act="tWalGo" data-addr="${x.addr}" style="all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--bd)"><span style="font-weight:${on ? 700 : 500}">${on ? '✓ ' : ''}${esc(x.name)}</span><span class="mu mono" style="font-size:13px">${a ? '$' + fx(usdVal(a)) : a === null ? 'not funded' : ''}</span></button>`; }).join('')}</div><button class="b-out" data-act="closeSheet">Close</button>`);
+    },
+    tWalGo: () => { homeAddr = t.dataset.addr; S.tradeLast = homeAddr; saveS(); closeSheet(); drawTrade(); },
     fundOpen: phGate(() => fundSheet()), fundReview: () => fundReview(),
     pinChange: () => pinChangeSheet(), pinChangeOk: () => pinChangeOk(),
     pinChkBio: async () => { try { const p = await bioPin(); if (p !== PIN) throw 0; pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); } catch (e) { toast('Use your PIN.'); } },
@@ -18931,6 +18951,9 @@ document.addEventListener('click', async (e) => {
     xrMax: () => { const d = XRA[xrSel]; $('#xsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
     xrNewDone: () => { const a = t.dataset.addr, fresh = XRFRESH; XRFRESH = false; const done = () => { closeSheet(); xrSel = a; go('xrp'); };
       if (fresh || phNeedCheck()) return phQuiz(done, 'new'); done(); },
+    pushYes: async () => { closeSheet(); try { await pushOn(); toast('✓ Stop alerts on. Turn them off any time in Settings.', 6000); } catch (er) { S.push = { ...(S.push || {}), asked: true }; saveS(); toast(er.message || String(er), 9000); } },
+    pushNo: () => { S.push = { ...(S.push || {}), asked: true }; saveS(); closeSheet(); toast('No alerts. You can turn them on in Settings → Stop alerts.'); },
+    pushTest: async () => { try { await stopApi('/push/test', { pid: S.push.pid, sec: S.push.sec }); toast('Test alert sent. It should pop up in a few seconds.'); } catch (er) { toast(er.message || String(er)); } },
     phqPick: () => phqPick(t.dataset.w), phqShow: () => phqShow(), phqLater: () => phqLater(), phqAgain: () => { if (PHQ) { PHQ.step = 0; phQuizPaint(''); } },
     xrRmWatch: () => { const w = (NS().xrw || []).find((x) => x.addr === xrSel); if (!w) return; pending = null; sheet(`<h2>Stop watching ${esc(w.name)}?</h2><div class="addr">${esc(w.addr)}</div><button class="b-red big" data-act="xrRmWatchOk">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     xrRmWatchOk: () => { const N = NS(); N.xrw = (N.xrw || []).filter((x) => x.addr !== xrSel); saveS(); closeSheet(); go('bots'); toast('Removed.'); },
@@ -19051,6 +19074,14 @@ $('#wWal').addEventListener('change', () => { homeAddr = $('#wWal').value; $('#w
 $('#xsAmt').addEventListener('input', xsQuote);
 $('#xsFrom').addEventListener('change', () => { ++XSW.rseq; XSW.from = $('#xsFrom').value; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); });   // To stays what you picked (drawXSwap only changes it if it no longer fits)
 $('#xsTo').addEventListener('change', () => { ++XSW.rseq; XSW.to = $('#xsTo').value; xsQuote(); });
+$('#setPushOn').addEventListener('change', async (e) => {
+  const on = e.target.checked; e.target.disabled = true;
+  try { if (on) { await pushOn(); toast('✓ Stop alerts on. Use "Send a test alert" to check.', 6000); } else { await pushOff(); toast('Stop alerts off. No pop-ups.'); } }
+  catch (er) { toast(er.message || String(er), 9000); }
+  e.target.disabled = false; pushPaint();
+});
+$('#setPushDet').addEventListener('change', async (e) => { try { await pushDetail(e.target.checked); } catch (er) { toast(er.message || String(er)); } pushPaint(); });
+$('#setStatsOn').addEventListener('change', (e) => { S.noStats = !e.target.checked; saveS(); toast(S.noStats ? 'Usage count off. Nothing is sent.' : 'Usage count on. Thank you.'); });
 $('#setBio').addEventListener('change', async (e) => {
   if (e.target.checked) { e.target.checked = false; await bioOn(); }
   else bioOff("Fingerprint / Face ID unlock is off. You can also delete the 'Liquidfi unlock' passkey in your phone's password settings.");
@@ -19061,9 +19092,106 @@ const bigAddr = (a, label) => `<div class="card" style="gap:10px"><span class="m
 async function copy(t) { try { await navigator.clipboard.writeText(t); toast('Copied.'); } catch (e) { toast(t, 8000); } }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && K && cur === 'bots') drawBots(true); });
 
+/* ---------- stop alerts (stop server v2.0): notifications through this phone's browser ----------
+   Off until the user turns them on (Settings → Stop alerts, or the offer after placing a stop). The browser gives us a push
+   address; the phone hands it to its own stop server with a random alert id (pid) whose secret only this phone knows, and
+   every stop request carries that id so the server knows where to send. The server encrypts each alert for this browser only.
+   Default wording is private ("A stop order changed"); "Show amounts in alerts" adds what filled. No keys, addresses or names. */
+const pushCan = () => { try { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; } catch (e) { return false; } };
+const pushIsIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);   /* iPadOS says "Mac" */
+const pushIOSHome = () => pushIsIOS() && !(navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches));
+let PUSHPRE = null;   /* {reg, key} got ready before the tap: iPhone only shows the permission prompt straight from a tap */
+async function pushPrep() {
+  try { if (PUSHPRE || !pushCan() || !S.stopUrl) return; const h = await stopApi('/health'); if (!h || !h.push) return;
+    const [{ key }, reg] = await Promise.all([stopApi('/push/key', {}), navigator.serviceWorker.register('sw.js')]); PUSHPRE = { key, reg }; } catch (e) {}
+}
+let PUSHSYNC = 0;
+async function pushResync() {   /* alerts on but the server lost the address (or the browser changed it): send it again, quietly */
+  if (!S.push || !S.push.on || !pushCan() || Date.now() - PUSHSYNC < 60000) return; PUSHSYNC = Date.now();
+  try { if (Notification.permission !== 'granted') return; const { key } = await stopApi('/push/key', {}), sub = await pushSubscription(key);
+    await stopApi('/push/sub', { pid: S.push.pid, sec: S.push.sec, sub: sub.toJSON(), detail: !!S.push.detail }); } catch (e) {}
+}
+const pushRef = () => (S && S.push && S.push.on && S.push.pid ? { pid: S.push.pid, sec: S.push.sec } : null);
+function pushKeyBytes(s) { const b = atob(String(s).replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (String(s).length % 4)) % 4)); return Uint8Array.from(b, (c) => c.charCodeAt(0)); }
+async function pushIds() {
+  S.push = S.push || {};
+  if (!S.push.sec || !S.push.pid) { const r = crypto.getRandomValues(new Uint8Array(32)), sec = [...r].map((x) => x.toString(16).padStart(2, '0')).join('');
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(sec))); S.push.sec = sec; S.push.pid = [...h].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 32); saveS(); }
+}
+async function pushSubscription(key) {
+  const reg = await navigator.serviceWorker.register('sw.js'); await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription(), want = pushKeyBytes(key);
+  if (sub && sub.options && sub.options.applicationServerKey) { const have = new Uint8Array(sub.options.applicationServerKey); if (have.length !== want.length || have.some((v, i) => v !== want[i])) { await sub.unsubscribe(); sub = null; } }
+  return sub || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: want });
+}
+async function pushOn() {
+  if (!S.stopUrl) throw new Error('Alerts come from your stop server: set it first in Settings → Stop orders.');
+  if (!pushCan()) throw new Error(pushIOSHome() ? 'On iPhone, add Liquidfi to your Home Screen first (Share → Add to Home Screen), open it from there, then turn alerts on.' : "This browser can't show alerts. Try Chrome.");
+  const blocked = new Error('Notifications are blocked for this site. Allow them in your browser\'s site settings, then try again.');
+  let sub = null;
+  if (PUSHPRE) {   /* ready before the tap: subscribing right away shows the permission prompt (iPhone needs it straight from the tap) */
+    const want = pushKeyBytes(PUSHPRE.key);
+    try { sub = await PUSHPRE.reg.pushManager.getSubscription(); if (sub) { const have = sub.options && sub.options.applicationServerKey ? new Uint8Array(sub.options.applicationServerKey) : null; if (!have || have.length !== want.length || have.some((v, i) => v !== want[i])) { await sub.unsubscribe(); sub = null; } }
+      if (!sub) sub = await PUSHPRE.reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: want }); }
+    catch (e) { if (/NotAllowed|denied|permission/i.test((e && (e.name + ' ' + e.message)) || '')) throw blocked; sub = null; }
+    if (sub) { const h = await stopApi('/health').catch(() => null); if (!h || !h.push) { PUSHPRE = null; try { await sub.unsubscribe(); } catch (e) {} throw new Error('Your stop server needs the update for alerts (version 2.0). Install it on the watcher box first.'); } }
+  }
+  if (!sub) {
+    const perm = await Notification.requestPermission(); if (perm !== 'granted') throw blocked;
+    const h = await stopApi('/health'); if (!h || !h.push) throw new Error('Your stop server needs the update for alerts (version 2.0). Install it on the watcher box first.');
+    const { key } = await stopApi('/push/key', {}); sub = await pushSubscription(key);
+  }
+  await pushIds(); await stopApi('/push/sub', { pid: S.push.pid, sec: S.push.sec, sub: sub.toJSON(), detail: !!S.push.detail });
+  S.push.on = true; S.push.asked = true; saveS(); XST_AT = 0;
+  for (const o of OWN()) stopList(o.addr).catch(() => {});   /* stops already waiting get this phone's alert id now */
+}
+async function pushOff() {
+  const P = S.push || {}; S.push = { ...P, on: false, asked: true }; saveS();
+  if (P.pid && S.stopUrl) { try { await stopApi('/push/sub', { pid: P.pid, sec: P.sec, sub: null }); } catch (e) {} }
+  try { const reg = await navigator.serviceWorker.getRegistration(); const sub = reg && await reg.pushManager.getSubscription(); if (sub) await sub.unsubscribe(); } catch (e) {}
+}
+async function pushDetail(on) {
+  S.push = S.push || {};
+  if (S.push.on) { const { key } = await stopApi('/push/key', {}), sub = await pushSubscription(key); await stopApi('/push/sub', { pid: S.push.pid, sec: S.push.sec, sub: sub.toJSON(), detail: !!on }); }
+  S.push.detail = !!on; saveS();
+  toast(on ? 'Alerts will say what filled (visible on your lock screen).' : 'Alerts will only say a stop changed.');
+}
+function pushPaint() {
+  const P = S.push || {}; if (!$('#setPushOn')) return;
+  $('#setPushOn').checked = !!P.on; $('#setPushDet').checked = !!P.detail; $('#setPushDetW').style.display = P.on ? '' : 'none'; $('#setPushTest').style.display = P.on ? '' : 'none';
+  $('#setPushSt').textContent = P.on ? (P.detail ? 'On. Alerts show the stop and amount (anyone holding your phone can read them).' : 'On. Alerts only say "A stop order changed": open Liquidfi to see it.')
+    : !pushCan() && pushIOSHome() ? 'On iPhone: add Liquidfi to your Home Screen (Share → Add to Home Screen) and open it from there to use alerts.'
+    : 'Off. No pop-ups. Turn on to hear right away when a stop fills, fails or ends, even with Liquidfi closed.';
+}
+function pushOffer() {   /* once, after the first stop is placed: offer alerts (never asks again after a yes or no) */
+  if (!S.stopUrl || (S.push && (S.push.on || S.push.asked)) || !(pushCan() || pushIOSHome())) return;
+  pushPrep();
+  setTimeout(() => { if ($('#sheet').classList.contains('on')) return; pending = null;
+    sheet(`<h2>Get an alert when this stop fills?</h2><div class="mu" style="font-size:14px">A notification on this phone when a stop fills, fails or ends, even with Liquidfi closed. It only says "A stop order changed" unless you choose to show amounts. You can turn it off any time in Settings.</div>
+      <button class="b-light big" data-act="pushYes">Turn on alerts</button><button class="b-out" data-act="pushNo">Not now</button>`); }, 1500);
+}
+/* ---------- anonymous usage count (GoatCounter) ----------
+   One tiny ping when the app opens (at most every 30 min), so we can see how many people use Liquidfi and from which
+   country / state. It sends only a page name ("/new" on a phone's first open, "/open" after, "/wallet-made" when setup
+   finishes) and the screen width: no wallet address, balance, key or memo, no cookie, and no script from them (it is an image
+   request). GoatCounter turns the connection into a country / region and doesn't keep the IP. Off on dev copies and when
+   "Share anonymous usage count" is off in Settings. GC_CODE empty = off. */
+const GC_CODE = 'liquidfi';
+function usagePing(page, force) {
+  try {
+    if (!GC_CODE || DEV || !S || S.noStats) return false;
+    const now = Date.now();
+    if (!force && S.pingAt && now - S.pingAt < 1800000) return false;
+    S.pingAt = now; saveS();
+    const u = `https://${GC_CODE}.goatcounter.com/count?p=${encodeURIComponent(page)}&t=${encodeURIComponent('Liquidfi')}&s=${encodeURIComponent(String((screen && screen.width) || ''))}&rnd=${Math.random().toString(36).slice(2)}`;
+    const im = new Image(); im.referrerPolicy = 'no-referrer'; im.src = u; window.__lastPing = u;
+    return true;
+  } catch (e) { return false; }
+}
+function usageOpen() { const first = !S.seenAt; if (first) { S.seenAt = Date.now(); saveS(); } usagePing(first ? '/new' : '/open', first); }
 /* ---------- boot ---------- */
 function applyCol() { document.body.classList.toggle('gr', S.col === 'gr'); }
-loadS(); applyCol();
+loadS(); applyCol(); setTimeout(usageOpen, 1500); setTimeout(() => { if (S.push && S.push.on && S.stopUrl) pushResync(); }, 6000);
 if (!SDK) document.body.innerHTML = '<p style="padding:20px">Stellar library failed to load.</p>';
 else go(S.vault ? 'lock' : 'setup');
 </script>
