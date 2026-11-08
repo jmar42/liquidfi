@@ -14070,7 +14070,7 @@ function xrDetail(x, me) {
     if (t.Account !== me) L.push(row('Sent by', ad(t.Account)));
   }
   const res = m.TransactionResult || 'tesSUCCESS'; if (res !== 'tesSUCCESS') L.push(row('Result', `<span class="red">failed (${esc(res)})</span>`));
-  L.push(row('Network fee', t.Account === me && t.Fee ? `${(+t.Fee / 1e6).toFixed(6)} XRP` : 'paid by the sender'));
+  L.push(row('Network fee', t.Account === me && t.Fee ? `${(+t.Fee / 1e6).toFixed(6)} XRP` : xsOutTx(x.hash || t.hash) ? 'paid by the swap bridge, not by you' : 'paid by the sender, not by you'));
   if (x.iso) L.push(row('Time', esc(new Date(x.iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))));
   return `<div class="recd">${L.join('')}<div><span></span><a href="${XRP_EXPL[S.net]}/transactions/${esc(x.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a></div></div>`;
 }
@@ -15089,7 +15089,7 @@ async function xrAdd(how, name) {
   }
   if (xrList().some((x) => x.addr === w.classicAddress && x.own)) return toast('That wallet is already here.');
   const ph0 = K.ph, phN0 = K.phN, xrN0 = K.xrN;
-  if (adoptPh) { K.ph = adoptPh; K.phN = K.phN || 0; }
+  if (adoptPh) { K.ph = adoptPh; K.phN = K.phN || 0; S.phOk = S.phOk || Date.now(); }   /* they typed the words in: they have them */
   K.xr = K.xr || []; K.xr.push({ name, w, hd, seed });
   if (how === 'new') K.xrN = hd + 1; else if (hd != null) K.xrN = Math.max(K.xrN || 0, hd + 1);
   const N = NS(); if (N.xrw) N.xrw = N.xrw.filter((x) => x.addr !== w.classicAddress);
@@ -15097,7 +15097,7 @@ async function xrAdd(how, name) {
   if (!(await resealVault())) { K.xr.pop(); K.ph = ph0; K.phN = phN0; K.xrN = xrN0; return; }   // undo everything this add changed
   pinOkAt = Date.now(); drawBots(true);
   if (how !== 'new') { closeSheet(); return toast(name + ' added.'); }
-  pending = null;
+  pending = null; XRFRESH = !!freshPh;
   sheet(`<h2>${esc(name)} is ready</h2>${bigAddr(w.classicAddress, 'XRP Ledger address (safe to share)')}
     ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this XRP wallet and your Stellar wallets, here or in any wallet app that takes a 24-word XRP phrase (Ledger, Trust Wallet).</div>${phraseRow(true)}` : `<div class="note">It comes from your recovery phrase (XRP #${hd + 1}), so the words you saved already back it up.</div>`}
     <div class="mu" style="font-size:12px">${S.net === 'public' ? `Next it needs at least ${m2((XRSV || { base: 1 }).base)} XRP to open on the XRP Ledger. Send XRP to the address above.` : 'Next, tap "Get free test XRP" on its page.'}</div>
@@ -16675,6 +16675,7 @@ async function doSetup() {
   const x = imp ? [{ name: 'Personal', type: 'personal', kp: imp, hd: ph ? 0 : undefined }] : [];
   S.vault = await seal(p1, { em: em.secret(), pe: null, ph, phN: ph ? 1 : 0, x: x.map((o) => ({ name: o.name, type: o.type, hd: o.hd, sec: o.kp.secret() })) });
   if (!saveS()) return;
+  if (ph) S.phOk = Date.now();   /* restored from typed words: no check needed */
   K = { em, pe: null, x, ph, phN: ph ? 1 : 0 }; PIN = p1; S.pinLen = p1.length; saveS(); $('#su1').value = $('#su2').value = $('#suImp').value = ''; bumpIdle(); startMarket();
   go('bots');
 }
@@ -16718,7 +16719,51 @@ function drawBkKeys() {
 }
 let clipT = 0;
 function clearClip() { clearTimeout(clipT); clipT = 0; try { navigator.clipboard.writeText(' '); } catch (e) {} }
-let NWFRESH = false;
+let NWFRESH = false, XRFRESH = false;
+/* ---------- "did you save it?" check: after a new recovery phrase, and before money goes in, tap word #4 and word #19 ----------
+   Skipped once passed (S.phOk) or when an encrypted backup file was saved (S.bk). Only matters when a wallet comes from the phrase. */
+const PHQ_POS = [4, 19];
+const phNeedCheck = () => !!(K && K.ph && !S.phOk && !S.bk && [...(K.x || []), ...(K.xr || [])].some((o) => o.hd != null));
+let PHQ = null;
+function phRand(n) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+function phShuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = phRand(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function phQuiz(then, why) {
+  if (!K || !K.ph) return then && then();
+  const n = K.ph.split(' ').length; PHQ = { then, why, step: 0, bad: 0, pos: PHQ_POS.filter((p) => p <= n) };
+  phQuizPaint('');
+}
+function phQuizPaint(msg) {
+  const W = K.ph.split(' '), n = PHQ.pos[PHQ.step], right = W[n - 1];
+  const opts = phShuffle([right, ...phShuffle([...new Set(W.filter((w) => w !== right))]).slice(0, 8)]);
+  pending = null;
+  sheet(`<h2>Check your recovery phrase</h2>
+    <div class="mu" style="font-size:14px">${PHQ.why === 'money' ? `Before money goes in, make sure your ${W.length} words are saved.` : `Make sure you wrote the ${W.length} words down.`} Look at your paper, not this screen.</div>
+    <div class="note"><b>Step ${PHQ.step + 1} of ${PHQ.pos.length} · Tap word #${n}</b></div>
+    ${msg ? `<div class="note amb" id="phqMsg">${esc(msg)}</div>` : ''}
+    <div class="g3" id="phqOpts">${opts.map((w) => `<button class="b-out" data-act="phqPick" data-w="${esc(w)}">${esc(w)}</button>`).join('')}</div>
+    <button class="b-out" data-act="phqShow">Show the words again</button>
+    <button class="b-out" data-act="phqLater">${PHQ.why === 'money' ? 'Cancel' : 'Later'}</button>`);
+}
+function phqPick(w) {
+  if (!PHQ || !K || !K.ph) return closeSheet();
+  const W = K.ph.split(' '), n = PHQ.pos[PHQ.step];
+  if (w !== W[n - 1]) { PHQ.bad++; return phQuizPaint(`That isn't word #${n}. Check your paper, or tap Show the words again.`); }
+  if (++PHQ.step < PHQ.pos.length) return phQuizPaint('');
+  S.phOk = Date.now(); saveS(); const then = PHQ.then; PHQ = null; closeSheet(); toast('✓ Recovery phrase checked. Keep the paper somewhere safe.', 6000);
+  if (then) then();
+}
+function phqShow() {
+  if (!PHQ) return;
+  const q = PHQ;
+  needPin(() => { PHQ = q; pending = null;
+    sheet(`<h2>Your recovery phrase</h2><div class="note amb">Write down these ${K.ph.split(' ').length} words in order, on paper. Then check ${q.pos.length > 1 ? 'two of them' : 'one of them'}.</div>${phraseRow(true)}
+      <button class="b-light big" data-act="phqAgain">I wrote them down · check</button><button class="b-out" data-act="phqLater">${q.why === 'money' ? 'Cancel' : 'Later'}</button>`); });
+}
+function phqLater() {
+  const q = PHQ; PHQ = null; closeSheet();
+  if (q && q.why === 'new') toast('Check your words before you add money: Liquidfi will ask first.', 7000);
+}
+const phGate = (fn) => (...a) => (phNeedCheck() ? phQuiz(() => fn(...a), 'money') : fn(...a));
 function newWalletSheet(i, freshPh) {
   const o = K.x[i]; pending = null; NWFRESH = !!freshPh;
   sheet(`<h2>${esc(o.name)} is ready</h2>${bigAddr(o.kp.publicKey(), 'Stellar address (safe to share)')}
@@ -17111,7 +17156,7 @@ document.addEventListener('toggle', async (e) => {   // memo + network fee from 
   try {
     const t = await H('/transactions/' + d.dataset.tx);
     const memo = t.memo_type === 'hash' && PM.isSealed(b64u8(t.memo)) ? 'private (encrypted on the ledger, shown above)' : t.memo_type && t.memo_type !== 'none' ? `${esc(String(t.memo))}${t.memo_type !== 'text' ? ` <span class="mu">(${esc(t.memo_type)})</span>` : ''}` : '';
-    x.outerHTML = (memo ? `<div><span>Memo</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${memo}</span></div>` : '') + (OWN().some((w) => w.addr === (t.fee_account || t.source_account)) ? `<div><span>Network fee</span><span class="mono">${(+t.fee_charged / 1e7).toFixed(7).replace(/0+$/, '').replace(/\.$/, '')} XLM</span></div>` : `<div><span>Network fee</span><span class="mu">paid by the sender</span></div>`);   // only show a fee this wallet actually paid
+    x.outerHTML = (memo ? `<div><span>Memo</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${memo}</span></div>` : '') + (OWN().some((w) => w.addr === (t.fee_account || t.source_account)) ? `<div><span>Network fee</span><span class="mono">${(+t.fee_charged / 1e7).toFixed(7).replace(/0+$/, '').replace(/\.$/, '')} XLM</span></div>` : `<div><span>Network fee</span><span class="mu">${xsOutTx(d.dataset.tx) ? 'paid by the swap bridge, not by you' : 'paid by the sender, not by you'}</span></div>`);   // only show a fee this wallet actually paid
   } catch (er) { x.remove(); }
 }, true);
 
@@ -18805,9 +18850,9 @@ document.addEventListener('click', async (e) => {
     scanSend: () => scanInline($('#sScan'), (r) => { $('#sNAddr').value = r.addr; $('#sNMemo').value = r.memo || ''; toast('Address scanned: ' + short(r.addr) + (r.memo ? ' · memo ' + r.memo : '')); }),
     scrBack: () => go(backTo[cur] || 'home'),
     accSend: () => { if (!OWN().length) return toast('Add a wallet first.'); if (!OWN().some((o) => o.addr === homeAddr)) homeAddr = firstWallet(); go('send'); },
-    accRcv: () => { if (!allAccts().length) return toast('Add a wallet first.'); rcvWant = OWN().some((o) => o.addr === homeAddr) ? homeAddr : firstWallet(); go('receive'); },
-    accBuy: () => onrPickSheet(),
-    onrPick: () => onrBuySheet(t.dataset.chain, t.dataset.addr),
+    accRcv: phGate(() => { if (!allAccts().length) return toast('Add a wallet first.'); rcvWant = OWN().some((o) => o.addr === homeAddr) ? homeAddr : firstWallet(); go('receive'); }),
+    accBuy: phGate(() => onrPickSheet()),
+    onrPick: phGate(() => onrBuySheet(t.dataset.chain, t.dataset.addr)),
     accSwap: () => { if (!OWN().length) return toast('Add a wallet first.'); go('swap'); },
     xsOpen: () => { XSW.from = cur === 'xrp' ? xrSel : (XS.from.XLM ? homeAddr : null); XSW.to = cur === 'xrp' || XS.from.XLM ? null : homeAddr; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
     xsMax: () => { if (XSW.av > 0) { const w = xsW(XSW.from); $('#xsAmt').value = String(+(+XSW.av).toFixed(w && w.chain === 'xrp' ? 6 : 7)); xsQuote(); } },
@@ -18836,7 +18881,7 @@ document.addEventListener('click', async (e) => {
       pending = null; sheet(`<h2>Trade from</h2>${L.map((x) => { const a = ACC[x.addr]; return `<button class="b-out" data-act="accTradeGo" data-addr="${x.addr}" style="text-align:left;display:flex;justify-content:space-between"><span>${esc(x.name)}</span><span class="mu mono" style="font-size:13px">${a ? '$' + fx(usdVal(a)) : a === null ? 'not funded' : ''}</span></button>`; }).join('')}<button class="b-out" data-act="closeSheet">Cancel</button>`);
     },
     accTradeGo: () => { homeAddr = t.dataset.addr; closeSheet(); go('trade'); },
-    fundOpen: () => fundSheet(), fundReview: () => fundReview(),
+    fundOpen: phGate(() => fundSheet()), fundReview: () => fundReview(),
     pinChange: () => pinChangeSheet(), pinChangeOk: () => pinChangeOk(),
     pinChkBio: async () => { try { const p = await bioPin(); if (p !== PIN) throw 0; pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); } catch (e) { toast('Use your PIN.'); } },
     secShow: () => { const i = +t.dataset.i, o = K.x[i]; if (!o) return; needPin(() => { const e = $('#sec' + i), b = document.querySelector(`[data-act=secShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? o.kp.secret() : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide key' : 'Show key'; }); },
@@ -18845,7 +18890,9 @@ document.addEventListener('click', async (e) => {
     phCopy: () => { if (!K.ph) return; const b = t; b.dataset.label = 'Copy phrase'; if (b.dataset.armed === '1') return copySecret(K.ph, b, 'cwP'); needPin(() => copySecret(K.ph, document.querySelector('[data-act=phCopy]') || b, 'cwP')); },
     pinChkOk: () => { const v = ($('#pinChk') || {}).value || ''; if (v !== PIN) { $('#pinChk').value = ''; if (++pinBad >= 3) { pinBad = 0; toast('Wrong PIN 3 times. Locked.'); return lock(); } return toast('Wrong PIN.'); } pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); },
     nwShowPh: () => walletKeySheet('xlm', +t.dataset.i),
-    newWalletDone: () => { if (NWFRESH) { S.phOk = Date.now(); saveS(); } NWFRESH = false; closeSheet(); const o = K.x.at(-1); if (o) { homeAddr = o.kp.publicKey(); go('home'); } toast((o || {}).name + ' added. Fund it to start using it.'); },
+    newWalletDone: () => { const fresh = NWFRESH; NWFRESH = false; const o = K.x.at(-1);
+      const done = () => { closeSheet(); if (o) { homeAddr = o.kp.publicKey(); go('home'); } toast((o || {}).name + ' added. Fund it to start using it.'); };
+      if (fresh || phNeedCheck()) return phQuiz(done, 'new'); done(); },
     bkFile: () => { exportVault(); $('#bkFileOk').style.display = ''; },
     bkBack: () => go('set'),
     bkDone: () => { if (bkNext === 'mainnet') { if (!bkOk()) return toast('Save the backup file first.'); go('set'); return mainnetSheet(); } go('set'); },
@@ -18855,8 +18902,8 @@ document.addEventListener('click', async (e) => {
     pickAcct: () => { const L = walletAccts(); pending = null; sheet(`<h2>Account</h2>${L.map((x) => `<button class="b-out" data-pickaddr="${x.addr}" style="text-align:left">${esc(x.name)} · <span class="mono">${short(x.addr)}</span></button>`).join('')}<button class="b-out" data-act="closeSheet">Close</button>`); },
     refreshBots: () => { pnlReset(); drawBots(true); },
     openPersonal: () => { homeAddr = t.dataset.addr || firstWallet(); go('home'); },
-    acctGo: () => { const b = tradeAccts()[botSel]; if (!b) return; rcvWant = b.addr; go(t.dataset.to === 'receive' ? 'receive' : 'bots'); },
-    rcvHome: () => { rcvWant = homeAddr; go('receive'); },
+    acctGo: () => { const b = tradeAccts()[botSel]; if (!b) return; const f = () => { rcvWant = b.addr; go(t.dataset.to === 'receive' ? 'receive' : 'bots'); }; return t.dataset.to === 'receive' ? phGate(f)() : f(); },
+    rcvHome: phGate(() => { rcvWant = homeAddr; go('receive'); }),
     rmWatch: () => { const i = NS().bots.indexOf(tradeAccts()[botSel]); if (i < 0) return; t.dataset.i = i; A.rmBot(); },
     addAcct: () => A.addWallet(),
     xrBackup: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i >= 0) walletKeySheet('xrp', i); },
@@ -18870,8 +18917,8 @@ document.addEventListener('click', async (e) => {
     vanCancel: () => { vanStop(); closeSheet(); toast('Stopped. Nothing was paid.'); }, vanPay: () => vanPay(), vanDrop: () => { VANHIT = null; closeSheet(); toast('Discarded.'); },
     clOpen: () => closeWallet(), clReview: () => closeReview(),
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
-    copyNewAddr: () => copy(t.dataset.addr), xstCancel: () => xstCancelSheet(t.dataset.xs), xstRelease: () => xstRelease(t.dataset.xs), xrTrust: () => xrTrustReview(t.dataset.xk || 'rl'), xrUntrust: () => xrUntrustReview(t.dataset.xc, t.dataset.xi), xrAssets: () => xrAssetsSheet(), xrSend: () => xrSendSheet(), xrRcv: () => xrRcvSheet(), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
-    onrBuy: () => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value)), onrCheck,
+    copyNewAddr: () => copy(t.dataset.addr), xstCancel: () => xstCancelSheet(t.dataset.xs), xstRelease: () => xstRelease(t.dataset.xs), xrTrust: () => xrTrustReview(t.dataset.xk || 'rl'), xrUntrust: () => xrUntrustReview(t.dataset.xc, t.dataset.xi), xrAssets: () => xrAssetsSheet(), xrSend: () => xrSendSheet(), xrRcv: phGate(() => xrRcvSheet()), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
+    onrBuy: phGate(() => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value))), onrCheck,
     onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
     onrAddUsdc: () => onrAddUsdc(t),
     helperRecover: () => helperRecover(),
@@ -18882,7 +18929,9 @@ document.addEventListener('click', async (e) => {
     onrGo: () => onrGo(t),
     xrScan: () => scanInline($('#xsScan'), (r) => { $('#xsTo').value = r.addr; $('#xsTag').value = r.tag || ''; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
     xrMax: () => { const d = XRA[xrSel]; $('#xsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
-    xrNewDone: () => { closeSheet(); xrSel = t.dataset.addr; go('xrp'); },
+    xrNewDone: () => { const a = t.dataset.addr, fresh = XRFRESH; XRFRESH = false; const done = () => { closeSheet(); xrSel = a; go('xrp'); };
+      if (fresh || phNeedCheck()) return phQuiz(done, 'new'); done(); },
+    phqPick: () => phqPick(t.dataset.w), phqShow: () => phqShow(), phqLater: () => phqLater(), phqAgain: () => { if (PHQ) { PHQ.step = 0; phQuizPaint(''); } },
     xrRmWatch: () => { const w = (NS().xrw || []).find((x) => x.addr === xrSel); if (!w) return; pending = null; sheet(`<h2>Stop watching ${esc(w.name)}?</h2><div class="addr">${esc(w.addr)}</div><button class="b-red big" data-act="xrRmWatchOk">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     xrRmWatchOk: () => { const N = NS(); N.xrw = (N.xrw || []).filter((x) => x.addr !== xrSel); saveS(); closeSheet(); go('bots'); toast('Removed.'); },
     xrSecShow: () => { const i = +t.dataset.i, o = (K.xr || [])[i]; if (!o) return; needPin(() => { const e = $('#xsec' + i), b = document.querySelector(`[data-act=xrSecShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? xrSecret(o) : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide key' : 'Show key'; }); },
@@ -18940,7 +18989,7 @@ document.addEventListener('click', async (e) => {
         else return toast('That is not a valid secret key or recovery phrase.');
       }
       if (allAccts().some((a) => a.addr === kp.publicKey()) || K.em.publicKey() === kp.publicKey()) return toast('That account is already here.');
-      if (adoptPh) { K.ph = adoptPh; K.phN = Math.max(K.phN || 0, hd + 1); }   // first phrase on this phone: Create new continues from it
+      if (adoptPh) { K.ph = adoptPh; K.phN = Math.max(K.phN || 0, hd + 1); S.phOk = S.phOk || Date.now(); }   /* typed in: already saved */   // first phrase on this phone: Create new continues from it
       K.x.push({ name, type: ty === 'personal' ? 'personal' : 'trading', kind: ty === 'personal' ? undefined : ty, kp, hd });
       $('#xSec').value = ''; if (!(await resealVault())) { K.x.pop(); if (freshPh) { K.ph = null; K.phN = 0; } return; }
       pinOkAt = Date.now();
