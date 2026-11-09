@@ -14203,9 +14203,9 @@ function xrTxText(x, me) {
 function xrSendSheet(pre = {}) {
   const o = xrOwn(xrSel); if (!o) return; pending = null; const d = XRA[xrSel];
   sheet(`<h2>Send XRP</h2><div class="mu" style="font-size:13px">From ${esc(o.name)} · ${m2(xrSpend(d))} XRP available</div>
-    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">To address (r…)</span><div class="scanrow"><input id="xsTo" placeholder="r…" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" value="${esc(pre.to || '')}"><button class="b-out" data-act="xrScan">Scan</button></div><div id="xsScan"></div></div>
-    <label>Destination tag (exchanges need it; leave empty for a personal wallet)<input id="xsTag" inputmode="numeric" autocomplete="off" value="${esc(pre.tag || '')}"></label>
-    <div class="g2" style="align-items:end"><label>Amount (XRP)<input id="xsAmt" inputmode="decimal" placeholder="0"></label><button class="b-out" data-act="xrMax">Max</button></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">To address (r…)</span><div class="scanrow"><input id="xrsTo" placeholder="r…" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" value="${esc(pre.to || '')}"><button class="b-out" data-act="xrScan">Scan</button></div><div id="xrsScan"></div></div>
+    <label>Destination tag (exchanges need it; leave empty for a personal wallet)<input id="xrsTag" inputmode="numeric" autocomplete="off" value="${esc(pre.tag || '')}"></label>
+    <div class="g2" style="align-items:end"><label>Amount (XRP)<input id="xrsAmt" inputmode="decimal" placeholder="0"></label><button class="b-out" data-act="xrMax">Max</button></div>
     <button class="b-light big" data-act="xrSendReview">Review send</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
 }
 function parseXrpQR(txt) {
@@ -14216,7 +14216,7 @@ function parseXrpQR(txt) {
 }
 async function xrSendReview() {
   const o = xrOwn(xrSel), d = XRA[xrSel]; if (!o || !d || !d.a) return toast('This wallet is not activated yet.');
-  const to = ($('#xsTo').value || '').trim(), tagS = ($('#xsTag').value || '').trim(), amt = +$('#xsAmt').value;
+  const to = ($('#xrsTo').value || '').trim(), tagS = ($('#xrsTag').value || '').trim(), amt = +$('#xrsAmt').value;
   if (!xrpl.isValidClassicAddress(to)) return toast('That is not an XRP Ledger address (r…).');
   if (to === o.w.classicAddress) return toast("That's this wallet's own address.");
   if (tagS && !/^\d{1,10}$/.test(tagS) || (tagS && +tagS > 4294967295)) return toast('A destination tag is a whole number.');
@@ -14231,7 +14231,8 @@ async function xrSendReview() {
   if (dst.account_data && (+dst.account_data.Flags & 0x00020000) && !tagS) return toast('That address needs a destination tag (exchanges do). Add it from the exchange.');
   if (dst.account_data && (+dst.account_data.Flags & 0x01000000)) return toast('That address only accepts payments from senders it approved (Deposit Authorization). The ledger would refuse it.');
   if (dst.account_data && (+dst.account_data.Flags & 0x00080000) && !confirm('That address asks not to be sent XRP. Send anyway?')) return;
-  const items = [...await xrBusy(xrSel), { t: `Send ${m2(amt)} XRP`, s: `to ${to}`, hl: 1 }, ...(tagS ? [{ t: `Destination tag ${tagS}` }] : []), { t: `Network fee ${m2(drops / 1e6)} XRP`, s: (dst.error === 'actNotFound' ? `This opens a new XRP Ledger address (it keeps ${m2(sv.base)} XRP as reserve). ` : '') + XR_BOT_NOTE }];
+  const items = [...await xrBusy(xrSel), { k: 'Send', v: `${m2(amt)} XRP`, hl: 1 }, { k: 'To', v: `${to.slice(0, 8)}…${to.slice(-6)}`, n: (xrList().find((w) => w.addr === to) || {}).name || 'check the start and end' }, ...(tagS ? [{ k: 'Destination tag', v: tagS }] : []), { k: 'Network fee', v: `${m2(drops / 1e6)} XRP` },
+    ...(dst.error === 'actNotFound' ? [{ foot: `This opens a new XRP Ledger address: ${m2(sv.base)} XRP of it stays there as the ledger's reserve.` }] : []), { foot: XR_BOT_NOTE }];
   confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops), false, 'b-acc', 'Sending…', true);
 }
 // sign + submit + wait until the outcome is CERTAIN. A payment is only "not sent" once the ledger has passed its
@@ -19010,8 +19011,8 @@ document.addEventListener('click', async (e) => {
     onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; ONR.usd = +(($('#onrAmt') || {}).value) || ONR.usd; onrBuySheet(ONR.chain, ONR.addr); },
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
     onrGo: () => onrGo(t),
-    xrScan: () => scanInline($('#xsScan'), (r) => { $('#xsTo').value = r.addr; $('#xsTag').value = r.tag || ''; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
-    xrMax: () => { const d = XRA[xrSel]; $('#xsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
+    xrScan: () => scanInline($('#xrsScan'), (r) => { $('#xrsTo').value = r.addr; $('#xrsTag').value = r.tag || ''; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
+    xrMax: () => { const d = XRA[xrSel]; $('#xrsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
     xrNewDone: () => { const a = t.dataset.addr, fresh = XRFRESH; XRFRESH = false; const done = () => { closeSheet(); xrSel = a; go('xrp'); };
       if (fresh || phNeedCheck()) return phQuiz(done, 'new'); done(); },
     pushYes: async () => { closeSheet(); try { await pushOn(); toast('✓ Stop alerts on. Turn them off any time in Settings.', 6000); } catch (er) { S.push = { ...(S.push || {}), asked: true }; saveS(); toast(er.message || String(er), 9000); } },
