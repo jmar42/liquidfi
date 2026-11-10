@@ -486,7 +486,6 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <!-- RECEIVE -->
 <section class="scr" id="s-swap">
   <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Swap</h2></div><span class="netb" id="wNet"></span></div>
-  <button class="b-out" data-act="xsOpen" style="font-size:13.5px">XLM ⇄ XRP across networks ›</button>
   <label id="wWalW">Wallet<select id="wWal"></select></label>
   <div class="card" style="gap:8px"><div class="r"><span class="mu" style="font-size:13px">You pay</span><button class="b-out sm" data-act="swapMax" style="width:auto;min-height:30px;padding:0 12px;font-size:12.5px">Max</button></div>
     <div class="swrow"><input id="wAmt" type="number" inputmode="decimal" placeholder="0.00" min="0" step="any"><select id="wFrom"></select></div>
@@ -495,30 +494,32 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" style="gap:8px"><span class="mu" style="font-size:13px">You get (about)</span>
     <div class="swrow"><span class="mono" id="wOut" style="font-size:24px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">–</span><select id="wTo"></select></div>
     <span class="mu" id="wOutUsd" style="font-size:12.5px"></span></div>
+  <div class="mu" id="wRoute" style="font-size:12.5px"></div>
   <div class="card rows" id="wInfo" style="padding:4px 14px;font-size:13.5px"></div>
   <button class="b-acc big" data-act="swapReview" id="wGo">Swap</button>
   <div id="wPend" style="display:none;flex-direction:column;gap:8px"></div>
-  <p class="mu" style="font-size:12px;margin:0">Swaps on the Stellar network at the best route right now: the order book and the AMM pools. If the price moves and you'd get less than the minimum shown, nothing trades.</p>
+  <p class="mu" style="font-size:12px;margin:0">Liquidfi picks the route: Stellar's order book and AMM pools for Stellar coins, NEAR Intents between Stellar and the XRP Ledger. If the price moves and you'd get less than the minimum shown, nothing trades.</p>
 </section>
 
 <section class="scr" id="s-xswap">
-  <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Swap XLM ⇄ XRP</h2></div><span class="netb" id="xsNet"></span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><h2>Swap</h2></div><span class="netb" id="xsNet"></span></div>
   <div id="xsOff"></div>
-  <label>From<select id="xsFrom"></select></label>
+  <label id="xsFromW">From<select id="xsFrom"></select></label>
   <div class="card" style="gap:8px"><div class="r"><span class="mu" style="font-size:13px">You pay</span><button class="b-out sm" data-act="xsMax" style="width:auto;min-height:30px;padding:0 12px;font-size:12.5px">Max</button></div>
-    <div class="swrow"><input id="xsAmt" type="number" inputmode="decimal" placeholder="0.00" min="0" step="any"><span class="mono" id="xsCoin" style="font-size:18px;font-weight:600;padding:0 6px"></span></div>
+    <div class="swrow"><input id="xsAmt" type="number" inputmode="decimal" placeholder="0.00" min="0" step="any"><span class="mono" id="xsCoin" style="display:none"></span><select id="xsPayC"></select></div>
     <span class="mu" id="xsAvail" style="font-size:12.5px"></span></div>
   <div style="display:flex;justify-content:center;margin:-14px 0"><button class="ico" data-act="xsFlip" aria-label="Swap direction" style="width:42px;height:42px;border-radius:50%;background:var(--s2);border:1px solid var(--bd2);font-size:18px;z-index:1">⇅</button></div>
-  <label>To<select id="xsTo"></select></label>
+  <label id="xsToW">To<select id="xsTo"></select></label>
   <div class="card" style="gap:8px"><span class="mu" style="font-size:13px">You get (about)</span>
-    <div class="swrow"><span class="mono" id="xsOut" style="font-size:24px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">–</span><span class="mono" id="xsCoin2" style="font-size:18px;font-weight:600;padding:0 6px"></span></div>
+    <div class="swrow"><span class="mono" id="xsOut" style="font-size:24px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">–</span><span class="mono" id="xsCoin2" style="display:none"></span><select id="xsGetC"></select></div>
     <span class="mu" id="xsOutUsd" style="font-size:12.5px"></span></div>
+  <div class="mu" id="xsRoute" style="font-size:12.5px"></div>
   <div class="card rows" id="xsInfo" style="padding:4px 14px;font-size:13.5px"></div>
   <button class="b-acc big" data-act="xsReview" id="xsGo">Review swap</button>
   <div id="xsPend" style="display:none;flex-direction:column;gap:8px"></div>
   <span class="lbl" id="xsRecL" style="display:none">Recent swaps</span>
   <div class="card" id="xsRec" style="display:none;padding:4px 14px;font-size:13.5px"></div>
-  <p class="mu" style="font-size:12px;margin:0">Across networks through NEAR Intents. Your wallet sends the coin to a one-time NEAR Intents address, checked first with NEAR Intents, and the other coin arrives in your other wallet, usually in under a minute. If the price moves and you'd get less than the minimum shown, your coin is sent back. The 0.50% fee is already in the price shown.</p>
+  <p class="mu" id="xsNote" style="font-size:12px;margin:0">Across networks through NEAR Intents. Your wallet sends the coin to a one-time NEAR Intents address, checked first with NEAR Intents, and the other coin arrives in your other wallet, usually in under a minute. If the price moves and you'd get less than the minimum shown, your coin is sent back. The 0.50% fee is already in the price shown.</p>
 </section>
 
 <section class="scr" id="s-earn">
@@ -15203,6 +15204,11 @@ async function drawSwap() {
   const toL = [...new Set([...swapKnown(), ...held])].sort((x, y) => rank(x) - rank(y));
   $('#wTo').innerHTML = toL.map((k) => `<option value="${esc(k)}">${esc(kName(k))}${k !== 'XLM' && !isTrusted(kName(k), k.split(':')[1]) ? ' · ' + short(k.split(':')[1]) : ''}</option>`).join('');
   const fk = $('#wFrom').value; $('#wTo').value = toL.includes(keepT) && keepT !== fk ? keepT : (toL.find((k) => k !== fk && (fk === 'XLM' ? kName(k) === 'USDC' : k === 'XLM')) || toL.find((k) => k !== fk));
+  if (xrList().some((w) => w.own)) {   /* one Swap screen: XRP is in the lists; picking it switches to the cross-network route */
+    $('#wFrom').insertAdjacentHTML('beforeend', '<optgroup label="XRP Ledger"><option value="@XRP">XRP</option></optgroup>');
+    $('#wTo').insertAdjacentHTML('beforeend', '<optgroup label="XRP Ledger"><option value="@XRP">XRP</option></optgroup>');
+  }
+  $('#wRoute').innerHTML = `Route: <b>Stellar DEX</b> · instant${feeTo(homeAddr) ? ` · ${SWAP_FEE.bps / 100}% fee` : ''}`;
   if (!a) { $('#wAvail').innerHTML = '<span class="amb">This wallet is not funded yet.</span>'; $('#wGo').disabled = true; }
   else $('#wGo').disabled = false;
   if (pre && pre.amt > 0 && $('#wFrom').value === pre.from) $('#wAmt').value = String(+pre.amt.toFixed(2));
@@ -15332,6 +15338,18 @@ async function xsAvail(w) {
   const d = await xrLoad(w.addr).catch(() => null); await xrServer().catch(() => null);
   return d && d.a ? Math.max(0, xrSpend(d) - xstHold(w.addr).xrp - 0.001) : null;   // a little left for the network fee
 }
+const xtCoin = (k) => xrCoins().find((c) => c.k === k) || xrCoins()[0];
+function xtUseQ(k) { if (XT.q === k) return; XT.q = k; XT.bids = []; XT.asks = []; XT.at = 0; XT.sales = []; XT.salesAt = 0; XT.fails = 0; }   /* switch the XRP Ledger pair and drop the old pair's book (never price from it) */
+async function xsSameQuote(fw, amt, seq) {   /* XRP → RLUSD / USDC on the XRP Ledger: price from its order book (the market order checks it again) */
+  xtUseQ(XSW.get); xsInfo('<div><span class="mu">Getting the best price…</span></div>');
+  let okB = true; try { await xtLoadBook(); } catch (e) { okB = false; }
+  if (seq !== XSW.seq || cur !== 'xswap') return;
+  if (!okB || !XT.at || Date.now() - XT.at > 60000 || XT.q !== XSW.get) { $('#xsOut').textContent = '–'; return xsInfo('<div><span class="amb">Couldn\'t load the XRP Ledger order book. Try again in a moment.</span></div>'); }
+  const c = xtWalk('sell', amt), tok = xtCoin(XSW.get).tok;
+  if (c == null) { $('#xsOut').textContent = '–'; return xsInfo('<div><span class="amb">Not enough on the XRP Ledger book for that size right now.</span></div>'); }
+  $('#xsOut').textContent = m2(c); $('#xsOutUsd').textContent = '≈ $' + fx(c);
+  xsInfo(`<div><span class="mu">Price</span><span class="mono">${(c / amt).toFixed(5)} ${tok} per XRP</span></div><div><span class="mu">Fills</span><span>now, or not at all</span></div>`);
+}
 async function drawXSwap() {
   netBadge($('#xsNet'));
   const L = xsWallets(), st = L.filter((w) => w.chain === 'stellar'), xw = L.filter((w) => w.chain === 'xrp');
@@ -15343,10 +15361,22 @@ async function drawXSwap() {
   const opt = (w) => `<option value="${esc(w.addr)}">${w.chain === 'xrp' ? 'XRP' : 'Stellar'} · ${esc(w.name)} · ${short(w.addr)}</option>`;
   $('#xsFrom').innerHTML = L.map(opt).join(''); if (fw) $('#xsFrom').value = fw.addr;
   const other = L.filter((w) => fw && w.chain !== fw.chain);
-  if (!XSW.to || !other.some((w) => w.addr === XSW.to)) XSW.to = (other[0] || {}).addr || null;
-  $('#xsTo').innerHTML = other.map(opt).join(''); if (XSW.to) $('#xsTo').value = XSW.to;
-  $('#xsCoin').textContent = fw ? fw.coin : ''; $('#xsCoin2').textContent = fw ? (fw.coin === 'XRP' ? 'XLM' : 'XRP') : '';
-  if (!off && fw && !XS.from[fw.coin]) { $('#xsOff').innerHTML = `<div class="note amb">${fw.coin} → ${fw.coin === 'XRP' ? 'XLM' : 'XRP'} is coming soon. ${fw.coin === 'XLM' ? 'XRP → XLM works now: tap ⇅.' : ''}</div>`; $('#xsGo').disabled = true; }
+  if (!fw || fw.chain !== 'xrp' || !xrCoins().some((c) => c.k === XSW.get)) XSW.get = 'x';   /* 'x' = across networks; 'rl' / 'uc' = an XRP Ledger dollar coin (same network) */
+  const same = XSW.get !== 'x';
+  if (!same && (!XSW.to || !other.some((w) => w.addr === XSW.to))) XSW.to = (other[0] || {}).addr || null;
+  $('#xsTo').innerHTML = other.map(opt).join(''); if (XSW.to && !same) $('#xsTo').value = XSW.to;
+  $('#xsToW').style.display = same ? 'none' : '';
+  $('#xsCoin').textContent = fw ? fw.coin : ''; $('#xsCoin2').textContent = fw ? (same ? xtCoin(XSW.get).tok : fw.coin === 'XRP' ? 'XLM' : 'XRP') : '';
+  /* the coin pickers: one Swap screen for every route */
+  $('#xsPayC').innerHTML = `<optgroup label="XRP Ledger"><option value="xrp">XRP</option></optgroup><optgroup label="Stellar"><option value="xlm">XLM</option><option value="stl">USDC, EURC…</option></optgroup>`;
+  $('#xsPayC').value = fw && fw.chain === 'xrp' ? 'xrp' : 'xlm';
+  $('#xsGetC').innerHTML = fw && fw.chain === 'xrp' ? `<optgroup label="Stellar"><option value="x">XLM</option></optgroup><optgroup label="XRP Ledger">${xrCoins().map((c) => `<option value="${c.k}">${esc(c.tok)}</option>`).join('')}</optgroup>`
+    : `<optgroup label="XRP Ledger"><option value="x">XRP</option></optgroup><optgroup label="Stellar"><option value="stl">USDC, EURC…</option></optgroup>`;
+  if ($('#xsNote')) $('#xsNote').style.display = same ? 'none' : '';
+  $('#xsGetC').value = same ? XSW.get : 'x';
+  $('#xsRoute').innerHTML = same ? `Route: <b>XRP Ledger DEX</b> · instant${xrFeeTo(fw.addr) ? ` · ${XR_FEE.bps / 100}% fee` : ''}` : `Route: <b>across networks</b> (NEAR Intents) · about 2 min · ${XS.bps / 100}% fee`;
+  if (same) { $('#xsOff').innerHTML = ''; $('#xsGo').disabled = XSW.busy; }
+  if (!off && fw && !same && !XS.from[fw.coin]) { $('#xsOff').innerHTML = `<div class="note amb">${fw.coin} → ${fw.coin === 'XRP' ? 'XLM' : 'XRP'} is coming soon. ${fw.coin === 'XLM' ? 'XRP → XLM works now: tap ⇅.' : ''}</div>`; $('#xsGo').disabled = true; }
   xsRecPaint(); tPendPaint(); xsResume();
   if (fw && !off) { const av = await xsAvail(fw); if (cur !== 'xswap' || XSW.from !== fw.addr) return; XSW.av = av;
     $('#xsAvail').innerHTML = av == null ? '<span class="amb">This wallet is not funded yet.</span>' : `Available: <span class="mono">${m2(av)}</span> ${fw.coin} (after the reserve)`; }
@@ -15382,7 +15412,11 @@ function xsPaintOut() {
   $('#xsOutUsd').textContent = q && +q.quote.amountOutUsd > 0 ? '≈ $' + fx(+q.quote.amountOutUsd) : '';
 }
 function xsQuote() {
-  clearTimeout(XSW.t); XSW.q = null; xsPaintOut(); const seq = ++XSW.seq;
+  clearTimeout(XSW.t); XSW.q = null; const seq = ++XSW.seq;
+  if (XSW.get && XSW.get !== 'x') { const fw = xsW(XSW.from), amt = +$('#xsAmt').value; $('#xsOut').textContent = '–'; $('#xsOutUsd').textContent = '';
+    if (!fw || !(amt > 0)) return xsInfo(''); if (XSW.av != null && amt > XSW.av + 1e-9) return xsInfo(`<div><span class="red">More than this wallet has available (${m2(XSW.av)} XRP).</span></div>`);
+    XSW.t = setTimeout(() => xsSameQuote(fw, amt, seq), 400); return; }
+  xsPaintOut();
   const fw = xsW(XSW.from), tw = xsW(XSW.to), amt = +$('#xsAmt').value;
   if (!xsOn() || !fw || !tw || !XS.from[fw.coin]) return xsInfo('');
   if (!(amt > 0)) return xsInfo('');
@@ -15429,6 +15463,12 @@ async function xsVerify(b, q, dry) {
   return { ...q, minAmountOut: qq.minAmountOut, amountOut: qq.amountOut || q.amountOut, deadline: qr.deadline };
 }
 async function xsReview() {
+  if (XSW.get && XSW.get !== 'x') {   /* same network (XRP → RLUSD / USDC): it is an XRP Ledger market sell; its own review checks and confirms */
+    const fw = xsW(XSW.from), amt = +$('#xsAmt').value; if (!fw) return; if (!(amt > 0)) return toast('Enter an amount.');
+    xrSel = fw.addr; xtUseQ(XSW.get); XT.mode = 'mkt'; XT.side = 'sell'; navHold = true; go('xtrade'); navHold = false;
+    $('#xtAmt').value = String(amt); $$('#xtSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === 'sell')); $$('#xtMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === 'mkt')); xtModeUI(); xtEst();
+    return xtReview();
+  }
   if (!xsOn()) return toast('Swaps across networks are not available here.');
   if (XSW.busy) return;   // one review at a time (two sheets for the same swap could both be confirmed)
   const fw = xsW(XSW.from), tw = xsW(XSW.to), amt = +$('#xsAmt').value, rs = ++XSW.rseq;
@@ -18930,12 +18970,14 @@ document.addEventListener('click', async (e) => {
     accBuy: phGate(() => onrPickSheet()),
     onrPick: phGate(() => onrBuySheet(t.dataset.chain, t.dataset.addr)),
     accSwap: () => { if (!OWN().length) return toast('Add a wallet first.'); go('swap'); },
-    xsOpen: () => { XSW.from = cur === 'xrp' ? xrSel : (XS.from.XLM ? homeAddr : null); XSW.to = cur === 'xrp' || XS.from.XLM ? null : homeAddr; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
-    xsMax: () => { if (XSW.av > 0) { const w = xsW(XSW.from); $('#xsAmt').value = String(+(+XSW.av).toFixed(w && w.chain === 'xrp' ? 6 : 7)); xsQuote(); } },
-    xsFlip: () => { const f = XSW.from, t2 = XSW.to; if (!t2 || XSW.busy) return; ++XSW.rseq; XSW.from = t2; XSW.to = f; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); },
+    xsOpen: () => { XSW.get = 'x'; XSW.from = cur === 'xrp' ? xrSel : (XS.from.XLM ? homeAddr : null); XSW.to = cur === 'xrp' || XS.from.XLM ? null : homeAddr; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
+    xsMax: () => { if (XSW.av > 0) { const w = xsW(XSW.from), same = XSW.get && XSW.get !== 'x';
+      const v = same ? Math.floor(((XSW.av - 0.0001) / (1 + XR_FEE.bps / 10000)) * 1e6) / 1e6 : +(+XSW.av).toFixed(w && w.chain === 'xrp' ? 6 : 7);   /* a market sell adds its fee on top */
+      $('#xsAmt').value = String(Math.max(0, v)); xsQuote(); } },
+    xsFlip: () => { if (XSW.get && XSW.get !== 'x') return toast(`To turn ${xtCoin(XSW.get).tok} into XRP, use Trade XRP → Buy.`); const f = XSW.from, t2 = XSW.to; if (!t2 || XSW.busy) return; ++XSW.rseq; XSW.from = t2; XSW.to = f; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); },
     xsReview: () => xsReview(),
     swapMax: () => { const k = $('#wFrom').value, v = swapAvail(ACC[homeAddr], k); $('#wAmt').value = v > 0 ? amt7(v).replace(/\.?0+$/, '') : ''; swapQuote(); },
-    swapFlip: () => { const f = $('#wFrom').value, t2 = $('#wTo').value; if (![...$('#wFrom').options].some((o) => o.value === t2)) return toast(`This wallet doesn't hold ${kName(t2)} yet.`); $('#wFrom').value = t2; $('#wTo').value = f; $('#wAmt').value = ''; swapQuote(); },
+    swapFlip: () => { const f = $('#wFrom').value, t2 = $('#wTo').value; if (f === '@XRP' || t2 === '@XRP') return swapToCross(t2 === '@XRP' ? false : true); if (![...$('#wFrom').options].some((o) => o.value === t2)) return toast(`This wallet doesn't hold ${kName(t2)} yet.`); $('#wFrom').value = t2; $('#wTo').value = f; $('#wAmt').value = ''; swapQuote(); },
     swapReview: () => swapReview(),
     taxMake: () => taxMake(), taxShare: () => taxShare(t.dataset.f), taxSave: () => taxSave(t.dataset.f),
     advForm: () => advForm(t.dataset.src), advSend: () => advSend(),
@@ -19135,10 +19177,34 @@ $('#sTo').addEventListener('change', sendToChanged); $('#sPriv').addEventListene
 $('#rAcct').addEventListener('change', drawReceive);
 $('#eWal').addEventListener('change', () => { earnAddr = $('#eWal').value; drawEarn(); });
 $('#eXWal').addEventListener('change', () => { earnXr = $('#eXWal').value; drawEarn(); });
-$('#wAmt').addEventListener('input', swapQuote); $('#wFrom').addEventListener('change', () => { if ($('#wFrom').value === $('#wTo').value) { const o = [...$('#wTo').options].find((x) => x.value !== $('#wFrom').value); if (o) $('#wTo').value = o.value; } swapQuote(); }); $('#wTo').addEventListener('change', swapQuote);
+function swapToCross(payXrp) {   /* Stellar Swap → the cross-network route (same screen layout), keeping what was typed */
+  const amt = $('#wAmt').value, xw = xrList().filter((w) => w.own);
+  if (payXrp) { XSW.from = (xw.find((w) => w.addr === xrSel) || xw[0] || {}).addr || null; XSW.to = homeAddr; XSW.get = 'x'; }
+  else { XSW.from = homeAddr; XSW.to = null; XSW.get = 'x'; }
+  XSW.av = null; ++XSW.rseq; if ($('#xsAmt')) $('#xsAmt').value = payXrp ? '' : amt;
+  const bt = backTo.swap || 'bots'; navHold = true; go('xswap'); navHold = false; backTo.xswap = bt;   /* Back goes where Swap was opened from */
+}
+function swapToStellar(from, to) {   /* cross-network → Stellar coins: back to the Stellar route */
+  const st = OWN(); const w = st.find((o) => o.addr === XSW.to) || st.find((o) => o.addr === XSW.from) || st.find((o) => o.addr === homeAddr) || st[0]; if (!w) return toast('Add a Stellar wallet first.');
+  homeAddr = w.addr; SWAP_PRE = { from: from || 'XLM', to: to || uKey(), amt: 0 }; const bt = backTo.xswap || 'bots'; navHold = true; go('swap'); navHold = false; backTo.swap = bt;
+}
+$('#wFrom').addEventListener('change', (e) => { if (e.target.value === '@XRP') { e.stopImmediatePropagation(); return swapToCross(true); } }, true);
+$('#wTo').addEventListener('change', (e) => { if (e.target.value === '@XRP') { e.stopImmediatePropagation(); if ($('#wFrom').value !== 'XLM') { toast('XRP swaps with XLM across networks. Pay with XLM.'); $('#wFrom').value = 'XLM'; $('#wAmt').value = ''; } return swapToCross(false); } }, true);
+$('#wAmt').addEventListener('input', swapQuote); $('#wFrom').addEventListener('change', () => { if ($('#wFrom').value === $('#wTo').value) { const o = [...$('#wTo').options].find((x) => x.value !== $('#wFrom').value && x.value !== '@XRP'); if (o) $('#wTo').value = o.value; } swapQuote(); }); $('#wTo').addEventListener('change', swapQuote);
 $('#wWal').addEventListener('change', () => { homeAddr = $('#wWal').value; $('#wAmt').value = ''; drawSwap(); });
 $('#xsAmt').addEventListener('input', xsQuote);
 $('#xsFrom').addEventListener('change', () => { ++XSW.rseq; XSW.from = $('#xsFrom').value; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); });   // To stays what you picked (drawXSwap only changes it if it no longer fits)
+$('#xsPayC').addEventListener('change', (e) => {
+  const v = e.target.value, L = xsWallets();
+  if (v === 'stl') return swapToStellar(uKey(), 'XLM');
+  const w = v === 'xrp' ? (L.find((x) => x.chain === 'xrp' && x.addr === xrSel) || L.find((x) => x.chain === 'xrp')) : (L.find((x) => x.chain === 'stellar' && x.addr === homeAddr) || L.find((x) => x.chain === 'stellar'));
+  if (!w) return toast(v === 'xrp' ? 'Add an XRP wallet first.' : 'Add a Stellar wallet first.');
+  ++XSW.rseq; XSW.from = w.addr; XSW.to = null; XSW.get = 'x'; XSW.av = null; $('#xsAmt').value = ''; drawXSwap();
+});
+$('#xsGetC').addEventListener('change', (e) => {
+  const v = e.target.value; if (v === 'stl') return swapToStellar('XLM', uKey());
+  ++XSW.rseq; XSW.get = v; if (v === 'x') XSW.to = null; drawXSwap();
+});
 $('#xsTo').addEventListener('change', () => { ++XSW.rseq; XSW.to = $('#xsTo').value; xsQuote(); });
 $('#setPushOn').addEventListener('change', async (e) => {
   const on = e.target.checked; e.target.disabled = true;
