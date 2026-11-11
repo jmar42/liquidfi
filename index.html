@@ -181,12 +181,12 @@ nav button svg{width:22px;height:22px}
 nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 #toast{border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:14}
 #sheet.on ~ #toast{bottom:auto;top:calc(12px + env(safe-area-inset-top))}
-#obn{position:fixed;left:16px;right:16px;top:calc(12px + env(safe-area-inset-top));max-width:448px;margin:0 auto;z-index:13;display:none;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:var(--s2);border:2px solid var(--amb);box-shadow:0 14px 40px rgba(0,0,0,.55);cursor:pointer}
+#obn{position:fixed;left:16px;right:16px;top:calc(12px + env(safe-area-inset-top));max-width:448px;margin:0 auto;z-index:13;display:none;align-items:center;gap:16px;padding:18px 20px;border-radius:16px;background:var(--s2);border:2px solid #FACC15;box-shadow:0 14px 40px rgba(0,0,0,.55);cursor:pointer}
 #obn.on{display:flex}#obn.ok{border-color:var(--grn)}#obn.bad{border-color:var(--red)}
-#obn .obi{flex:none;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;background:rgba(240,160,48,.15);color:var(--amb)}
+#obn .obi{flex:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;background:rgba(250,204,21,.15);color:#FACC15}
 #obn.ok .obi{background:rgba(63,184,127,.18);color:var(--grn)}#obn.bad .obi{background:rgba(201,48,44,.2);color:var(--redt)}
-#obn b{font-size:18px;display:block}#obn .obs{font-size:13px;color:var(--mu);margin-top:2px;overflow-wrap:anywhere}
-@keyframes obspin{to{transform:rotate(360deg)}}#obn .obsp{width:20px;height:20px;border:3px solid rgba(240,160,48,.3);border-top-color:var(--amb);border-radius:50%;animation:obspin .8s linear infinite}
+#obn b{font-size:21px;display:block}#obn .obs{font-size:15px;line-height:1.35;color:var(--mu);margin-top:2px;overflow-wrap:anywhere}
+@keyframes obspin{to{transform:rotate(360deg)}}#obn .obsp{width:24px;height:24px;border:3px solid rgba(250,204,21,.3);border-top-color:#FACC15;border-radius:50%;animation:obspin .8s linear infinite}
 #s-home.unf .hide-unf{display:none!important}
 #sheet>div{border-radius:24px 24px 0 0}
 
@@ -14988,7 +14988,7 @@ async function xrLoadOpen(addr) {
   try {
     const r = await xr('account_offers', { account: addr, ledger_index: 'validated' });
     if (cur !== 'xrp' || xrSel !== addr) return;
-    const L = r.offers || [], own = !!xrOwn(addr);
+    const L = [...(r.offers || [])].sort((x, y) => (+y.seq || 0) - (+x.seq || 0)), own = !!xrOwn(addr);   // newest first
     XT.offers = L.filter(xtIsPairOffer);   // Edit works from here too
     $('#xrOffN').textContent = L.length ? ` (${L.length})` : ''; $('#xrCanAll').style.display = own && L.length ? '' : 'none';
     const SC = own ? await xstCards(addr) : ''; if (cur !== 'xrp' || xrSel !== addr) return;
@@ -15000,7 +15000,7 @@ async function xtLoadOpen() {
   const el = $('#xtOpen'); if (!el) return;
   try {
     const r = await xr('account_offers', { account: xrSel, ledger_index: 'validated' });
-    XT.offers = (r.offers || []).filter(xtIsPairOffer);   // XRP / RLUSD and XRP / USDC (Circle) orders
+    XT.offers = [...(r.offers || [])].sort((x, y) => (+y.seq || 0) - (+x.seq || 0)).filter(xtIsPairOffer);   // newest first; XRP / RLUSD and XRP / USDC (Circle) orders
     if (cur !== 'xtrade') return;
     const SC = await xstCards(xrSel); if (cur !== 'xtrade') return;
     el.innerHTML = SC + (XT.offers.length ? XT.offers.map((f) => xtOfferCard(f, true)).join('') : SC ? '' : '<div class="note">No open orders.</div>');
@@ -15190,8 +15190,9 @@ async function drawSwap() {
   netBadge($('#wNet'));
   const L = OWN(); if (!L.length) { toast('Add a wallet first.'); return go('bots'); }
   if (!L.some((o) => o.addr === homeAddr)) homeAddr = firstWallet();
-  $('#wWal').innerHTML = L.map((o) => `<option value="${o.addr}">${esc(o.name)} · ${short(o.addr)}</option>`).join(''); $('#wWal').value = homeAddr;
-  $('#wWalW').style.display = L.length > 1 ? '' : 'none';
+  const XW = xsWallets().filter((w) => w.chain === 'xrp'), wo = (o, v) => `<option value="${v}">${esc(o.name)} · ${short(o.addr)}</option>`;   /* XRP wallets too: picking one opens the XRP side of Swap */
+  $('#wWal').innerHTML = XW.length ? `<optgroup label="Stellar">${L.map((o) => wo(o, o.addr)).join('')}</optgroup><optgroup label="XRP Ledger">${XW.map((o) => wo(o, 'x:' + o.addr)).join('')}</optgroup>` : L.map((o) => wo(o, o.addr)).join(''); $('#wWal').value = homeAddr;
+  $('#wWalW').style.display = L.length + XW.length > 1 ? '' : 'none';
   const a = await refreshAcct(homeAddr).catch(() => null); if (cur !== 'swap') return;
   priceAssets(a).then(() => { if (cur === 'swap') swapPaintOut(); });
   const held = a ? a.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares' && !isNFT(b) && +b.balance > 0).map(akey) : [];
@@ -16975,7 +16976,7 @@ const effAsset = (t, c) => (t === 'native' ? 'XLM' : c);
 // Fills read like the market quotes them: the coin is bought or sold, the price is in dollars (then euros, then XLM).
 // "bought 0.004 EURC @ 1.106500" · "sold 100.00 XLM @ 0.182000" · "bought 1,000 AQUA @ 0.000600 XLM"
 const qAmt = (v) => (v >= 0.995 ? fx(v, 2) : v > 0 ? String(+v.toPrecision(3)) : '0');   // rounded, small fills keep 3 digits (0.0038)
-const qRank = (c) => (['USDC', 'USD', 'PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0);
+const qRank = (c) => (c === 'USDC' || c === 'USD' ? 4 : ['PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0);
 function fillText(sold, sa, bought, ba) {
   const sellBase = qRank(ba) >= qRank(sa), base = sellBase ? sa : ba, q = sellBase ? ba : sa, amt = sellBase ? sold : bought, px = amt > 0 ? (sellBase ? bought : sold) / amt : 0;
   return `${sellBase ? 'sold' : 'bought'} ${qAmt(amt)} ${base}${px ? ' @ ' + pxF(px) + (q === 'USDC' ? '' : ' ' + q) : ''}`;
@@ -17098,7 +17099,7 @@ async function homeOrders(a, quiet) {
   TRADE_OFF = off; tradeAddr = addr;
   const paint = () => { if (cur !== 'home' || homeAddr !== addr) return; const st = STOPS.addr === addr ? STOPS.list.filter(stopLive) : [], n = st.length + off.length;
     $('#hOffN').textContent = n ? ` (${n})` : ''; $('#hCanAll').style.display = (off.length || st.some((x) => ['armed', 'triggered'].includes(x.status))) && OWN().some((w) => w.addr === addr) ? '' : 'none';
-    const cards = [...st.map((x) => stopCard(x)), ...off.map(orderCard)], cap = HOME_ALL ? cards.length : 5;   // a busy wallet (bot ladders) shows 5, then "Show all"
+    const cards = [...st.map((x) => stopCard(x)), ...[...off].sort(byNewest).map(orderCard)], cap = HOME_ALL ? cards.length : 5;   // a busy wallet (bot ladders) shows 5, then "Show all"
     el.innerHTML = n ? cards.slice(0, cap).join('') + (cards.length > cap ? `<button class="b-out sm" data-act="homeAll">Show all ${cards.length} open orders</button>` : '') : '<div class="note">No open orders. Place limit and stop orders in Trade.</div>'; };
   HOME_PAINT = paint;
   STOP_PAINT = paint; paint();
@@ -17109,7 +17110,7 @@ function ago(t) { const s = (Date.now() - Date.parse(t)) / 1000; return s < 90 ?
 // a trade with yourself (market order or stop) in trader words: "Filled · bought 10.00 XLM @ 0.170000". XLM / the non-dollar token is the base.
 function fillWords(sa, sAmt, ba, bAmt, pre = 'Filled', short4 = false) {
   // Priced the way markets quote it: in dollars when a dollar coin is involved (XLM @ 0.1700 USDC), then euros, then XLM.
-  const rank = (c) => (['USDC', 'USD', 'PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0);
+  const rank = (c) => (c === 'USDC' || c === 'USD' ? 4 : ['PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0);
   let side, base, bq, q, qq;
   if (rank(sa) > rank(ba)) { side = 'bought'; base = ba; bq = bAmt; q = sa; qq = sAmt; }
   else if (rank(ba) > rank(sa)) { side = 'sold'; base = sa; bq = sAmt; q = ba; qq = bAmt; }
@@ -17517,7 +17518,7 @@ function paintPnl() {
 const ACT = { at: 0, net: null, fil: 'all', recs: {}, next: {}, xr: {}, xnext: {}, busy: false, tab: 'filled', open: null };
 /* ---------- Activity → Open orders: every wallet's waiting orders and stops in one place, grouped by wallet ---------- */
 const opPx = (v) => (v >= 1 ? (+v).toFixed(4) : (+v).toFixed(5));
-const QRANK = (n) => (['USDC', 'PYUSD', 'USDT', 'RLUSD', 'USD', 'yUSDC'].includes(n) ? 2 : n === 'EURC' ? 1 : 0);   /* the side prices are quoted in: dollars, then euros */
+const QRANK = (n) => (n === 'USDC' || n === 'USD' ? 3 : ['PYUSD', 'USDT', 'RLUSD', 'yUSDC'].includes(n) ? 2 : n === 'EURC' ? 1 : 0);   /* the side prices are quoted in: dollars, then euros */
 function stOfferText(o) {   /* a Stellar offer as "Sell 500 XLM @ 0.15200 USDC" (priced in the dollar / euro side) */
   const sN = o.selling.asset_type === 'native' ? 'XLM' : o.selling.asset_code, bN = o.buying.asset_type === 'native' ? 'XLM' : o.buying.asset_code, amt = +o.amount, pr = +o.price;
   if (QRANK(bN) > QRANK(sN)) return { side: 'SELL', t: `${fx(amt, 2)} ${sN} @ ${opPx(pr)} ${bN}` };
@@ -17530,12 +17531,12 @@ async function actOpenLoad(force) {
   const out = {}, L = allAccts(), XL = xrList();
   await Promise.all([...L.map(async (a) => {
     const R = out[a.addr] = { name: a.name, kind: 'xlm', rows: [] };
-    try { for (const o of await offersOf(a.addr)) { const x = stOfferText(o); R.rows.push({ tag: x.side, t: x.t, s: 'order #' + o.id }); } } catch (e) { if (e.status !== 404) R.err = niceErr(e); }
+    try { for (const o of [...await offersOf(a.addr)].sort(byNewest)) { const x = stOfferText(o); R.rows.push({ tag: x.side, t: x.t, s: 'order #' + o.id }); } } catch (e) { if (e.status !== 404) R.err = niceErr(e); }
     try { if (S.stopUrl && kpFor(a.addr)) for (const x of (await stopList(a.addr)) || []) if (stopLive(x)) { const b = (x.base && (x.base[0] || x.base)) || 'XLM';
       R.rows.unshift({ tag: 'STOP', side: x.side, t: `${x.side === 'sell' ? 'Sell' : 'Buy'} ${fx(+x.xlm, 2)} ${b} @ ${opPx(+x.stop)}`, s: `stop · ${x.status === 'armed' ? 'waiting' : x.status}` }); } } catch (e) {}
   }), ...XL.map(async (w) => {
     const R = out[w.addr] = out[w.addr] || { name: w.name, kind: 'xrp', rows: [] }; R.kind = 'xrp';
-    try { const r = await xr('account_offers', { account: w.addr, ledger_index: 'validated' }); for (const f of r.offers || []) { const t = xrOfferText(f); R.rows.push({ tag: /^Buy/i.test(t) ? 'BUY' : 'SELL', t: t.replace(/^(Buy|Sell) /, ''), s: 'order #' + f.seq }); } } catch (e) { if (!/actNotFound/.test(String(e && e.message))) R.err = niceErr(e); }
+    try { const r = await xr('account_offers', { account: w.addr, ledger_index: 'validated' }); for (const f of [...(r.offers || [])].sort((x, y) => (+y.seq || 0) - (+x.seq || 0))) { const t = xrOfferText(f); R.rows.push({ tag: /^Buy/i.test(t) ? 'BUY' : 'SELL', t: t.replace(/^(Buy|Sell) /, ''), s: 'order #' + f.seq }); } } catch (e) { if (!/actNotFound/.test(String(e && e.message))) R.err = niceErr(e); }
     for (const x of xstOf(w.addr)) if (xstLive(x)) R.rows.unshift({ tag: 'STOP', side: x.side, t: `${x.side === 'sell' ? 'Sell' : 'Buy'} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}`, s: `stop · ${x.st === 'armed' ? 'waiting' : x.st}${x.until ? ' · ends ' + xstEnds(x.until) : ''}` });
   })]);
   ACT.open = { at: Date.now(), net: S.net, w: out }; ACT.openBusy = false; paintActOpen();
@@ -17747,6 +17748,8 @@ function earnOpenView(v) { if (EARN_VIEW === 'home') navPush({ t: 'earnv' }); EA
 // "Talk to our Wealth Advisors": a short form; Send opens the phone's email app with it filled in (nothing leaves the phone until the person sends it)
 const US_STATES = 'Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District of Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New Hampshire,New Jersey,New Mexico,New York,North Carolina,North Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode Island,South Carolina,South Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West Virginia,Wisconsin,Wyoming,Outside the US'.split(',');
 const ADV_TO = 'jeff@trevericapital.com';
+const ADV_TOPICS = ['Wealth Management', 'Crypto Portfolio Management', 'Legacy Estate Planning'];   /* topic chips on the advisor form: tap to add to the email */
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-advt]'); if (b) { e.preventDefault(); b.classList.toggle('on'); b.setAttribute('aria-pressed', b.classList.contains('on')); } });
 function advForm(src) {
   pending = null; window._advSrc = src || 'app';
   const f = (id, l, t = 'text', extra = '') => `<label>${l}<input id="${id}" type="${t}" autocomplete="off" ${extra}></label>`;
@@ -17754,17 +17757,18 @@ function advForm(src) {
     ${f('advName', 'Name', 'text', 'autocomplete="name"')}${f('advPhone', 'Phone', 'tel', 'inputmode="tel" autocomplete="tel"')}${f('advEmail', 'Email', 'email', 'autocomplete="email"')}
     <div class="g2"><label>State<select id="advState"><option value="">Choose…</option>${US_STATES.map((x) => `<option>${x}</option>`).join('')}</select></label>
       <label>Best time<select id="advTime"><option>Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label></div>
-    <label>Message (optional)<textarea id="advMsg" rows="3" style="resize:vertical;background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:10px;font:inherit"></textarea></label>
+    <div><div class="mu" style="font-size:13.5px;margin-bottom:6px">What would you like to talk about? <span style="font-size:12px">(tap any)</span></div><div id="advTop" style="display:flex;flex-wrap:wrap;gap:6px">${ADV_TOPICS.map((x) => `<button class="chip" data-advt="${x}" aria-pressed="false" style="white-space:normal">${x}</button>`).join('')}</div></div>
+    <label>Anything else? (optional)<textarea id="advMsg" rows="3" placeholder="Your goals, timeline or questions" style="resize:vertical;background:var(--s1);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:10px;font:inherit"></textarea></label>
     <button class="b-light big" data-act="advSend">Send to Treveri Capital</button><button class="b-out" data-act="closeSheet">Cancel</button>
     <div class="mu" style="font-size:11px;line-height:1.45">Opens your email app with this filled in; nothing is sent until you tap Send there. Treveri Capital LLC is a California registered investment adviser, owned by Liquidfi's founder. Not an offer of advice where it isn't registered or exempt.</div>`);
 }
 function advMail(v, src) {   // the email it opens
-  const body = ['Please have a wealth advisor contact me about a customized portfolio.', '', `Name: ${v.name}`, `Phone: ${v.phone || '-'}`, `Email: ${v.email || '-'}`, `State: ${v.state}`, `Best time: ${v.time}`]
+  const body = ['Please have a wealth advisor contact me about a customized portfolio.', '', `Name: ${v.name}`, `Phone: ${v.phone || '-'}`, `Email: ${v.email || '-'}`, `State: ${v.state}`, `Best time: ${v.time}`].concat(v.topics && v.topics.length ? [`Interested in: ${v.topics.join(', ')}`] : [])
     .concat(v.msg ? ['', 'Message:', v.msg] : []).concat(['', `(Sent from Liquidfi · ${src})`]).concat(['California', 'Texas'].includes(v.state) ? [] : ['Note: state outside CA/TX: check registration or exemption before advising.']);
   return `mailto:${ADV_TO}?subject=${encodeURIComponent('Customized portfolio request (' + src + ')')}&body=${encodeURIComponent(body.join('\n'))}`;
 }
 function advSend() {
-  const g = (id) => ($('#' + id).value || '').trim(), v = { name: g('advName'), phone: g('advPhone'), email: g('advEmail'), state: g('advState'), time: g('advTime'), msg: g('advMsg') };
+  const g = (id) => ($('#' + id).value || '').trim(), v = { name: g('advName'), phone: g('advPhone'), email: g('advEmail'), state: g('advState'), time: g('advTime'), msg: g('advMsg'), topics: [...document.querySelectorAll('#advTop .chip.on')].map((b) => b.dataset.advt) };
   if (!v.name) return toast('Add your name.');
   if (!v.phone && !v.email) return toast('Add a phone number or an email so we can reach you.');
   if (v.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) return toast('That email doesn\'t look right.');
@@ -17866,7 +17870,7 @@ async function tradeLoadMine() {   // open orders, stops and fills of the Trade 
   tBalPaint(a);
   TRADE_OFF = off;
   const paintOpen = () => { if (cur !== 'trade') return; const st = STOPS.addr === tradeAddr ? STOPS.list : [], live = st.filter(stopLive), old = st.filter((x) => !stopLive(x) && Date.now() / 1000 - (x.done_at || 0) < 86400);
-    $('#tOpen').innerHTML = (live.length || off.length) ? live.map((x) => stopCard(x)).join('') + [...off].sort((x, y) => onPair(y) - onPair(x)).map(orderCard).join('') : '<div class="note">No open orders.</div>';
+    $('#tOpen').innerHTML = (live.length || off.length) ? live.map((x) => stopCard(x)).join('') + [...off].sort((x, y) => onPair(y) - onPair(x) || byNewest(x, y)).map(orderCard).join('') : '<div class="note">No open orders.</div>';
     const dn = $('#tStopDone'); if (dn) { dn.style.display = old.length ? 'flex' : 'none'; dn.innerHTML = old.map((x) => stopCard(x, true)).join(''); } };   // finished stops (filled / cancelled / ended) live in Activity, not Open orders
   STOP_PAINT = paintOpen;
   paintOpen(); drawFills(tradeAddr, off); tPendPaint();
@@ -18039,7 +18043,7 @@ const OBN = { p: null, t: 0 }, OBN_SCR = ['trade', 'xtrade', 'swap', 'xswap'];
 function obnPaint() {
   const p = OBN.p, el = $('#obn'); if (!p || !el) return;
   const what = p.scr === 'swap' || p.scr === 'xswap' ? 'swap' : 'order', bad = p.cls === 'red', warn = !p.busy && !bad && /amb/.test(p.cls || '');
-  const title = p.busy ? (/^Sending/.test(p.st) ? `Sending your ${what}…` : /^Sent/.test(p.st) ? `${what === 'swap' ? 'Swap' : 'Order'} sent · confirming…` : String(p.st || '')) : String(p.st || '').replace(/^✓\s*/, '');
+  const title = p.busy ? (/^(Sending|Sent)/.test(p.st) ? `Sending your ${what}…` : String(p.st || ''))   /* two steps only: Sending… (yellow) → the result (On the book / Filled, green) */ : String(p.st || '').replace(/^✓\s*/, '');
   el.className = 'on ' + (p.busy || warn ? '' : bad ? 'bad' : 'ok');
   el.innerHTML = `<div class="obi">${p.busy ? '<div class="obsp"></div>' : bad || warn ? '!' : '✓'}</div><div style="min-width:0"><b>${esc(title)}</b><div class="obs">${esc(p.label)}${p.sub ? ' · ' + esc(p.sub) : ''}</div></div>`;
   clearTimeout(OBN.t); if (!p.busy) OBN.t = setTimeout(obnHide, bad || warn ? 12000 : 5000);
@@ -18564,6 +18568,7 @@ function offerInfo(o) {   // side, coin left, price (quote per coin), names and 
     : { side: 'buy', left: +o.amount * +o.price, px: 1 / +o.price, b: B, q: S, bA: o.buying, qA: o.selling };
 }
 const FILLED = {};
+const byNewest = (x, y) => { const X = BigInt(x.id || 0), Y = BigInt(y.id || 0); return Y > X ? 1 : Y < X ? -1 : 0; };   // Stellar offer ids only go up: the highest is the newest order
 function orderCard(o) {
   const i = offerInfo(o), qs = i.q === 'USDC' ? '' : ' ' + i.q;
   const st = ordStore()[o.id] || {}, f = FILLED[o.id];
@@ -18573,7 +18578,7 @@ function orderCard(o) {
   const when = !wd ? '' : wd.toDateString() === new Date().toDateString() ? wd.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : wd.toLocaleDateString([], { month: 'short', day: 'numeric' });
   return `<div class="card ocard"><div class="r"><span><span class="tag ${i.side === 'buy' ? 't-buy' : 't-sell'}">${i.side.toUpperCase()}</span> <b class="mono">${qAmt(i.left)} ${esc(i.b)}</b> <span class="mu">@</span> <b class="mono">${pxF(i.px)}${esc(qs)}</b></span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(when)}</span></div>
     <div class="obar"><i style="width:${pct.toFixed(1)}%" class="${i.side}"></i></div>
-    <div class="r" style="font-size:12.5px"><span class="mu">${filled == null ? 'Filled …' : filled > 0 ? `Filled <b class="mono" style="color:var(--tx)">${qAmt(filled)}</b> of ${qAmt(total)} ${esc(i.b)} (${pct.toFixed(0)}%)` : `Nothing filled yet · ${qAmt(i.left)} ${esc(i.b)} open`}</span><span class="mono mu">#${esc(o.id)}</span></div>
+    <div class="r" style="font-size:12.5px"><span class="mu">${filled == null ? 'Checking fills…' : filled > 0 ? `Filled <b class="mono" style="color:var(--tx)">${qAmt(filled)}</b> of ${qAmt(total)} ${esc(i.b)} (${pct.toFixed(0)}%)` : `Nothing filled yet · ${qAmt(i.left)} ${esc(i.b)} open`}</span><span class="mono mu">#${esc(o.id)}</span></div>
     <div class="g2"><button class="b-out sm" data-edit="${o.id}">Edit</button><button class="b-out sm" data-cancel="${o.id}">Cancel</button></div></div>`;
 }
 function editSheet(o) {
@@ -19191,7 +19196,7 @@ function swapToStellar(from, to) {   /* cross-network → Stellar coins: back to
 $('#wFrom').addEventListener('change', (e) => { if (e.target.value === '@XRP') { e.stopImmediatePropagation(); return swapToCross(true); } }, true);
 $('#wTo').addEventListener('change', (e) => { if (e.target.value === '@XRP') { e.stopImmediatePropagation(); if ($('#wFrom').value !== 'XLM') { toast('XRP swaps with XLM across networks. Pay with XLM.'); $('#wFrom').value = 'XLM'; $('#wAmt').value = ''; } return swapToCross(false); } }, true);
 $('#wAmt').addEventListener('input', swapQuote); $('#wFrom').addEventListener('change', () => { if ($('#wFrom').value === $('#wTo').value) { const o = [...$('#wTo').options].find((x) => x.value !== $('#wFrom').value && x.value !== '@XRP'); if (o) $('#wTo').value = o.value; } swapQuote(); }); $('#wTo').addEventListener('change', swapQuote);
-$('#wWal').addEventListener('change', () => { homeAddr = $('#wWal').value; $('#wAmt').value = ''; drawSwap(); });
+$('#wWal').addEventListener('change', () => { const v = $('#wWal').value; if (v.startsWith('x:')) { xrSel = v.slice(2); $('#wWal').value = homeAddr; $('#wAmt').value = ''; return swapToCross(true); } homeAddr = v; $('#wAmt').value = ''; drawSwap(); });
 $('#xsAmt').addEventListener('input', xsQuote);
 $('#xsFrom').addEventListener('change', () => { ++XSW.rseq; XSW.from = $('#xsFrom').value; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); });   // To stays what you picked (drawXSwap only changes it if it no longer fits)
 $('#xsPayC').addEventListener('change', (e) => {
