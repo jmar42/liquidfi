@@ -238,7 +238,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37g</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37m</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -573,7 +573,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37g</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37m</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop helpers</span><div class="mu" style="font-size:12px">Each waiting stop has its own small helper account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your helpers from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return helper XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -598,11 +598,12 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <div id="setPushFills" style="display:none;flex-direction:column;gap:6px"><span class="mu" style="font-size:12.5px">Order fills from</span><div id="setPushW" style="display:flex;flex-direction:column"></div><div class="mu" style="font-size:11.5px">Bot wallets trade all day: they start off.</div></div>
     <div class="amb" id="setPushTip" style="display:none;font-size:12px">Tip: install Liquidfi (Chrome ⋮ → Add to home screen → Install) so alerts come from Liquidfi, not Chrome. If Chrome says "possible spam", tap Always allow.</div>
     <button class="b-out sm" data-act="pushTest" id="setPushTest" style="display:none">Send a test alert</button></div>
+  <div class="card" id="setBook"><span class="lbl">Address book</span><div class="mu" style="font-size:12.5px">Addresses you can send to. To change an address, tag or memo, add it again from Send (it gets checked).</div><div id="setBookL" style="display:flex;flex-direction:column;gap:6px"></div></div>
   <div class="card" id="setStats"><span class="lbl">Help improve Liquidfi</span><div class="top"><span>Share anonymous usage</span><input type="checkbox" id="setStatsOn" style="width:28px;min-height:28px"></div></div>
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.37g · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.37m · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13447,6 +13448,78 @@ const PM = (() => {
   }
   return { x25519, edPkToX, edSkToX, seal, open, isSealed, fits, MAX };
 })();
+/* Private memos on the XRP Ledger. XRP keys are ed25519 (ED…) or secp256k1 (02/03…), so a memo is sealed with a fresh
+   one-time key on the receiver's curve AND on the sender's curve: either wallet can open it later with its own key, nobody else.
+   The text is AES-GCM; the per-wallet keys come from X25519 / secp256k1 ECDH + HKDF. No extra library. */
+const XPM = (() => {
+  const te = new TextEncoder(), P = 2n ** 256n - 0x1000003D1n, N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n;
+  const G = [0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798n, 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8n];
+  const md = (a) => ((a % P) + P) % P;
+  const pw = (b, e) => { let r = 1n; b = md(b); while (e > 0n) { if (e & 1n) r = (r * b) % P; b = (b * b) % P; e >>= 1n; } return r; };
+  const inv = (a) => pw(a, P - 2n);
+  function add(A, B) {
+    if (!A) return B; if (!B) return A;
+    let l; if (A[0] === B[0]) { if (md(A[1] + B[1]) === 0n) return null; l = md(3n * A[0] * A[0] * inv(2n * A[1])); } else l = md((B[1] - A[1]) * inv(B[0] - A[0]));
+    const x = md(l * l - A[0] - B[0]); return [x, md(l * (A[0] - x) - A[1])];
+  }
+  const mul = (k, Q) => { let R = null, D = Q; while (k > 0n) { if (k & 1n) R = add(R, D); D = add(D, D); k >>= 1n; } return R; };
+  const hexB = (h) => Uint8Array.from((String(h).match(/../g) || []).map((x) => parseInt(x, 16)));
+  const bHex = (b) => [...b].map((x) => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+  const B2n = (b) => (b.length ? BigInt('0x' + bHex(b)) : 0n), n2B = (n) => hexB(n.toString(16).padStart(64, '0'));
+  const cat = (...a) => { const o = new Uint8Array(a.reduce((t, x) => t + x.length, 0)); let i = 0; for (const x of a) { o.set(x, i); i += x.length; } return o; };
+  const rnd = (n) => crypto.getRandomValues(new Uint8Array(n));
+  function decomp(b) {
+    if (b.length !== 33 || (b[0] !== 2 && b[0] !== 3)) throw new Error('bad key');
+    const x = B2n(b.slice(1)), y2 = md(md(x * x) * x + 7n); let y = pw(y2, (P + 1n) / 4n);
+    if (md(y * y) !== y2) throw new Error('bad key'); if ((y & 1n) !== BigInt(b[0] & 1)) y = P - y; return [x, y];
+  }
+  const comp = (Q) => cat(new Uint8Array([2 + Number(Q[1] & 1n)]), n2B(Q[0]));
+  const U9 = new Uint8Array(32); U9[0] = 9;
+  const curve = (pubHex) => (/^ED[0-9A-F]{64}$/i.test(pubHex) ? 0 : /^0[23][0-9A-F]{64}$/i.test(pubHex) ? 1 : -1);
+  async function toKey(pubHex) {   // a one-time key on that wallet's curve → { c, eph, shared }
+    const c = curve(pubHex), pub = hexB(pubHex); if (c < 0) throw new Error('Unknown key type.');
+    if (c === 0) { const k = rnd(32); return { c, eph: PM.x25519(k, U9), shared: PM.x25519(k, PM.edPkToX(pub.slice(1))) }; }
+    const k = (B2n(rnd(32)) % (N - 1n)) + 1n; return { c, eph: comp(mul(k, G)), shared: n2B(mul(k, decomp(pub))[0]) };
+  }
+  async function myShared(c, eph, privHex) {
+    const pv = hexB(privHex).slice(-32);
+    if (c === 0) return PM.x25519(await PM.edSkToX(pv), eph);
+    return n2B(mul(B2n(pv), decomp(eph))[0]);
+  }
+  async function kek(shared, eph) {
+    const base = await crypto.subtle.importKey('raw', shared, 'HKDF', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt: eph, info: te.encode('liquidfi-xmemo-v1') }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  const Z12 = new Uint8Array(12), MAX = 300, MAGIC = [0x4C, 0x01], TYPE = 'liquidfi/pmemo';
+  const fits = (t) => { const n = te.encode(t).length; return n > 0 && n <= MAX; };
+  async function seal(text, toPubHex, fromPubHex) {   // → bytes for MemoData
+    const m = te.encode(text); if (!m.length || m.length > MAX) throw new Error(`Private memo: 1 to ${MAX} characters.`);
+    const K = rnd(32), iv = rnd(12), ck = await crypto.subtle.importKey('raw', K, 'AES-GCM', false, ['encrypt']);
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, ck, m)), slots = [];
+    for (const pk of [toPubHex, fromPubHex]) { const t = await toKey(pk), w = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: Z12 }, await kek(t.shared, t.eph), K)); slots.push(cat(new Uint8Array([t.c]), t.eph, w)); }
+    return cat(new Uint8Array(MAGIC), ...slots, iv, ct);
+  }
+  async function open(b, privHex, pubHex) {   // → text, or null if this wallet can't open it
+    try {
+      if (!b || b.length < 40 || b[0] !== MAGIC[0] || b[1] !== MAGIC[1]) return null;
+      const mine = curve(pubHex); let i = 2; const slots = [];
+      for (let n = 0; n < 2; n++) { const c = b[i], el = c === 0 ? 32 : c === 1 ? 33 : -1; if (el < 0) return null; slots.push({ c, eph: b.slice(i + 1, i + 1 + el), w: b.slice(i + 1 + el, i + 1 + el + 48) }); i += 1 + el + 48; }
+      const iv = b.slice(i, i + 12), ct = b.slice(i + 12);
+      for (const sl of slots) {
+        if (sl.c !== mine) continue;
+        try {
+          const K = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: Z12 }, await kek(await myShared(sl.c, sl.eph, privHex), sl.eph), sl.w));
+          const ck = await crypto.subtle.importKey('raw', K, 'AES-GCM', false, ['decrypt']);
+          return new TextDecoder('utf-8', { fatal: true }).decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, ck, ct));
+        } catch (e) {}
+      }
+      return null;
+    } catch (e) { return null; }
+  }
+  return { seal, open, fits, curve, hexB, bHex, MAX, TYPE, _mul: mul, _G: G, _comp: comp };
+})();
+const strHex = (t) => XPM.bHex(new TextEncoder().encode(t));
+const hexStr = (h) => { try { return new TextDecoder('utf-8', { fatal: true }).decode(XPM.hexB(h)); } catch (e) { return null; } };
 async function buildTx(src, ops, memo) {
   const a = await H('/accounts/' + src);
   if (typeof memo === 'function') memo = await memo((BigInt(a.sequence) + 1n).toString());   // a private memo is sealed to this transaction's own sequence number
@@ -14064,7 +14137,7 @@ async function drawXrp() {
       const L = FG.fills.has(x.hash) ? (FG.heads.get(x.hash) || []).map((g) => (g.own ? (g.fok ? 'Market: ' : 'Filled: ') : 'Order filled: ') + xrGroupText(g)) : [xrTxText(x, addr)];
       for (const t of L) { const q = /^(Order placed|Order cancelled)/.test(t), last = R[R.length - 1]; if (q && last && last.q) { last.m.push({ x, t }); continue; } R.push({ q, m: [{ x, t }] }); } }
     const rows = R.flatMap((g) => g.q && g.m.length >= 3 ? [{ x: g.m[0].x, t: `${g.m.length} orders placed / replaced (a bot re-quoting)` }] : g.m).slice(0, 12);   // runs of 1-2 stay as they are
-    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^Order filled|^Filled|^Market/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${esc(t)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>';
+    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^Order filled|^Filled|^Market/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${esc(t)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>'; xpmFill($('#xrRec')).catch(() => {});
   } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
 }
 /* tap a Recent line: what it moved, who, the network fee, and a link to the explorer (like the Stellar wallet) */
@@ -14075,6 +14148,9 @@ function xrDetail(x, me) {
     const amt = m.delivered_amount || m.DeliveredAmount || t.DeliverMax || t.Amount, rec = t.Account === me && xsDep(t.Destination);
     L.push(row('Amount', esc(xrAmt(amt))), row('From', ad(t.Account)), row('To', ad(t.Destination) + (rec ? ' <span class="mu">· swap deposit address</span>' : '')));
     if (t.DestinationTag != null) L.push(row('Destination tag', esc(String(t.DestinationTag))));
+    for (const mm of t.Memos || []) { const M = mm.Memo || {}, ty = M.MemoType ? hexStr(M.MemoType) : '';
+      if (ty === XPM.TYPE && M.MemoData) { const k = (x.hash || t.hash) + me; L.push(row('🔒 Private memo', `<span class="xpmemo" data-k="${esc(k)}" data-m="${esc(M.MemoData)}" data-me="${esc(me)}">${xpmTxt(XPMC[k])}</span>`)); }
+      else if (M.MemoData) { const v = hexStr(M.MemoData); if (v && !/[\u0000-\u0008\u000e-\u001f\u007f]/.test(v)) L.push(row('Memo', esc(v.slice(0, 300)))); } }
     if (rec) { const [w, , sub] = xsWords(rec); L.push(row('Swap', `${esc(w)}${sub ? ' · ' + esc(sub) : ''}`)); }
   } else {
     L.push(row('Type', esc(t.TransactionType || 'Transaction')));
@@ -14085,6 +14161,14 @@ function xrDetail(x, me) {
   L.push(row('Network fee', t.Account === me && t.Fee ? `${(+t.Fee / 1e6).toFixed(6)} XRP` : xsOutTx(x.hash || t.hash) ? 'paid by the swap bridge, not by you' : 'paid by the sender, not by you'));
   if (x.iso) L.push(row('Time', esc(new Date(x.iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))));
   return `<div class="recd">${L.join('')}<div><span></span><a href="${XRP_EXPL[S.net]}/transactions/${esc(x.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a></div></div>`;
+}
+const XPMC = {};   // tx hash + wallet → opened private memo ('' = not readable on this wallet)
+const xpmTxt = (v) => (v == null ? 'opening…' : v ? esc(v) : 'not readable on this wallet');
+async function xpmFill(root) {
+  for (const el of (root ? root.querySelectorAll('.xpmemo') : [])) {
+    const k = el.dataset.k; if (XPMC[k] == null) { const o = xrOwn(el.dataset.me); XPMC[k] = o ? (await XPM.open(XPM.hexB(el.dataset.m), o.w.privateKey, o.w.publicKey)) || '' : ''; }
+    el.innerHTML = xpmTxt(XPMC[k]);
+  }
 }
 function xrAmt(a) { if (a == null) return '?'; if (typeof a === 'string') return m2(+a / 1e6) + ' XRP'; return m2(+a.value) + ' ' + xrCur(a.currency); }
 /* What a transaction did to MY XRP and RLUSD (from the ledger's before/after), fee put back for my own transactions.
@@ -14201,13 +14285,83 @@ function xrTxText(x, me) {
 }
 
 /* send */
-function xrSendSheet(pre = {}) {
+function xrSendSheet(pre = {}) {   /* like Stellar Send: you can only send to a saved address you checked (name, address, destination tag) */
   const o = xrOwn(xrSel); if (!o) return; pending = null; const d = XRA[xrSel];
+  const XB = xrBook(), pick = pre.pick != null && XB[pre.pick] ? String(pre.pick) : '';
   sheet(`<h2>Send XRP</h2><div class="mu" style="font-size:13px">From ${esc(o.name)} · ${m2(xrSpend(d))} XRP available</div>
-    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">To address (r…)</span><div class="scanrow"><input id="xrsTo" placeholder="r…" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" value="${esc(pre.to || '')}"><button class="b-out" data-act="xrScan">Scan</button></div><div id="xrsScan"></div></div>
-    <label>Destination tag (exchanges need it; leave empty for a personal wallet)<input id="xrsTag" inputmode="numeric" autocomplete="off" value="${esc(pre.tag || '')}"></label>
-    <div class="g2" style="align-items:end"><label>Amount (XRP)<input id="xrsAmt" inputmode="decimal" placeholder="0"></label><button class="b-out" data-act="xrMax">Max</button></div>
-    <button class="b-light big" data-act="xrSendReview">Review send</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+    <label>To<select id="xrsBook"><option value="">Choose…</option>${XB.map((x, i) => `<option value="${i}"${String(i) === pick ? ' selected' : ''}>${esc(x.name)} · ${esc(short(x.addr))}${x.tag !== '' && x.tag != null ? ' · tag ' + esc(x.tag) : ''}</option>`).join('')}<option value="new">+ New address</option></select></label>
+    <div id="xrsNew" style="display:none;flex-direction:column;gap:10px">
+      <label>Name for this address<input id="xrsName" placeholder="e.g. Coinbase" maxlength="30" autocomplete="off"></label>
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">Address (r…)</span><div class="scanrow"><input id="xrsTo" placeholder="r…" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"><button class="b-out" data-act="xrScan">Scan</button></div><div id="xrsScan"></div></div>
+      <label>Destination tag (exchanges need it; leave empty for a personal wallet)<input id="xrsTag" inputmode="numeric" autocomplete="off"></label>
+      <label>Memo this address needs, optional<input id="xrsNMemo" autocomplete="off" maxlength="300"></label>
+      <div id="xrsChk"></div>
+      <button class="b-out" data-act="xrBookCheck" id="xrsChkBtn">Check and save address</button>
+    </div>
+    <div id="xrsSendW" style="display:flex;flex-direction:column;gap:10px"><div class="g2" style="align-items:end"><label>Amount (XRP)<input id="xrsAmt" inputmode="decimal" placeholder="0" value="${esc(pre.amt || '')}"></label><button class="b-out" data-act="xrMax">Max</button></div>
+    <label><span id="xrsMemoL">Memo (optional, public: anyone can see it on the ledger)</span><input id="xrsMemo" autocomplete="off" maxlength="300" value="${esc(pick !== '' ? XB[+pick].memo || '' : '')}"></label>
+    <label style="flex-direction:row;align-items:center;gap:10px;font-size:14px"><input type="checkbox" id="xrsPriv" style="width:20px;height:20px"><span>Private memo <span class="mu" style="font-size:12px">only you and the receiver can read it, in Liquidfi</span></span></label>
+    <div class="note"><span>Only saved, checked addresses can be sent to.</span></div>
+    <button class="b-light big" data-act="xrSendReview">Review send</button></div><button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+/* XRP address book (per network), like Stellar's saved addresses: name, address, destination tag */
+function xrBook() { const n = NS(); if (!Array.isArray(n.xsaved)) n.xsaved = []; return n.xsaved; }
+function xrBookSave(name, addr, tag, memo) {   // → index of the entry
+  const L = xrBook(), t = tag == null || tag === '' ? '' : String(tag), i = L.findIndex((x) => x.addr === addr && String(x.tag ?? '') === t), mm = String(memo || '').trim();
+  if (i >= 0) { L[i].name = name; if (mm) L[i].memo = mm; else delete L[i].memo; saveS(); return i; }
+  L.push(mm ? { name, addr, tag: t, memo: mm } : { name, addr, tag: t }); saveS(); return L.length - 1;
+}
+/* the receiver's master public key, needed to seal a private memo: from a transaction that address signed itself */
+const XRPUB = {};
+async function xrPubOf(addr) {
+  const own = xrList().map((w) => xrOwn(w.addr)).find((o) => o && o.w.classicAddress === addr); if (own) return own.w.publicKey;
+  if (XRPUB[addr]) return XRPUB[addr];
+  let marker; for (let pg = 0; pg < 4; pg++) {
+    const r = await xr('account_tx', { account: addr, limit: 100, forward: false, ...(marker ? { marker } : {}) });
+    for (const x of r.transactions || []) { const t = x.tx || x.tx_json || {}; const k = t.SigningPubKey;
+      if (t.Account === addr && k && XPM.curve(k) >= 0) { try { if (xrpl.deriveAddress(k) === addr) return (XRPUB[addr] = k.toUpperCase()); } catch (e) {} } }
+    if (!r.marker) break; marker = r.marker;
+  }
+  return null;
+}
+function xrLookAlike(a) {   /* address poisoning: same first 4 and last 4 as a saved address or one of your XRP wallets, different middle */
+  const K2 = new Set([...xrBook().map((x) => x.addr), ...xrList().map((w) => w.addr)]);
+  if (!a || K2.has(a)) return null;
+  for (const k of K2) if (k && k.slice(0, 4) === a.slice(0, 4) && k.slice(-4) === a.slice(-4)) return k;
+  return null;
+}
+function xrsShow() {
+  const v = ($('#xrsBook') || {}).value, bk = xrBook()[+v]; $('#xrsNew').style.display = v === 'new' ? 'flex' : 'none'; $('#xrsSendW').style.display = v === 'new' ? 'none' : 'flex';
+  if ($('#xrsMemo')) { $('#xrsMemo').value = v !== 'new' && v !== '' && bk ? bk.memo || '' : ''; $('#xrsPriv').checked = false; xrsPrivPaint(); }
+}
+function xrsPrivPaint() { const on = ($('#xrsPriv') || {}).checked; if ($('#xrsMemoL')) $('#xrsMemoL').textContent = on ? 'Private memo (encrypted: only you and the receiver can read it)' : 'Memo (optional, public: anyone can see it on the ledger)'; }
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'xrsPriv') xrsPrivPaint(); });
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'xrsBook') { XRCHK = null; if ($('#xrsChk')) $('#xrsChk').innerHTML = ''; xrsShow(); } });
+document.addEventListener('input', (e) => { if (e.target && ['xrsTo', 'xrsTag', 'xrsName', 'xrsNMemo'].includes(e.target.id) && XRCHK) { XRCHK = null; $('#xrsChk').innerHTML = ''; $('#xrsChkBtn').textContent = 'Check and save address'; } });   // changed after the check: check again
+let XRCHK = null;   /* the address being checked: { name, addr, tag } */
+async function xrBookCheck() {
+  if (XRCHK) {   /* step 2: last 4 typed → save it and go back to Send with it picked */
+    if ((($('#xrsChk4') || {}).value || '').trim() !== XRCHK.addr.slice(-4)) return toast('Last 4 do not match.');
+    const amt = ($('#xrsAmt') || {}).value || '', i = xrBookSave(XRCHK.name, XRCHK.addr, XRCHK.tag, XRCHK.memo); XRCHK = null;
+    toast('Saved.'); return xrSendSheet({ pick: i, amt });
+  }
+  const name = ($('#xrsName').value || '').trim().slice(0, 30), addr = ($('#xrsTo').value || '').trim(), tag = ($('#xrsTag').value || '').trim(), nmemo = ($('#xrsNMemo').value || '').trim();
+  if (!name) return toast('Give the address a name.');
+  if (!xrpl.isValidClassicAddress(addr)) return toast('That is not an XRP Ledger address (r…).');
+  if (tag && (!/^\d{1,10}$/.test(tag) || +tag > 4294967295)) return toast('A destination tag is a whole number.');
+  { const la = xrLookAlike(addr); if (la) return toast(`⚠ This looks like ${short(la)} but the middle is different: a scam look-alike. Copy the address from the real source (exchange page or QR), never from your history.`, 9000); }
+  let r = null; try { r = await xr('account_info', { account: addr, ledger_index: 'validated' }); } catch (e) { return toast(e.message || String(e)); }
+  const ad = r && r.account_data, F = ad ? +ad.Flags : 0;
+  if (r && r.error && r.error !== 'actNotFound') return toast(r.error_message || r.error);
+  if (ad && (F & 0x00020000) && !tag) return toast('This address says a destination tag is required (exchanges do). Add the tag from the exchange first.');
+  if (ad && (F & 0x01000000)) return toast('That address only accepts payments from senders it approved (Deposit Authorization). Sends to it would fail.');
+  if (nmemo && new TextEncoder().encode(nmemo).length > 300) return toast('A memo fits 300 characters.');
+  XRCHK = { name, addr, tag, memo: nmemo };
+  const sv = await xrServer().catch(() => null);
+  $('#xrsChk').innerHTML = `<div class="mu" style="font-size:13.5px">Compare every group with the source (exchange page, QR). Then type the last 4 characters.</div>
+    <div class="card"><div class="addr" style="font-size:15px;line-height:1.7">${[addr.slice(0, 4), ...(addr.slice(4, -4).match(/.{1,4}/g) || []), addr.slice(-4)].map((g) => `<span style="display:inline-block;white-space:nowrap;margin-right:.45em">${esc(g)}</span>`).join('')}</div><div class="mu" style="font-size:13px">${ad ? 'Exists on the XRP Ledger' + (F & 0x00020000 ? ' · destination tag required' : '') : `<span class="amb">Not activated yet: the first send must be at least ${sv ? m2(sv.base) : 'the reserve in'} XRP</span>`}${tag ? ' · tag ' + esc(tag) : ''}${nmemo ? ' · memo ' + esc(nmemo) : ''}</div></div>
+    <label>Last 4 characters<input id="xrsChk4" autocomplete="off" autocapitalize="off" spellcheck="false"></label>`;
+  $('#xrsChkBtn').textContent = 'Save address'; $('#xrsChk4').focus();
 }
 function parseXrpQR(txt) {
   const t = String(txt || '').trim(), m = t.match(/r[1-9A-HJ-NP-Za-km-z]{24,34}/);
@@ -14217,9 +14371,12 @@ function parseXrpQR(txt) {
 }
 async function xrSendReview() {
   const o = xrOwn(xrSel), d = XRA[xrSel]; if (!o || !d || !d.a) return toast('This wallet is not activated yet.');
-  const to = ($('#xrsTo').value || '').trim(), tagS = ($('#xrsTag').value || '').trim(), amt = +$('#xrsAmt').value;
+  const bv = ($('#xrsBook') || {}).value, bk = xrBook()[+bv];
+  if (!bk || bv === '' || bv === 'new') return toast('Choose a saved address.');
+  const to = bk.addr, tagS = String(bk.tag ?? ''), amt = +$('#xrsAmt').value;
   if (!xrpl.isValidClassicAddress(to)) return toast('That is not an XRP Ledger address (r…).');
   if (to === o.w.classicAddress) return toast("That's this wallet's own address.");
+  { const la = xrLookAlike(to); if (la) return toast(`⚠ This looks like ${short(la)} but the middle is different: a scam look-alike. Copy the address from the real source (exchange page or QR), never from your history.`, 9000); }
   if (tagS && !/^\d{1,10}$/.test(tagS) || (tagS && +tagS > 4294967295)) return toast('A destination tag is a whole number.');
   if (!(amt > 0)) return toast('Enter an amount.');
   let sv, dst, fee;
@@ -14232,9 +14389,18 @@ async function xrSendReview() {
   if (dst.account_data && (+dst.account_data.Flags & 0x00020000) && !tagS) return toast('That address needs a destination tag (exchanges do). Add it from the exchange.');
   if (dst.account_data && (+dst.account_data.Flags & 0x01000000)) return toast('That address only accepts payments from senders it approved (Deposit Authorization). The ledger would refuse it.');
   if (dst.account_data && (+dst.account_data.Flags & 0x00080000) && !confirm('That address asks not to be sent XRP. Send anyway?')) return;
-  const items = [...await xrBusy(xrSel), { k: 'Send', v: `${m2(amt)} XRP`, hl: 1 }, { k: 'To', v: `${to.slice(0, 8)}…${to.slice(-6)}`, n: (xrList().find((w) => w.addr === to) || {}).name || 'check the start and end' }, ...(tagS ? [{ k: 'Destination tag', v: tagS }] : []), { k: 'Network fee', v: `${m2(drops / 1e6)} XRP` },
+  const memoS = (($('#xrsMemo') || {}).value || '').trim(), priv = !!($('#xrsPriv') || {}).checked; let memos = null;
+  if (memoS && new TextEncoder().encode(memoS).length > 300) return toast('A memo fits 300 characters.');
+  if (priv) {
+    if (!memoS) return toast('Type the private memo, or turn Private off.');
+    if (tagS || (dst.account_data && (+dst.account_data.Flags & 0x00020000))) return toast('This address uses a destination tag (exchanges read the tag and memo to credit you). Turn Private off.', 7000);
+    let pk = null; try { pk = await xrPubOf(to); } catch (e) {}
+    if (!pk) return toast("A private memo needs the receiver to have sent at least one XRP Ledger transaction (that's how Liquidfi gets their key). Send it as a public memo instead.", 9000);
+    try { memos = [{ Memo: { MemoType: strHex(XPM.TYPE), MemoData: XPM.bHex(await XPM.seal(memoS, pk, o.w.publicKey)) } }]; } catch (e) { return toast(e.message || String(e)); }
+  } else if (memoS) memos = [{ Memo: { MemoType: strHex('text'), MemoFormat: strHex('text/plain'), MemoData: strHex(memoS) } }];
+  const items = [...await xrBusy(xrSel), { k: 'Send', v: `${m2(amt)} XRP`, hl: 1 }, { k: 'To', v: `${to.slice(0, 8)}…${to.slice(-6)}`, n: bk.name || (xrList().find((w) => w.addr === to) || {}).name || 'check the start and end' }, ...(tagS ? [{ k: 'Destination tag', v: tagS }] : []), ...(memoS ? [{ k: priv ? '🔒 Private memo' : 'Memo', v: memoS, n: priv ? `encrypted: only you and ${bk.name} can read it, in Liquidfi` : 'public' }] : []), { k: 'Network fee', v: `${m2(drops / 1e6)} XRP` },
     ...(dst.error === 'actNotFound' ? [{ foot: `This opens a new XRP Ledger address: ${m2(sv.base)} XRP of it stays there as the ledger's reserve.` }] : []), { foot: XR_BOT_NOTE }];
-  confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops), false, 'b-acc', 'Sending…', true);
+  confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops, memos), false, 'b-acc', 'Sending…', true);
 }
 // sign + submit + wait until the outcome is CERTAIN. A payment is only "not sent" once the ledger has passed its
 // LastLedgerSequence without it. Timeouts, tef/ter/tel answers (e.g. tefPAST_SEQ from a second server that already has it)
@@ -14364,10 +14530,11 @@ async function xrBusyN(addr) {
 const xrBusyItems = (n) => n >= 2 ? [{ t: '⚠ A bot is trading from this wallet right now', s: `it sent ${n} transactions in the last 90 seconds (XRP Sweepr?). Pause it first: two programs on one wallet collide and this may not go through.`, hl: 1 }] : [];
 async function xrBusy(addr) { return xrBusyItems(await xrBusyN(addr)); }
 const XR_BOT_NOTE = 'If a bot (like XRP Sweepr) trades from this wallet, pause it first so the two don\'t clash.';
-async function xrSendRun(o, to, tag, amt, drops) {
+async function xrSendRun(o, to, tag, amt, drops, memos) {
   try {
     const tx = { TransactionType: 'Payment', Destination: to, Amount: String(Math.round(amt * 1e6)) };
     if (tag != null) tx.DestinationTag = tag;
+    if (memos && memos.length) tx.Memos = memos;
     const r = await xrSubmit(o, tx, drops);
     return xrOutcome(r, 'Sent', `${m2(amt)} XRP to ${esc(short(to))}${tag != null ? ' · tag ' + tag : ''}`, 'Not sent');
   } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
@@ -14701,8 +14868,8 @@ function xtOrderDone(p, r, o, lim, drops) {
   if (r.state === 'ok') {
     const tr = xrTradeText(xrMyDelta(r.meta || {}, me, { Account: me, Fee: String(drops) }));
     let rest = null, id = null; for (const n of ((r.meta || {}).AffectedNodes || [])) { const v = n.CreatedNode; if (v && v.LedgerEntryType === 'Offer' && (v.NewFields || {}).Account === me) { rest = xrXrpSide(v.NewFields); id = v.NewFields.Sequence; } }
-    if (rest > 0 && tr) return tPendSet(p, 'Partly filled', 'grn', `${tr} · ${xq4(rest)} XRP on the book${id ? ' · order #' + id : ''}`, true);
-    if (rest > 0) return tPendSet(p, '✓ On the book', 'grn', `${xq4(rest)} XRP waiting to fill${id ? ' · order #' + id : ''}`, true);
+    if (rest > 0 && tr) return tPendSet(p, 'Partial', 'grn', `${tr} · ${xq4(rest)} XRP still open${id ? ' · order #' + id : ''}`, true);
+    if (rest > 0) return tPendSet(p, '✓ Sent', 'grn', `${xq4(rest)} XRP waiting to fill${id ? ' · order #' + id : ''}`, true);
     if (tr) return tPendSet(p, '✓ Filled', 'grn', tr, true);
     return tPendSet(p, lim ? '✓ Sent' : '✓ Done', 'grn', 'ledger ' + (r.ledger || ''), true);
   }
@@ -14770,7 +14937,7 @@ async function xtReview() {
     : { TransactionType: 'OfferCreate', TakerGets: String(xd), TakerPays: R, Flags: flags };              // you pay XRP, get ${tk}
   if (lf) lines.push({ k: 'Liquidfi fee', v: `${xq4(lf)} XRP`, n: `${XR_FEE.bps / 100}% · on top, only if it fills` });
   lines.push({ k: 'Network fee', v: `${m2(drops / 1e6)} XRP` }, { foot: XR_BOT_NOTE }); lines.unshift(...await xrBusy(xrSel)); if (XT.q !== C.k) return toast('You switched pairs. Review again.');
-  confirmSheet(title, `${XT.mode === 'lim' ? 'stays on the book until filled or cancelled' : 'fills now or not at all'} · ${S.net === 'public' ? '' : 'Testnet · '}${esc(o.name)}`, lines, `Send ${XT.mode === 'lim' ? 'order' : XT.side}`, async () => {
+  confirmSheet(title, `${XT.mode === 'lim' ? 'stays open until filled or cancelled' : 'fills now or not at all'} · ${S.net === 'public' ? '' : 'Testnet · '}${esc(o.name)}`, lines, `Send ${XT.mode === 'lim' ? 'order' : XT.side}`, async () => {
     const lim = XT.mode === 'lim';   /* read before tPend resets the form */
     const p = tPend(`${lim ? 'Limit' : 'Market'} ${buy ? 'buy' : 'sell'} ${m2(q)} XRP${lim ? ' @ ' + px.toFixed(5) + ' ' + tk : ''}`, 'xtrade', o.w.classicAddress);
     let r = null;
@@ -14796,8 +14963,8 @@ function xtModeUI() {
     $('#xtStL').textContent = `Stop price (${C.tok} per XRP)`; $('#xtSlL').textContent = `Worst price you'll accept (${C.tok} per XRP)`;
     if (stp && !$('#xtStop').value) { const b = XT.bids[0], a = XT.asks[0], m = b && a ? (b[0] + a[0]) / 2 : 0; if (m) $('#xtStop').value = (m * (XT.side === 'sell' ? 0.98 : 1.02)).toFixed(4); }
     $('#xtStNote').textContent = !stp ? '' : XT.sk === 'mkt'
-      ? `When XRP-USD reaches your stop, it ${XT.side === 'sell' ? 'sells' : 'buys'} at up to ${XST_MKT}% ${XT.side === 'sell' ? 'below' : 'above'} it. Any part that can't fill there waits on the book.`
-      : `When XRP-USD reaches your stop, it places a limit order at your worst price. It fills at that price or better; the rest waits on the book.`;
+      ? `When XRP-USD reaches your stop, it ${XT.side === 'sell' ? 'sells' : 'buys'} at up to ${XST_MKT}% ${XT.side === 'sell' ? 'below' : 'above'} it. Any part that can't fill there stays open as an order.`
+      : `When XRP-USD reaches your stop, it places a limit order at your worst price. It fills at that price or better; the rest stays open as an order.`;
   }
   const g = $('#xtGo'); if (g) { g.textContent = (XT.side === 'buy' ? 'Buy' : 'Sell') + (stp ? ' stop' : ''); g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big'; }
 }
@@ -14925,7 +15092,7 @@ function xstCancelSheet(id) {
       const ss = sv && sv.stop && sv.stop.status;
       if (ss && ss !== 'armed' && ss !== 'cancelled' && ss !== 'sending') {   /* it already triggered and the ledger settled it */
         Object.assign(x, { st: ss, note: sv.stop.note || '' }); if (!xstLive(x)) x.endAt = x.endAt || Date.now(); saveS();
-        return tPendSet(p, 'Too late to cancel', 'amb', ss === 'sending' ? 'It already triggered: the order is going in now.' : `It already ${ss === 'placed' ? 'triggered (the rest waits on the book: cancel that order below)' : ss}.`, true);
+        return tPendSet(p, 'Too late to cancel', 'amb', ss === 'sending' ? 'It already triggered: the order is going in now.' : `It already ${ss === 'placed' ? 'triggered (the rest is an open order: cancel it below)' : ss}.`, true);
       }
       tPendSet(p, 'Cancelling…', 'mu', ss === 'sending' ? 'it triggered but the ledger has not taken it yet: using its ticket so it never applies' : 'using up the tickets');
       const U1 = await xstUseTickets(o, [x.tickets[0]]), ours = U1.mine.includes(x.tickets[0]);   /* a ticket applies once: if OUR no-op used it, the order never can */
@@ -17996,7 +18163,7 @@ async function tradeReview() {
       if (avail('XLM') < xNeed - 1e-7) return toast(`Not enough XLM for this order and its network fee (have ${fx(avail('XLM'))}).${holdNote(a, 'XLM')}`, 7000); }
     const op = T.side === 'buy' ? SDK.Operation.manageBuyOffer({ selling: AQ, buying: AB, buyAmount: amt7(q), price: p.toFixed(7) })
       : SDK.Operation.manageSellOffer({ selling: AB, buying: AQ, amount: amt7(q), price: p.toFixed(7) });
-    return confirmSheet(`Limit ${T.side} ${fx(q)} ${nB}`, `${netPre()}stays open on the book until filled or cancelled`, [{ k: T.side === 'buy' ? 'Buy' : 'Sell', v: `${fx(q, 2)} ${nB}`, hl: 1 }, { k: 'Limit price', v: `${pxF(p)} ${nQ}` }, { k: 'Total', v: `${fx(q * p)} ${nQ}` }, { k: 'Liquidfi fee', v: 'None', n: 'limit orders are free' }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
+    return confirmSheet(`Limit ${T.side} ${fx(q)} ${nB}`, `${netPre()}stays open until filled or cancelled`, [{ k: T.side === 'buy' ? 'Buy' : 'Sell', v: `${fx(q, 2)} ${nB}`, hl: 1 }, { k: 'Limit price', v: `${pxF(p)} ${nQ}` }, { k: 'Total', v: `${fx(q * p)} ${nQ}` }, { k: 'Liquidfi fee', v: 'None', n: 'limit orders are free' }], `Send ${T.side} order`, () => orderTx(kp, tradeAddr, op, T.side, 'Sent', q), false, T.side === 'buy' ? 'b-grn' : 'b-pur', 'Sending…', true);
   }
   // Market = path payment to self + the Liquidfi fee in the same transaction (all or nothing). The amount entered is exactly what trades;
   // the fee is paid on top (buy: in the quote token, sell: in the base token).
@@ -18043,7 +18210,7 @@ const OBN = { p: null, t: 0 }, OBN_SCR = ['trade', 'xtrade', 'swap', 'xswap'];
 function obnPaint() {
   const p = OBN.p, el = $('#obn'); if (!p || !el) return;
   const what = p.scr === 'swap' || p.scr === 'xswap' ? 'swap' : 'order', bad = p.cls === 'red', warn = !p.busy && !bad && /amb/.test(p.cls || '');
-  const title = p.busy ? (/^(Sending|Sent)/.test(p.st) ? `Sending your ${what}…` : String(p.st || ''))   /* two steps only: Sending… (yellow) → the result (On the book / Filled, green) */ : String(p.st || '').replace(/^✓\s*/, '');
+  const title = p.busy ? (/^(Sending|Sent)/.test(p.st) ? 'Sending…' : String(p.st || ''))   /* two steps only: Sending… (yellow) → the result (Order placed / Filled, green) */ : String(p.st || '').replace(/^✓\s*/, '');
   el.className = 'on ' + (p.busy || warn ? '' : bad ? 'bad' : 'ok');
   el.innerHTML = `<div class="obi">${p.busy ? '<div class="obsp"></div>' : bad || warn ? '!' : '✓'}</div><div style="min-width:0"><b>${esc(title)}</b><div class="obs">${esc(p.label)}${p.sub ? ' · ' + esc(p.sub) : ''}</div></div>`;
   clearTimeout(OBN.t); if (!p.busy) OBN.t = setTimeout(obnHide, bad || warn ? 12000 : 5000);
@@ -18610,14 +18777,14 @@ async function orderTx(kp, src, op, side, title, orig) {
     if (f) {
       if (f.id && orig) { const st = ordStore(); st[f.id] = { orig, side, at: Date.now() }; saveS(); }
       if (f.filled > 0) rows.push(`<div class="card"><div class="r"><span>Filled now</span><b class="mono">${fx(f.filled, 2)} ${esc(kName(TP().b))}</b></div><div class="r mu" style="font-size:12.5px"><span>avg price</span><span class="mono">${f.avg.toFixed(6)} · ${fx(f.usdc)} ${esc(kName(TP().q))}</span></div></div>`);
-      rows.push(f.id ? `<div class="card"><div class="r"><span>Open on the book</span><b class="mono">${fx(f.rest, 2)} ${esc(kName(TP().b))}</b></div><div class="r mu" style="font-size:12.5px"><span>order #${esc(f.id)}</span><span>Edit or cancel it on Trade</span></div></div>` : `<div class="card"><span class="grn">Nothing left open.</span></div>`);
+      rows.push(f.id ? `<div class="card"><div class="r"><span>Still open</span><b class="mono">${fx(f.rest, 2)} ${esc(kName(TP().b))}</b></div><div class="r mu" style="font-size:12.5px"><span>order #${esc(f.id)}</span><span>Edit or cancel it on Trade</span></div></div>` : `<div class="card"><span class="grn">Nothing left open.</span></div>`);
       rows.unshift(`<div class="card"><b>${f.filled > 0 && !f.id ? 'Filled' : f.filled > 0 ? 'Partial' : 'Open'}</b><span class="mu" style="font-size:12.5px">Confirmed in ledger ${r.ledger}</span></div>`);
     }
     const nB = kName(TP().b);
     if (!f) return tPendSet(p, '✓ Sent', 'grn', 'ledger ' + r.ledger, true);
     if (f.filled > 0 && !f.id) return tPendSet(p, '✓ Filled', 'grn', `${fx(f.filled, 2)} ${nB}${f.avg ? ' @ ' + pxF(f.avg) : ''}`, true);
-    if (f.filled > 0) return tPendSet(p, 'Partly filled', 'grn', `${fx(f.filled, 2)} ${nB} filled now · ${fx(f.rest, 2)} on the book${f.id ? ' · #' + f.id : ''}`, true);
-    return tPendSet(p, '✓ On the book', 'grn', `${fx(f.rest, 2)} ${nB} waiting to fill${f.id ? ' · #' + f.id : ''}`, true);
+    if (f.filled > 0) return tPendSet(p, 'Partial', 'grn', `${fx(f.filled, 2)} ${nB} filled now · ${fx(f.rest, 2)} still open${f.id ? ' · #' + f.id : ''}`, true);
+    return tPendSet(p, '✓ Sent', 'grn', `${fx(f.rest, 2)} ${nB} waiting to fill${f.id ? ' · #' + f.id : ''}`, true);
   } catch (e) { tPendSet(p, 'Failed', 'red', niceErr(e) + ' Nothing traded.', true); }
 }
 // Trade screen activity: orders placed, edited, cancelled, market orders, and fills, newest first
@@ -18798,7 +18965,35 @@ async function trCheck() {
 }
 
 /* ---------- settings ---------- */
+function bookList() { return [...(NS().saved || []).map((x, i) => ({ k: 'st', i, x })), ...xrBook().map((x, i) => ({ k: 'xr', i, x }))]; }
+function bookPaint() {
+  const el = $('#setBookL'); if (!el) return; const L = bookList();
+  const grp = (k, h) => { const R = L.filter((r) => r.k === k); return R.length ? `<span class="mu" style="font-size:12px;margin-top:4px">${h}</span>` + R.map((r) => `<div class="r" style="gap:8px;align-items:center"><span style="min-width:0;overflow-wrap:anywhere"><b>${esc(r.x.name)}</b> <span class="mu mono" style="font-size:12px">${esc(short(r.x.addr))}${r.x.tag ? ' · tag ' + esc(r.x.tag) : ''}${r.x.memo ? ' · memo ' + esc(r.x.memo) : ''}</span></span><span style="display:flex;gap:6px;flex:none"><button class="b-out sm" data-act="bookRen" data-k="${k}" data-i="${r.i}" style="width:auto;padding:0 10px">Rename</button><button class="b-out sm" data-act="bookDel" data-k="${k}" data-i="${r.i}" style="width:auto;padding:0 10px">Delete</button></span></div>`).join('') : ''; };
+  el.innerHTML = L.length ? grp('st', 'Stellar') + grp('xr', 'XRP Ledger') : '<div class="mu" style="font-size:13px">No saved addresses yet. Add one from Send.</div>';
+}
+const bookGet = (k, i) => (k === 'xr' ? xrBook() : NS().saved || [])[+i];
+function bookRen(k, i) {
+  const x = bookGet(k, i); if (!x) return; pending = null; window._bookEd = { k, i: +i, addr: x.addr };
+  sheet(`<h2>Rename address</h2><div class="mu mono" style="font-size:13px">${esc(short(x.addr))}${x.tag ? ' · tag ' + esc(x.tag) : ''}</div><label>Name<input id="bookName" maxlength="30" value="${esc(x.name)}" autocomplete="off"></label>
+    <button class="b-light big" data-act="bookRenOk">Save</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+function bookRenOk() {
+  const e = window._bookEd, x = e && bookGet(e.k, e.i), n = (($('#bookName') || {}).value || '').trim().slice(0, 30);
+  if (!x || x.addr !== e.addr) return closeSheet(); if (!n) return toast('Give the address a name.');
+  x.name = n; saveS(); closeSheet(); bookPaint(); toast('Renamed.');
+}
+function bookDel(k, i) {
+  const x = bookGet(k, i); if (!x) return; pending = null; window._bookEd = { k, i: +i, addr: x.addr };
+  sheet(`<h2>Delete ${esc(x.name)}?</h2><div class="mu" style="font-size:13.5px">${esc(short(x.addr))}${x.tag ? ' · tag ' + esc(x.tag) : ''} is removed from your address book. To send there again you'd add and check it again. Your money and past sends aren't affected.</div>
+    <button class="b-red big" data-act="bookDelOk">Delete</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+function bookDelOk() {
+  const e = window._bookEd, L = e && (e.k === 'xr' ? xrBook() : NS().saved || []), x = L && L[e.i];
+  if (!x || x.addr !== e.addr) return closeSheet();
+  L.splice(e.i, 1); saveS(); closeSheet(); bookPaint(); toast('Deleted.');
+}
 function drawSet() {
+  try { bookPaint(); } catch (e) {}
   $('#setNetCard').style.display = DEV ? '' : 'none';
   try { drawTax(); } catch (e) {}
   $$('#setNet button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.net));
@@ -19048,7 +19243,7 @@ document.addEventListener('click', async (e) => {
     vanCancel: () => { vanStop(); closeSheet(); toast('Stopped. Nothing was paid.'); }, vanPay: () => vanPay(), vanDrop: () => { VANHIT = null; closeSheet(); toast('Discarded.'); },
     clOpen: () => closeWallet(), clReview: () => closeReview(),
     homeRemove: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i < 0) return; t.dataset.i = i; A.rmAcct(); },
-    copyNewAddr: () => copy(t.dataset.addr), xstCancel: () => xstCancelSheet(t.dataset.xs), xstRelease: () => xstRelease(t.dataset.xs), xrTrust: () => xrTrustReview(t.dataset.xk || 'rl'), xrUntrust: () => xrUntrustReview(t.dataset.xc, t.dataset.xi), xrAssets: () => xrAssetsSheet(), xrSend: () => xrSendSheet(), xrRcv: phGate(() => xrRcvSheet()), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
+    copyNewAddr: () => copy(t.dataset.addr), xstCancel: () => xstCancelSheet(t.dataset.xs), xstRelease: () => xstRelease(t.dataset.xs), xrTrust: () => xrTrustReview(t.dataset.xk || 'rl'), xrUntrust: () => xrUntrustReview(t.dataset.xc, t.dataset.xi), xrAssets: () => xrAssetsSheet(), xrSend: () => xrSendSheet(), bookRen: () => bookRen(t.dataset.k, t.dataset.i), bookDel: () => bookDel(t.dataset.k, t.dataset.i), xrRcv: phGate(() => xrRcvSheet()), xrFaucet, xrSendReview, xrCopy: () => copy(xrSel),
     onrBuy: phGate(() => onrBuySheet(t.dataset.chain, t.dataset.chain === 'xrp' ? (t.dataset.addr || xrSel) : (t.dataset.addr || $('#rAcct').value))), onrCheck,
     onrProv: () => { ONR.prov = t.dataset.v; onrBuySheet(ONR.chain, ONR.addr); },
     onrAddUsdc: () => onrAddUsdc(t),
@@ -19058,7 +19253,7 @@ document.addEventListener('click', async (e) => {
     onrAsset: () => { ONR.asset = t.dataset.v; ONR.network = t.dataset.n; ONR.usd = +(($('#onrAmt') || {}).value) || ONR.usd; onrBuySheet(ONR.chain, ONR.addr); },
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
     onrGo: () => onrGo(t),
-    xrScan: () => scanInline($('#xrsScan'), (r) => { $('#xrsTo').value = r.addr; $('#xrsTag').value = r.tag || ''; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
+    xrScan: () => scanInline($('#xrsScan'), (r) => { $('#xrsTo').value = r.addr; $('#xrsTag').value = r.tag || ''; XRCHK = null; $('#xrsChk').innerHTML = ''; $('#xrsChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
     xrMax: () => { const d = XRA[xrSel]; $('#xrsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
     xrNewDone: () => { const a = t.dataset.addr, fresh = XRFRESH; XRFRESH = false; const done = () => { closeSheet(); xrSel = a; go('xrp'); };
       if (fresh || phNeedCheck()) return phQuiz(done, 'new'); done(); },
@@ -19145,7 +19340,7 @@ document.addEventListener('click', async (e) => {
     killOne: () => killFlow(planCancel(tradeAccts()[botSel]).then((p) => [p]), `Cancel ${tradeAccts()[botSel].name} orders?`, 'cancel'),
     flatOne: () => { const b = tradeAccts()[botSel]; killFlow(planFlat(b).then((p) => [p]), `Cancel ${b.name} orders and close positions into ${flatCode()}?`, 'cancel + close'); },
     resultBack: () => go(resultBack),
-    tradeReview, sendReview, saveAddr, saveAddrOk, trCheck,
+    tradeReview, sendReview, saveAddr, saveAddrOk, xrBookCheck, bookRenOk, bookDelOk, trCheck,
     trAddCustom: () => { const c = window._custom; if (!c) return; if (!NS().extraKnown.some((k) => k.code === c.code && k.issuer === c.issuer)) { NS().extraKnown.push(c); saveS(); } trustOp(c, false); },
     copyAddr: () => copy($('#rAddr').textContent), copyEm: () => copy(K.em.publicKey()),
     shareAddr: () => { const a = $('#rAddr').textContent; if (navigator.share) navigator.share({ text: a }).catch(() => {}); else copy(a); },
