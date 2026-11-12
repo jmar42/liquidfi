@@ -182,6 +182,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 #toast{border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:14}
 #sheet.on ~ #toast{bottom:auto;top:calc(12px + env(safe-area-inset-top))}
 #obn{position:fixed;left:16px;right:16px;top:calc(12px + env(safe-area-inset-top));max-width:448px;margin:0 auto;z-index:13;display:none;align-items:center;gap:16px;padding:18px 20px;border-radius:16px;background:var(--s2);border:2px solid #FACC15;box-shadow:0 14px 40px rgba(0,0,0,.55);cursor:pointer}
+#tLimMode.buy button.on{background:var(--buy);color:#0B0E13}#tLimMode.sell button.on{background:var(--sell);color:#0B0E13}
 #obn.on{display:flex}#obn.ok{border-color:var(--grn)}#obn.bad{border-color:var(--red)}
 #obn .obi{flex:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;background:rgba(250,204,21,.15);color:#FACC15}
 #obn.ok .obi{background:rgba(63,184,127,.18);color:var(--grn)}#obn.bad .obi{background:rgba(201,48,44,.2);color:var(--redt)}
@@ -238,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37n</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37s</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -449,7 +450,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <label>Stop price<input id="tStop" inputmode="decimal"></label>
     <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px" id="tLimLbl">Fill no worse than</span><div class="seg" id="tLimMode" style="font-size:13.5px"><button data-v="mkt">Market</button><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="custom">Custom</button></div></div>
     <label id="tLimW" style="display:none">Limit price<input id="tLim" inputmode="decimal"></label>
-    <div class="mu" id="tLimTxt" style="font-size:12.5px;line-height:1.5"></div>
+    <div id="tLimTxt" style="font-size:15px;font-weight:600;line-height:1.5"></div>
     <div class="g2"><label>Trigger on<select id="tFeed"><option value="avg">3-exchange avg</option><option value="stellar">Stellar last sale</option><option value="cb">Coinbase</option><option value="kr">Kraken</option><option value="bn">Binance</option></select></label><label>Ends after<select id="tDays"><option value="1" selected>1 day</option><option value="7">7 days</option><option value="30">30 days</option></select></label></div>
     <div class="mu" id="tStopNote" style="font-size:12px;line-height:1.5"></div>
   </div>
@@ -573,10 +574,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37n</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37s</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
-  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop helpers</span><div class="mu" style="font-size:12px">Each waiting stop has its own small helper account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your helpers from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return helper XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
+  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:12px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone).</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setTax"><span class="lbl">Taxes</span><div class="mu" style="font-size:12px">Everything your wallets did in a year (trades, swaps, sends, receives, pools, fees) with dollar values at the time, in two files: one for tax software (Koinly format) and a broker-style statement of buys, sells and totals for you or your tax pro. Made on this phone from the public ledgers; Liquidfi never sees it. Not tax advice.</div>
     <label>Year<select id="taxYear"></select></label><div id="taxW" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -603,7 +604,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.37n · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.37s · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15977,52 +15978,137 @@ function sharesAt(ev, now, t) {   // your shares just after time t: today's, min
   let s = now; for (const e of ev || []) if (e.t > t) s -= e.d; return Math.max(0, s);
 }
 const firstDep = (ev) => { const d = (ev || []).filter((e) => e.d > 0).map((e) => e.t); return d.length ? Math.min(...d) : 0; };   // 0 = no deposit on record (shares received some other way): count the whole window
-async function earnTrades(ch, k) {
+/* Pool trades are history: they never change. So they're kept on this phone (raw: time, dollar size, text) and the next
+   visit only fetches what's new since then. While a first load is still walking back, the numbers it already covers
+   (Today, Yesterday…) show right away instead of waiting for all 62 days. */
+const ERAW_KEY = 'lf-eraw-v1';
+let ERAW = null;
+function erawAll() { if (ERAW) return ERAW; try { ERAW = JSON.parse(localStorage.getItem(ERAW_KEY) || '{}') || {}; } catch (e) { ERAW = {}; } return ERAW; }
+function erawSave() {
+  try { const A = erawAll(); let j = JSON.stringify(A);
+    while (j.length > 1500000) {   /* well under the browser's ~5 MB, so the wallet's own saved data always has room */ const ks = Object.keys(A); if (!ks.length) break; let big = ks[0]; for (const x of ks) if ((A[x].list || []).length > (A[big].list || []).length) big = x; A[big].list = A[big].list.slice(0, Math.floor(A[big].list.length / 2)); A[big].complete = false; j = JSON.stringify(A); }
+    localStorage.setItem(ERAW_KEY, j); } catch (e) {}
+}
+async function earnTrades(ch, k, onPage) {
   const w = ch === 'st' ? earnAddr : earnXr, key = `${S.net}:${ch}:${k}:${w}`, c0 = EFEES[key];
-  if (c0 && Date.now() - c0.at < (c0.err ? 20000 : 120000)) return c0;
+  if (c0 && !c0.partial && Date.now() - c0.at < (c0.err ? 20000 : 120000)) return c0;
   try {
     // the wallet's own deposit / withdrawal history first: without it every trade would look like it was made with today's shares
     if (ch === 'st') await earnHistStellar(w); else await earnHistXr(w);
-    const since = Date.now() - EWIN, out = []; let capped = false, windowed = false;
+    const since = Date.now() - EWIN, R0 = erawAll()[key], known = new Set(R0 ? R0.list.map((x) => x.id) : []), fresh = [];
+    let capped = false, windowed = false, hitKnown = false, oldest = Date.now(), cutOf;
     if (ch === 'st') {
       const p = earnPools().find((x) => x.id === k); if (p && !(POOLC[k] && POOLC[k].at)) await poolLoad(p, false);
       const c = POOLC[k], a = ACC[w], b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === k);
       const sh = b ? +b.balance : 0, E = ((EPL[w] || {}).pools || {})[k] || { ev: [] }, first = firstDep(E.ev);
       if (!p || !c || !(c.shares > 0)) throw new Error('pool not loaded');
-      windowed = !first || first < since;
+      windowed = !first || first < since; cutOf = (r) => r.usd * c.fee * sharesAt(E.ev, sh, r.t) / c.shares;
+      var keep = (r) => r.t >= since && (!first || r.t >= first);
       let cu = '', stop = false;
       for (let pg = 0; pg < 25 && !stop; pg++) {
         const j = await H(`/liquidity_pools/${k}/trades?order=desc&limit=200${cu ? '&cursor=' + cu : ''}`), Rr = (j._embedded || {}).records || [];
         for (const t of Rr) {
           const at = Date.parse(t.ledger_close_time); if (at < since || (first && at < first)) { stop = true; break; }
+          const id = t.paging_token || t.id; if (known.has(id)) { stop = true; hitKnown = true; break; }
           const bk = hzAk(t.base_asset_type, t.base_asset_code, t.base_asset_issuer), usd = bk === p.b ? +t.base_amount : +t.counter_amount;   /* the dollar-coin side of the trade */
           const ck = hzAk(t.counter_asset_type, t.counter_asset_code, t.counter_asset_issuer), coin = bk === p.b ? +t.counter_amount : +t.base_amount;
           const poolGot = t.base_liquidity_pool_id === k ? !t.base_is_seller : t.base_is_seller, gotK = poolGot ? bk : ck;   /* the side the pool received = what the trader sold */
-          out.push({ t: at, usd, cut: usd * c.fee * sharesAt(E.ev, sh, at) / c.shares, txt: `${gotK === p.b ? 'bought' : 'sold'} ${m2(coin)} ${esc(kName(p.a))} ($${fx(usd)})` });
+          fresh.push({ id, t: at, usd, txt: `${gotK === p.b ? 'bought' : 'sold'} ${m2(coin)} ${esc(kName(p.a))} ($${fx(usd)})` }); oldest = at;
         }
-        if (stop || Rr.length < 200) break; cu = Rr[Rr.length - 1].paging_token; if (pg === 24) capped = true;
+        if (stop || Rr.length < 200) { stop = true; break; } cu = Rr[Rr.length - 1].paging_token; if (pg === 24) capped = true;
+        if (onPage) { EFEES[key] = erMake(key, fresh, R0, keep, cutOf, { partial: true, oldest, windowed }); onPage(); }
       }
     } else {
       const p = xrPoolK(k); if (p && !XAM(k).acct) await xrAmmLoad(p, false);
       const A = XAM(k), lp = xrLpOf(XRA[w], A), E = ((XPL[w] || {}).pools || {})[k] || { ev: [] }, first = firstDep(E.ev);
       if (!p || !A.acct || !(A.lp > 0)) throw new Error('pool not loaded');
-      windowed = !first || first < since;
+      windowed = !first || first < since; cutOf = (r) => r.usd * A.fee * sharesAt(E.ev, lp, r.t) / A.lp;
+      var keep = (r) => r.t >= since && (!first || r.t >= first);
       let marker, stop = false;
       for (let pg = 0; pg < 25 && !stop; pg++) {
         const r = await xr('account_tx', { account: A.acct, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(marker ? { marker } : {}) });
         for (const x of r.transactions || []) {
           const { t, m } = xrTxOf(x); if (m.TransactionResult !== 'tesSUCCESS') continue;
           const at = ((t.date || 0) + 946684800) * 1000; if (at < since || (first && at < first)) { stop = true; break; }
+          const id = x.hash || t.hash || (x.tx_json || {}).hash || ''; if (id && known.has(id)) { stop = true; hitKnown = true; break; }
           const dd = xrDeltas(m, A.acct), dx = dd.XRP || 0, du = dd[p.a2.currency + '.' + p.a2.issuer] || 0;
+          oldest = at;
           if (!(dx * du < 0)) continue;   /* a swap moves the two sides in opposite directions; deposits and withdrawals move them together */
           const usd = Math.abs(du);
-          out.push({ t: at, usd, cut: usd * A.fee * sharesAt(E.ev, lp, at) / A.lp, txt: `${dx < 0 ? 'bought' : 'sold'} ${m2(Math.abs(dx))} XRP ($${fx(usd)})` });
+          fresh.push({ id: id || 'x' + at + ':' + usd, t: at, usd, txt: `${dx < 0 ? 'bought' : 'sold'} ${m2(Math.abs(dx))} XRP ($${fx(usd)})` });
         }
-        marker = r.marker; if (stop || !marker) break; if (pg === 24) capped = true;
+        marker = r.marker; if (stop || !marker) { stop = true; break; } if (pg === 24) capped = true;
+        if (onPage) { EFEES[key] = erMake(key, fresh, R0, keep, cutOf, { partial: true, oldest, windowed }); onPage(); }
       }
     }
-    return (EFEES[key] = { at: Date.now(), trades: out, capped, windowed });
+    const complete = hitKnown ? !!(R0 && R0.complete) : !capped;
+    const list = erMerge(fresh, R0, keep); erawAll()[key] = { list, complete, at: Date.now() }; erawSave();
+    return (EFEES[key] = { at: Date.now(), trades: list.map((r) => ({ t: r.t, usd: r.usd, txt: r.txt, cut: cutOf(r) })), capped: !complete, windowed });
   } catch (e) { return (EFEES[key] = { at: Date.now(), trades: [], err: true }); }
+}
+/* Earned from share value instead of counting trades. g = sqrt(coin × dollars) / shares only grows from fees, and one
+   share is worth 2·√price·g. So fees between two moments = your shares × 2·√(price today) × (g then → g now), split at
+   your own deposits / withdrawals (the g at each one comes from that transaction). Instant and exact; no trade walking. */
+function feeSpan(ev, shNow, gNow, pNow, t0, t1, gAt) {
+  if (!(gNow > 0) || !(pNow > 0)) return null;
+  const now = Date.now(), E = (ev || []).filter((e) => e.t > t0 && e.t < t1).sort((a, b) => a.t - b.t);
+  const pts = [{ t: t0 }, ...E, { t: t1, end: true }]; let sum = 0;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1], sh = sharesAt(ev, shNow, a.t);
+    if (!(sh > 1e-12)) continue;
+    const ga = a.g > 0 ? a.g : gAt(a.t), gb = b.g > 0 ? b.g : b.end && t1 >= now - 60000 ? gNow : gAt(b.t);
+    if (!(ga > 0) || !(gb > 0)) return null;
+    sum += sh * (gb - ga);
+  }
+  return Math.max(0, sum * 2 * Math.sqrt(pNow));
+}
+function poolNow(ch, k) {   // → { sh, g, p } for your position now
+  if (ch === 'st') { const p = earnPools().find((x) => x.id === k), c = POOLC[k], a = ACC[earnAddr], b = a && a.balances.find((x) => x.asset_type === 'liquidity_pool_shares' && x.liquidity_pool_id === k);
+    if (!p || !c || !c.res || !(c.shares > 0)) return null; const x = +c.res[p.a], y = +c.res[p.b]; return x > 0 && y > 0 ? { sh: b ? +b.balance : 0, g: Math.sqrt(x * y) / c.shares, p: y / x } : null; }
+  const A = XAM(k); if (!A.acct || !(A.lp > 0) || !(A.x > 0) || !(A.u > 0)) return null;
+  return { sh: xrLpOf(XRA[earnXr], A), g: Math.sqrt(A.x * A.u) / A.lp, p: A.u / A.x };
+}
+// Stellar: the stop server records each pool's g every hour (Horizon has no pool history)
+const SNAPS = {};
+async function snapLoad(ids) {
+  const now = Date.now(), need = ids.filter((id) => { const c = SNAPS[S.net + ':' + id]; return !c || now - c.at > (c.err ? 60000 : 600000); });
+  if (!need.length || !S.stopUrl) return false;
+  try { const j = await stopApi(`/pools/snap?net=${S.net}&ids=${need.join(',')}`);
+    for (const id of need) SNAPS[S.net + ':' + id] = { at: now, pts: ((j.pools || {})[id] || []).map(([ts, g]) => [ts * 1000, +g]) }; }
+  catch (e) { for (const id of need) SNAPS[S.net + ':' + id] = { at: now, pts: (SNAPS[S.net + ':' + id] || {}).pts || [], err: true }; }
+  return true;
+}
+function gAtSt(id, t) { const c = SNAPS[S.net + ':' + id]; if (!c) return null; let best = null, bd = Infinity; for (const [ts, g] of c.pts) { const d = Math.abs(ts - t); if (d < bd) { bd = d; best = g; } } return bd <= 90 * 60000 ? best : null; }
+// XRP Ledger: the ledger keeps its history, so ask for the pool as it was at that time (kept on the phone: history never changes)
+const XG_KEY = 'lf-xg-v1'; let XG = null;
+const xgAll = () => { if (XG) return XG; try { XG = JSON.parse(localStorage.getItem(XG_KEY) || '{}') || {}; } catch (e) { XG = {}; } return XG; };
+const xgK = (k, t) => `${S.net}:${k}:${Math.round(t / HR)}`;
+function gAtXr(k, t) { const v = xgAll()[xgK(k, t)]; return v > 0 ? v : null; }
+async function xgLoad(k, times) {
+  const p = xrPoolK(k), A = XAM(k), X = xgAll(); if (!p || !(A.li > 0)) return false;
+  const todo = [...new Set(times.filter((t) => t < Date.now() - 5 * 60000 && X[xgK(k, t)] === undefined).map((t) => Math.round(t / HR) * HR))];
+  if (!todo.length) return false;
+  await Promise.all(todo.map(async (t) => {
+    try {
+      let li = Math.max(1, A.li - Math.round((Date.now() - t) / 3900));
+      for (let i = 0; i < 2; i++) {   /* ledgers aren't exactly 3.9 s apart: read the guess's close time and correct once or twice */
+        const L = await xr('ledger', { ledger_index: li }), ct = ((((L.ledger || {}).close_time) || 0) + 946684800) * 1000; if (!ct) break;
+        const off = Math.round((t - ct) / 3900); if (Math.abs(off) < 300) break; li = Math.max(1, li + off);
+      }
+      const r = await xr('amm_info', { asset: p.a1, asset2: p.a2, ledger_index: li }), m = r.amm;
+      X[xgK(k, t)] = m && +m.lp_token.value > 0 ? Math.sqrt(+m.amount / 1e6 * +m.amount2.value) / +m.lp_token.value : 0;
+    } catch (e) {}
+  }));
+  try { localStorage.setItem(XG_KEY, JSON.stringify(X)); } catch (e) {}
+  return true;
+}
+function erMerge(fresh, R0, keep) {   // newest first, no repeats, only the window still counted
+  const seen = new Set(), out = [];
+  for (const r of fresh.concat(R0 ? R0.list : [])) { if (seen.has(r.id) || !keep(r)) continue; seen.add(r.id); out.push(r); }
+  return out.sort((a, b) => b.t - a.t);
+}
+function erMake(key, fresh, R0, keep, cutOf, extra) {   // a still-loading answer: what's in so far
+  return { at: Date.now(), trades: erMerge(fresh, R0, keep).map((r) => ({ t: r.t, usd: r.usd, txt: r.txt, cut: cutOf(r) })), ...extra };
 }
 // period starts: real midnights in the app's time zone (daylight-saving safe), weeks start Monday
 const ePartsOf = (t) => Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: TZ, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23', weekday: 'short' }).formatToParts(t).map((x) => [x.type, x.value]));
@@ -16064,36 +16150,47 @@ function earnDetPaint(load) {
   const keys = pairs.map((x) => x[1]), F = pairs.map(([c, x]) => EFEES[`${S.net}:${c}:${x}:${c === 'st' ? earnAddr : earnXr}`]);
   const chips = (list) => `<div class="echips">${list.map(([v, l]) => `<button data-act="earnPer" data-eper="${v}" class="${v === per ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   const perName = per === 'all' ? 'since you joined' : (EPERS.find((x) => x[0] === per) || EPERS[2])[1].toLowerCase();
-  const loading = F.some((f) => !f), failed = F.some((f) => f && f.err), win = F.some((f) => f && f.windowed), capped = F.some((f) => f && f.capped);
+  const P0r = ePerStarts(), covers = (lo) => F.every((f) => f && (f.err || !f.partial || f.oldest <= lo));   /* a loading answer already counts for times it has reached */
+  const loadingAll = F.some((f) => !f || f.partial), loading = !covers(P0r[per] || 0), failed = F.some((f) => f && f.err), win = F.some((f) => f && f.windowed), capped = F.some((f) => f && !f.partial && f.capped);
   const allPL = (pos) => (pos.E && pos.E.in > 0 ? pos.now + pos.E.out - pos.E.in : null);
   const earnedAll = (f) => (f && !f.err ? f.trades.reduce((s2, t) => s2 + t.cut, 0) : 0);
   const v = (txt) => (loading ? '…' : failed ? '–' : txt);   // a number, or … while loading, or – if it couldn't load
-  const note = `<div class="mu" style="font-size:11px;line-height:1.45">Earned = what the pool's trading fees paid your share, counted trade by trade (an estimate: it uses the pool's shares today). Profit / Loss also counts price moves, so it's shown since you joined.${win ? ' Earned covers the last 62 days.' : ''}${capped ? ' Busy pool: counted from its most recent 5,000 trades.' : ''}${failed ? ' <span class="amb">Couldn\'t load the trades right now. Close and reopen to try again.</span>' : ''}</div>`;
-  const pcOK = !win && !capped && !failed;   // price change = P/L − Earned only makes sense when Earned covers the whole time you've been in
+  /* Earned: from share value (instant, exact) where the pool's history is known; otherwise counted from trades */
+  const nowT = Date.now(), perLo = P0r[per] || 0, perHi = per === 'yday' ? P0r.today : per === 'lastMonth' ? P0r.month : nowT;
+  const NW = pairs.map(([c, x]) => poolNow(c, x)), EVs = pairs.map(([c, x]) => (poolPos(c, x).E || {}).ev || []);
+  const fs = (i, t0, t1) => { const n = NW[i]; if (!n) return null; const [c, x] = pairs[i]; return feeSpan(EVs[i], n.sh, n.g, n.p, t0, Math.min(t1, nowT), (t) => (c === 'st' ? gAtSt(x, t) : gAtXr(x, t))); };
+  const tradeCut = (i, lo, hi) => { const f = F[i]; if (!f || f.err || (f.partial && f.oldest > lo)) return null; let c2 = 0; for (const t of f.trades) if (t.t >= lo && t.t < hi) c2 += t.cut; return c2; };
+  const earnIn = (i, lo, hi) => { const a2 = fs(i, lo, hi); return a2 != null ? a2 : tradeCut(i, lo, hi); };   // null = not ready yet
+  const earnSumIn = (lo, hi) => { let t2 = 0; for (let i = 0; i < pairs.length; i++) { const a2 = earnIn(i, lo, hi); if (a2 == null) return null; t2 += a2; } return t2; };
+  const vx = (val) => (val == null ? (failed ? '–' : '…') : esg(val));
+  const shareAll = pairs.length > 0 && pairs.every((_, i) => fs(i, 0, nowT) != null);   // "since you joined" fully from share value: no 62-day window, no trade cap
+  const vAll = (txt) => (loadingAll ? '…' : failed ? '–' : txt), vDay = (lo, txt) => (!covers(lo) ? '…' : failed ? '–' : txt);
+  const note = `<div class="mu" style="font-size:11px;line-height:1.45">Earned = the trading fees your shares collected: fees stay in the pool, so each share is backed by a little more over time (valued at today's price). Profit / Loss also counts price moves, so it's shown since you joined.${!shareAll && win ? ' Earned covers the last 62 days.' : ''}${!shareAll && capped ? ' Busy pool: counted from its most recent 5,000 trades.' : ''}${failed && !shareAll ? ' <span class="amb">Couldn\'t load the trades right now. Close and reopen to try again.</span>' : ''}</div>`;
+  const pcOK = shareAll || (!win && !capped && !failed);   // price change = P/L − Earned only makes sense when Earned covers the whole time you've been in
   let h;
   if (mode === 'sum') {
     const pos = pairs.map(([c, x]) => poolPos(c, x)), now = pos.reduce((s2, x) => s2 + x.now, 0), sums = F.map((f) => (f && !f.err ? ePerSum(f.trades, per) : { cut: 0, n: 0 }));
-    const withPL = pos.map((x, i) => ({ pl: x.now > 0 ? allPL(x) : null, ea: earnedAll(F[i]) })).filter((x) => x.pl != null), pl = withPL.reduce((s2, x) => s2 + x.pl, 0), eaPL = withPL.reduce((s2, x) => s2 + x.ea, 0);
-    const ea = F.reduce((s2, f) => s2 + earnedAll(f), 0), P0 = ePerStarts(), days = [];
-    for (let i = 0; i < 7; i++) { const lo = eMidnight(P0.y, P0.m, P0.d - i), hi = i ? eMidnight(P0.y, P0.m, P0.d - i + 1) : Infinity; let c = 0, n = 0; F.forEach((f) => (f && !f.err ? f.trades : []).forEach((t) => { if (t.t >= lo && t.t < hi) { c += t.cut; n++; } })); days.push({ lo, c, n }); }
-    const rowsOf = (c) => pairs.map((pr, i) => [pr, i]).filter(([pr]) => pr[0] === c).map(([pr, i]) => `<div class="ekv" data-act="earnPool" data-ch="${pr[0]}" data-k="${esc(pr[1])}" style="cursor:pointer;padding:6px 0"><span>${esc(pos[i].name)} ›</span><b class="mono grn">${!F[i] ? '…' : F[i].err ? '–' : esg(sums[i].cut)}</b></div>`).join('');
+    const withPL = pos.map((x, i) => ({ pl: x.now > 0 ? allPL(x) : null, ea: earnIn(i, 0, nowT) })).filter((x) => x.pl != null), pl = withPL.reduce((s2, x) => s2 + x.pl, 0), eaPL = withPL.some((x) => x.ea == null) ? null : withPL.reduce((s2, x) => s2 + x.ea, 0);
+    const ea = earnSumIn(0, nowT), P0 = ePerStarts(), days = [];
+    for (let i = 0; i < 7; i++) { const lo = eMidnight(P0.y, P0.m, P0.d - i), hi = i ? eMidnight(P0.y, P0.m, P0.d - i + 1) : nowT; let n = 0; F.forEach((f) => (f && !f.err ? f.trades : []).forEach((t) => { if (t.t >= lo && t.t < hi) n++; })); days.push({ lo, c: earnSumIn(lo, hi), n, nOK: covers(lo) && !failed }); }
+    const rowsOf = (c) => pairs.map((pr, i) => [pr, i]).filter(([pr]) => pr[0] === c).map(([pr, i]) => `<div class="ekv" data-act="earnPool" data-ch="${pr[0]}" data-k="${esc(pr[1])}" style="cursor:pointer;padding:6px 0"><span>${esc(pos[i].name)} ›</span><b class="mono grn">${vx(earnIn(i, perLo, perHi))}</b></div>`).join('');
     const chainName = { st: 'Stellar', xr: 'XRP Ledger' };
     h = `<h2 style="margin-bottom:0">${ch === 'all' ? 'Your pools' : chainName[ch] + ' pools'}</h2>${chips(EPERS)}
       <div class="card" style="gap:10px;padding:16px"><div class="r" style="align-items:baseline"><span style="font-size:16px">Worth now</span><b class="mono" style="font-size:26px">$${fxv(now)}</b></div>
-        <div class="r" style="align-items:baseline"><span style="font-size:16px">Earned ${perName}</span><b class="mono grn" style="font-size:24px">${v(esg(sums.reduce((s2, x) => s2 + x.cut, 0)))}</b></div>
+        <div class="r" style="align-items:baseline"><span style="font-size:16px">Earned ${perName}</span><b class="mono grn" style="font-size:24px">${vx(earnSumIn(perLo, perHi))}</b></div>
         <div class="ekv"><span>Trades through your pools</span><span class="mono">${v(sums.reduce((s2, x) => s2 + x.n, 0).toLocaleString())}</span></div></div>
       <div class="elbl">Since you joined</div>
-      <div class="card" style="gap:2px"><div class="ekv"><span>Earned${win ? ' (last 62 days)' : ''}</span><b class="mono grn">${v(esg(ea))}</b></div>
-        <div class="ekv"><span>Price change</span><b class="mono ${pl - eaPL >= 0 ? 'grn' : 'red'}">${loading || !withPL.length || !pcOK ? '–' : esg(pl - eaPL)}</b></div>
+      <div class="card" style="gap:2px"><div class="ekv"><span>Earned${!shareAll && win ? ' (last 62 days)' : ''}</span><b class="mono grn">${vx(ea)}</b></div>
+        <div class="ekv"><span>Price change</span><b class="mono ${pl - (eaPL || 0) >= 0 ? 'grn' : 'red'}">${!withPL.length || !pcOK ? '–' : eaPL == null ? '…' : esg(pl - eaPL)}</b></div>
         <div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${withPL.length ? esg(pl) : '–'}</b></div></div>
       ${pos.length ? ['st', 'xr'].filter((c) => pairs.some((pr) => pr[0] === c)).map((c) => `<div class="elbl">${chainName[c]} · earned ${perName}</div><div class="card" style="gap:2px">${rowsOf(c)}</div>`).join('')
         : `<div class="card"><span class="mu">You're not in any pool yet. Go back and pick Stellar pools or XRP Ledger pools to start.</span></div>`}
       <div class="elbl">By day</div>
-      <div class="card" style="gap:2px">${days.map((d2) => `<div class="ekv"><span>${esc(new Date(d2.lo + 12 * HR).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }))}</span><span class="mono">${v(`${esg(d2.c)} · ${d2.n} trade${d2.n === 1 ? '' : 's'}`)}</span></div>`).join('')}</div>
+      <div class="card" style="gap:2px">${days.map((d2) => `<div class="ekv"><span>${esc(new Date(d2.lo + 12 * HR).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }))}</span><span class="mono">${d2.c == null ? vx(null) : esg(d2.c) + (d2.nOK ? ` · ${d2.n.toLocaleString()} trade${d2.n === 1 ? '' : 's'}` : '')}</span></div>`).join('')}</div>
       <div class="mu" style="font-size:12px">Tap a pool for your shares, what it holds, and every trade's cut.</div>
       ${note}<button class="b-out" data-act="closeSheet">Close</button>`;
   } else {
-    const x = poolPos(ch, k), f = F[0], ok = f && !f.err, sum = ok ? ePerSum(f.trades, per) : null, ea = earnedAll(f), pl = allPL(x), my = x.total > 0 ? x.mine / x.total : 0;
+    const x = poolPos(ch, k), f = F[0], ok = f && !f.err, sum = ok ? ePerSum(f.trades, per) : null, ea = earnIn(0, 0, nowT), pl = allPL(x), my = x.total > 0 ? x.mine / x.total : 0, eP = earnIn(0, perLo, perHi);
     h = `<div class="r"><h2 style="margin:0">${esc(x.name || '')}</h2><span class="mu" style="font-size:12.5px">${esc(x.where)}</span></div>
       <div class="card" style="gap:2px"><div class="ekv"><span>Your shares</span><b class="mono">${x.mine ? (+x.mine).toFixed(7).replace(/\.?0+$/, '') : '0'}</b></div>
         <div class="ekv"><span>Total shares</span><span class="mono">${x.total ? x.total.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '–'}</span></div>
@@ -16102,9 +16199,9 @@ function earnDetPaint(load) {
         ${x.hold && my ? `<div class="ekv"><span>Yours</span><b class="mono">${x.hold.map(([a, n]) => `${m2(a * my)} ${esc(n)}`).join(' + ')} · $${fxv(x.now)}</b></div>` : ''}</div>
       ${x.mine > 0 ? `${chips(EPERS.filter(([p0]) => EPERS_POOL.includes(p0)))}
       <div class="card" style="gap:2px">${x.E && x.E.in > 0 ? `<div class="ekv"><span>Put in</span><span class="mono">$${fx(x.E.in)}${x.E.out > 0 ? ` · taken out $${fx(x.E.out)}` : ''}</span></div>` : ''}
-        <div class="ekv"><span>Earned ${perName}${per === 'all' && win ? ' (last 62 days)' : ''}</span><b class="mono grn">${v(ok ? esg(sum.cut) : '')}</b></div>
+        <div class="ekv"><span>Earned ${perName}${per === 'all' && win && !shareAll ? ' (last 62 days)' : ''}</span><b class="mono grn">${vx(eP)}</b></div>
         <div class="ekv"><span>Trades ${perName}</span><span class="mono">${v(ok ? sum.n.toLocaleString() : '')}</span></div>
-        ${pl != null ? `<div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Since you joined: price change</span><b class="mono ${pl - ea >= 0 ? 'grn' : 'red'}">${ok && pcOK ? esg(pl - ea) : loading ? '…' : '–'}</b></div>
+        ${pl != null ? `<div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Since you joined: price change</span><b class="mono ${pl - (ea || 0) >= 0 ? 'grn' : 'red'}">${!pcOK ? '–' : ea == null ? '…' : esg(pl - ea)}</b></div>
         <div class="ekv"><span>Since you joined: Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${esg(pl)}</b></div>` : ''}</div>
       <div class="elbl">Recent trades through the pool · your cut</div>
       <div class="card" style="gap:0">${!f ? '<span class="mu">Loading…</span>' : f.err ? '<span class="amb">Couldn\'t load the trades right now.</span>' : (f.trades.slice(0, 12).map((t) => `<div class="etr"><span class="mu">${esc(new Date(t.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }))}</span><span>${t.txt}</span><span class="mono grn">+$${t.cut < 1e-7 ? t.cut.toExponential(1) : fxd(t.cut)}</span></div>`).join('') || '<span class="mu">No trades since you joined yet.</span>')}</div>
@@ -16118,7 +16215,11 @@ function earnDetPaint(load) {
   const stale = (f) => !f || Date.now() - f.at > (f.err ? 20000 : 120000);   /* expired answers reload too (old numbers stay on screen meanwhile) */
   const need = pairs.filter(([c, x], i) => stale(F[i]) && poolPos(c, x).mine > 0 && !EFETCH[`${S.net}:${c}:${x}`]);
   need.forEach(([c, x]) => (EFETCH[`${S.net}:${c}:${x}`] = 1));
-  if (need.length) Promise.all(need.map(([c, x]) => earnTrades(c, x).catch(() => null).finally(() => delete EFETCH[`${S.net}:${c}:${x}`]))).then(() => { if (eDetOpen(gen)) earnDetPaint(); });
+  let rp = 0; const onPage = () => { if (rp) return; rp = setTimeout(() => { rp = 0; if (eDetOpen(gen)) earnDetPaint(); }, 250); };   /* repaint as pages arrive (at most 4× a second) */
+  { const P1 = ePerStarts(), T = [P1.today, P1.yday, P1.week, P1.month, P1.lastMonth]; for (let i = 1; i < 7; i++) T.push(eMidnight(P1.y, P1.m, P1.d - i));
+    const st = pairs.filter((pr) => pr[0] === 'st').map((pr) => pr[1]), xp = pairs.filter((pr) => pr[0] === 'xr').map((pr) => pr[1]);
+    Promise.all([st.length ? snapLoad(st) : false, ...xp.map((x) => xgLoad(x, T))]).then((R) => { if (R.some(Boolean)) onPage(); }).catch(() => {}); }
+  if (need.length) Promise.all(need.map(([c, x]) => earnTrades(c, x, onPage).catch(() => null).finally(() => delete EFETCH[`${S.net}:${c}:${x}`]))).then(() => { if (eDetOpen(gen)) earnDetPaint(); });
 }
 function earnCard(name, where, c, mine, note, risk, btns, tap) {
   const ok = c && c.at && !c.none;
@@ -16291,7 +16392,8 @@ async function earnHistStellar(addr) {
       if (o.type !== 'liquidity_pool_deposit' && o.type !== 'liquidity_pool_withdraw') continue;
       const p = earnPools().find((x) => x.id === o.liquidity_pool_id); if (!p) continue;
       const E = P[p.id] || (P[p.id] = { in: 0, out: 0, net: {}, ev: [] }), dep = o.type === 'liquidity_pool_deposit';
-      E.ev.push({ t: Date.parse(o.created_at), d: dep ? +o.shares_received || 0 : -(+o.shares || 0) });
+      const rr = (dep ? o.reserves_deposited : o.reserves_received) || [], sh0 = dep ? +o.shares_received || 0 : +o.shares || 0;
+      E.ev.push({ t: Date.parse(o.created_at), d: dep ? sh0 : -sh0, g: rr.length === 2 && sh0 > 0 ? Math.sqrt(+rr[0].amount * +rr[1].amount) / sh0 : null });   /* g = pool backing per share at that moment (a deposit or withdrawal is in the pool's own ratio) */
       for (const r of (dep ? o.reserves_deposited : o.reserves_received) || []) { const k = r.asset === 'native' ? 'XLM' : r.asset; E.net[k] = (E.net[k] || 0) + (dep ? 1 : -1) * +r.amount; if (k === p.b) E[dep ? 'in' : 'out'] += 2 * +r.amount; }
     }
     if (R.length < 200) break; url = rel(j._links.next.href);
@@ -16315,6 +16417,17 @@ function xrDeltas(meta, me, tx) {
   return d;
 }
 const xrTxOf = (x) => ({ t: x.tx || x.tx_json || x.transaction || {}, m: x.meta || x.metaData || {}, hash: (x.tx || x.tx_json || {}).hash || x.hash });
+function xrAmmG(m, p) {   // the pool right after a transaction, from its metadata: sqrt(XRP × token) / pool tokens
+  try {
+    let acct = null, lp = 0, x = 0, u = 0;
+    for (const n of (m && m.AffectedNodes) || []) { const v = n[Object.keys(n)[0]] || {}, F = v.FinalFields || v.NewFields || {}; if (v.LedgerEntryType === 'AMM' && F.Account) { acct = F.Account; lp = +(F.LPTokenBalance || {}).value || 0; } }
+    if (!acct || !(lp > 0)) return null;
+    for (const n of m.AffectedNodes) { const v = n[Object.keys(n)[0]] || {}, F = v.FinalFields || v.NewFields || {};
+      if (v.LedgerEntryType === 'AccountRoot' && F.Account === acct) x = +F.Balance / 1e6;
+      if (v.LedgerEntryType === 'RippleState' && F.Balance && F.Balance.currency === p.a2.currency && [(F.LowLimit || {}).issuer, (F.HighLimit || {}).issuer].includes(acct)) u = Math.abs(+F.Balance.value); }
+    return x > 0 && u > 0 ? Math.sqrt(x * u) / lp : null;
+  } catch (e) { return null; }
+}
 async function earnHistXr(addr) {
   const c = XPL[addr]; if (c && Date.now() - c.at < 120000) return c;
   const P = {}; let marker;
@@ -16326,7 +16439,7 @@ async function earnHistXr(addr) {
       const p = xrPools().find((q) => q.a2.currency === t.Asset2.currency && q.a2.issuer === t.Asset2.issuer); if (!p) continue;
       const d = xrDeltas(m, addr, t), dx = d.XRP || 0, du = d[p.a2.currency + '.' + p.a2.issuer] || 0;
       const E = P[p.key] || (P[p.key] = { in: 0, out: 0, net: { x: 0, u: 0 }, ev: [] });
-      E.ev.push({ t: ((t.date || 0) + 946684800) * 1000, d: Object.entries(d).filter(([k]) => /^03/.test(k)).reduce((s2, [, v]) => s2 + v, 0) });   /* the pool tokens it got or gave back */
+      E.ev.push({ t: ((t.date || 0) + 946684800) * 1000, d: Object.entries(d).filter(([k]) => /^03/.test(k)).reduce((s2, [, v]) => s2 + v, 0), g: xrAmmG(m, p) });   /* the pool tokens it got or gave back; g = the pool right after */
       E.net.x -= dx; E.net.u -= du; if (du < 0) E.in += -2 * du; else E.out += 2 * du;
     }
     marker = r.marker; if (!marker) break;
@@ -16636,7 +16749,7 @@ async function closeWallet() {
   if (+a.num_sponsoring > 0) block.push('It pays the reserve for another account or entry (sponsoring). End that first.');
   if (a.balances.some((b) => b.asset_type === 'liquidity_pool_shares')) block.push('It is in a liquidity pool. Earn → Withdraw → All first.');
   if (S.stopUrl) { try { const L = await stopList(addr); if (L.some((x) => stopLive(x))) block.push('It has stop orders on your stop server. Cancel them first (Open orders → Cancel all).'); } catch (e) {} }
-  for (const [h, r] of Object.entries(hlpReg())) if (r.w === addr) { try { if (await acct(h)) { block.push('One of its stop helpers still holds 1.01 XLM. Settings → Stop orders → Return helper XLM first.'); break; } } catch (e) {} }
+  for (const [h, r] of Object.entries(hlpReg())) if (r.w === addr) { try { if (await acct(h)) { block.push('One of its stop clerks still holds 1.01 XLM. Settings → Stop orders → Return clerk XLM first.'); break; } } catch (e) {} }
   if (block.length) return sheet(`<h2>Close ${esc(w.name)}</h2><div class="note amb">${block.map(esc).join('<br>')}</div><button class="b-out" data-act="closeSheet">OK</button>`);
   CLW.addr = addr; CLW.a = a; CLW.off = off;
   await Promise.all(OWN().filter((o) => o.addr !== addr).map((o) => refreshAcct(o.addr).catch(() => null)));
@@ -17002,7 +17115,7 @@ function newWalletSheet(i, freshPh) {
     <div class="mu" style="font-size:12px">Missed it? Open the wallet and tap "Back up: show key and recovery phrase", or Settings → Back up keys. Your PIN shows it again.</div>
     <button class="b-light big" data-act="newWalletDone">I saved it</button>`);
 }
-function eraseAll() { try { localStorage.removeItem(SKEY); } catch (e) {} K = null; PIN = null; location.reload(); }
+function eraseAll() { try { localStorage.removeItem(SKEY); localStorage.removeItem(ERAW_KEY); localStorage.removeItem(XG_KEY); } catch (e) {} ERAW = null; XG = null; K = null; PIN = null; location.reload(); }
 function resetSheet() {
   pending = eraseAll;
   sheet(`<h2>Erase Liquidfi from this phone?</h2><div class="note amb">This deletes your PIN, every wallet key, the emergency key, the bot list and settings from this phone. Funds stay on Stellar, but you can only reach them again with their secret keys or a backup file.</div>
@@ -17306,7 +17419,7 @@ const resTxt = (R) => (R || []).map((r) => `${fx(r.amount)} ${r.asset === 'nativ
 function opText(o, me) {
   const an = (t, c) => t === 'native' ? 'XLM' : c;
   switch (o.type) {
-    case 'create_account': return o.account === me ? `Account created with ${fx(o.starting_balance)} XLM` : isHelper(o.account) ? `Stop helper opened · ${fx(o.starting_balance)} XLM (comes back)` : `Created ${short(o.account)}`;
+    case 'create_account': return o.account === me ? `Account created with ${fx(o.starting_balance)} XLM` : isHelper(o.account) ? `Stop clerk opened · ${fx(o.starting_balance)} XLM (comes back)` : `Created ${short(o.account)}`;
     case 'payment': if (o.from === me && o.to === SWAP_FEE.to[S.net]) return `Liquidfi fee ${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)}`;
       if (o.from === me && xsDep(o.to)) return `Swap ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} → ${xsDep(o.to).to.coin} · NEAR Intents`;
       if (o.to === me && xsOutTx(o.transaction_hash)) return `Received ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} · swap from ${xsOutTx(o.transaction_hash).from.coin}`;
@@ -17323,7 +17436,7 @@ function opText(o, me) {
     }
     case 'set_options': return 'Changed account options/signers';
     case 'account_merge': { const nm = (a) => ((allAccts().find((x) => x.addr === a) || {}).name || short(a)), amt = MERGEAMT[o.id] != null ? fx(MERGEAMT[o.id]) + ' XLM' : 'all its XLM';
-      return o.account === me ? `Closed this wallet · sent ${amt} to ${nm(o.into)}` : isHelper(o.account) ? `Stop helper closed · ${amt} back` : `Received ${amt} from closed wallet ${nm(o.account)}`; }
+      return o.account === me ? `Closed this wallet · sent ${amt} to ${nm(o.into)}` : isHelper(o.account) ? `Stop clerk closed · ${amt} back` : `Received ${amt} from closed wallet ${nm(o.account)}`; }
     default: return o.type.replace(/_/g, ' ');
   }
 }
@@ -18311,7 +18424,7 @@ async function helperFree(kp, w) {   // the first helper index whose account doe
     if (R[a] && Date.now() - (R[a].at || 0) < 15 * 60e3) continue;   // just made for another stop
     if (!(await acct(a))) return { h, k };
   }
-  throw new Error('Too many stop helpers open on this wallet. Cancel a stop first.');
+  throw new Error('Too many stop clerks open on this wallet. Cancel a stop first.');
 }
 async function helperClose(w, hkp) {   // helper → wallet (its XLM comes back). Signed by the helper's own key.
   const a = hkp.publicKey(), x = await acct(a); if (!x) { delete hlpReg()[a]; saveS(); return 'gone'; }
@@ -18328,7 +18441,7 @@ async function helperSweep(w, list) {
     if (r.w !== w || live.has(a)) continue;
     const done = r.sid ? (list || []).some((x) => x.id === r.sid && !stopLive(x)) || now > (r.exp || 0) + 10 * 60e3 : now - (r.at || 0) > 15 * 60e3;
     if (!done) continue;
-    try { const h = await helperKp(kp, r.k); if (h.publicKey() === a && (await helperClose(w, h)) === 'closed') toast('Stop helper closed: its XLM is back in your wallet.'); } catch (e) {}
+    try { const h = await helperKp(kp, r.k); if (h.publicKey() === a && (await helperClose(w, h)) === 'closed') toast('Stop clerk closed: its XLM is back in your wallet.'); } catch (e) {}
   }
 }
 // Lost phone / new phone: find helpers by their keys (from the wallet key) and close every one not holding a live stop
@@ -18337,11 +18450,11 @@ async function helperRecover() {
   try {
     for (const o of OWN()) {
       const kp = kpFor(o.addr); if (!kp) continue;
-      let list = []; if (S.stopUrl) list = await stopList(o.addr).catch(() => null); if (list === null) { if (el) el.innerHTML = '<span class="amb">Can\'t reach your stop server, so nothing was closed (a helper might hold a live stop).</span>'; return; }
+      let list = []; if (S.stopUrl) list = await stopList(o.addr).catch(() => null); if (list === null) { if (el) el.innerHTML = '<span class="amb">Can\'t reach your stop server, so nothing was closed (a clerk might hold a live stop).</span>'; return; }
       const live = new Set(list.filter(stopLive).map((x) => x.helper).filter(Boolean));
       for (let k = 0; k < 40; k++) { const h = await helperKp(kp, k), a = h.publicKey(); if (live.has(a)) continue; const x = await acct(a); if (!x) continue; f++; try { if ((await helperClose(o.addr, h)) === 'closed') n++; } catch (e) {} }
     }
-    if (el) el.textContent = f ? `Closed ${n} of ${f} leftover helper${f > 1 ? 's' : ''}: the XLM is back in your wallets.` : 'No leftover helpers. Nothing to return.';
+    if (el) el.textContent = f ? `Closed ${n} of ${f} leftover clerk${f > 1 ? 's' : ''}: the XLM is back in your wallets.` : 'No leftover clerks. Nothing to return.';
   } catch (e) { if (el) el.innerHTML = `<span class="amb">${esc(niceErr(e))}</span>`; }
 }
 async function stopList(addr) {
@@ -18363,6 +18476,7 @@ function stopDefaults() {
   if (m && (!$('#tStop').value || (T.stopSide !== T.side && !T.stopTyped))) {   // a price you typed stays when you switch Buy/Sell
     const gap = TP().b === 'XLM' ? 0.05 : 0.005, st = sell ? m * (1 - gap) : m * (1 + gap);   /* XLM 5% away; steadier coins (EURC…) 0.5% */ $('#tStop').value = st.toFixed(4); T.stopSide = T.side; if (mode === 'custom') $('#tLim').value = ''; }
   $$('#tLimMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === mode));
+  $('#tLimMode').classList.toggle('buy', !sell); $('#tLimMode').classList.toggle('sell', sell); $('#tLimTxt').style.color = sell ? 'var(--sell)' : 'var(--buy)';   /* colored like the Buy / Sell side */
   $('#tLimLbl').textContent = sell ? 'Sell no lower than' : 'Buy no higher than';
   $('#tLimW').style.display = mode === 'custom' ? '' : 'none';
   const st = +$('#tStop').value;
@@ -18380,7 +18494,7 @@ function stopEst(q, el) {
   const warn = st && m && (sell ? st >= m : st <= m) ? `<div><span class="amb">The price is ${p4(m)} now: a ${sell ? 'sell' : 'buy'} stop goes ${sell ? 'below' : 'above'} it.</span></div>` : '';
   const badLim = st && lim && (sell ? lim > st : lim < st) ? `<div><span class="amb">The limit should be ${sell ? 'at or below' : 'at or above'} the stop.</span></div>` : '';
   el.innerHTML = warn + badLim + `<div><span class="mu">Now</span><span class="mono">${m ? p4(m) : '–'}</span></div>`
-    + (sell ? `<div><span class="mu">If it fills, at least</span><span class="mono">${fx(q * lim)} ${esc(nQ)}</span></div>` : `<div><span class="mu">If it fills, pay at most</span><span class="mono">${fx(q * lim)} ${esc(nQ)}</span></div>`)
+    + (lim ? `<div><span class="mu">${limMode() === 'mkt' ? 'Worst price' : 'Limit price'}</span><span class="mono">${p4(lim)}</span></div><div><span class="mu">Total</span><span class="mono">${fx(q * lim)} ${esc(nQ)}</span></div>` : '')
     + (fOn ? `<div><span class="mu">Fee ${SWAP_FEE.bps / 100}%</span><span class="mono">${sell ? m2(f) + ' ' + esc(nB) : m2(f) + ' ' + esc(nQ)}</span></div>` : '');
 }
 async function stopReview(q, a, kp) {
@@ -18392,9 +18506,9 @@ async function stopReview(q, a, kp) {
   if (m && (sell ? st >= m : st <= m)) return toast(`The price is ${p4(m)} now. A ${sell ? 'sell stop goes below' : 'buy stop goes above'} it.`);
   let fee = null; try { fee = await feeLegFor(sell ? bK : qK, feeOf(sell ? q : q * st), tradeAddr); } catch (e) { return toast(niceErr(e)); }
   const sq = q, usd = q * lim;   // the amount entered is what sells; the fee is paid on top
-  if (sell && isX && spendable(a, true) < q + (fee ? fee.amt : 0) + 1.02) return toast(`Not enough spendable XLM: ${fx(q, 2)} to sell + ${fee ? m2(fee.amt) + ' fee + ' : ''}1.01 held by its helper (have ${fx(spendable(a, true))}).${holdNote(a, 'XLM')}`, 7000);
+  if (sell && isX && spendable(a, true) < q + (fee ? fee.amt : 0) + 1.02) return toast(`Not enough spendable XLM: ${fx(q, 2)} to sell + ${fee ? m2(fee.amt) + ' fee + ' : ''}1.01 held by its clerk (have ${fx(spendable(a, true))}).${holdNote(a, 'XLM')}`, 7000);
   if (sell && !isX && swapAvail(a, bK) < q + (fee ? fee.amt : 0)) return toast(`Not enough ${nB}: ${fx(q, 2)} to sell${fee ? ' + ' + m2(fee.amt) + ' fee' : ''} (have ${fx(swapAvail(a, bK))}).${holdNote(a, bK)}`, 7000);
-  if ((!sell || !isX) && spendable(a, true) < 1.02) return toast(`A stop needs 1.01 XLM free for its helper (have ${fx(spendable(a, true))}). It comes back when the stop ends.`);
+  if ((!sell || !isX) && spendable(a, true) < 1.02) return toast(`A stop needs 1.01 XLM free for its clerk (have ${fx(spendable(a, true))}). It comes back when the stop ends.`);
   if (!sell && swapAvail(a, qK) < usd + (fee ? fee.amt : 0)) return toast(`Not enough ${nQ} (have ${fx(swapAvail(a, qK))}, need ${fx(usd + (fee ? fee.amt : 0))}).${holdNote(a, qK)}`, 7000);
   const end = new Date(Date.now() + days * 86400e3);
   const items = [   /* a short summary; the details live in the help text on the form */
@@ -18404,7 +18518,7 @@ async function stopReview(q, a, kp) {
     ...(fee ? [{ k: 'Liquidfi fee', v: `${m2(fee.amt)} ${sell ? nB : nQ}`, n: `${SWAP_FEE.bps / 100}%` }] : []),
     ...(isX && stopGuard() ? [{ k: 'Price guard', v: `${stopGuard()}%`, n: 'from the Coinbase, Kraken, Binance average' }] : []),
     { k: 'Ends', v: end.toLocaleDateString([], { month: 'short', day: 'numeric' }), n: `${days} day${days > 1 ? 's' : ''}` },
-    { k: 'Helper holds', v: '1.01 XLM', n: 'back when it ends' },
+    { k: 'Clerk holds', v: '1.01 XLM', n: 'back when it ends' },
     { foot: `Keep the ${sell ? nB : nQ} in this wallet until then, or the stop fails.` }];
   const RP = T.replace && T.replace.w === tradeAddr ? { ...T.replace } : null;
   if (RP) items.push({ k: 'Then cancels', v: `old ${RP.side} ${fx(RP.xlm, 2)} ${RP.coin || 'XLM'} @ ${p4(RP.stop)}`, n: 'new one is placed first' });
@@ -18414,15 +18528,15 @@ async function stopReview(q, a, kp) {
     try {
       const w = tradeAddr, ts = Date.now();
       const hl = await stopHealth().catch(() => ({}));
-      if (!hl.own) throw new Error('Update your stop server to v1.5 (own helpers): copy the new stopd.py to the watcher box and run install-stops.sh again.');
+      if (!hl.own) throw new Error('Update your stop server to v1.5 (own clerks): copy the new stopd.py to the watcher box and run install-stops.sh again.');
       if ((feed === 'trades3' || !isX) && !hl.trades3) throw new Error('Update your stop server to v1.6 (stops on any coin, Stellar trades trigger): copy the new stopd.py to the watcher box and run install-stops.sh again.');
       // a) the wallet makes and funds its own helper
-      tPendSet(pnd, 'Setting up…', 'mu', 'making its helper account (1.01 XLM from this wallet, comes back)');
+      tPendSet(pnd, 'Setting up…', 'mu', 'making its clerk account (1.01 XLM from this wallet, comes back)');
       const { h, k } = await helperFree(kp, w); hh = h; const ha = h.publicKey();
       hlpReg()[ha] = { w, k, at: Date.now() }; hlpSeen()[ha] = 1; saveS();
       { const t0 = await buildTx(w, [SDK.Operation.createAccount({ destination: ha, startingBalance: HELPER_XLM })]); t0.sign(kp); await submit(t0); }
       let hx = null; for (let i = 0; i < 6 && !hx; i++) { hx = await acct(ha).catch(() => null); if (!hx) await sleep(1500); }
-      if (!hx) throw new Error('The helper account did not show up on Stellar. Try again.');
+      if (!hx) throw new Error('The clerk account did not show up on Stellar. Try again.');
       const s0 = BigInt(hx.sequence);
       // b) the order: N copies from the helper (min sequence s0), each ends by closing the helper into the wallet
       const ops = [sell ? SDK.Operation.pathPaymentStrictSend({ source: w, sendAsset: bA, sendAmount: amt7(sq), destination: w, destAsset: qA, destMin: amt7(usd), path: [] })
@@ -18451,11 +18565,11 @@ async function stopReview(q, a, kp) {
       }
       stopList(w).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {});
       pushOffer();
-      tPendSet(pnd, RP ? (oldNote.includes('NOT') ? '✓ New stop armed' : '✓ Stop replaced') : '✓ Stop armed', oldNote.includes('NOT') ? 'amb' : 'grn', `${feed === 'trades3' ? `waits for 3 trades of 1+ ${nB} at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)}`} · 1.01 XLM in its helper until it ends${oldNote}`, true);
+      tPendSet(pnd, RP ? (oldNote.includes('NOT') ? '✓ New stop armed' : '✓ Stop replaced') : '✓ Stop armed', oldNote.includes('NOT') ? 'amb' : 'grn', `${feed === 'trades3' ? `waits for 3 trades of 1+ ${nB} at ${p4(st)} or ${sell ? 'lower' : 'higher'}` : `waits for ${FEEDN[feed]} to ${sell ? 'fall' : 'rise'} to ${p4(st)}`} · 1.01 XLM in its clerk until it ends${oldNote}`, true);
     } catch (e) {
       let why = niceErr(e);
-      if (hh) { try { if ((await helperClose(tradeAddr, hh)) === 'closed') why += ' Its helper was closed, so the 1.01 XLM is back.'; } catch (x) { why += ' Its helper will be closed and the XLM returned next time you open Trade.'; } }
-      if (/not funded yet/i.test(why)) why += ' Your stop server needs about 10 XLM on ' + netWord() + ' for its helper accounts. Settings → Stop orders → Check shows the address to send it to.';
+      if (hh) { try { if ((await helperClose(tradeAddr, hh)) === 'closed') why += ' Its clerk was closed, so the 1.01 XLM is back.'; } catch (x) { why += ' Its clerk will be closed and the XLM returned next time you open Trade.'; } }
+      if (/not funded yet/i.test(why)) why += ' Your stop server needs about 10 XLM on ' + netWord() + ' for its clerk accounts. Settings → Stop orders → Check shows the address to send it to.';
       tPendSet(pnd, 'Failed', 'red', why + (RP ? ' Nothing was placed. Your old stop is still waiting.' : ' Nothing was placed.'), true);
     }
   }, false, sell ? 'b-pur' : 'b-grn', 'Placing…', true);
@@ -18506,8 +18620,8 @@ async function stopCancel(t) {
     const again = () => stopList(tradeAddr).then(() => STOP_PAINT && STOP_PAINT()).catch(() => {}); setTimeout(again, 1500); setTimeout(again, 4000);   // the server closes it within a few seconds
   } catch (e) {
     const x = (STOPS.list || []).find((y) => y.id === id), r = x && x.helper && hlpReg()[x.helper];
-    if (r) {   // the stop server can't be reached: close the helper from here. That kills every signed copy for good.
-      try { const h = await helperKp(kpFor(r.w), r.k); if (h.publicKey() === x.helper) { await helperClose(r.w, h); t.textContent = 'Cancelled'; t.classList.add('done'); if (card) card.classList.add('gone'); toast('Cancelled from this phone (its helper is closed, the XLM is back).', 6000); return; } } catch (e2) {}
+    if (r) {   // the stop server can't be reached: close the clerk from here. That kills every signed copy for good.
+      try { const h = await helperKp(kpFor(r.w), r.k); if (h.publicKey() === x.helper) { await helperClose(r.w, h); t.textContent = 'Cancelled'; t.classList.add('done'); if (card) card.classList.add('gone'); toast('Cancelled from this phone (its clerk is closed, the XLM is back).', 6000); return; } } catch (e2) {}
     }
     t.disabled = false; t.textContent = 'Cancel stop'; toast('Not cancelled: ' + niceErr(e));
   }
@@ -18536,7 +18650,7 @@ async function stopStatus(h) {
     const k = +j.stops || 0, x = j.xlm == null ? null : +j.xlm;
     el.innerHTML = `${head}${S.net === 'public' ? '' : ' · ' + NET().name}${j.private ? ' · private' : ' · <span class="amb">open to any wallet</span>'}`
       + (x != null && x < 3 && S.net === 'testnet' ? '<br>Testnet: it funds itself from friendbot the first time you place a stop.'
-        : x != null && x < 3 && h.own ? `<br>Stops use your own helper accounts, so this server needs no XLM. Optional: 2–3 XLM to <span class="mono">${esc(String(j.funder || ''))}</span> lets it pay a higher fee when the network is busy.`
+        : x != null && x < 3 && h.own ? `<br>Stops use your own clerk accounts, so this server needs no XLM. Optional: 2–3 XLM to <span class="mono">${esc(String(j.funder || ''))}</span> lets it pay a higher fee when the network is busy.`
         : x != null && x < 3 ? `<br><span class="amb">The stop server needs about 10 XLM on ${netWord()} to open its channels. Send it to <span class="mono">${esc(String(j.funder || ''))}</span>. Or update it to v1.5, which needs none.</span>`
         : `<br>Service balance ${fx(x || 0, 2)} XLM (pays network fees, not your trades).`);
   } catch (e) { el.innerHTML = `${head}<br><span class="amb">${esc(niceErr(e))}</span>`; }
