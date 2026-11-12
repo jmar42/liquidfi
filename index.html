@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37s</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37u</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -574,7 +574,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37s</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37u</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -604,7 +604,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.37s · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.37u · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -16127,7 +16127,7 @@ function ePerSum(trades, per) {   // → { cut, n } for one period
   const P0 = ePerStarts(), lo = P0[per], hi = per === 'yday' ? P0.today : per === 'lastMonth' ? P0.month : Infinity;
   let cut = 0, n = 0; for (const t of trades) if (t.t >= lo && t.t < hi) { cut += t.cut; n++; } return { cut, n };
 }
-const EDET = { mode: null, ch: 'st', k: null, per: 'week', gen: 0 };
+const EDET = { mode: null, ch: 'st', k: null, per: 'today', gen: 0 };
 const esg = (v) => (v >= 0 ? '+' : '−') + '$' + fxd(v);
 // one pool's numbers: value now, put in/out, P/L since joined
 function poolPos(ch, k) {
@@ -16140,8 +16140,8 @@ function poolPos(ch, k) {
   return { p, name: p && p.name, where: `XRP Ledger pool · ${p ? p.tok + ' by ' + p.who : ''}`, mine: lp, total: A.lp || 0, hold: A.at && !A.none && p ? [[A.x, 'XRP'], [A.u, p.tok]] : null, now: lp > 0 && A.lp > 0 ? lp / A.lp * A.tvl : 0, E, add: `data-act="xrEarnAdd" data-xp="${k}"`, out: `data-act="xrEarnOut" data-xp="${k}"` };
 }
 const heldKeys = (ch) => (ch === 'st' ? earnPools().map((p) => p.id) : xrPools().map((p) => p.key)).filter((k) => poolPos(ch, k).mine > 0);
-function earnSum(ch) { Object.assign(EDET, { mode: 'sum', ch, k: null }); earnDetPaint(true); }
-function earnPoolSheet(ch, k) { Object.assign(EDET, { mode: 'pool', ch, k }); if (!EPERS_POOL.includes(EDET.per)) EDET.per = 'week'; earnDetPaint(true); }
+function earnSum(ch) { Object.assign(EDET, { mode: 'sum', ch, k: null, per: 'today' }); earnDetPaint(true); }   /* opens on Today every time */
+function earnPoolSheet(ch, k) { const fromSum = EDET.mode === 'sum' && eDetOpen(EDET.gen); Object.assign(EDET, { mode: 'pool', ch, k }); if (!fromSum || !EPERS_POOL.includes(EDET.per)) EDET.per = 'today'; earnDetPaint(true); }   /* Today, unless you tapped the pool from Your pools (keeps that period) */
 const eDetOpen = (gen) => $('#sheet').classList.contains('on') && !!$(`#sheetIn [data-edet="${gen}"]`);   // still showing THIS Earn sheet (not an Add / Withdraw / confirm sheet opened since)
 function earnDetPaint(load) {
   if (load) EDET.gen++;
@@ -16154,7 +16154,9 @@ function earnDetPaint(load) {
   const loadingAll = F.some((f) => !f || f.partial), loading = !covers(P0r[per] || 0), failed = F.some((f) => f && f.err), win = F.some((f) => f && f.windowed), capped = F.some((f) => f && !f.partial && f.capped);
   const allPL = (pos) => (pos.E && pos.E.in > 0 ? pos.now + pos.E.out - pos.E.in : null);
   const earnedAll = (f) => (f && !f.err ? f.trades.reduce((s2, t) => s2 + t.cut, 0) : 0);
-  const v = (txt) => (loading ? '…' : failed ? '–' : txt);   // a number, or … while loading, or – if it couldn't load
+  const SY = '<span class="mu" style="font-size:13px;font-weight:400">Syncing…</span>';   // still loading (shown instead of a number)
+  const histOK = pairs.every(([c]) => (c === 'st' ? EPL[earnAddr] : XPL[earnXr]));   /* your deposit / withdrawal history is in */
+  const v = (txt) => (loading ? SY : failed ? '–' : txt);   // a number, or Syncing… while loading, or – if it couldn't load
   /* Earned: from share value (instant, exact) where the pool's history is known; otherwise counted from trades */
   const nowT = Date.now(), perLo = P0r[per] || 0, perHi = per === 'yday' ? P0r.today : per === 'lastMonth' ? P0r.month : nowT;
   const NW = pairs.map(([c, x]) => poolNow(c, x)), EVs = pairs.map(([c, x]) => (poolPos(c, x).E || {}).ev || []);
@@ -16162,9 +16164,9 @@ function earnDetPaint(load) {
   const tradeCut = (i, lo, hi) => { const f = F[i]; if (!f || f.err || (f.partial && f.oldest > lo)) return null; let c2 = 0; for (const t of f.trades) if (t.t >= lo && t.t < hi) c2 += t.cut; return c2; };
   const earnIn = (i, lo, hi) => { const a2 = fs(i, lo, hi); return a2 != null ? a2 : tradeCut(i, lo, hi); };   // null = not ready yet
   const earnSumIn = (lo, hi) => { let t2 = 0; for (let i = 0; i < pairs.length; i++) { const a2 = earnIn(i, lo, hi); if (a2 == null) return null; t2 += a2; } return t2; };
-  const vx = (val) => (val == null ? (failed ? '–' : '…') : esg(val));
+  const vx = (val) => (val == null || !histOK ? (failed && histOK ? '–' : SY) : esg(val));
   const shareAll = pairs.length > 0 && pairs.every((_, i) => fs(i, 0, nowT) != null);   // "since you joined" fully from share value: no 62-day window, no trade cap
-  const vAll = (txt) => (loadingAll ? '…' : failed ? '–' : txt), vDay = (lo, txt) => (!covers(lo) ? '…' : failed ? '–' : txt);
+  const vAll = (txt) => (loadingAll ? SY : failed ? '–' : txt), vDay = (lo, txt) => (!covers(lo) ? SY : failed ? '–' : txt);
   const note = `<div class="mu" style="font-size:11px;line-height:1.45">Earned = the trading fees your shares collected: fees stay in the pool, so each share is backed by a little more over time (valued at today's price). Profit / Loss also counts price moves, so it's shown since you joined.${!shareAll && win ? ' Earned covers the last 62 days.' : ''}${!shareAll && capped ? ' Busy pool: counted from its most recent 5,000 trades.' : ''}${failed && !shareAll ? ' <span class="amb">Couldn\'t load the trades right now. Close and reopen to try again.</span>' : ''}</div>`;
   const pcOK = shareAll || (!win && !capped && !failed);   // price change = P/L − Earned only makes sense when Earned covers the whole time you've been in
   let h;
@@ -16181,8 +16183,8 @@ function earnDetPaint(load) {
         <div class="ekv"><span>Trades through your pools</span><span class="mono">${v(sums.reduce((s2, x) => s2 + x.n, 0).toLocaleString())}</span></div></div>
       <div class="elbl">Since you joined</div>
       <div class="card" style="gap:2px"><div class="ekv"><span>Earned${!shareAll && win ? ' (last 62 days)' : ''}</span><b class="mono grn">${vx(ea)}</b></div>
-        <div class="ekv"><span>Price change</span><b class="mono ${pl - (eaPL || 0) >= 0 ? 'grn' : 'red'}">${!withPL.length || !pcOK ? '–' : eaPL == null ? '…' : esg(pl - eaPL)}</b></div>
-        <div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${withPL.length ? esg(pl) : '–'}</b></div></div>
+        <div class="ekv"><span>Price change</span><b class="mono ${pl - (eaPL || 0) >= 0 ? 'grn' : 'red'}">${!histOK ? SY : !withPL.length || !pcOK ? '–' : eaPL == null ? SY : esg(pl - eaPL)}</b></div>
+        <div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${!histOK ? SY : withPL.length ? esg(pl) : '–'}</b></div></div>
       ${pos.length ? ['st', 'xr'].filter((c) => pairs.some((pr) => pr[0] === c)).map((c) => `<div class="elbl">${chainName[c]} · earned ${perName}</div><div class="card" style="gap:2px">${rowsOf(c)}</div>`).join('')
         : `<div class="card"><span class="mu">You're not in any pool yet. Go back and pick Stellar pools or XRP Ledger pools to start.</span></div>`}
       <div class="elbl">By day</div>
@@ -16201,10 +16203,10 @@ function earnDetPaint(load) {
       <div class="card" style="gap:2px">${x.E && x.E.in > 0 ? `<div class="ekv"><span>Put in</span><span class="mono">$${fx(x.E.in)}${x.E.out > 0 ? ` · taken out $${fx(x.E.out)}` : ''}</span></div>` : ''}
         <div class="ekv"><span>Earned ${perName}${per === 'all' && win && !shareAll ? ' (last 62 days)' : ''}</span><b class="mono grn">${vx(eP)}</b></div>
         <div class="ekv"><span>Trades ${perName}</span><span class="mono">${v(ok ? sum.n.toLocaleString() : '')}</span></div>
-        ${pl != null ? `<div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Since you joined: price change</span><b class="mono ${pl - (ea || 0) >= 0 ? 'grn' : 'red'}">${!pcOK ? '–' : ea == null ? '…' : esg(pl - ea)}</b></div>
+        ${pl != null ? `<div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Since you joined: price change</span><b class="mono ${pl - (ea || 0) >= 0 ? 'grn' : 'red'}">${!pcOK ? '–' : ea == null ? SY : esg(pl - ea)}</b></div>
         <div class="ekv"><span>Since you joined: Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${esg(pl)}</b></div>` : ''}</div>
       <div class="elbl">Recent trades through the pool · your cut</div>
-      <div class="card" style="gap:0">${!f ? '<span class="mu">Loading…</span>' : f.err ? '<span class="amb">Couldn\'t load the trades right now.</span>' : (f.trades.slice(0, 12).map((t) => `<div class="etr"><span class="mu">${esc(new Date(t.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }))}</span><span>${t.txt}</span><span class="mono grn">+$${t.cut < 1e-7 ? t.cut.toExponential(1) : fxd(t.cut)}</span></div>`).join('') || '<span class="mu">No trades since you joined yet.</span>')}</div>
+      <div class="card" style="gap:0">${!f ? SY : f.err ? '<span class="amb">Couldn\'t load the trades right now.</span>' : (f.trades.slice(0, 12).map((t) => `<div class="etr"><span class="mu">${esc(new Date(t.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }))}</span><span>${t.txt}</span><span class="mono grn">+$${t.cut < 1e-7 ? t.cut.toExponential(1) : fxd(t.cut)}</span></div>`).join('') || '<span class="mu">No trades since you joined yet.</span>')}</div>
       ${note}` : `<div class="note"><span>You're not in this pool yet. Add to it to start earning a share of its trading fees.</span></div>`}
       <div class="g2"><button class="b-light" ${x.add}>Add</button><button class="b-out" ${x.out}${x.mine > 0 ? '' : ' disabled'}>Withdraw</button></div><button class="b-out" data-act="closeSheet">Close</button>`;
   }
@@ -16218,7 +16220,8 @@ function earnDetPaint(load) {
   let rp = 0; const onPage = () => { if (rp) return; rp = setTimeout(() => { rp = 0; if (eDetOpen(gen)) earnDetPaint(); }, 250); };   /* repaint as pages arrive (at most 4× a second) */
   { const P1 = ePerStarts(), T = [P1.today, P1.yday, P1.week, P1.month, P1.lastMonth]; for (let i = 1; i < 7; i++) T.push(eMidnight(P1.y, P1.m, P1.d - i));
     const st = pairs.filter((pr) => pr[0] === 'st').map((pr) => pr[1]), xp = pairs.filter((pr) => pr[0] === 'xr').map((pr) => pr[1]);
-    Promise.all([st.length ? snapLoad(st) : false, ...xp.map((x) => xgLoad(x, T))]).then((R) => { if (R.some(Boolean)) onPage(); }).catch(() => {}); }
+    const hist = [st.length && !EPL[earnAddr] ? earnHistStellar(earnAddr).then(() => true) : false, xp.length && !XPL[earnXr] ? earnHistXr(earnXr).then(() => true) : false];
+    Promise.all([st.length ? snapLoad(st) : false, ...xp.map((x) => xgLoad(x, T)), ...hist.map((h2) => Promise.resolve(h2).catch(() => false))]).then((R) => { if (R.some(Boolean)) onPage(); }).catch(() => {}); }
   if (need.length) Promise.all(need.map(([c, x]) => earnTrades(c, x, onPage).catch(() => null).finally(() => delete EFETCH[`${S.net}:${c}:${x}`]))).then(() => { if (eDetOpen(gen)) earnDetPaint(); });
 }
 function earnCard(name, where, c, mine, note, risk, btns, tap) {
@@ -16382,21 +16385,35 @@ function xrEarnOutGo(k, pct) {
    "vs just holding" = pool value now minus what the same coins would be worth today if they had never been added
    (= fees earned minus impermanent loss). */
 const EPL = {}, XPL = {};
+/* Your pool deposits / withdrawals, kept on the phone (history never changes): next time only operations newer than the
+   last one seen are read, instead of paging through the whole wallet again. */
+const EPLC_KEY = 'lf-epl-v1'; let EPLC = null;
+const eplAll = () => { if (EPLC) return EPLC; try { EPLC = JSON.parse(localStorage.getItem(EPLC_KEY) || '{}') || {}; } catch (e) { EPLC = {}; } return EPLC; };
+const eplSave = () => { try { localStorage.setItem(EPLC_KEY, JSON.stringify(eplAll())); } catch (e) {} };
 async function earnHistStellar(addr) {
   const c = EPL[addr]; if (c && Date.now() - c.at < 120000) return c;
-  const P = {}; let url = `/accounts/${addr}/operations?order=desc&limit=200`;
-  for (let pg = 0; pg < 30; pg++) {
+  const ck = `${S.net}:st:${addr}`, C = eplAll()[ck] || { ops: [], top: null }, fresh = [];
+  let url = `/accounts/${addr}/operations?order=desc&limit=200`, top = null, hit = false;
+  for (let pg = 0; pg < 30 && !hit; pg++) {
     let j; try { j = await H(url); } catch (e) { if (e.status === 404) break; throw e; }
     const R = (j._embedded || {}).records || [];
+    if (pg === 0 && R.length) top = R[0].paging_token;
     for (const o of R) {
+      if (C.top && o.paging_token === C.top) { hit = true; break; }
       if (o.type !== 'liquidity_pool_deposit' && o.type !== 'liquidity_pool_withdraw') continue;
-      const p = earnPools().find((x) => x.id === o.liquidity_pool_id); if (!p) continue;
-      const E = P[p.id] || (P[p.id] = { in: 0, out: 0, net: {}, ev: [] }), dep = o.type === 'liquidity_pool_deposit';
-      const rr = (dep ? o.reserves_deposited : o.reserves_received) || [], sh0 = dep ? +o.shares_received || 0 : +o.shares || 0;
-      E.ev.push({ t: Date.parse(o.created_at), d: dep ? sh0 : -sh0, g: rr.length === 2 && sh0 > 0 ? Math.sqrt(+rr[0].amount * +rr[1].amount) / sh0 : null });   /* g = pool backing per share at that moment (a deposit or withdrawal is in the pool's own ratio) */
-      for (const r of (dep ? o.reserves_deposited : o.reserves_received) || []) { const k = r.asset === 'native' ? 'XLM' : r.asset; E.net[k] = (E.net[k] || 0) + (dep ? 1 : -1) * +r.amount; if (k === p.b) E[dep ? 'in' : 'out'] += 2 * +r.amount; }
+      const dep = o.type === 'liquidity_pool_deposit';
+      fresh.push({ id: o.paging_token, dep, pid: o.liquidity_pool_id, t: Date.parse(o.created_at), sh: dep ? +o.shares_received || 0 : +o.shares || 0, rr: ((dep ? o.reserves_deposited : o.reserves_received) || []).map((r) => [r.asset, +r.amount]) });
     }
-    if (R.length < 200) break; url = rel(j._links.next.href);
+    if (hit || R.length < 200) break; url = rel(j._links.next.href);
+  }
+  const seen = new Set(), ops = fresh.concat(C.ops).filter((o) => !seen.has(o.id) && seen.add(o.id));
+  eplAll()[ck] = { ops, top: top || C.top }; eplSave();
+  const P = {};
+  for (const o of ops) {
+    const p = earnPools().find((x) => x.id === o.pid); if (!p) continue;
+    const E = P[p.id] || (P[p.id] = { in: 0, out: 0, net: {}, ev: [] });
+    E.ev.push({ t: o.t, d: o.dep ? o.sh : -o.sh, g: o.rr.length === 2 && o.sh > 0 ? Math.sqrt(o.rr[0][1] * o.rr[1][1]) / o.sh : null });   /* g = pool backing per share at that moment (a deposit or withdrawal is in the pool's own ratio) */
+    for (const [a0, amt] of o.rr) { const k = a0 === 'native' ? 'XLM' : a0; E.net[k] = (E.net[k] || 0) + (o.dep ? 1 : -1) * amt; if (k === p.b) E[o.dep ? 'in' : 'out'] += 2 * amt; }
   }
   return (EPL[addr] = { at: Date.now(), pools: P });
 }
@@ -16430,19 +16447,29 @@ function xrAmmG(m, p) {   // the pool right after a transaction, from its metada
 }
 async function earnHistXr(addr) {
   const c = XPL[addr]; if (c && Date.now() - c.at < 120000) return c;
-  const P = {}; let marker;
-  for (let pg = 0; pg < 20; pg++) {
+  const ck = `${S.net}:xr:${addr}`, C = eplAll()[ck] || { ops: [], top: null }, fresh = [];
+  let marker, top = null, hit = false;
+  for (let pg = 0; pg < 20 && !hit; pg++) {
     const r = await xr('account_tx', { account: addr, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(marker ? { marker } : {}) });
-    for (const x of r.transactions || []) {
-      const { t, m } = xrTxOf(x);
+    const L = r.transactions || [];
+    for (const x of L) {
+      const { t, m, hash } = xrTxOf(x); const id = hash || x.hash || '';
+      if (pg === 0 && !top && id) top = id;
+      if (C.top && id === C.top) { hit = true; break; }
       if (t.Account !== addr || (t.TransactionType !== 'AMMDeposit' && t.TransactionType !== 'AMMWithdraw') || m.TransactionResult !== 'tesSUCCESS' || !t.Asset2) continue;
       const p = xrPools().find((q) => q.a2.currency === t.Asset2.currency && q.a2.issuer === t.Asset2.issuer); if (!p) continue;
-      const d = xrDeltas(m, addr, t), dx = d.XRP || 0, du = d[p.a2.currency + '.' + p.a2.issuer] || 0;
-      const E = P[p.key] || (P[p.key] = { in: 0, out: 0, net: { x: 0, u: 0 }, ev: [] });
-      E.ev.push({ t: ((t.date || 0) + 946684800) * 1000, d: Object.entries(d).filter(([k]) => /^03/.test(k)).reduce((s2, [, v]) => s2 + v, 0), g: xrAmmG(m, p) });   /* the pool tokens it got or gave back; g = the pool right after */
-      E.net.x -= dx; E.net.u -= du; if (du < 0) E.in += -2 * du; else E.out += 2 * du;
+      const d = xrDeltas(m, addr, t);
+      fresh.push({ id, key: p.key, t: ((t.date || 0) + 946684800) * 1000, d: Object.entries(d).filter(([k]) => /^03/.test(k)).reduce((s2, [, v]) => s2 + v, 0), g: xrAmmG(m, p), dx: d.XRP || 0, du: d[p.a2.currency + '.' + p.a2.issuer] || 0 });   /* the pool tokens it got or gave back; g = the pool right after */
     }
-    marker = r.marker; if (!marker) break;
+    marker = r.marker; if (hit || !marker) break;
+  }
+  const seen = new Set(), ops = fresh.concat(C.ops).filter((o) => !seen.has(o.id) && seen.add(o.id));
+  eplAll()[ck] = { ops, top: top || C.top }; eplSave();
+  const P = {};
+  for (const o of ops) {
+    const E = P[o.key] || (P[o.key] = { in: 0, out: 0, net: { x: 0, u: 0 }, ev: [] });
+    E.ev.push({ t: o.t, d: o.d, g: o.g });
+    E.net.x -= o.dx; E.net.u -= o.du; if (o.du < 0) E.in += -2 * o.du; else E.out += 2 * o.du;
   }
   return (XPL[addr] = { at: Date.now(), pools: P });
 }
@@ -17115,7 +17142,7 @@ function newWalletSheet(i, freshPh) {
     <div class="mu" style="font-size:12px">Missed it? Open the wallet and tap "Back up: show key and recovery phrase", or Settings → Back up keys. Your PIN shows it again.</div>
     <button class="b-light big" data-act="newWalletDone">I saved it</button>`);
 }
-function eraseAll() { try { localStorage.removeItem(SKEY); localStorage.removeItem(ERAW_KEY); localStorage.removeItem(XG_KEY); } catch (e) {} ERAW = null; XG = null; K = null; PIN = null; location.reload(); }
+function eraseAll() { try { localStorage.removeItem(SKEY); localStorage.removeItem(ERAW_KEY); localStorage.removeItem(XG_KEY); localStorage.removeItem(EPLC_KEY); } catch (e) {} ERAW = null; XG = null; EPLC = null; K = null; PIN = null; location.reload(); }
 function resetSheet() {
   pending = eraseAll;
   sheet(`<h2>Erase Liquidfi from this phone?</h2><div class="note amb">This deletes your PIN, every wallet key, the emergency key, the bot list and settings from this phone. Funds stay on Stellar, but you can only reach them again with their secret keys or a backup file.</div>
