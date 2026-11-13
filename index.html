@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37y</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.38c</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -574,7 +574,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37y</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.38c</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -604,7 +604,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.37y · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.38c · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13269,8 +13269,31 @@ function loadS() {
     if (!N.hz) N.hz = { mode: 'sdf', url: '' };
   }
   if (DEFAULT_STOP_URL && (!S.stopUrl || /\.ts\.net(\/|$)/i.test(S.stopUrl))) S.stopUrl = DEFAULT_STOP_URL;   // the built-in server: nothing to set up (the old home-box address moves here)
+  VBASE = JSON.stringify(S.vault || null);
 }
-function saveS() { try { localStorage.setItem(SKEY, JSON.stringify(S)); return true; } catch (e) { toast('This browser will not save data here. Open the page another way (see notes).'); return false; } }
+/* Two open copies of Liquidfi (the home-screen app and a browser tab) share this phone's storage. Without care, the copy
+   opened earlier still holds the OLD wallet list and its next save writes it back over a wallet the other copy just made.
+   So: every copy remembers the vault it last read or wrote (VBASE). If storage holds a different one, another copy changed
+   it: we take theirs (and reopen the keys with the PIN), never write ours over it. */
+let VBASE = 'null';
+const vDisk = () => { try { const j = JSON.parse(localStorage.getItem(SKEY) || 'null'); return j ? { v: JSON.stringify(j.vault || null), at: j.keysAt, j } : null; } catch (e) { return null; } };
+async function vAdopt(d) {   // another copy changed the wallets: use its vault here too
+  S.vault = JSON.parse(d.v); S.keysAt = d.at; if (d.j && d.j.bk) S.bk = d.j.bk; VBASE = d.v;
+  if (!K || !PIN || !S.vault) return;
+  try { K = unpackVault(await unseal(PIN, S.vault)); if (typeof drawBots === 'function') drawBots(true); } catch (e) { lock(); }   // PIN changed in the other copy: unlock again
+}
+function saveS() {
+  try {
+    const d = vDisk(), mine = JSON.stringify(S.vault || null);
+    if (d && d.v !== VBASE && d.v !== mine) {   // the wallets were changed in another open copy since we last looked
+      const changingKeys = mine !== VBASE;
+      vAdopt(d);
+      if (changingKeys) { toast('Your wallets were just changed in another open copy of Liquidfi. Close the other copy, then try again.', 9000); return false; }
+    }
+    localStorage.setItem(SKEY, JSON.stringify(S)); VBASE = JSON.stringify(S.vault || null); return true;
+  } catch (e) { toast('This browser will not save data here. Open the page another way (see notes).'); return false; }
+}
+window.addEventListener('storage', (e) => { if (e.key !== SKEY || !S) return; const d = vDisk(); if (d && d.v !== VBASE) vAdopt(d); });
 const NET = () => NETS[S.net], NS = () => S.nets[S.net];
 const netWord = () => (S.net === 'public' ? 'Stellar' : 'Testnet');
 const netTag = () => (S.net === 'public' ? '' : ' · <b style="color:var(--amb)">TESTNET</b>');
@@ -15251,7 +15274,7 @@ function walletKeySheet(kind, i) {
     sheet(`<h2>Back up ${esc(o.name)}</h2><div class="mu" style="font-size:13px">Write these on paper or keep them in a password manager. Anyone who has them can take the funds. Never type them into a website or chat.</div>
       ${fromPh ? `<b>Recovery phrase (${K.ph.split(' ').length} words)</b><div class="mu" style="font-size:12px">Restores this wallet (${kind === 'xrp' ? 'XRP' : 'Stellar'} #${o.hd + 1}) and every other wallet made from the same words.</div>${phraseRow(true)}` : ''}
       <b>Secret key${kind === 'xrp' && !o.seed && !o.w.seed ? ' (private key)' : ''}</b><div class="addr" id="wkSec">${esc(sec)}</div><div class="amb" id="wkCw" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div>
-      <button class="b-out sm" data-act="wkCopy" data-kind="${kind}" data-i="${i}">Copy key</button>
+      <button class="b-out sm" data-act="wkCopy" data-kind="${kind}" data-i="${i}">Copy secret key</button>
       <div class="mu" style="font-size:12px">Address: <span class="mono">${esc(addr)}</span>. You can see these again any time here or in Settings → Back up keys.</div>
       <button class="b-light big" data-act="closeSheet">Done</button>`);
   });
@@ -15292,7 +15315,7 @@ async function xrAdd(how, name) {
     <div class="mu" style="font-size:12px">Missed it? Open the wallet and tap "Back up: show key and recovery phrase", or Settings → Back up keys. Your PIN shows it again.</div>
     <button class="b-light big" data-act="xrNewDone" data-addr="${esc(w.classicAddress)}">I saved it</button>`);
 }
-const xrKeyRow = (i) => { const o = K.xr[i]; return `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(o.name)} <span class="mu" style="font-weight:400">· XRP</span></b><span class="mu" style="font-size:12px">${o.hd != null && K.ph ? 'phrase XRP #' + (o.hd + 1) + ' · ' : ''}${short(o.w.classicAddress)}</span></div><div class="addr" id="xsec${i}" style="display:none"></div><div class="amb" id="xcw${i}" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="xrSecShow" data-i="${i}">Show key</button><button class="b-out sm" data-act="xrSecCopy" data-i="${i}">Copy key</button></div></div>`; };
+const xrKeyRow = (i) => { const o = K.xr[i]; return `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(o.name)} <span class="mu" style="font-weight:400">· XRP</span></b><span class="mu" style="font-size:12px">${o.hd != null && K.ph ? 'phrase XRP #' + (o.hd + 1) + ' · ' : ''}${short(o.w.classicAddress)}</span></div><div class="addr" id="xsec${i}" style="display:none"></div><div class="amb" id="xcw${i}" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="xrSecShow" data-i="${i}">Show secret key</button><button class="b-out sm" data-act="xrSecCopy" data-i="${i}">Copy secret key</button></div></div>`; };
 const xrSecret = (o) => o.seed || o.w.seed || o.w.privateKey;   // family seed (s…) when there is one, else the private key (hex)
 
 /* ---------- Swap: any token you hold → any token, best Stellar route (order book + AMM pools) ----------
@@ -16903,14 +16926,14 @@ function vanUpd() {
   if (!on) return;
   $('#xVanPos').style.display = '';
   $('#xVan').setAttribute('autocapitalize', X ? 'off' : 'characters'); $('#xVan').maxLength = X ? 4 : 5;
-  W.querySelector('label').firstChild.textContent = X ? 'Your letters (up to 4)' : 'Your letters (up to 5)';
+  W.querySelector('label').firstChild.textContent = X ? 'Letters or numbers (up to 4)' : 'Your letters (up to 5)'; $('#xVan').placeholder = X ? 'e.g. Jeff or Jm42' : 'e.g. JEFF';
   if (X) {
     const L = [...($('#xVan').value || '')].filter((c) => XR_ABC.includes(c)).join('').slice(0, 4);
     if ($('#xVan').value !== L) $('#xVan').value = L;
     const fee = xrVanFee((xrList().find((w) => w.own) || {}).addr), endX = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start'; $('#xHowNote').innerHTML = '';
     const rare = !endX && L && !XR_START_OK.includes(L[0]);
     $('#xVanEst').innerHTML = L ? `Looks like <span class="mono">${endX ? 'r…<b style="color:var(--blu)">' + esc(L) + '</b>' : 'r<b style="color:var(--blu)">' + esc(L) + '</b>…'}</span><br>On this phone: ${vanEta(L.length, 58, xrVanTries(L, endX))} (could be quicker, or a few times longer). Keep Liquidfi open while it searches.${rare ? `<br><span class="amb">Right after the r, "${esc(L[0])}" is rare on the XRP Ledger, so this takes much longer. These are common there: ${XR_START_OK.split('').join(' ')}.</span>` : ''}${fee ? `<br>Fee when found: <b>${fee} XRP</b>, plus the XRP that opens it (the ledger keeps ${m2((XRSV || { base: 1 }).base)} XRP as its reserve).` : ''}`
-      : 'Type 1 to 4 characters. XRP addresses are case-sensitive and have no 0, O, I or l (so QUID won\'t work; Quid will).';
+      : 'Type 1 to 4 letters or numbers (1–9). XRP addresses are case-sensitive and have no 0, O, I or l (so QUID won\'t work; Quid will).';
     return;
   }
   const L = ($('#xVan').value || '').toUpperCase().replace(/[^A-Z2-7]/g, '').slice(0, 5), end = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start';
@@ -17063,14 +17086,35 @@ async function xrVanPay() {
     drawBots(true); xrVanDoneSheet(h.name, a);
   } finally { VAN.busy = false; bumpIdle(); }
 }
-function xrVanDoneSheet(name, addr) {
-  const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === addr); pending = null; XRFRESH = false;
-  sheet(`<h2>${esc(name)} is ready</h2>${bigAddr(addr, 'XRP Ledger address (safe to share)')}
-    <div class="note amb">Save its secret now. A custom address isn't part of your recovery phrase: without this secret, a lost phone means a lost wallet. Any XRP wallet app can open it (Xaman, Ledger, Trust Wallet).</div>
-    ${i >= 0 ? xrKeyRow(i) : ''}
-    <div class="mu" style="font-size:12px">Missed it? Settings → Back up keys. Your PIN shows it again.</div>
-    <button class="b-light big" data-act="xrNewDone" data-addr="${esc(addr)}">I saved it</button>`);
+function xrVanDoneSheet(name, addr) { pending = null; XRFRESH = false; keyGate('xrp', addr); }
+/* Custom addresses are the one kind of wallet the 24 words can't restore, so the "ready" screen is about the SECRET KEY:
+   it comes first, the address is small with no copy button (easy to mix up), and you confirm by typing the key's last 4. */
+const kgTodo = () => (NS().keyTodo = NS().keyTodo || []);
+function kgFind(kind, addr) { const L = kind === 'xrp' ? (K.xr || []) : K.x; const i = L.findIndex((o) => (kind === 'xrp' ? o.w && o.w.classicAddress : o.kp && o.kp.publicKey()) === addr); return { i, o: L[i] }; }
+function keyGate(kind, addr) {
+  const { i, o } = kgFind(kind, addr); if (i < 0) return closeSheet();
+  if (!kgTodo().some((x) => x.addr === addr)) { kgTodo().push({ kind, addr, name: o.name }); saveS(); }
+  const X = kind === 'xrp', row = X ? xrKeyRow(i) : keyRow(i), sec = X ? xrSecret(o) : o.kp.secret();
+  sheet(`<h2>${esc(o.name)} is ready</h2>
+    <div class="card" style="gap:10px;border:2px solid var(--amb)">
+      <b style="font-size:17px">Step 1 · Save its SECRET KEY</b>
+      <div class="amb" style="font-size:13.5px;line-height:1.5">This key is the only way back into ${esc(o.name)}. Your recovery phrase does not cover custom addresses. Copy the key into your password manager, or write it on paper.<br>The secret key starts with <b class="mono">${esc(sec.slice(0, X ? 3 : 1))}…</b>. The address starts with <b class="mono">${X ? 'r' : 'G'}…</b> and is NOT the key.</div>
+      ${row}
+    </div>
+    <b style="font-size:17px">Step 2 · Confirm</b>
+    <label>Type the last 4 characters of the secret key you saved<input id="kgL4" maxlength="4" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="from your saved copy"></label>
+    <button class="b-light big" data-act="kgOk" data-k="${kind}" data-addr="${esc(addr)}">I saved the secret key</button>
+    <div class="mu" style="font-size:12px;word-break:break-all">Address (public, safe to share, not the key): <span class="mono">${esc(addr)}</span></div>`);
 }
+function kgOk(kind, addr) {
+  const { o } = kgFind(kind, addr); if (!o) return closeSheet();
+  const sec = kind === 'xrp' ? xrSecret(o) : o.kp.secret(), v = ($('#kgL4').value || '').trim();
+  if (v.length !== 4) return toast('Type the last 4 characters of the secret key you saved.');
+  if (v === sec.slice(-4)) { NS().keyTodo = kgTodo().filter((x) => x.addr !== addr); saveS(); closeSheet(); toast('✓ Secret key saved. Keep it somewhere safe.'); if (kind === 'xrp') { xrSel = addr; go('xrp'); } else drawBots(true); return; }
+  if (v === addr.slice(-4)) return toast("Those are the ADDRESS's last 4. You need the SECRET KEY: tap Copy secret key, save it, then try again.", 9000);
+  toast("That doesn't match the secret key. Tap Show secret key and check your saved copy.", 8000);
+}
+const kgBanner = () => { if (!K) return ''; const L = kgTodo().filter((x) => kgFind(x.kind, x.addr).i >= 0); return L.map((x) => `<div class="note amb" style="flex-direction:column;align-items:stretch;gap:8px"><span><b>${esc(x.name)}: secret key not saved yet.</b> A custom address can't be restored from your recovery phrase.</span><button class="b-light" data-act="kgOpen" data-k="${x.kind}" data-addr="${esc(x.addr)}">Save the secret key</button></div>`).join(''); };
 async function xrVanForget(a) {
   const i = (K.xr || []).findIndex((x) => x.vp && x.w && x.w.classicAddress === a); if (i < 0) return;
   K.xr.splice(i, 1); await resealVault(); drawBots(true);
@@ -17165,7 +17209,7 @@ function openBackup(next) {
   drawBkKeys();
 }
 function switchMainnet() { closeSheet(); S.net = 'public'; hzPick = null; saveS(); homeAddr = null; startMarket(); drawSet(); toast('Switched to Mainnet.'); }
-const keyRow = (i) => { const o = K.x[i]; return `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(o.name)}</b><span class="mu" style="font-size:12px">${o.hd != null && K.ph ? 'phrase #' + (o.hd + 1) + ' · ' : ''}${short(o.kp.publicKey())}</span></div><div class="addr" id="sec${i}" style="display:none"></div><div class="amb" id="cw${i}" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="secShow" data-i="${i}">Show key</button><button class="b-out sm" data-act="secCopy" data-i="${i}">Copy key</button></div></div>`; };
+const keyRow = (i) => { const o = K.x[i]; return `<div style="display:flex;flex-direction:column;gap:6px"><div class="top"><b>${esc(o.name)}</b><span class="mu" style="font-size:12px">${o.hd != null && K.ph ? 'phrase #' + (o.hd + 1) + ' · ' : ''}${short(o.kp.publicKey())}</span></div><div class="addr" id="sec${i}" style="display:none"></div><div class="amb" id="cw${i}" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="secShow" data-i="${i}">Show secret key</button><button class="b-out sm" data-act="secCopy" data-i="${i}">Copy secret key</button></div></div>`; };
 const phraseRow = (open) => `<div style="display:flex;flex-direction:column;gap:8px"><ol class="words" id="phW" style="display:${open ? '' : 'none'}">${open ? K.ph.split(' ').map((w) => `<li>${esc(w)}</li>`).join('') : ''}</ol><div class="amb" id="cwP" style="display:none;font-size:12px">Other apps can read the clipboard. Paste it only into your password manager.</div><div class="g2"><button class="b-out sm" data-act="phShow">${open ? 'Hide phrase' : 'Show phrase'}</button><button class="b-out sm" data-act="phCopy">Copy phrase</button></div></div>`;
 let pinOkAt = 0, pinCb = null, pinBad = 0, addHow = 'new';
 function needPin(cb) {   // re-enter the PIN before showing or copying keys (good for 2 minutes)
@@ -17179,6 +17223,8 @@ async function copySecret(text, btn, warnId) {   /* one tap copies (the PIN chec
   try { await navigator.clipboard.writeText(text); } catch (e) { return toast('This browser blocked copying. Use Show and write it down.'); }
   if (btn && btn.isConnected) { const lb = btn.dataset.label || btn.textContent; btn.dataset.armed = ''; btn.textContent = '✓ Copied'; clearTimeout(btn._ct); btn._ct = setTimeout(() => { if (btn.isConnected) btn.textContent = lb; }, 4000); }
   clearTimeout(clipT); clipT = setTimeout(clearClip, 300000);
+  const g = $('#kgL4');
+  if (g) { setTimeout(() => { g.scrollIntoView({ behavior: 'smooth', block: 'center' }); g.style.outline = '2px solid var(--amb)'; }, 300); return toast('Copied. Save it in your password manager, then type its last 4 characters below to confirm.', 8000); }
   toast('Copied. Paste it into your password manager now. The clipboard clears in 5 minutes or when Liquidfi locks.', 7000);
 }
 function drawBkKeys() {
@@ -17236,6 +17282,7 @@ function phqLater() {
 const phGate = (fn) => (...a) => (phNeedCheck() ? phQuiz(() => fn(...a), 'money') : fn(...a));
 function newWalletSheet(i, freshPh) {
   const o = K.x[i]; pending = null; NWFRESH = !!freshPh;
+  if (o && o.hd == null && !freshPh) return keyGate('xlm', o.kp.publicKey());   // custom address: secret key first
   sheet(`<h2>${esc(o.name)} is ready</h2>${bigAddr(o.kp.publicKey(), 'Stellar address (safe to share)')}
     ${freshPh ? `<div class="note amb">Write down these 24 words in order. They restore this wallet and every wallet you create later on this phone, in Liquidfi or LOBSTR, Freighter or Stellar Laboratory.</div>${phraseRow(true)}`
       : o.hd != null && K.ph ? `<div class="note" id="nwPhOk"><span><b>✓ Backed up by your recovery phrase · Wallet #${o.hd + 1}</b><br><span style="font-size:12.5px">The same 24 words you saved for your other wallets restore this one too. No new words to write down.</span></span></div>${!S.phOk && !S.bk ? '<div class="note amb" id="nwPhWarn">You haven\'t confirmed saving your recovery phrase yet. Tap Show recovery phrase and write the 24 words on paper now.</div>' : ''}<button class="b-out" data-act="nwShowPh" data-i="${i}">Show recovery phrase</button><span class="lbl">Secret key (optional extra backup for this wallet only)</span>`
@@ -17324,7 +17371,7 @@ const firstWallet = () => (persAccts()[0] || OWN()[0] || {}).addr;
 async function resealVault() {   // seal first, keep the old vault if the save fails (so the PIN on disk never drifts)
   const nv = await seal(PIN, { em: K.em.secret(), pe: null, ph: K.ph || null, phN: K.phN || 0, x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, sec: o.kp.secret() })), xrN: K.xrN || 0, xr: (K.xr || []).map((o) => (o.w ? { name: o.name, hd: o.hd, seed: o.seed || null, pub: o.w.publicKey, priv: o.w.privateKey, ...(o.vp ? { vp: 1, vt: o.vt || 0 } : {}) } : o.raw)) });
   const old = S.vault, oldAt = S.keysAt; S.vault = nv; S.keysAt = Date.now();
-  if (!saveS()) { S.vault = old; S.keysAt = oldAt; return false; }
+  if (!saveS()) { if (S.vault === nv) { S.vault = old; S.keysAt = oldAt; } return false; }   // (if another copy's wallets were just adopted, keep those)
   return true;
 }
 const OWN = () => K.x.map((o) => ({ name: o.name, tag: o.type === 'personal' ? 'wallet' : (o.kind === 'dir' ? 'trader' : 'market maker') + ' · own key', addr: o.kp.publicKey(), type: o.type, kind: o.kind || 'mm', kp: o.kp, own: true }));
@@ -17680,7 +17727,7 @@ async function drawBots(reload = true) {
     paintTotal(); kbPaint(); drawXrpRows(); if (drag || press) return;
     const RR = P.res[P.sel], R = allRows();
     if (!R.length) { $('#bPers').innerHTML = '<div class="note">No wallets yet. Tap + Add wallet to make a new one or bring one you have.</div>'; return; }
-    $('#bPers').innerHTML = R.map((x, i) => {
+    $('#bPers').innerHTML = kgBanner() + R.map((x, i) => {
       if (x.xr) { const a = x.a, d = XRA[a.addr], val = d ? (d.a ? '$' + fx(xrUsd(d)) : 'not activated') : '…';
         return `<div class="wrow" data-row="${i}" data-glist="wal"><button class="acct" data-xr="${esc(a.addr)}"><div class="r"><span style="font-size:17px;font-weight:600">${esc(a.name)} <span class="mu" style="font-weight:400">· ${a.own ? 'XRP' : 'XRP watch'}</span></span><span class="mono" style="font-weight:600">${val}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${esc(short(a.addr))}</span><span class="mono mu" style="font-size:12.5px">${d && d.a ? m2(xrXrp(d)) + ' XRP' : ''}</span></div></button></div>`; }
       const a = x.a, isBot = x.bot >= 0, d = isBot ? BOT[a.addr] || {} : null, acc = isBot ? d.a : ACC[a.addr];
@@ -19454,12 +19501,14 @@ document.addEventListener('click', async (e) => {
     fundOpen: phGate(() => fundSheet()), fundReview: () => fundReview(),
     pinChange: () => pinChangeSheet(), pinChangeOk: () => pinChangeOk(),
     pinChkBio: async () => { try { const p = await bioPin(); if (p !== PIN) throw 0; pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); } catch (e) { toast('Use your PIN.'); } },
-    secShow: () => { const i = +t.dataset.i, o = K.x[i]; if (!o) return; needPin(() => { const e = $('#sec' + i), b = document.querySelector(`[data-act=secShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? o.kp.secret() : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide key' : 'Show key'; }); },
-    secCopy: () => { const i = +t.dataset.i, o = K.x[i], b = t; if (!o) return; b.dataset.label = 'Copy key'; if (b.dataset.armed === '1') return copySecret(o.kp.secret(), b, 'cw' + i); needPin(() => copySecret(o.kp.secret(), document.querySelector(`[data-act=secCopy][data-i="${i}"]`) || b, 'cw' + i)); },
+    secShow: () => { const i = +t.dataset.i, o = K.x[i]; if (!o) return; needPin(() => { const e = $('#sec' + i), b = document.querySelector(`[data-act=secShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? o.kp.secret() : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide secret key' : 'Show secret key'; }); },
+    secCopy: () => { const i = +t.dataset.i, o = K.x[i], b = t; if (!o) return; b.dataset.label = 'Copy secret key'; if (b.dataset.armed === '1') return copySecret(o.kp.secret(), b, 'cw' + i); needPin(() => copySecret(o.kp.secret(), document.querySelector(`[data-act=secCopy][data-i="${i}"]`) || b, 'cw' + i)); },
     phShow: () => { if (!K.ph) return; needPin(() => { const e = $('#phW'), b = document.querySelector('[data-act=phShow]'); if (!e) return; const on = e.style.display === 'none'; e.innerHTML = on ? K.ph.split(' ').map((w) => `<li>${esc(w)}</li>`).join('') : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide phrase' : 'Show phrase'; }); },
     phCopy: () => { if (!K.ph) return; const b = t; b.dataset.label = 'Copy phrase'; if (b.dataset.armed === '1') return copySecret(K.ph, b, 'cwP'); needPin(() => copySecret(K.ph, document.querySelector('[data-act=phCopy]') || b, 'cwP')); },
     pinChkOk: () => { const v = ($('#pinChk') || {}).value || ''; if (v !== PIN) { $('#pinChk').value = ''; if (++pinBad >= 3) { pinBad = 0; toast('Wrong PIN 3 times. Locked.'); return lock(); } return toast('Wrong PIN.'); } pinBad = 0; pinOkAt = Date.now(); const f = pinCb; pinCb = null; closeSheet(); if (f) setTimeout(f, 0); },
     nwShowPh: () => walletKeySheet('xlm', +t.dataset.i),
+    kgOk: () => kgOk(t.dataset.k, t.dataset.addr),
+    kgOpen: () => needPin(() => keyGate(t.dataset.k, t.dataset.addr)),
     newWalletDone: () => { const fresh = NWFRESH; NWFRESH = false; const o = K.x.at(-1);
       const done = () => { closeSheet(); if (o) { homeAddr = o.kp.publicKey(); go('home'); } toast((o || {}).name + ' added. Fund it to start using it.'); };
       if (fresh || phNeedCheck()) return phQuiz(done, 'new'); done(); },
@@ -19478,7 +19527,7 @@ document.addEventListener('click', async (e) => {
     addAcct: () => A.addWallet(),
     xrBackup: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i >= 0) walletKeySheet('xrp', i); },
     homeBackup: () => { const i = K.x.findIndex((o) => o.kp.publicKey() === homeAddr); if (i >= 0) walletKeySheet('xlm', i); },
-    wkCopy: () => { const k = t.dataset.kind, i = +t.dataset.i, o = k === 'xrp' ? (K.xr || [])[i] : K.x[i]; if (!o) return; t.dataset.label = 'Copy key'; const sec = k === 'xrp' ? xrSecret(o) : o.kp.secret(); if (t.dataset.armed === '1') return copySecret(sec, t, 'wkCw'); needPin(() => copySecret(sec, document.querySelector('[data-act=wkCopy]') || t, 'wkCw')); },
+    wkCopy: () => { const k = t.dataset.kind, i = +t.dataset.i, o = k === 'xrp' ? (K.xr || [])[i] : K.x[i]; if (!o) return; t.dataset.label = 'Copy secret key'; const sec = k === 'xrp' ? xrSecret(o) : o.kp.secret(); if (t.dataset.armed === '1') return copySecret(sec, t, 'wkCw'); needPin(() => copySecret(sec, document.querySelector('[data-act=wkCopy]') || t, 'wkCw')); },
     xrTradeGo: async () => { let d = XRA[xrSel]; const a0 = xrSel; if (!d) { try { d = await xrLoad(xrSel); } catch (e) { return toast(e.message || String(e)); } if (cur !== 'xrp' || xrSel !== a0) return; } if (d && d.a && !xrCoins().some((c) => xrLineOf(d, c))) return toast('Add RLUSD or USDC to this wallet first (buttons on this page). XRP trades against a dollar coin.'); xtPickQ(xrSel); go('xtrade'); },
     xtReview, xtEditOk: () => xtEditOk(+t.dataset.seq),
     xrWatchTrade: () => { pending = null; sheet(`<h2>This wallet is watch only</h2><div class="mu" style="font-size:14px">Liquidfi has its address but not its key, so it can show balances but can't trade or send. To trade from it, add it with its key: Accounts → + Add wallet → XRP Ledger → Import, and paste its secret (s…). The screen shows "✓ Opens r…" so you can check it's this wallet. Then remove this watch-only copy.</div><div class="addr">${esc(xrSel)}</div><button class="b-light big" data-act="closeSheet">OK</button>`); },
@@ -19507,8 +19556,8 @@ document.addEventListener('click', async (e) => {
     phqPick: () => phqPick(t.dataset.w), phqShow: () => phqShow(), phqLater: () => phqLater(), phqAgain: () => { if (PHQ) { PHQ.step = 0; phQuizPaint(''); } },
     xrRmWatch: () => { const w = (NS().xrw || []).find((x) => x.addr === xrSel); if (!w) return; pending = null; sheet(`<h2>Stop watching ${esc(w.name)}?</h2><div class="addr">${esc(w.addr)}</div><button class="b-red big" data-act="xrRmWatchOk">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     xrRmWatchOk: () => { const N = NS(); N.xrw = (N.xrw || []).filter((x) => x.addr !== xrSel); saveS(); closeSheet(); go('bots'); toast('Removed.'); },
-    xrSecShow: () => { const i = +t.dataset.i, o = (K.xr || [])[i]; if (!o) return; needPin(() => { const e = $('#xsec' + i), b = document.querySelector(`[data-act=xrSecShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? xrSecret(o) : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide key' : 'Show key'; }); },
-    xrSecCopy: () => { const i = +t.dataset.i, o = (K.xr || [])[i], b = t; if (!o) return; b.dataset.label = 'Copy key'; if (b.dataset.armed === '1') return copySecret(xrSecret(o), b, 'xcw' + i); needPin(() => copySecret(xrSecret(o), document.querySelector(`[data-act=xrSecCopy][data-i="${i}"]`) || b, 'xcw' + i)); },
+    xrSecShow: () => { const i = +t.dataset.i, o = (K.xr || [])[i]; if (!o) return; needPin(() => { const e = $('#xsec' + i), b = document.querySelector(`[data-act=xrSecShow][data-i="${i}"]`); if (!e) return; const on = e.style.display === 'none'; e.textContent = on ? xrSecret(o) : ''; e.style.display = on ? '' : 'none'; if (b) b.textContent = on ? 'Hide secret key' : 'Show secret key'; }); },
+    xrSecCopy: () => { const i = +t.dataset.i, o = (K.xr || [])[i], b = t; if (!o) return; b.dataset.label = 'Copy secret key'; if (b.dataset.armed === '1') return copySecret(xrSecret(o), b, 'xcw' + i); needPin(() => copySecret(xrSecret(o), document.querySelector(`[data-act=xrSecCopy][data-i="${i}"]`) || b, 'xcw' + i)); },
     rmXr: () => { const o = (K.xr || [])[+t.dataset.i]; if (!o) return; pending = null; sheet(`<h2>Remove ${esc(o.name)} from this phone?</h2><div class="note amb">The XRP and its tokens stay on the XRP Ledger, but this phone forgets the key. Without the secret (or your recovery phrase / backup file) you can't reach them again.</div><div class="addr">${esc(o.w ? o.w.classicAddress : '')}</div><button class="b-red big" data-act="rmXrOk" data-i="${t.dataset.i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     rmXrOk: async () => { const i = +t.dataset.i; const o = K.xr.splice(i, 1)[0]; if (!(await resealVault())) { K.xr.splice(i, 0, o); return; } closeSheet(); toast('Removed.'); if (cur === 'set') drawSet(); else go('bots'); },
     addWallet: () => { pending = null; const h0 = addHow; addHow = 'new'; sheet(`<h2>Add a wallet</h2>
