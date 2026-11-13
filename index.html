@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37v</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.37y</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -574,7 +574,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37v</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.37y</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -604,7 +604,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.37v · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.37y · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15259,6 +15259,7 @@ function walletKeySheet(kind, i) {
 
 /* add / remove */
 async function xrAdd(how, name) {
+  if (how === 'van') return vanStart(name, 'xrp');
   if (how === 'watch') {
     const r = parseXrpQR($('#xAddr').value); if (!r) return toast('That is not a valid XRP Ledger address (r…).');
     if (xrList().some((w) => w.addr === r.addr)) return toast('That wallet is already here.');
@@ -16025,7 +16026,7 @@ async function earnTrades(ch, k, onPage) {
       windowed = !first || first < since; cutOf = (r) => r.usd * A.fee * sharesAt(E.ev, lp, r.t) / A.lp;
       var keep = (r) => r.t >= since && (!first || r.t >= first);
       let marker, stop = false;
-      for (let pg = 0; pg < 25 && !stop; pg++) {
+      for (let pg = 0; pg < 2 && !stop; pg++) {   /* XRP: just the newest 400 (busy pools + public servers' rate limits); earnings come from share value */
         const r = await xr('account_tx', { account: A.acct, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(marker ? { marker } : {}) });
         for (const x of r.transactions || []) {
           const { t, m } = xrTxOf(x); if (m.TransactionResult !== 'tesSUCCESS') continue;
@@ -16037,13 +16038,13 @@ async function earnTrades(ch, k, onPage) {
           const usd = Math.abs(du);
           fresh.push({ id: id || 'x' + at + ':' + usd, t: at, usd, txt: `${dx < 0 ? 'bought' : 'sold'} ${m2(Math.abs(dx))} XRP ($${fx(usd)})` });
         }
-        marker = r.marker; if (stop || !marker) { stop = true; break; } if (pg === 24) capped = true;
+        marker = r.marker; if (stop || !marker) { stop = true; break; } if (pg === 1) capped = true;
         if (onPage) { EFEES[key] = erMake(key, fresh, R0, keep, cutOf, { partial: true, oldest, windowed }); onPage(); }
       }
     }
     const complete = hitKnown ? !!(R0 && R0.complete) : !capped;
     const list = erMerge(fresh, R0, keep); erawAll()[key] = { list, complete, at: Date.now() }; erawSave();
-    return (EFEES[key] = { at: Date.now(), trades: list.map((r) => ({ t: r.t, usd: r.usd, txt: r.txt, cut: cutOf(r) })), capped: !complete, windowed });
+    return (EFEES[key] = { at: Date.now(), trades: list.map((r) => ({ t: r.t, usd: r.usd, txt: r.txt, cut: cutOf(r) })), capped: !complete, windowed, oldest: complete ? 0 : (list.length ? list[list.length - 1].t : Date.now()) });
   } catch (e) { return (EFEES[key] = { at: Date.now(), trades: [], err: true }); }
 }
 /* Earned from share value instead of counting trades. g = sqrt(coin × dollars) / shares only grows from fees, and one
@@ -16055,7 +16056,7 @@ function feeSpan(ev, shNow, gNow, pNow, t0, t1, gAt) {
   const pts = [{ t: t0 }, ...E, { t: t1, end: true }]; let sum = 0;
   for (let i = 0; i < pts.length - 1; i++) {
     const a = pts[i], b = pts[i + 1], sh = sharesAt(ev, shNow, a.t);
-    if (!(sh > 1e-12)) continue;
+    if (!(sh > 1e-9 * Math.max(1, shNow))) continue;   // rounding dust (XRP pool tokens have 15 digits) isn't a position
     const ga = a.g > 0 ? a.g : gAt(a.t), gb = b.g > 0 ? b.g : b.end && t1 >= now - 60000 ? gNow : gAt(b.t);
     if (!(ga > 0) || !(gb > 0)) return null;
     sum += sh * (gb - ga);
@@ -16150,19 +16151,19 @@ function earnDetPaint(load) {
   const keys = pairs.map((x) => x[1]), F = pairs.map(([c, x]) => EFEES[`${S.net}:${c}:${x}:${c === 'st' ? earnAddr : earnXr}`]);
   const chips = (list) => `<div class="echips">${list.map(([v, l]) => `<button data-act="earnPer" data-eper="${v}" class="${v === per ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   const perName = per === 'all' ? 'since you joined' : (EPERS.find((x) => x[0] === per) || EPERS[2])[1].toLowerCase();
-  const P0r = ePerStarts(), covers = (lo) => F.every((f) => f && (f.err || !f.partial || f.oldest <= lo));   /* a loading answer already counts for times it has reached */
+  const P0r = ePerStarts(), covers = (lo) => F.every((f) => f && (f.err || (!f.partial && !f.capped) || f.oldest <= lo)), stillLoading = F.some((f) => !f || f.partial);   /* a loading answer already counts for times it has reached */
   const loadingAll = F.some((f) => !f || f.partial), loading = !covers(P0r[per] || 0), failed = F.some((f) => f && f.err), win = F.some((f) => f && f.windowed), capped = F.some((f) => f && !f.partial && f.capped);
   const allPL = (pos) => (pos.E && pos.E.in > 0 ? pos.now + pos.E.out - pos.E.in : null);
   const earnedAll = (f) => (f && !f.err ? f.trades.reduce((s2, t) => s2 + t.cut, 0) : 0);
   const SY = '<span class="mu" style="font-size:13px;font-weight:400">Syncing…</span>';   // still loading (shown instead of a number)
   const histOK = pairs.every(([c]) => (c === 'st' ? EPL[earnAddr] : XPL[earnXr]));   /* your deposit / withdrawal history is in (or failed: then – ) */
   const histErr = pairs.some(([c]) => ((c === 'st' ? EPL[earnAddr] : XPL[earnXr]) || {}).err);
-  const v = (txt) => (loading ? SY : failed ? '–' : txt);   // a number, or Syncing… while loading, or – if it couldn't load
+  const v = (txt) => (loading ? (stillLoading ? SY : '–') : failed ? '–' : txt);   // a number, or Syncing… while loading, or – if it couldn't load (or isn't covered)
   /* Earned: from share value (instant, exact) where the pool's history is known; otherwise counted from trades */
   const nowT = Date.now(), perLo = P0r[per] || 0, perHi = per === 'yday' ? P0r.today : per === 'lastMonth' ? P0r.month : nowT;
   const NW = pairs.map(([c, x]) => poolNow(c, x)), EVs = pairs.map(([c, x]) => (poolPos(c, x).E || {}).ev || []);
   const fs = (i, t0, t1) => { const n = NW[i]; if (!n) return null; const [c, x] = pairs[i]; return feeSpan(EVs[i], n.sh, n.g, n.p, t0, Math.min(t1, nowT), (t) => (c === 'st' ? gAtSt(x, t) : gAtXr(x, t))); };
-  const tradeCut = (i, lo, hi) => { const f = F[i]; if (!f || f.err || (f.partial && f.oldest > lo)) return null; let c2 = 0; for (const t of f.trades) if (t.t >= lo && t.t < hi) c2 += t.cut; return c2; };
+  const tradeCut = (i, lo, hi) => { const f = F[i]; if (!f || f.err || ((f.partial || f.capped) && f.oldest > lo)) return null; let c2 = 0; for (const t of f.trades) if (t.t >= lo && t.t < hi) c2 += t.cut; return c2; };
   const earnIn = (i, lo, hi) => { const a2 = fs(i, lo, hi); return a2 != null ? a2 : tradeCut(i, lo, hi); };   // null = not ready yet
   const earnSumIn = (lo, hi) => { let t2 = 0; for (let i = 0; i < pairs.length; i++) { const a2 = earnIn(i, lo, hi); if (a2 == null) return null; t2 += a2; } return t2; };
   const vx = (val) => (val == null || !histOK ? (failed && histOK ? '–' : SY) : esg(val));
@@ -16456,31 +16457,37 @@ function earnHistXr(addr) {
   const k = 'xr:' + S.net + ':' + addr; if (HISTF[k]) return HISTF[k];
   return (HISTF[k] = histXr(addr).catch((e) => { XPL[addr] = { at: Date.now(), pools: {}, err: true }; throw e; }).finally(() => delete HISTF[k]));
 }
+/* XRP Ledger: no paging through the wallet's whole history (busy wallets have thousands of transactions, and public servers
+   rate-limit that). Each pool-token trust line remembers the last transaction that changed it (PreviousTxnID), and each of
+   those transactions remembers the one before. So we follow that chain back: one lookup per deposit / withdrawal. */
 async function histXr(addr) {
-  const ck = `${S.net}:xr:${addr}`, C = eplAll()[ck] || { ops: [], top: null }, fresh = [];
-  let marker, top = null, hit = false;
-  for (let pg = 0; pg < 20 && !hit; pg++) {
-    const r = await xr('account_tx', { account: addr, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(marker ? { marker } : {}) });
-    const L = r.transactions || [];
-    for (const x of L) {
-      const { t, m, hash } = xrTxOf(x); const id = hash || x.hash || '';
-      if (pg === 0 && !top && id) top = id;
-      if (C.top && id === C.top) { hit = true; break; }
-      if (t.Account !== addr || (t.TransactionType !== 'AMMDeposit' && t.TransactionType !== 'AMMWithdraw') || m.TransactionResult !== 'tesSUCCESS' || !t.Asset2) continue;
-      const p = xrPools().find((q) => q.a2.currency === t.Asset2.currency && q.a2.issuer === t.Asset2.issuer); if (!p) continue;
-      const d = xrDeltas(m, addr, t);
-      fresh.push({ id, key: p.key, t: ((t.date || 0) + 946684800) * 1000, d: Object.entries(d).filter(([k]) => /^03/.test(k)).reduce((s2, [, v]) => s2 + v, 0), g: xrAmmG(m, p), dx: d.XRP || 0, du: d[p.a2.currency + '.' + p.a2.issuer] || 0 });   /* the pool tokens it got or gave back; g = the pool right after */
+  const ck = `${S.net}:xr2:${addr}`, C = eplAll()[ck] || { pools: {} }, P = {};
+  for (const p of xrPools()) {
+    let A = XAM(p.key); if (!A.lpi) { try { await xrAmmLoad(p, false); } catch (e) {} A = XAM(p.key); } if (!A.lpi || !A.lpc) continue;
+    const r = await xr('ledger_entry', { ripple_state: { accounts: [addr, A.lpi], currency: A.lpc }, ledger_index: 'validated' }).catch((e) => ({ error: String(e && e.message || e) }));
+    if (r.error && r.error !== 'entryNotFound') throw new Error(r.error_message || r.error);
+    const node = r.node; if (!node) continue;   // no pool tokens line: never in this pool (or fully out)
+    const top = node.PreviousTxnID, old = C.pools[p.key] || { top: null, ops: [] }, fresh = [];
+    let h = top, steps = 0;
+    while (h && h !== old.top && steps++ < 80) {
+      const t = await xr('tx', { transaction: h }); if (!t || t.error) throw new Error((t && (t.error_message || t.error)) || 'tx lookup failed');
+      const tx = t.tx_json || t, m = t.meta || {}; let rs = null, created = false, prevH = null;
+      for (const n of m.AffectedNodes || []) { const k = Object.keys(n)[0], v = n[k] || {}, F = v.FinalFields || v.NewFields || {};
+        if (v.LedgerEntryType === 'RippleState' && F.Balance && F.Balance.currency === A.lpc && [(F.LowLimit || {}).issuer, (F.HighLimit || {}).issuer].includes(addr)) { rs = { v, F }; created = k === 'CreatedNode'; prevH = v.PreviousTxnID || null; } }
+      if (!rs) break;
+      const sg = (rs.F.LowLimit || {}).issuer === addr ? 1 : -1, fin = sg * +rs.F.Balance.value, prev = rs.v.PreviousFields && rs.v.PreviousFields.Balance ? sg * +rs.v.PreviousFields.Balance.value : created ? 0 : fin;
+      const own = tx.Account === addr && /^AMM(Deposit|Withdraw)$/.test(tx.TransactionType || ''), d2 = own ? xrDeltas(m, addr, tx) : {};
+      fresh.push({ id: h, key: p.key, t: ((tx.date || 0) + 946684800) * 1000, d: fin - prev, g: own ? xrAmmG(m, p) : null, dx: d2.XRP || 0, du: d2[p.a2.currency + '.' + p.a2.issuer] || 0 });
+      if (created) break; h = prevH;
     }
-    marker = r.marker; if (hit || !marker) break;
+    const seen = new Set(); C.pools[p.key] = { top, ops: fresh.concat(old.ops).filter((o) => o.d && !seen.has(o.id) && seen.add(o.id)) };
+    for (const o of C.pools[p.key].ops) {
+      const E = P[o.key] || (P[o.key] = { in: 0, out: 0, net: { x: 0, u: 0 }, ev: [] });
+      E.ev.push({ t: o.t, d: o.d, g: o.g });
+      E.net.x -= o.dx; E.net.u -= o.du; if (o.du < 0) E.in += -2 * o.du; else if (o.du > 0) E.out += 2 * o.du;
+    }
   }
-  const seen = new Set(), ops = fresh.concat(C.ops).filter((o) => !seen.has(o.id) && seen.add(o.id));
-  eplAll()[ck] = { ops, top: top || C.top }; eplSave();
-  const P = {};
-  for (const o of ops) {
-    const E = P[o.key] || (P[o.key] = { in: 0, out: 0, net: { x: 0, u: 0 }, ev: [] });
-    E.ev.push({ t: o.t, d: o.d, g: o.g });
-    E.net.x -= o.dx; E.net.u -= o.du; if (o.du < 0) E.in += -2 * o.du; else E.out += 2 * o.du;
-  }
+  eplAll()[ck] = C; eplSave();
   return (XPL[addr] = { at: Date.now(), pools: P });
 }
 // small dollar amounts keep their digits: $1.23 · $0.0421 · $0.000183 (pool earnings on small positions are fractions of a cent)
@@ -16877,18 +16884,35 @@ async function closeReview() {
    after "G" + A–D) with the letters. The secret never leaves the phone; Liquidfi never sees it. The 10 XLM fee is paid when
    one is found, in the same transaction that opens the new wallet. Not part of the recovery phrase: the user saves its key. */
 const VANITY_FEE = 10, VAN = { ws: [], rate: 0, n: 0, t0: 0, lock: null, run: null };
+/* XRP Ledger custom address: same idea, r… address ending in up to 4 characters. A random 16-byte seed → its ed25519 key
+   (the standard XRP derivation), so the result is a normal XRP secret (sEd…) any XRP wallet app can import. */
+const XR_VANITY_FEE = 2, XR_ABC = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz';
+const xrVanFee = (src) => (xrFeeTo(src) ? XR_VANITY_FEE : 0);   // Testnet / no fee wallet: free
+const XR_START_OK = 'pshnaf39wBUDNEGHJKLM4P';   // the characters that usually follow the r (measured: ~4.4% each); Q ~1.5%; the rest ~0.1%
+const xrVanTries = (L, end) => (end ? Math.pow(58, L.length) : Math.pow(58, L.length - 1) / (XR_START_OK.includes(L[0]) ? 0.044 : L[0] === 'Q' ? 0.015 : 0.001));
+const XR_VAN_WORKER = "const A='rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz';\nconst ZL=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,7,4,13,1,10,6,15,3,12,0,9,5,2,14,11,8,3,10,14,4,9,15,8,1,2,7,0,6,13,11,5,12,1,9,11,10,0,8,12,4,13,3,7,15,14,5,6,2,4,0,5,9,7,12,2,10,14,1,3,8,11,6,15,13];\nconst ZR=[5,14,7,0,9,2,11,4,13,6,15,8,1,10,3,12,6,11,3,7,0,13,5,10,14,15,8,12,4,9,1,2,15,5,1,3,7,14,6,9,11,8,12,2,10,0,4,13,8,6,4,1,3,11,15,0,5,12,2,13,9,7,10,14,12,15,10,4,1,5,8,7,6,2,13,14,0,3,9,11];\nconst SL=[11,14,15,12,5,8,7,9,11,13,14,15,6,7,9,8,7,6,8,13,11,9,7,15,7,12,15,9,11,7,13,12,11,13,6,7,14,9,13,15,14,8,13,6,5,12,7,5,11,12,14,15,14,15,9,8,9,14,5,6,8,6,5,12,9,15,5,11,6,8,13,12,5,12,13,14,11,8,5,6];\nconst SR=[8,9,9,11,13,15,15,5,7,7,8,11,14,14,12,6,9,13,15,7,12,8,9,11,7,7,12,7,6,15,13,11,9,7,15,11,8,6,6,14,12,13,5,14,13,13,7,5,15,5,8,11,14,14,6,14,6,9,12,9,12,5,15,8,8,5,12,9,12,5,14,6,8,13,6,5,15,13,11,11];\nconst KL=[0,0x5a827999,0x6ed9eba1,0x8f1bbcdc,0xa953fd4e],KR=[0x50a28be6,0x5c4dd124,0x6d703ef3,0x7a6d76e9,0];\nconst F=(j,x,y,z)=>j<16?x^y^z:j<32?(x&y)|(~x&z):j<48?(x|~y)^z:j<64?(x&z)|(y&~z):x^(y|~z);\nconst R=(x,n)=>(x<<n)|(x>>>(32-n));\nfunction rmd(m){const n=((m.length+9+63)>>6)<<6,b=new Uint8Array(n);b.set(m);b[m.length]=0x80;const bits=m.length*8;b[n-8]=bits&255;b[n-7]=(bits>>>8)&255;b[n-6]=(bits>>>16)&255;b[n-5]=(bits>>>24)&255;\n let h0=0x67452301,h1=0xefcdab89,h2=0x98badcfe,h3=0x10325476,h4=0xc3d2e1f0;const X=new Int32Array(16);\n for(let o=0;o<n;o+=64){for(let i=0;i<16;i++)X[i]=b[o+4*i]|(b[o+4*i+1]<<8)|(b[o+4*i+2]<<16)|(b[o+4*i+3]<<24);\n  let al=h0,bl=h1,cl=h2,dl=h3,el=h4,ar=h0,br=h1,cr=h2,dr=h3,er=h4,t;\n  for(let j=0;j<80;j++){t=(al+F(j,bl,cl,dl)+X[ZL[j]]+KL[j>>4])|0;t=(R(t,SL[j])+el)|0;al=el;el=dl;dl=R(cl,10);cl=bl;bl=t;\n   t=(ar+F(79-j,br,cr,dr)+X[ZR[j]]+KR[j>>4])|0;t=(R(t,SR[j])+er)|0;ar=er;er=dr;dr=R(cr,10);cr=br;br=t;}\n  t=(h1+cl+dr)|0;h1=(h2+dl+er)|0;h2=(h3+el+ar)|0;h3=(h4+al+br)|0;h4=(h0+bl+cr)|0;h0=t;}\n const o=new Uint8Array(20);[h0,h1,h2,h3,h4].forEach((h,i)=>{o[4*i]=h&255;o[4*i+1]=(h>>>8)&255;o[4*i+2]=(h>>>16)&255;o[4*i+3]=(h>>>24)&255;});return o;}\nfunction b58(by){let z=0;while(z<by.length&&by[z]===0)z++;const d=[];for(const x of by){let c=x;for(let j=0;j<d.length;j++){c+=d[j]<<8;d[j]=c%58;c=(c/58)|0;}while(c){d.push(c%58);c=(c/58)|0;}}let s=A[0].repeat(z);for(let i=d.length-1;i>=0;i--)s+=A[d[i]];return s;}\nconst P8=Uint8Array.from([0x30,0x2e,0x02,0x01,0x00,0x30,0x05,0x06,0x03,0x2b,0x65,0x70,0x04,0x22,0x04,0x20]);\nconst S=crypto.subtle,u8=(b)=>new Uint8Array(b);\nasync function addrOf(seed){const pv=u8(await S.digest('SHA-512',seed)).slice(0,32);const p8=new Uint8Array(48);p8.set(P8);p8.set(pv,16);\n const k=await S.importKey('pkcs8',p8,{name:'Ed25519'},true,['sign']);const j=await S.exportKey('jwk',k);\n const pub=Uint8Array.from(atob(j.x.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));const pk=new Uint8Array(33);pk[0]=0xED;pk.set(pub,1);\n const id=rmd(u8(await S.digest('SHA-256',pk)));const pl=new Uint8Array(21);pl.set(id,1);const ck=u8(await S.digest('SHA-256',u8(await S.digest('SHA-256',pl)))).slice(0,4);\n const full=new Uint8Array(25);full.set(pl);full.set(ck,21);return b58(full);}\nlet stop=false;\nonmessage=async(e)=>{if(e.data==='stop'){stop=true;return;}const {L,end}=e.data;let n=0,t=Date.now();\n while(!stop){const seeds=Array.from({length:16},()=>crypto.getRandomValues(new Uint8Array(16)));const as=await Promise.all(seeds.map(addrOf));\n  for(let i=0;i<as.length;i++){n++;if(end===false?as[i].startsWith(L,1):as[i].endsWith(L)){postMessage({hit:Array.from(seeds[i]),addr:as[i],n});return;}}\n  if(Date.now()-t>700){postMessage({n});n=0;t=Date.now();}}};\n";
 const VAN_ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 const vanCores = () => Math.max(1, Math.min(8, (navigator.hardwareConcurrency || 4) - 1));
 const vanFee = (src) => (feeTo(src) ? VANITY_FEE : 0);   // Testnet / no fee wallet: free
-function vanEta(n) { const per = VAN.rate || 8000 * vanCores(), s = Math.pow(32, n) / per; return s < 60 ? 'under a minute' : s < 3600 ? `about ${Math.ceil(s / 60)} minutes` : `about ${(s / 3600).toFixed(s < 36000 ? 1 : 0)} hours`; }
+function vanEta(n, base = 32, tries) { const per = VAN.rate || (base === 58 ? 1500 : 8000) * vanCores(), s = (tries || Math.pow(base, n)) / per; return s < 60 ? 'under a minute' : s < 3600 ? `about ${Math.ceil(s / 60)} minutes` : `about ${(s / 3600).toFixed(s < 36000 ? 1 : 0)} hours`; }
 function vanUpd() {
   const W = $('#xVanW'); if (!W) return;
-  const X = ($('#xChain .on') || { dataset: {} }).dataset.v === 'xrp', vb = $('#xHow [data-v=van]');
-  if (vb) vb.style.display = X ? 'none' : '';
-  if (X && $('#xHow .on') === vb) { vb.classList.remove('on'); $('#xHow [data-v=new]').classList.add('on'); }
-  const on = !X && ($('#xHow .on') || {}).dataset && $('#xHow .on').dataset.v === 'van';
+  const X = ($('#xChain .on') || { dataset: {} }).dataset.v === 'xrp';
+  const on = ($('#xHow .on') || {}).dataset && $('#xHow .on').dataset.v === 'van';
   W.style.display = on ? 'flex' : 'none'; $('#xGo').textContent = on ? 'Find my address' : 'Add wallet';
   if (!on) return;
+  $('#xVanPos').style.display = '';
+  $('#xVan').setAttribute('autocapitalize', X ? 'off' : 'characters'); $('#xVan').maxLength = X ? 4 : 5;
+  W.querySelector('label').firstChild.textContent = X ? 'Your letters (up to 4)' : 'Your letters (up to 5)';
+  if (X) {
+    const L = [...($('#xVan').value || '')].filter((c) => XR_ABC.includes(c)).join('').slice(0, 4);
+    if ($('#xVan').value !== L) $('#xVan').value = L;
+    const fee = xrVanFee((xrList().find((w) => w.own) || {}).addr), endX = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start'; $('#xHowNote').innerHTML = '';
+    const rare = !endX && L && !XR_START_OK.includes(L[0]);
+    $('#xVanEst').innerHTML = L ? `Looks like <span class="mono">${endX ? 'r…<b style="color:var(--blu)">' + esc(L) + '</b>' : 'r<b style="color:var(--blu)">' + esc(L) + '</b>…'}</span><br>On this phone: ${vanEta(L.length, 58, xrVanTries(L, endX))} (could be quicker, or a few times longer). Keep Liquidfi open while it searches.${rare ? `<br><span class="amb">Right after the r, "${esc(L[0])}" is rare on the XRP Ledger, so this takes much longer. These are common there: ${XR_START_OK.split('').join(' ')}.</span>` : ''}${fee ? `<br>Fee when found: <b>${fee} XRP</b>, plus the XRP that opens it (the ledger keeps ${m2((XRSV || { base: 1 }).base)} XRP as its reserve).` : ''}`
+      : 'Type 1 to 4 characters. XRP addresses are case-sensitive and have no 0, O, I or l (so QUID won\'t work; Quid will).';
+    return;
+  }
   const L = ($('#xVan').value || '').toUpperCase().replace(/[^A-Z2-7]/g, '').slice(0, 5), end = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start';
   if ($('#xVan').value !== L) $('#xVan').value = L;
   const fee = vanFee(firstWallet && firstWallet());
@@ -16907,15 +16931,17 @@ onmessage=async(e)=>{if(e.data==='stop'){stop=true;return;}const {L,end}=e.data;
    if(end?a.endsWith(L):a.startsWith(L,2)){const p8=new Uint8Array(await crypto.subtle.exportKey('pkcs8',k.privateKey));postMessage({hit:Array.from(p8.slice(p8.length-32)),addr:a,n});return;}}
   if(Date.now()-t>700){postMessage({n});n=0;t=Date.now();}}};`;
 function vanStop() { VAN.ws.forEach((w) => { try { w.postMessage('stop'); w.terminate(); } catch (e) {} }); VAN.ws = []; if (VAN.lock) { VAN.lock.release().catch(() => {}); VAN.lock = null; } clearInterval(VAN.tick); }
-async function vanStart(name) {
-  const L = ($('#xVan').value || '').toUpperCase(), end = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start';
-  if (!/^[A-Z2-7]{1,5}$/.test(L)) return toast('Type 1 to 5 letters (A–Z, 2–7).');
+async function vanStart(name, chain = 'xlm') {
+  const X = chain === 'xrp', L = X ? ($('#xVan').value || '') : ($('#xVan').value || '').toUpperCase(), end = ($('#xVanPos .on') || { dataset: { v: 'end' } }).dataset.v !== 'start';
+  if (X ? !(L.length >= 1 && L.length <= 4 && [...L].every((c) => XR_ABC.includes(c))) : !/^[A-Z2-7]{1,5}$/.test(L)) return toast(X ? 'Type 1 to 4 characters (no 0, O, I or l).' : 'Type 1 to 5 letters (A–Z, 2–7).');
+  if (X) await Promise.all((K.xr || []).filter((o) => o.w && !o.vp).map((o) => xrLoad(o.w.classicAddress).catch(() => null)));
+  if (X && !xrList().some((w) => w.own && XRA[w.addr] && XRA[w.addr].a)) return toast('You need an XRP wallet with XRP in it to pay for this. Add or fund one first.', 6000);
   if (!(window.crypto && crypto.subtle && window.Worker)) return toast('This browser cannot make keys in the background. Try Chrome or Safari.');
   try { await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign']); } catch (e) { return toast('This browser is too old for vanity addresses. Update it and try again.', 6000); }
-  vanStop(); VAN.n = 0; VAN.t0 = Date.now(); VAN.rate = 0; VAN.run = { name, L, end };
+  vanStop(); VAN.n = 0; VAN.t0 = Date.now(); VAN.rate = 0; VAN.run = { name, L, end, xrp: X };
   try { VAN.lock = navigator.wakeLock ? await navigator.wakeLock.request('screen') : null; } catch (e) { VAN.lock = null; }
   vanRunSheet();
-  const url = URL.createObjectURL(new Blob([VAN_WORKER], { type: 'text/javascript' }));
+  const url = URL.createObjectURL(new Blob([X ? XR_VAN_WORKER : VAN_WORKER], { type: 'text/javascript' }));
   for (let i = 0; i < vanCores(); i++) {
     const w = new Worker(url);
     w.onmessage = (m) => { const d = m.data; VAN.n += d.n || 0; if (d.hit) { vanStop(); vanFound(d.hit, d.addr); } };
@@ -16923,11 +16949,11 @@ async function vanStart(name) {
     w.postMessage({ L, end }); VAN.ws.push(w);
   }
   VAN.tick = setInterval(() => { const s = (Date.now() - VAN.t0) / 1000; VAN.rate = s > 1 ? VAN.n / s : 0; const e1 = $('#vanN'); if (!e1) return;
-    e1.textContent = fx(VAN.n, 0); $('#vanR').textContent = VAN.rate ? fx(VAN.rate, 0) + ' / sec' : '…'; $('#vanE').textContent = VAN.rate ? vanEta(L.length) : '…'; }, 1000);
+    e1.textContent = fx(VAN.n, 0); $('#vanR').textContent = VAN.rate ? fx(VAN.rate, 0) + ' / sec' : '…'; $('#vanE').textContent = VAN.rate ? vanEta(L.length, X ? 58 : 32, X ? xrVanTries(L, end) : 0) : '…'; }, 1000);
 }
 function vanRunSheet() {
   const r = VAN.run; if (!r) return; const { L, end } = r; pending = null;
-  sheet(`<h2>Finding your address</h2><div class="mu" style="font-size:13.5px">Looking for <span class="mono">${end ? 'G…<b style="color:var(--blu)">' + esc(L) + '</b>' : 'GA<b style="color:var(--blu)">' + esc(L) + '</b>…'}</span> on this phone. Keep Liquidfi open and the screen on.</div>
+  sheet(`<h2>Finding your address</h2><div class="mu" style="font-size:13.5px">Looking for <span class="mono">${r.xrp ? (end ? 'r…<b style="color:var(--blu)">' + esc(L) + '</b>' : 'r<b style="color:var(--blu)">' + esc(L) + '</b>…') : end ? 'G…<b style="color:var(--blu)">' + esc(L) + '</b>' : 'GA<b style="color:var(--blu)">' + esc(L) + '</b>…'}</span> on this phone. Keep Liquidfi open and the screen on.</div>
     <div class="card rows" style="font-size:14px"><div><span class="mu">Tried</span><span class="mono" id="vanN">${fx(VAN.n, 0)}</span></div><div><span class="mu">Speed</span><span class="mono" id="vanR">…</span></div><div><span class="mu">Usually takes</span><span id="vanE">…</span></div></div>
     <div class="mu" style="font-size:12px">The key is made and kept on this phone only. Nothing is paid until one is found. If Liquidfi locks, the search keeps going: unlock to see it.</div>
     <button class="b-out" data-act="vanCancel">Stop</button>`);
@@ -16938,13 +16964,20 @@ function vanResume() { if (!K) return; if (VANHIT) vanPaySheet(); else if (VAN.w
 window.addEventListener('beforeunload', (e) => { if (VAN.busy || VAN.ws.length) { e.preventDefault(); e.returnValue = ''; } });
 let VANHIT = null;
 function vanFound(seed, addr) {
+  if (VAN.run && VAN.run.xrp) {
+    let sd, w; try { sd = xrpl.encodeSeed(Uint8Array.from(seed), 'ed25519'); w = xrFromSeed(sd); } catch (e) { return toast('Check failed. Try again.'); }
+    if (w.classicAddress !== addr) return toast('Check failed. Try again.');
+    if (VAN.run.end ? !addr.endsWith(VAN.run.L) : !addr.startsWith(VAN.run.L, 1)) return toast('Check failed. Try again.');
+    VANHIT = { xrp: true, w, seed: sd, name: VAN.run.name, L: VAN.run.L, end: VAN.run.end };
+    if (K) vanPaySheet(); return;
+  }
   const kp = SDK.Keypair.fromRawEd25519Seed(Uint8Array.from(seed));
   if (kp.publicKey() !== addr) return toast('Check failed. Try again.');
   VANHIT = { kp, name: VAN.run.name, L: VAN.run.L, end: VAN.run.end };
   if (K) vanPaySheet();   // locked: shown right after unlock
 }
 function vanPaySheet() {
-  const h = VANHIT; if (!h) return; const a = h.kp.publicKey(), src = fundSrc(a), fee = src.length ? vanFee(src[0].addr) : VANITY_FEE;
+  const h = VANHIT; if (!h) return; if (h.xrp) return xrVanPaySheet(); const a = h.kp.publicKey(), src = fundSrc(a), fee = src.length ? vanFee(src[0].addr) : VANITY_FEE;
   const pretty = h.end ? esc(a.slice(0, -h.L.length)) + '<b style="color:var(--blu)">' + esc(h.L) + '</b>' : esc(a.slice(0, 2)) + '<b style="color:var(--blu)">' + esc(h.L) + '</b>' + esc(a.slice(2 + h.L.length));
   pending = null;
   sheet(`<h2>Found it</h2><div class="addr" style="font-size:15px">${pretty}</div>
@@ -16957,7 +16990,7 @@ function vanPaySheet() {
     <button class="b-out" data-act="vanDrop">Discard this address</button>`);
 }
 async function vanPay() {
-  const h = VANHIT; if (!h) return; const a = h.kp.publicKey(), from = $('#vanSrc').value, amt = +$('#vanAmt').value, src = fundSrc(a).find((x) => x.addr === from);
+  const h = VANHIT; if (!h) return; if (h.xrp) return xrVanPay(); const a = h.kp.publicKey(), from = $('#vanSrc').value, amt = +$('#vanAmt').value, src = fundSrc(a).find((x) => x.addr === from);
   if (!src) return toast('Pick a wallet to pay from.'); if (!(amt >= 1)) return toast('At least 1 XLM is needed to open it.');
   const fee = vanFee(from); if (src.free < amt + fee) return toast(`${src.name} has ${fx(src.free, 2)} XLM free; this needs ${fx(amt + fee, 2)}.`);
   // Nothing is saved until the user taps Pay. Only then is the key put in the vault (marked unpaid, so a crash mid-send
@@ -16987,12 +17020,72 @@ async function vanPay() {
     } finally { VAN.busy = false; bumpIdle(); }
   }
 }
+const xrVanSrc = () => (K.xr || []).filter((o) => o.w && !o.vp).map((o) => ({ o, addr: o.w.classicAddress, name: o.name, free: XRA[o.w.classicAddress] && XRA[o.w.classicAddress].a ? xrSpend(XRA[o.w.classicAddress]) : 0 })).filter((x) => x.free > 0);
+async function xrVanPaySheet() {
+  const h = VANHIT; if (!h || !h.xrp) return; const a = h.w.classicAddress;
+  await Promise.all((K.xr || []).filter((o) => o.w && !o.vp).map((o) => xrLoad(o.w.classicAddress).catch(() => null))); await xrServer().catch(() => null);
+  if (VANHIT !== h) return;
+  const src = xrVanSrc(), base = (XRSV || { base: 1 }).base, fee = src.length ? xrVanFee(src[0].addr) : XR_VANITY_FEE, pretty = h.end ? esc(a.slice(0, -h.L.length)) + '<b style="color:var(--blu)">' + esc(h.L) + '</b>' : 'r<b style="color:var(--blu)">' + esc(h.L) + '</b>' + esc(a.slice(1 + h.L.length));
+  pending = null;
+  sheet(`<h2>Found it</h2><div class="addr" style="font-size:15px">${pretty}</div>
+    ${src.length ? `<label>Pay from<select id="vanSrc">${src.map((x) => `<option value="${esc(x.addr)}">${esc(x.name)} · ${m2(x.free)} XRP free</option>`).join('')}</select></label>
+    <label>Start it with (XRP)<input id="vanAmt" type="number" inputmode="decimal" value="${Math.max(2, Math.ceil(base + 1))}" min="${base}"></label>
+    <div class="mu" style="font-size:12.5px">${fee ? `<b>${fee} XRP</b> fee to Liquidfi, plus ` : ''}the XRP that opens ${esc(h.name)} (${m2(base)} XRP stays as its reserve). Two payments on the XRP Ledger, one tap.</div>
+    <button class="b-light big" data-act="vanPay">${fee ? `Pay ${fee} XRP and create wallet` : 'Create wallet'}</button>`
+    : `<div class="note amb">You need an XRP wallet with at least ${XR_VANITY_FEE + base + 1} XRP free to pay for this. Fund one, then come back. This address is only kept until you leave this screen; it's never saved unless you pay.</div>`}
+    <div class="mu" style="font-size:12px">Not saved until you pay. Leave this screen without paying and the address is gone.</div>
+    <button class="b-out" data-act="vanDrop">Discard this address</button>`);
+}
+async function xrVanPay() {
+  const h = VANHIT; if (!h || !h.xrp || VAN.busy) return; const a = h.w.classicAddress, from = $('#vanSrc').value, amt = +$('#vanAmt').value, sx = xrVanSrc().find((x) => x.addr === from);
+  const base = (XRSV || { base: 1 }).base;
+  if (!sx) return toast('Pick a wallet to pay from.'); if (!(amt >= base)) return toast(`At least ${m2(base)} XRP is needed to open it.`);
+  const fTo = xrFeeTo(from), fee = fTo && await xrFeeLive(fTo) ? xrVanFee(from) : 0, drops = 12;
+  if (sx.free < amt + fee + 0.0001) return toast(`${sx.name} has ${m2(sx.free)} XRP free; this needs ${m2(amt + fee)}.`);
+  const btn = $('[data-act=vanPay]'); if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+  VAN.busy = true;
+  try {
+    // saved first (marked unpaid), so a crash mid-payment can't lose the new wallet's XRP; taken back out if it doesn't open
+    K.xr = K.xr || []; K.xr.push({ name: h.name, w: h.w, hd: null, seed: h.seed, vp: 1, vt: Date.now() });
+    if (!(await resealVault())) { K.xr.pop(); return xrVanPaySheet(); }
+    let r = null, err = null; try { r = await xrSubmit(sx.o, { TransactionType: 'Payment', Destination: a, Amount: String(Math.round(amt * 1e6)) }, drops); } catch (e) { err = e; }
+    if (!r || r.state !== 'ok') {
+      if (r && r.state === 'pending') { VANHIT = null; toast("Sent, but the ledger hasn't confirmed it yet. Liquidfi checks again when you next unlock and keeps the wallet if it opened.", 8000); closeSheet(); return; }
+      await xrVanForget(a); toast(`Not created: ${String(err ? niceErr(err) : xrErr(r && r.code)).replace(/\.+$/, '')}. The address was not saved.`, 7000);
+      if (VANHIT === h) xrVanPaySheet(); return;
+    }
+    const o = (K.xr || []).find((x) => x.w && x.w.classicAddress === a); if (o) { delete o.vp; delete o.vt; await resealVault(); }
+    VANHIT = null;
+    if (fee) {   /* the fee is its own small payment (the XRP Ledger can't bundle two payments); labeled so it shows what it's for */
+      const fx2 = { TransactionType: 'Payment', Destination: fTo, Amount: String(Math.round(fee * 1e6)), Memos: [{ Memo: { MemoType: strHex('text'), MemoFormat: strHex('text/plain'), MemoData: strHex('Liquidfi fee · custom address') } }] };
+      for (let i = 0; i < 2; i++) { try { const rf = await xrSubmit(sx.o, fx2, drops); if (rf.state === 'ok' || rf.state === 'pending') break; } catch (e) {} }
+    }
+    drawBots(true); xrVanDoneSheet(h.name, a);
+  } finally { VAN.busy = false; bumpIdle(); }
+}
+function xrVanDoneSheet(name, addr) {
+  const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === addr); pending = null; XRFRESH = false;
+  sheet(`<h2>${esc(name)} is ready</h2>${bigAddr(addr, 'XRP Ledger address (safe to share)')}
+    <div class="note amb">Save its secret now. A custom address isn't part of your recovery phrase: without this secret, a lost phone means a lost wallet. Any XRP wallet app can open it (Xaman, Ledger, Trust Wallet).</div>
+    ${i >= 0 ? xrKeyRow(i) : ''}
+    <div class="mu" style="font-size:12px">Missed it? Settings → Back up keys. Your PIN shows it again.</div>
+    <button class="b-light big" data-act="xrNewDone" data-addr="${esc(addr)}">I saved it</button>`);
+}
+async function xrVanForget(a) {
+  const i = (K.xr || []).findIndex((x) => x.vp && x.w && x.w.classicAddress === a); if (i < 0) return;
+  K.xr.splice(i, 1); await resealVault(); drawBots(true);
+}
 async function vanForget(a) {
   const i = K.x.findIndex((x) => x.vp && x.kp.publicKey() === a); if (i < 0) return;
   K.x.splice(i, 1); await resealVault(); drawBots(true);
 }
 // After unlock: a vanity wallet left unpaid (app closed mid-payment) is kept only if the payment went through
 async function vanSweep() {
+  for (const o of (K && K.xr || []).filter((x) => x.vp && x.w)) {
+    if (Date.now() - (o.vt || 0) < 180000) continue;
+    try { const r = await xr('account_info', { account: o.w.classicAddress, ledger_index: 'validated' });
+      if (r.account_data) { delete o.vp; delete o.vt; await resealVault(); drawBots(true); } else if (r.error === 'actNotFound') await xrVanForget(o.w.classicAddress); } catch (e) {}
+  }
   for (const o of (K && K.x || []).filter((x) => x.vp)) {
     if (Date.now() - (o.vt || 0) < 120000) continue;
     try { const r = await acct(o.kp.publicKey()); if (r) { delete o.vp; delete o.vt; await resealVault(); drawBots(true); } else await vanForget(o.kp.publicKey()); } catch (e) {}
@@ -17226,10 +17319,10 @@ let homeAddr = null, rcvWant = null;
 /* every account: Personal (own key), imported (own key, Personal or Trading), bots (emergency signer, Trading) */
 const loadX = (x) => (x || []).map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, kp: SDK.Keypair.fromSecret(o.sec) }));
 // older vaults kept the Personal key apart (v.pe); it now sits in the account list like any other wallet
-function unpackVault(v) { const x = loadX(v.x); if (v.pe) x.unshift({ name: 'Personal', type: 'personal', kp: SDK.Keypair.fromSecret(v.pe) }); return { em: SDK.Keypair.fromSecret(v.em), pe: null, x, ph: v.ph || null, phN: v.phN || 0, xrN: v.xrN || 0, xr: (v.xr || []).map((o) => { try { return { name: o.name, hd: o.hd, seed: o.seed || null, w: o.seed ? xrFromSeed(o.seed) : new xrpl.Wallet(o.pub, o.priv) }; } catch (e) { return { name: o.name, raw: o, w: null }; } }) }; }   // an entry that can't be rebuilt is kept as-is (never dropped)
+function unpackVault(v) { const x = loadX(v.x); if (v.pe) x.unshift({ name: 'Personal', type: 'personal', kp: SDK.Keypair.fromSecret(v.pe) }); return { em: SDK.Keypair.fromSecret(v.em), pe: null, x, ph: v.ph || null, phN: v.phN || 0, xrN: v.xrN || 0, xr: (v.xr || []).map((o) => { try { return { name: o.name, hd: o.hd, seed: o.seed || null, w: o.seed ? xrFromSeed(o.seed) : new xrpl.Wallet(o.pub, o.priv), ...(o.vp ? { vp: 1, vt: o.vt || 0 } : {}) }; } catch (e) { return { name: o.name, raw: o, w: null }; } }) }; }   // an entry that can't be rebuilt is kept as-is (never dropped)
 const firstWallet = () => (persAccts()[0] || OWN()[0] || {}).addr;
 async function resealVault() {   // seal first, keep the old vault if the save fails (so the PIN on disk never drifts)
-  const nv = await seal(PIN, { em: K.em.secret(), pe: null, ph: K.ph || null, phN: K.phN || 0, x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, sec: o.kp.secret() })), xrN: K.xrN || 0, xr: (K.xr || []).map((o) => (o.w ? { name: o.name, hd: o.hd, seed: o.seed || null, pub: o.w.publicKey, priv: o.w.privateKey } : o.raw)) });
+  const nv = await seal(PIN, { em: K.em.secret(), pe: null, ph: K.ph || null, phN: K.phN || 0, x: K.x.map((o) => ({ name: o.name, type: o.type, kind: o.kind, hd: o.hd, sec: o.kp.secret() })), xrN: K.xrN || 0, xr: (K.xr || []).map((o) => (o.w ? { name: o.name, hd: o.hd, seed: o.seed || null, pub: o.w.publicKey, priv: o.w.privateKey, ...(o.vp ? { vp: 1, vt: o.vt || 0 } : {}) } : o.raw)) });
   const old = S.vault, oldAt = S.keysAt; S.vault = nv; S.keysAt = Date.now();
   if (!saveS()) { S.vault = old; S.keysAt = oldAt; return false; }
   return true;
