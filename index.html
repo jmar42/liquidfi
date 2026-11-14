@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.38c</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.38f</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -574,7 +574,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.38c</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.38f</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -604,7 +604,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.38c · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.38f · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13565,6 +13565,7 @@ function niceErr(e) {
   if (rc) { const all = [rc.transaction, ...(rc.operations || [])].filter((c) => c && c !== 'op_success' && c !== 'tx_failed'); return all.map((c) => CODES[c] || c).join(' ') || 'Stellar refused it.'; }
   const m = e.message || String(e);
   if (/stop server is private/i.test(m)) return 'This wallet isn\'t on your stop server\'s allowed list yet. Add its address to allowed-wallets.txt and run set-allowlist.sh on the watcher box.';
+  if (/XRP Ledger/i.test(m)) return m.replace(/ \((Failed to fetch|NetworkError[^)]*|Load failed)\)/i, '') + '. Check your connection and try again.';   // XRP errors say XRP, not Stellar
   return /Failed to fetch|NetworkError|Load failed/i.test(m) ? "Can't reach Stellar right now. Check your connection and try again." : m;
 }
 async function submit(tx) {
@@ -14059,7 +14060,7 @@ async function scanInline(box, onAddr, parse = parseAddrQR, what = 'a Stellar ad
    Own-key XRP wallets live in K.xr (sealed in the vault with the Stellar keys); watched XRP addresses in NS().xrw.
    New XRP wallets come from the same recovery phrase as Stellar (BIP44 m/44'/144'/0'/0/n, like Ledger / Trust Wallet).
    Talks to public XRP Ledger servers over JSON-RPC (xrplcluster.com has CORS). Network follows Mainnet / Testnet. */
-const XRPL_URL = { public: ['https://xrplcluster.com/', 'https://xrpl.link/', 'https://xrpl.ws/', 'https://s2.ripple.com:51234/', 'https://s1.ripple.com:51234/'], testnet: ['https://testnet.xrpl-labs.com/', 'https://s.altnet.rippletest.net:51234/'] };
+const XRPL_URL = { public: ['https://xrplcluster.com/', 'https://xrpl.link/', 'https://xrpl.ws/'], testnet: ['https://testnet.xrpl-labs.com/', 'https://s.altnet.rippletest.net:51234/'] };
 const XRPL_WS = { public: ['wss://xrplcluster.com/', 'wss://xrpl.link/', 'wss://s2.ripple.com/', 'wss://s1.ripple.com/'], testnet: ['wss://testnet.xrpl-labs.com/', 'wss://s.altnet.rippletest.net:51233/'] };   // push updates (Trade XRP)
 const XRP_EXPL = { public: 'https://livenet.xrpl.org', testnet: 'https://testnet.xrpl.org' };
 const XRP_USD_ISS = { public: ['rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De'], testnet: ['rQhWct2fv4Vc4KRjRgMrxa8xPN9Zx9iLKV'] };   // RLUSD (Ripple USD): counted as $1
@@ -14072,18 +14073,26 @@ const xrList = () => { const own = (K && K.xr || []).filter((o) => o.w).map((o) 
 const xrFromSeed = (seed) => xrpl.Wallet.fromSeed(seed, { algorithm: seed.startsWith('sEd') ? 'ed25519' : 'ecdsa-secp256k1' });
 const xrOwn = (addr) => (K && K.xr || []).find((o) => o.w && o.w.classicAddress === addr);
 async function xr(method, params = {}) {   // JSON-RPC with failover; returns `result` (which may carry error: 'actNotFound' etc.)
-  let err;
-  for (const u of XRPL_URL[S.net] || XRPL_URL.public) {
+  /* xrplcluster.com, xrpl.link and xrpl.ws are one group sharing a per-IP quota, and Ripple's own s1/s2 servers can't be
+     called from a web page. So when the first one is busy or silent, the next try is Liquidfi's own server (it relays
+     read-only lookups and already-signed transactions; it never sees a key), then the rest of the group. */
+  const L = XRPL_URL[S.net] || XRPL_URL.public, relay = (S.stopUrl || DEFAULT_STOP_URL || '').replace(/\/+$/, '');
+  const tries = [L[0], ...(relay ? ['relay'] : []), ...L.slice(1)];
+  let err, busy = false;
+  for (const u of tries) {
     try {
       const c = new AbortController(), tm = setTimeout(() => c.abort(), 9000);
-      const r = await fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ method, params: [params] }), signal: c.signal });
+      const r = u === 'relay'
+        ? await fetch(relay + '/xrpl', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ net: S.net, method, params: [params] }), signal: c.signal })
+        : await fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ method, params: [params] }), signal: c.signal });
       clearTimeout(tm);
-      const j = await r.json(); if (!j || !j.result) throw new Error('bad answer');
-      if (j.result.status === 'error' && ['slowDown', 'tooBusy', 'noNetwork', 'notReady', 'noCurrent', 'noClosed'].includes(j.result.error)) throw new Error(j.result.error);
+      if (r.status === 429 || r.status === 503) { busy = true; throw new Error('busy'); }
+      const j = await r.json(); if (!j || !j.result) throw new Error((j && j.error) || 'bad answer');
+      if (j.result.status === 'error' && ['slowDown', 'tooBusy', 'noNetwork', 'notReady', 'noCurrent', 'noClosed'].includes(j.result.error)) { if (/slowDown|tooBusy/.test(j.result.error)) busy = true; throw new Error(j.result.error); }
       return j.result;
     } catch (e) { err = e; }
   }
-  throw new Error("Can't reach the XRP Ledger right now" + (err && err.message ? ` (${err.message})` : ''));
+  throw new Error(busy ? "XRP Ledger servers are busy right now. Try again in a minute" : "Can't reach the XRP Ledger right now" + (err && err.message ? ` (${err.message})` : ''));
 }
 async function xrServer() {   // reserves + fee, cached 10 min
   if (XRSV && XRSV.net === S.net && Date.now() - XRSV.at < 600000) return XRSV;
@@ -17991,11 +18000,11 @@ async function actOpenLoad(force) {
     try { for (const o of [...await offersOf(a.addr)].sort(byNewest)) { const x = stOfferText(o); R.rows.push({ tag: x.side, t: x.t, s: 'order #' + o.id }); } } catch (e) { if (e.status !== 404) R.err = niceErr(e); }
     try { if (S.stopUrl && kpFor(a.addr)) for (const x of (await stopList(a.addr)) || []) if (stopLive(x)) { const b = (x.base && (x.base[0] || x.base)) || 'XLM';
       R.rows.unshift({ tag: 'STOP', side: x.side, t: `${x.side === 'sell' ? 'Sell' : 'Buy'} ${fx(+x.xlm, 2)} ${b} @ ${opPx(+x.stop)}`, s: `stop · ${x.status === 'armed' ? 'waiting' : x.status}` }); } } catch (e) {}
-  }), ...XL.map(async (w) => {
+  }), (async () => { for (const w of XL) await (async (w) => {
     const R = out[w.addr] = out[w.addr] || { name: w.name, kind: 'xrp', rows: [] }; R.kind = 'xrp';
     try { const r = await xr('account_offers', { account: w.addr, ledger_index: 'validated' }); for (const f of [...(r.offers || [])].sort((x, y) => (+y.seq || 0) - (+x.seq || 0))) { const t = xrOfferText(f); R.rows.push({ tag: /^Buy/i.test(t) ? 'BUY' : 'SELL', t: t.replace(/^(Buy|Sell) /, ''), s: 'order #' + f.seq }); } } catch (e) { if (!/actNotFound/.test(String(e && e.message))) R.err = niceErr(e); }
     for (const x of xstOf(w.addr)) if (xstLive(x)) R.rows.unshift({ tag: 'STOP', side: x.side, t: `${x.side === 'sell' ? 'Sell' : 'Buy'} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}`, s: `stop · ${x.st === 'armed' ? 'waiting' : x.st}${x.until ? ' · ends ' + xstEnds(x.until) : ''}` });
-  })]);
+  })(w); })()]);
   ACT.open = { at: Date.now(), net: S.net, w: out }; ACT.openBusy = false; paintActOpen();
 }
 function paintActOpen() {
@@ -18234,7 +18243,7 @@ function advSend() {
   location.href = u; toast('Opening your email app… tap Send there.', 6000);
 }
 function sheet(html) { if (!$('#sheet').classList.contains('on')) navPush({ t: 'sheet' }); $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
-function closeSheet(fromBack) { scanStop(); const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if ($('#wkSec') || $('#phW') || $('#sheetIn [data-act=secShow], #sheetIn [data-act=xrSecShow], #sheetIn [data-act=phShow]')) $('#sheetIn').innerHTML = ''; /* never leave a shown key or phrase in the page */ if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
+function closeSheet(fromBack) { scanStop(); const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if ($('#buyFrame')) { $('#sheetIn').innerHTML = ''; BUYPG = null; } if ($('#wkSec') || $('#phW') || $('#sheetIn [data-act=secShow], #sheetIn [data-act=xrSecShow], #sheetIn [data-act=phShow]')) $('#sheetIn').innerHTML = ''; /* never leave a shown key or phrase in the page */ if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
 let pending = null;
 let pendingBusy = null, pendingTap = false;   // tap = one press sends (trades); otherwise press and hold   // what the hold button says while it waits for the ledger
 function confirmSheet(title, sub, items, btn, run, danger = true, cls = null, busy = null, tap = false) {
@@ -18922,6 +18931,7 @@ async function onrBuySheet(chain, addr) {
   const provs = [...(chain === 'stellar' && h.stripe ? ['stripe'] : []), ...(h.onramp ? ['coinbase'] : [])];
   if (!provs.length) return sheet(`<h2>Buy</h2><div class="note amb">${chain === 'xrp' ? 'Buying XRP needs the Coinbase key on your stop server.' : 'No buy service is set up on your stop server yet (Stripe or Coinbase key).'}</div><button class="b-out" data-act="closeSheet">Close</button>`);
   if (!provs.includes(ONR.prov)) ONR.prov = provs[0];
+  ONR.embed = chain === 'stellar' && !!h.stripeEmbed;   // embedded Stripe checkout on buy.liquidfi.com (server v2.4 + publishable key)
   const P = PROV_NM[ONR.prov];
   let L;
   const a0 = chain === 'stellar' ? await refreshAcct(addr).catch(() => null) : null;
@@ -18938,7 +18948,9 @@ async function onrBuySheet(chain, addr) {
     if (!a) note = 'This wallet isn’t open on Stellar yet, so buy XLM first: your first XLM opens it (1 XLM stays as its reserve). Add USDC after that.';
     else if (ONR.asset === 'USDC' && !a.balances.some((b) => b.asset_code === 'USDC' && b.asset_issuer === NS().usdc.issuer)) needU = true;
   }
-  const how = ONR.prov === 'stripe'
+  const how = ONR.prov === 'stripe' && ONR.embed
+    ? 'Stripe\'s checkout opens right here. It runs on its own separate page (buy.liquidfi.com) that never sees your keys. No exchange account: you check out with Link (email, a quick ID check the first time, then how to pay). The fee shows before you pay. The coins come straight to this wallet.'
+    : ONR.prov === 'stripe'
     ? 'Stripe opens in a new tab. No exchange account: you check out with Link (email, a quick ID check the first time, then card or bank). The fee shows before you pay. The coins come straight to this wallet.'
     : `<div class="note" style="font-size:12.5px">Sign in to coinbase.com in Chrome once before you start, so the code from your authenticator app doesn't make you lose the page. Finish the buy on the page Liquidfi opens: a buy made in the regular Coinbase app stays in your Coinbase account.</div>Coinbase opens in a new tab. You sign in, pick a payment method and confirm there. Coinbase's fee shows before you pay. While Coinbase reviews the Liquidfi app, buys are limited to $5.`;
   sheet(`<h2>Buy</h2>
@@ -18950,7 +18962,7 @@ async function onrBuySheet(chain, addr) {
     ${note ? `<div class="note amb">${esc(note)}</div>` : ''}
     <div class="mu" style="font-size:12px">${how}</div>
     ${needU ? `<div class="note amb">This wallet can't receive USDC yet. Stellar needs a USDC line on the wallet first (it locks 0.5 XLM, which you get back if you remove it). Without it the USDC can't be delivered.</div>
-    <button class="b-light big" data-act="onrAddUsdc">Add USDC to this wallet</button>` : `<button class="b-light big" data-act="onrGo">Open ${P}</button>`}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+    <button class="b-light big" data-act="onrAddUsdc">Add USDC to this wallet</button>` : ONR.prov === 'stripe' && ONR.embed ? `<button class="b-light big" data-act="onrGo">Pay with Stripe</button><button class="b-out sm" data-act="onrGo" data-tab="1">Open Stripe in a new tab instead</button>` : `<button class="b-light big" data-act="onrGo">Open ${P}</button>`}<button class="b-out" data-act="closeSheet">Cancel</button>`);
 }
 // one tap: add the USDC line to the wallet the buy goes to, then back to the Buy sheet
 async function onrAddUsdc(btn) {
@@ -18975,6 +18987,7 @@ function onrPickSheet() {
 function onrGo(btn) {
   const amt = +($('#onrAmt') || {}).value || ONR.usd, P = PROV_NM[ONR.prov] || 'Coinbase';
   if (!(amt >= 1)) return toast('Enter an amount of at least $1.');
+  if (ONR.prov === 'stripe' && ONR.embed && !(btn && btn.dataset.tab)) return onrEmbed(btn, amt);
   const win = window.open('about:blank', '_blank');   // opened right on the tap so the browser doesn't block it
   btn.disabled = true; btn.textContent = `Opening ${P}…`;
   const go = ONR.prov === 'stripe'
@@ -18990,6 +19003,40 @@ function onrGo(btn) {
     })
     .catch((e) => { try { if (win) win.close(); } catch (x) {} btn.disabled = false; btn.textContent = `Open ${P}`; toast(`${P} not opened: ` + niceErr(e), 7000); });
 }
+
+/* Embedded Stripe checkout. Stripe's code never loads in this page (it holds your keys): it runs on buy.liquidfi.com, a
+   separate site the browser walls off from this one, shown here in a frame. Your stop server makes the session with this
+   wallet's address locked in, and the frame only gets that session's one-time secret, by message, never in a link. */
+const BUY_URL = 'https://buy.liquidfi.com/', BUY_ORIGIN = 'https://buy.liquidfi.com';
+let BUYPG = null;
+async function onrEmbed(btn, amt) {
+  btn.disabled = true; btn.textContent = 'Opening Stripe…';
+  let j; try { j = await onrApi('/stripe/embed', { address: ONR.addr, asset: ONR.asset.toLowerCase(), usd: amt }, (w, ts) => `liquidfi-stops:stripe-embed:${S.net}:${w}:${ONR.addr}:${ts}`); }
+  catch (e) { btn.disabled = false; btn.textContent = 'Pay with Stripe'; return toast('Stripe checkout not opened: ' + niceErr(e) + ' You can use "Open Stripe in a new tab instead".', 9000); }
+  if (!j || !j.client_secret || !j.pk) { btn.disabled = false; btn.textContent = 'Pay with Stripe'; return toast('Stripe sent no checkout. Use "Open Stripe in a new tab instead".', 8000); }
+  BUYPG = { cs: j.client_secret, pk: j.pk, id: j.id, asset: ONR.asset, sent: false, st: '' };
+  pending = null;
+  sheet(`<h2>Buy ${esc(ONR.asset)} with Stripe</h2>
+    <div class="mu" style="font-size:12px">Secure checkout by Stripe on buy.liquidfi.com. It never sees your keys. The coins go straight to this wallet.</div>
+    <iframe id="buyFrame" src="${BUY_URL}" title="Stripe checkout" style="width:100%;height:68vh;border:0;border-radius:12px;background:#0b0e14" allow="payment *; camera *; clipboard-write" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+    <div class="mu" id="buyMsg" style="font-size:12.5px">Loading Stripe…</div>
+    <button class="b-out" data-act="closeSheet">Close</button>`);
+  const B = BUYPG; setTimeout(() => { if (BUYPG === B && !B.sent) { const m = $('#buyMsg'); if (m) m.innerHTML = 'Stripe is taking a while. You can close this and use <b>Open Stripe in a new tab instead</b>.'; } }, 20000);
+}
+window.addEventListener('message', (e) => {
+  const B = BUYPG, f = $('#buyFrame'); if (!B || !f || e.source !== f.contentWindow || e.origin !== BUY_ORIGIN) return;   // only our checkout frame
+  const d = e.data || {};
+  if (d.type === 'lf-buy-ready' && !B.sent) { B.sent = true; f.contentWindow.postMessage({ type: 'lf-buy', cs: B.cs, pk: B.pk, theme: 'dark' }, BUY_ORIGIN); B.cs = null; return; }   // the secret goes to that site only, once
+  if (d.type === 'lf-buy-status') {
+    const st = String(d.status || ''), m = $('#buyMsg'); B.st = st;
+    const words = { initialized: 'Fill in the checkout above.', requires_payment: 'Waiting for your payment details.', fulfillment_processing: `Paid. Stripe is sending your ${B.asset}…`, fulfillment_complete: `✓ Done. Your ${B.asset} is on its way to this wallet.`, rejected: 'Stripe could not complete this buy. Nothing more will be charged.' };
+    if (m) m.textContent = words[st] || '';
+    if (st === 'fulfillment_processing' || st === 'fulfillment_complete') onrWatch();
+    if (st === 'fulfillment_complete') { toast(`✓ Stripe: your ${B.asset} is on its way.`, 7000); setTimeout(() => { if (BUYPG === B) { closeSheet(); drawBots(true); } }, 4000); }
+    return;
+  }
+  if (d.type === 'lf-buy-error') { const m = $('#buyMsg'); if (m) m.innerHTML = `${esc(String(d.msg || 'Stripe checkout could not load.').slice(0, 200))} You can close this and use <b>Open Stripe in a new tab instead</b>.`; }
+});
 
 /* ---------- orders: what filled, what rests, edit / cancel ---------- */
 const stro = (x) => +x.toString() / 1e7;
