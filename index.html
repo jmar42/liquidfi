@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.38i</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.38j</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -574,7 +574,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.38i</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.38j</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -604,7 +604,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.38i · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.38j · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -18982,7 +18982,7 @@ async function onrBuySheet(chain, addr) {
     ${note ? `<div class="note amb">${esc(note)}</div>` : ''}
     <div class="mu" style="font-size:12px">${how}</div>
     ${needU ? `<div class="note amb">This wallet can't receive USDC yet. Stellar needs a USDC line on the wallet first (it locks 0.5 XLM, which you get back if you remove it). Without it the USDC can't be delivered.</div>
-    <button class="b-light big" data-act="onrAddUsdc">Add USDC to this wallet</button>` : ONR.prov === 'stripe' && ONR.embed ? `<button class="b-light big" data-act="onrGo">Pay with Stripe</button><button class="b-out sm" data-act="onrGo" data-tab="1">Open Stripe's own page instead</button>` : `<button class="b-light big" data-act="onrGo">Open ${P}</button>`}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+    <button class="b-light big" data-act="onrAddUsdc">Add USDC to this wallet</button>` : ONR.prov === 'stripe' && ONR.embed ? `<button class="b-light big" data-act="onrGo">Pay with Stripe</button>` : `<button class="b-light big" data-act="onrGo">Open ${P}</button>`}<button class="b-out" data-act="closeSheet">Cancel</button>`);
 }
 // one tap: add the USDC line to the wallet the buy goes to, then back to the Buy sheet
 async function onrAddUsdc(btn) {
@@ -19039,7 +19039,13 @@ function onrEmbed(btn, amt) {
       if (win && !win.closed) win.location.href = url; else location.href = url;
       closeSheet(); toast(`Stripe checkout opened in a new tab. Your ${ONR.asset} shows up here once Stripe sends it.`, 8000); onrWatch();
     })
-    .catch((e) => { try { if (win) win.close(); } catch (x) {} btn.disabled = false; btn.textContent = 'Pay with Stripe'; toast('Stripe checkout not opened: ' + niceErr(e) + ' You can use "Open Stripe\'s own page instead".', 9000); });
+    .catch((e) => {
+      try { if (win) win.close(); } catch (x) {}
+      btn.disabled = false; btn.textContent = 'Pay with Stripe';
+      // the backup (Stripe's own page) only shows up when Liquidfi's checkout couldn't open
+      if (btn.isConnected && !document.querySelector('[data-act=onrGo][data-tab="1"]')) btn.insertAdjacentHTML('afterend', `<button class="b-out" data-act="onrGo" data-tab="1">Open Stripe's own page instead</button>`);
+      toast('Stripe checkout not opened: ' + niceErr(e) + ' Tap "Open Stripe\'s own page instead" below.', 9000);
+    });
 }
 
 /* ---------- orders: what filled, what rests, edit / cancel ---------- */
