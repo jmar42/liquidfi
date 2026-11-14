@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.38f</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.38i</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -574,7 +574,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.38f</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.38i</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -604,7 +604,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.38f · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.38i · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14161,7 +14161,7 @@ async function drawXrp() {
   if (!XRA[addr].a) { $('#xrOff').innerHTML = '<div class="note">No open orders.</div>'; return; }
   xrLoadOpen(addr); xrWatch(addr);
   try {
-    const r = await xr('account_tx', { account: addr, limit: 60, ledger_index_min: -1, ledger_index_max: -1 });
+    const r = await xrTxDeep(addr, () => cur === 'xrp' && xrSel === addr);
     if (cur !== 'xrp' || xrSel !== addr) return;
     const T = (r.transactions || []).map((x) => ({ tx: x.tx || x.tx_json || {}, meta: x.meta || {}, hash: x.hash || (x.tx || {}).hash, iso: x.close_time_iso || ((x.tx || x.tx_json || {}).date != null ? new Date(((x.tx || x.tx_json).date + 946684800) * 1000).toISOString() : null) }));
     // a bot re-quotes every few seconds: 3+ "Order placed / Order cancelled" in a row collapse into one line, so fills and payments stay visible
@@ -14169,9 +14169,25 @@ async function drawXrp() {
     const R = []; for (const x of T) {
       const L = FG.fills.has(x.hash) ? (FG.heads.get(x.hash) || []).map((g) => (g.own ? (g.fok ? 'Market: ' : 'Filled: ') : 'Order filled: ') + xrGroupText(g)) : [xrTxText(x, addr)];
       for (const t of L) { const q = /^(Order placed|Order cancelled)/.test(t), last = R[R.length - 1]; if (q && last && last.q) { last.m.push({ x, t }); continue; } R.push({ q, m: [{ x, t }] }); } }
-    const rows = R.flatMap((g) => g.q && g.m.length >= 3 ? [{ x: g.m[0].x, t: `${g.m.length} orders placed / replaced (a bot re-quoting)` }] : g.m).slice(0, 12);   // runs of 1-2 stay as they are
+    const rows = R.flatMap((g) => g.q && g.m.length >= 3 ? [{ x: g.m[0].x, t: `${g.m.length} orders placed / replaced (a bot re-quoting)` }] : g.m).slice(0, 16);   // runs of 1-2 stay as they are
     $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^Order filled|^Filled|^Market/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${esc(t)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>'; xpmFill($('#xrRec')).catch(() => {});
   } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
+}
+/* A bot wallet re-quotes all day: the newest 60 transactions can be minutes of "order placed / cancelled" and no trade.
+   Keep reading back (200 at a time, up to 6 more pages ≈ several hours of a busy bot, or 2 days) until a few trades or
+   payments show up, so Recent shows what actually happened. */
+const xrIsTrade = (x, me) => { const t = x.tx || x.tx_json || {}, m = x.meta || {}; if ((m.TransactionResult || 'tesSUCCESS') !== 'tesSUCCESS') return false;
+  if (t.TransactionType === 'Payment') return true; const d = xrMyDelta(m, me, t); return !!(d && Math.abs(d.x) > 1e-6 && Math.abs(d.u) > 1e-6); };
+async function xrTxDeep(addr, still) {
+  const r = await xr('account_tx', { account: addr, limit: 60, ledger_index_min: -1, ledger_index_max: -1 });
+  const L = [...(r.transactions || [])]; let marker = r.marker, n = L.filter((x) => xrIsTrade(x, addr)).length;
+  const t0 = Date.now() - 2 * 864e5;
+  for (let pg = 0; pg < 6 && marker && n < 5 && still(); pg++) {
+    const last = L[L.length - 1], lt = last && ((last.tx || last.tx_json || {}).date + 946684800) * 1000; if (lt && lt < t0) break;
+    let q; try { q = await xr('account_tx', { account: addr, limit: 200, ledger_index_min: -1, ledger_index_max: -1, marker }); } catch (e) { break; }
+    const add = q.transactions || []; L.push(...add); n += add.filter((x) => xrIsTrade(x, addr)).length; marker = q.marker;
+  }
+  return { transactions: L };
 }
 /* tap a Recent line: what it moved, who, the network fee, and a link to the explorer (like the Stellar wallet) */
 function xrDetail(x, me) {
@@ -18036,14 +18052,18 @@ async function actLoad(more) {
       const rs = j._embedded.records; ACT.recs[a.addr] = (more ? ACT.recs[a.addr] || [] : []).concat(rs);
       ACT.next[a.addr] = rs.length < 100 ? null : rel(j._links.next.href);
     } catch (e) { if (!more) { ACT.recs[a.addr] = []; ACT.next[a.addr] = null; } }
-  }), ...xrList().map(async (w) => {   /* XRP wallets: their XRP ⇄ RLUSD / USDC trades from the ledger */
+  }), (async () => { for (const w of xrList()) await (async (w) => {   /* XRP wallets, one at a time (bursts trip the public servers' limit): their XRP ⇄ RLUSD / USDC trades */
     if (more && !ACT.xnext[w.addr]) return;
     try {
-      const r = await xr('account_tx', { account: w.addr, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(more ? { marker: ACT.xnext[w.addr] } : {}) });
-      ACT.xr[w.addr] = (more ? ACT.xr[w.addr] || [] : []).concat((r.transactions || []).map((x) => xrActRow(x, w.addr)).filter(Boolean));
-      ACT.xnext[w.addr] = r.marker || null;
+      let mk = more ? ACT.xnext[w.addr] : null, got = [], pg = 0;
+      do {   /* a bot wallet's 200 newest can be all re-quotes: read on (up to 5 pages) until some trades show */
+        const r = await xr('account_tx', { account: w.addr, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(mk ? { marker: mk } : {}) });
+        got = got.concat((r.transactions || []).map((x) => xrActRow(x, w.addr)).filter(Boolean)); mk = r.marker || null; pg++;
+      } while (mk && got.length < 10 && pg < 5);
+      ACT.xr[w.addr] = (more ? ACT.xr[w.addr] || [] : []).concat(got);
+      ACT.xnext[w.addr] = mk;
     } catch (e) { if (!more) { ACT.xr[w.addr] = []; ACT.xnext[w.addr] = null; } }
-  })]);
+  })(w); })()]);
   ACT.at = Date.now(); ACT.net = S.net; ACT.busy = false; $('#aMore').textContent = 'Load more';
   if (cur === 'act') paintAct();
 }
@@ -18243,7 +18263,7 @@ function advSend() {
   location.href = u; toast('Opening your email app… tap Send there.', 6000);
 }
 function sheet(html) { if (!$('#sheet').classList.contains('on')) navPush({ t: 'sheet' }); $('#sheetIn').innerHTML = `<div style="width:40px;height:5px;border-radius:3px;background:var(--bd2);align-self:center"></div>` + html; $('#sheet').classList.add('on'); }
-function closeSheet(fromBack) { scanStop(); const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on'); if ($('#buyFrame')) { $('#sheetIn').innerHTML = ''; BUYPG = null; } if ($('#wkSec') || $('#phW') || $('#sheetIn [data-act=secShow], #sheetIn [data-act=xrSecShow], #sheetIn [data-act=phShow]')) $('#sheetIn').innerHTML = ''; /* never leave a shown key or phrase in the page */ if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
+function closeSheet(fromBack) { scanStop(); const sh = $('#sheet'); if (!sh.classList.contains('on')) return; sh.classList.remove('on');  if ($('#wkSec') || $('#phW') || $('#sheetIn [data-act=secShow], #sheetIn [data-act=xrSecShow], #sheetIn [data-act=phShow]')) $('#sheetIn').innerHTML = ''; /* never leave a shown key or phrase in the page */ if (!fromBack) { const top = NAV[NAV.length - 1]; if (top && top.t === 'sheet') top.t = 'dead'; } }
 let pending = null;
 let pendingBusy = null, pendingTap = false;   // tap = one press sends (trades); otherwise press and hold   // what the hold button says while it waits for the ledger
 function confirmSheet(title, sub, items, btn, run, danger = true, cls = null, busy = null, tap = false) {
@@ -18931,7 +18951,7 @@ async function onrBuySheet(chain, addr) {
   const provs = [...(chain === 'stellar' && h.stripe ? ['stripe'] : []), ...(h.onramp ? ['coinbase'] : [])];
   if (!provs.length) return sheet(`<h2>Buy</h2><div class="note amb">${chain === 'xrp' ? 'Buying XRP needs the Coinbase key on your stop server.' : 'No buy service is set up on your stop server yet (Stripe or Coinbase key).'}</div><button class="b-out" data-act="closeSheet">Close</button>`);
   if (!provs.includes(ONR.prov)) ONR.prov = provs[0];
-  ONR.embed = chain === 'stellar' && !!h.stripeEmbed;   // embedded Stripe checkout on buy.liquidfi.com (server v2.4 + publishable key)
+  ONR.embed = chain === 'stellar' && !!h.stripeEmbed && !!h.stripeTicket;   // Liquidfi's own Stripe checkout page (server v2.5); Stripe's own page stays as the backup
   const P = PROV_NM[ONR.prov];
   let L;
   const a0 = chain === 'stellar' ? await refreshAcct(addr).catch(() => null) : null;
@@ -18949,7 +18969,7 @@ async function onrBuySheet(chain, addr) {
     else if (ONR.asset === 'USDC' && !a.balances.some((b) => b.asset_code === 'USDC' && b.asset_issuer === NS().usdc.issuer)) needU = true;
   }
   const how = ONR.prov === 'stripe' && ONR.embed
-    ? 'Stripe\'s checkout opens right here. It runs on its own separate page (buy.liquidfi.com) that never sees your keys. No exchange account: you check out with Link (email, a quick ID check the first time, then how to pay). The fee shows before you pay. The coins come straight to this wallet.'
+    ? 'Stripe\'s checkout opens in a new tab on buy.liquidfi.com, Liquidfi\'s checkout page. It never sees your keys. No exchange account: you check out with Link (email, a quick ID check the first time, then how to pay). The fee shows before you pay. The coins come straight to this wallet.'
     : ONR.prov === 'stripe'
     ? 'Stripe opens in a new tab. No exchange account: you check out with Link (email, a quick ID check the first time, then card or bank). The fee shows before you pay. The coins come straight to this wallet.'
     : `<div class="note" style="font-size:12.5px">Sign in to coinbase.com in Chrome once before you start, so the code from your authenticator app doesn't make you lose the page. Finish the buy on the page Liquidfi opens: a buy made in the regular Coinbase app stays in your Coinbase account.</div>Coinbase opens in a new tab. You sign in, pick a payment method and confirm there. Coinbase's fee shows before you pay. While Coinbase reviews the Liquidfi app, buys are limited to $5.`;
@@ -18962,7 +18982,7 @@ async function onrBuySheet(chain, addr) {
     ${note ? `<div class="note amb">${esc(note)}</div>` : ''}
     <div class="mu" style="font-size:12px">${how}</div>
     ${needU ? `<div class="note amb">This wallet can't receive USDC yet. Stellar needs a USDC line on the wallet first (it locks 0.5 XLM, which you get back if you remove it). Without it the USDC can't be delivered.</div>
-    <button class="b-light big" data-act="onrAddUsdc">Add USDC to this wallet</button>` : ONR.prov === 'stripe' && ONR.embed ? `<button class="b-light big" data-act="onrGo">Pay with Stripe</button><button class="b-out sm" data-act="onrGo" data-tab="1">Open Stripe in a new tab instead</button>` : `<button class="b-light big" data-act="onrGo">Open ${P}</button>`}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+    <button class="b-light big" data-act="onrAddUsdc">Add USDC to this wallet</button>` : ONR.prov === 'stripe' && ONR.embed ? `<button class="b-light big" data-act="onrGo">Pay with Stripe</button><button class="b-out sm" data-act="onrGo" data-tab="1">Open Stripe's own page instead</button>` : `<button class="b-light big" data-act="onrGo">Open ${P}</button>`}<button class="b-out" data-act="closeSheet">Cancel</button>`);
 }
 // one tap: add the USDC line to the wallet the buy goes to, then back to the Buy sheet
 async function onrAddUsdc(btn) {
@@ -19004,39 +19024,23 @@ function onrGo(btn) {
     .catch((e) => { try { if (win) win.close(); } catch (x) {} btn.disabled = false; btn.textContent = `Open ${P}`; toast(`${P} not opened: ` + niceErr(e), 7000); });
 }
 
-/* Embedded Stripe checkout. Stripe's code never loads in this page (it holds your keys): it runs on buy.liquidfi.com, a
-   separate site the browser walls off from this one, shown here in a frame. Your stop server makes the session with this
-   wallet's address locked in, and the frame only gets that session's one-time secret, by message, never in a link. */
-const BUY_URL = 'https://buy.liquidfi.com/', BUY_ORIGIN = 'https://buy.liquidfi.com';
-let BUYPG = null;
-async function onrEmbed(btn, amt) {
+/* Liquidfi's Stripe checkout (buy.liquidfi.com). Stripe's embedded onramp only runs as a full page (it refuses to run
+   inside a frame), so it opens in a new tab. Your stop server makes the session with this wallet's address locked in and
+   hands back a one-time ticket (works once, for 3 minutes). It travels in the link's #part, which browsers never send to
+   any server; that page trades it for the session and shows Stripe's checkout. Stripe's code never loads in this page. */
+const BUY_URL = 'https://buy.liquidfi.com/';
+function onrEmbed(btn, amt) {
+  const win = window.open('about:blank', '_blank');   // opened right on the tap so the browser doesn't block it
   btn.disabled = true; btn.textContent = 'Opening Stripe…';
-  let j; try { j = await onrApi('/stripe/embed', { address: ONR.addr, asset: ONR.asset.toLowerCase(), usd: amt }, (w, ts) => `liquidfi-stops:stripe-embed:${S.net}:${w}:${ONR.addr}:${ts}`); }
-  catch (e) { btn.disabled = false; btn.textContent = 'Pay with Stripe'; return toast('Stripe checkout not opened: ' + niceErr(e) + ' You can use "Open Stripe in a new tab instead".', 9000); }
-  if (!j || !j.client_secret || !j.pk) { btn.disabled = false; btn.textContent = 'Pay with Stripe'; return toast('Stripe sent no checkout. Use "Open Stripe in a new tab instead".', 8000); }
-  BUYPG = { cs: j.client_secret, pk: j.pk, id: j.id, asset: ONR.asset, sent: false, st: '' };
-  pending = null;
-  sheet(`<h2>Buy ${esc(ONR.asset)} with Stripe</h2>
-    <div class="mu" style="font-size:12px">Secure checkout by Stripe on buy.liquidfi.com. It never sees your keys. The coins go straight to this wallet.</div>
-    <iframe id="buyFrame" src="${BUY_URL}" title="Stripe checkout" style="width:100%;height:68vh;border:0;border-radius:12px;background:#0b0e14" allow="payment *; camera *; clipboard-write" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
-    <div class="mu" id="buyMsg" style="font-size:12.5px">Loading Stripe…</div>
-    <button class="b-out" data-act="closeSheet">Close</button>`);
-  const B = BUYPG; setTimeout(() => { if (BUYPG === B && !B.sent) { const m = $('#buyMsg'); if (m) m.innerHTML = 'Stripe is taking a while. You can close this and use <b>Open Stripe in a new tab instead</b>.'; } }, 20000);
+  onrApi('/stripe/embed', { address: ONR.addr, asset: ONR.asset.toLowerCase(), usd: amt }, (w, ts) => `liquidfi-stops:stripe-embed:${S.net}:${w}:${ONR.addr}:${ts}`)
+    .then((j) => {
+      if (!j || !j.ticket) throw new Error('Stripe sent no checkout.');
+      const url = BUY_URL + '#t=' + encodeURIComponent(j.ticket);
+      if (win && !win.closed) win.location.href = url; else location.href = url;
+      closeSheet(); toast(`Stripe checkout opened in a new tab. Your ${ONR.asset} shows up here once Stripe sends it.`, 8000); onrWatch();
+    })
+    .catch((e) => { try { if (win) win.close(); } catch (x) {} btn.disabled = false; btn.textContent = 'Pay with Stripe'; toast('Stripe checkout not opened: ' + niceErr(e) + ' You can use "Open Stripe\'s own page instead".', 9000); });
 }
-window.addEventListener('message', (e) => {
-  const B = BUYPG, f = $('#buyFrame'); if (!B || !f || e.source !== f.contentWindow || e.origin !== BUY_ORIGIN) return;   // only our checkout frame
-  const d = e.data || {};
-  if (d.type === 'lf-buy-ready' && !B.sent) { B.sent = true; f.contentWindow.postMessage({ type: 'lf-buy', cs: B.cs, pk: B.pk, theme: 'dark' }, BUY_ORIGIN); B.cs = null; return; }   // the secret goes to that site only, once
-  if (d.type === 'lf-buy-status') {
-    const st = String(d.status || ''), m = $('#buyMsg'); B.st = st;
-    const words = { initialized: 'Fill in the checkout above.', requires_payment: 'Waiting for your payment details.', fulfillment_processing: `Paid. Stripe is sending your ${B.asset}…`, fulfillment_complete: `✓ Done. Your ${B.asset} is on its way to this wallet.`, rejected: 'Stripe could not complete this buy. Nothing more will be charged.' };
-    if (m) m.textContent = words[st] || '';
-    if (st === 'fulfillment_processing' || st === 'fulfillment_complete') onrWatch();
-    if (st === 'fulfillment_complete') { toast(`✓ Stripe: your ${B.asset} is on its way.`, 7000); setTimeout(() => { if (BUYPG === B) { closeSheet(); drawBots(true); } }, 4000); }
-    return;
-  }
-  if (d.type === 'lf-buy-error') { const m = $('#buyMsg'); if (m) m.innerHTML = `${esc(String(d.msg || 'Stripe checkout could not load.').slice(0, 200))} You can close this and use <b>Open Stripe in a new tab instead</b>.`; }
-});
 
 /* ---------- orders: what filled, what rests, edit / cancel ---------- */
 const stro = (x) => +x.toString() / 1e7;
