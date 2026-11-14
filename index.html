@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40b</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40d</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -597,9 +597,11 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40b</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40d</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
+  <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
+  <div class="card" id="setMySol" style="display:none"><span class="lbl">Solana server <span class="tag">beta</span></span><div class="mu" style="font-size:12px">Your own Solana RPC (yours, or a Helius / Alchemy / QuickNode address with your key). Without one, Solana goes through the Liquidfi server.</div><label>Your server (https)<input id="setSsUrl" placeholder="https://solana-mainnet.g.alchemy.com/v2/…" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setSsOnly" style="width:auto"> Only my server (no Liquidfi backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="sol">Save</button><button class="b-out sm" data-act="myOff" data-k="sol">Use Liquidfi server</button></div><div class="mu" id="setSsSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:12px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone).</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setTax"><span class="lbl">Taxes</span><div class="mu" style="font-size:12px">Everything your wallets did in a year (trades, swaps, sends, receives, pools, fees) with dollar values at the time, in two files: one for tax software (Koinly format) and a broker-style statement of buys, sells and totals for you or your tax pro. Made on this phone from the public ledgers; Liquidfi never sees it. Not tax advice.</div>
@@ -627,7 +629,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40b · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.40d · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13608,11 +13610,11 @@ const VN = {
   cb: { name: 'Coinbase', tag: 'CB', col: '#A78BFA' },
   kr: { name: 'Kraken', tag: 'KR', col: '#FBBF24' },
   bn: { name: 'Binance', tag: 'BU', col: '#34D399' },   // Binance global, market data from data-api.binance.vision (works from the US; view only)
-  xl: { name: 'XRP Ledger DEX', tag: 'XL', col: '#23C4F0' },   // v2.40b: XRP / RLUSD / USDC on the XRP Ledger (order book + AMM pool), Mainnet
+  xl: { name: 'XRP Ledger DEX', tag: 'XL', col: '#23C4F0' },   // v2.40d: XRP / RLUSD / USDC on the XRP Ledger (order book + AMM pool), Mainnet
 };
 const VALL = ['st', 'sp', 'xl', 'cb', 'kr', 'bn'];   // spot markets only (Jeff, Oct 14: no perps)
 const USDQ = ['USD', 'USDC', 'USDT', 'PYUSD', 'RLUSD'];
-/* v2.40b (Jeff: "XRP/RLUSD ... It doesnt work?"): XRP Ledger pairs. Issuers are fixed here (a lookalike token can't sneak in). */
+/* v2.40d (Jeff: "XRP/RLUSD ... It doesnt work?"): XRP Ledger pairs. Issuers are fixed here (a lookalike token can't sneak in). */
 const XLA = { XRP: { currency: 'XRP' }, RLUSD: { currency: '524C555344000000000000000000000000000000', issuer: 'rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De' }, USDC: { currency: '5553444300000000000000000000000000000000', issuer: 'rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE' } };
 async function xlBook(s) {   /* → { bids: [[px, size]], asks: [[px, size]] } in quote per base; the AMM pool's price is added as one level each side */
   const v = (x) => (typeof x === 'string' ? +x / 1e6 : +x.value), lv = (L, bid) => (L || []).map((o) => { const g = v(o.taker_gets_funded || o.TakerGets), p = v(o.taker_pays_funded || o.TakerPays); return g > 0 && p > 0 ? (bid ? [g / p, p] : [p / g, g]) : null; }).filter(Boolean);
@@ -13622,7 +13624,46 @@ async function xlBook(s) {   /* → { bids: [[px, size]], asks: [[px, size]] } i
     const first = isA(am.amount), base = v(first ? am.amount : am.amount2), quote = v(first ? am.amount2 : am.amount), spot = quote / base;
     if (spot > 0) { bids.push([spot * (1 - f), +(base * 0.001).toFixed(2)]); asks.push([spot / (1 - f), +(base * 0.001).toFixed(2)]); } }   /* AMM: its price for a trade of ~0.1% of the pool */
   bids.sort((x, y) => y[0] - x[0]); asks.sort((x, y) => x[0] - y[0]);
-  return { bids: bids.slice(0, 25), asks: asks.slice(0, 25) };
+  return { bids: bids.slice(0, 25), asks: asks.slice(0, 25), amm: am && am.account || null };
+}
+/* XRP Ledger last sales (v2.40d, Jeff: "Last sales issues.."): the ledger has no "trades" list, so sales are read from the
+   transactions themselves. Order-book fills = offers on this pair that shrank; AMM fills = the pool's two balances moving
+   opposite ways. History: the AMM pool's recent transactions. Live: a push connection (books + pool) while Level 2 is open. */
+const XLT = { ws: null, key: '', list: [], seen: new Set(), at: 0 };
+function xlSame(a, x) { return typeof a === 'string' ? x.currency === 'XRP' : !!a && a.currency === x.currency && a.issuer === x.issuer; }
+function xlTradesOf(meta, s, amm, t) {
+  const v = (x) => (typeof x === 'string' ? +x / 1e6 : +x.value), out = []; let b = 0, q = 0, buy = null;
+  for (const n of (meta && meta.AffectedNodes) || []) { const o = n.ModifiedNode || n.DeletedNode; if (!o || o.LedgerEntryType !== 'Offer') continue;
+    const F = o.FinalFields, P = o.PreviousFields; if (!F || !P || P.TakerGets == null || P.TakerPays == null) continue;
+    const dG = v(P.TakerGets) - v(F.TakerGets), dP = v(P.TakerPays) - v(F.TakerPays); if (!(dG > 0 && dP > 0)) continue;
+    if (xlSame(F.TakerGets, s.A) && xlSame(F.TakerPays, s.Q)) { b += dG; q += dP; buy = true; }        /* a maker sold the base: the taker BOUGHT */
+    else if (xlSame(F.TakerGets, s.Q) && xlSame(F.TakerPays, s.A)) { b += dP; q += dG; buy = false; } }
+  if (b > 0) out.push({ t, px: q / b, x: b, buy });
+  if (amm && typeof xrpl !== 'undefined' && xrpl.getBalanceChanges) { try {
+    const ch = xrpl.getBalanceChanges(meta).find((c) => c.account === amm); let dB = 0, dQ = 0;
+    for (const x of (ch && ch.balances) || []) { const a = x.currency === 'XRP' ? { currency: 'XRP' } : { currency: x.currency, issuer: x.issuer };
+      if (xlSame(a.currency === 'XRP' ? '1' : a, s.A)) dB += +x.value; else if (xlSame(a.currency === 'XRP' ? '1' : a, s.Q)) dQ += +x.value; }
+    if (dB && dQ && Math.sign(dB) !== Math.sign(dQ)) out.push({ t, px: Math.abs(dQ / dB), x: Math.abs(dB), buy: dB < 0 });   /* the pool gave base: the taker bought */
+  } catch (e) {} }
+  return out;
+}
+function xlAdd(list) { for (const r of list) XLT.list.push(r); XLT.list.sort((a, b) => b.t - a.t); XLT.list.length = Math.min(XLT.list.length, 40); }
+function xlTradesStop() { const w = XLT.ws; XLT.ws = null; XLT.key = ''; if (w) { try { w.onclose = null; w.close(); } catch (e) {} } }
+async function xlTradesStart(s, key, amm) {
+  if (XLT.key === key && (XLT.ws || Date.now() - XLT.at < 30000)) return;
+  xlTradesStop(); XLT.key = key; XLT.list = []; XLT.seen = new Set(); XLT.at = Date.now();
+  const tOf = (tx) => (tx && tx.date ? (tx.date + 946684800) * 1000 : Date.now());
+  if (amm) { try { const r = await xr('account_tx', { account: amm, limit: 30 }); if (XLT.key !== key) return;
+    for (const x of r.transactions || []) { const tx = x.tx_json || x.tx || {}, h = x.hash || tx.hash; if (!x.meta || x.meta.TransactionResult !== 'tesSUCCESS' || XLT.seen.has(h)) continue; XLT.seen.add(h); xlAdd(xlTradesOf(x.meta, s, amm, tOf(tx))); } } catch (e) {} }
+  if (typeof WebSocket === 'undefined') return;
+  const L = xrWsList('public'), me = xrMine(); let ws; try { ws = new WebSocket(me ? L[0] : L[(XLT.i = (XLT.i || 0) + 1) % L.length]); } catch (e) { return; }
+  XLT.ws = ws;
+  ws.onopen = () => { if (XLT.ws !== ws) return; ws.send(JSON.stringify({ id: 1, command: 'subscribe', books: [{ taker_gets: s.A, taker_pays: s.Q, both: true }], ...(amm ? { accounts: [amm] } : {}) })); };
+  ws.onmessage = (ev) => { if (XLT.ws !== ws) return; let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+    if (m.type !== 'transaction' || !m.validated || !m.meta || m.meta.TransactionResult !== 'tesSUCCESS') return;
+    const tx = m.tx_json || m.transaction || {}, h = m.hash || tx.hash; if (h && XLT.seen.has(h)) return; if (h) XLT.seen.add(h);
+    const L2r = xlTradesOf(m.meta, s, amm, tOf(tx)); if (L2r.length) { xlAdd(L2r); if (L2.d.xl) L2.d.xl.tr = XLT.list.slice(); if (cur === 'l2') paintL2(); } };
+  ws.onclose = () => { if (XLT.ws === ws) { XLT.ws = null; } };   /* the next Level 2 refresh reconnects (after 30 s) */
 }
 function stAsset(code) {
   if (code === 'XLM') return { native: true, code: 'XLM' };
@@ -13709,7 +13750,7 @@ async function loadL2() {
     const s = vSym(k, w.b, w.q); if (!s) { delete L2.d[k]; return; }
     if (k === 'st' && isMain(w)) { L2.d.st = { bids: MK.bids, asks: MK.asks, tr: tick(MK.tr.map((r) => ({ t: Date.parse(r.t), px: r.px, x: r.x }))), at: MK.at, pair: w.b + '/' + w.q }; return; }
     if ((k === 'st' || k === 'sp') && (vTick % 2) && L2.d[k]) return;   // Horizon rate limit: every 6 s
-    if (k === 'xl') { if ((vTick % 2) && L2.d.xl) return; try { const B = await xlBook(s); L2.d.xl = { ...B, tr: [], at: Date.now(), pair: s.pair }; } catch (e) { L2.d.xl = { bids: [], asks: [], tr: [], err: 'no data', pair: s.pair }; } return; }
+    if (k === 'xl') { if ((vTick % 2) && L2.d.xl) return; try { const B = await xlBook(s); xlTradesStart(s, symKey(w), B.amm); L2.d.xl = { ...B, tr: XLT.key === symKey(w) ? XLT.list.slice() : [], at: Date.now(), pair: s.pair }; } catch (e) { L2.d.xl = { bids: [], asks: [], tr: [], err: 'no data', pair: s.pair }; } return; }
     const u = vUrls(k, s), get = k === 'st' || k === 'sp' ? (x) => H(x.replace(HZ(), '')) : getJ;
     try { const [b, t] = await Promise.all([get(u.book()), get(u.tr())]); const [bids, asks] = PARSE[k].pb(b); L2.d[k] = { bids, asks, tr: PARSE[k].pt(t), at: Date.now(), pair: s.pair || w.b + '/' + w.q }; }
     catch (e) { L2.d[k] = { bids: [], asks: [], tr: [], err: 'no data', pair: s.pair || '' }; }
@@ -13754,7 +13795,8 @@ function paintL2() {
   for (let i = 0; i < n; i++) { const b = B[i], a = A[i]; h += `<div class="l2r"><span>${b && multi ? tag(b.k) : ''}</span><span class="mono mu">${b ? fx(b.q, b.q < 10 ? 2 : 0) : ''}</span><span class="mono buy">${b ? pxL(b.p) : ''}</span><span class="mono sell">${a ? pxL(a.p) : ''}</span><span class="mono mu">${a ? fx(a.q, a.q < 10 ? 2 : 0) : ''}</span><span>${a && multi ? tag(a.k) : ''}</span></div>`; }
   $('#lBook').innerHTML = n ? h : '<div class="mu" style="padding:8px">Loading…</div>';
   const T = ks.flatMap((k) => ((L2.d[k] || {}).tr || []).map((t) => ({ ...t, k }))).sort((x, y) => y.t - x.t).slice(0, 10);
-  $('#lTr').innerHTML = T.length ? `<div class="l2t l2h"><span>Time</span><span>${multi ? 'Mkt' : ''}</span><span>Price</span><span>Size</span></div>` + T.map((t) => `<div class="l2t"><span class="mono mu">${new Date(t.t).toLocaleTimeString([], { hour12: false })}</span><span>${multi ? tag(t.k) : ''}</span><span class="mono ${t.buy ? 'buy' : 'sell'}">${pxL(t.px)}</span><span class="mono mu">${fx(t.x, t.x < 10 ? 4 : 0)}</span></div>`).join('') : '<div class="mu" style="padding:8px">Loading…</div>';
+  $('#lTr').innerHTML = T.length ? `<div class="l2t l2h"><span>Time</span><span>${multi ? 'Mkt' : ''}</span><span>Price</span><span>Size</span></div>` + T.map((t) => `<div class="l2t"><span class="mono mu">${new Date(t.t).toLocaleTimeString([], { hour12: false })}</span><span>${multi ? tag(t.k) : ''}</span><span class="mono ${t.buy ? 'buy' : 'sell'}">${pxL(t.px)}</span><span class="mono mu">${fx(t.x, t.x < 10 ? 4 : 0)}</span></div>`).join('')
+    : `<div class="mu" style="padding:8px">${ks.every((k) => L2.d[k]) ? (ks.includes('xl') ? 'No sales yet. Watching the XRP Ledger live: new sales show here as they happen.' : 'No recent sales.') : 'Loading…'}</div>`;
 }
 // add a symbol: "BTC" → BTC/USD, "XLM/EURC", "sol usd"…
 function parseSym(txt) {
@@ -13882,6 +13924,7 @@ let cur = 'lock';
 let setFrom = 'mkt'; const backTo = {};
 function go(name) {
   if (name !== cur) scanStop();
+  if (cur === 'l2' && name !== 'l2') { try { xlTradesStop(); } catch (e) {} }   /* XRP Ledger sales push: only while Level 2 is open */
   if (cur === 'backup' && name !== 'backup') { const bk = $('#bkKeys'); if (bk) bk.innerHTML = ''; }   // leaving Back up keys: no key or phrase left in the page
   if (name === 'pnl') name = 'bots';   // P/L now lives on Accounts
   if (name === 'earn' && cur !== 'earn') { let r = null; try { r = TPEND.find((q) => (q.scr === 'earn' || q.scr === 'earnx') && (q.busy || q.cls === 'red')); } catch (er) {} EARN_VIEW = r ? (r.scr === 'earnx' ? 'xr' : 'st') : 'home'; }   /* Earn opens on home, or on the chain page of a receipt still sending / failed */
@@ -14112,6 +14155,12 @@ async function scanInline(box, onAddr, parse = parseAddrQR, what = 'a Stellar ad
    Own-key XRP wallets live in K.xr (sealed in the vault with the Stellar keys); watched XRP addresses in NS().xrw.
    New XRP wallets come from the same recovery phrase as Stellar (BIP44 m/44'/144'/0'/0/n, like Ledger / Trust Wallet).
    Talks to public XRP Ledger servers over JSON-RPC (xrplcluster.com has CORS). Network follows Mainnet / Testnet. */
+/* v2.40d (Jeff: "Shouldn't we have in the settings so a user can put their own server ip in there if they want privacy??"):
+   your own XRP Ledger / Solana server, per network. "Only" = never fall back to public servers or the Liquidfi relay. */
+const myCfg = (k) => { const N = NS(); return (N.my || (N.my = {}))[k] || null; };
+const xrMine = () => { const c = myCfg('xr'); return c && c.url ? c : null; };
+const xrWsOf = (u) => u.replace(/^https:/i, 'wss:').replace(/^http:/i, 'ws:');
+function xrWsList(net) { const L = XRPL_WS[net] || XRPL_WS.public, m = net === S.net ? xrMine() : null; return m ? (m.only ? [m.ws || xrWsOf(m.url)] : [m.ws || xrWsOf(m.url), ...L]) : L; }
 const XRPL_URL = { public: ['https://xrplcluster.com/', 'https://xrpl.link/', 'https://xrpl.ws/'], testnet: ['https://testnet.xrpl-labs.com/', 'https://s.altnet.rippletest.net:51234/'] };
 const XRPL_WS = { public: ['wss://xrplcluster.com/', 'wss://xrpl.link/', 'wss://s2.ripple.com/', 'wss://s1.ripple.com/'], testnet: ['wss://testnet.xrpl-labs.com/', 'wss://s.altnet.rippletest.net:51233/'] };   // push updates (Trade XRP)
 const XRP_EXPL = { public: 'https://livenet.xrpl.org', testnet: 'https://testnet.xrpl.org' };
@@ -14129,7 +14178,7 @@ async function xr(method, params = {}) {   // JSON-RPC with failover; returns `r
      called from a web page. So when the first one is busy or silent, the next try is Liquidfi's own server (it relays
      read-only lookups and already-signed transactions; it never sees a key), then the rest of the group. */
   const L = XRPL_URL[S.net] || XRPL_URL.public, relay = (S.stopUrl || DEFAULT_STOP_URL || '').replace(/\/+$/, '');
-  const tries = [L[0], ...(relay ? ['relay'] : []), ...L.slice(1)];
+  const me = xrMine(), tries = me && me.only ? [me.url] : [...(me ? [me.url] : []), L[0], ...(relay ? ['relay'] : []), ...L.slice(1)];
   let err, busy = false;
   for (const u of tries) {
     try {
@@ -14893,7 +14942,7 @@ async function xtPushBook() {
 function xwStart() {
   xwStop();
   if (typeof WebSocket === 'undefined') return xtPollStart();
-  const L = XRPL_WS[S.net] || XRPL_WS.public, net = S.net; let ws;
+  const L = xrWsList(S.net), net = S.net; let ws;
   try { ws = new WebSocket(L[XW.i % L.length]); } catch (e) { return xwFail(); }
   XW.ws = ws; XW.net = net; XW.lastLed = Date.now();
   ws.onopen = () => {
@@ -15440,6 +15489,10 @@ const u8b64 = (u) => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s 
 
 /* data through the stop server's /sol relay */
 async function solRpc(method, params = []) {
+  const me = myCfg('sol');
+  if (me && me.url) { try { const r = await fetch(me.url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) }), j = await r.json();
+      if (j && j.error) { const e = new Error(j.error.message || 'Solana error'); e.sol = j.error; if (me.only || !/rate|limit|busy|credit/i.test(e.message)) throw e; } else if (j && 'result' in j) return j.result; }
+    catch (e) { if (me.only || e.sol) throw (e.sol ? e : new Error("Can't reach your Solana server right now.")); } }
   const u = (S.stopUrl || DEFAULT_STOP_URL || '').replace(/\/+$/, ''); if (!u) throw new Error('Solana needs the Liquidfi server (Settings → Stop orders).');
   let r, j; try { r = await fetch(u + '/sol', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ net: solNet(), method, params }) }); j = await r.json(); }
   catch (e) { throw new Error("Can't reach the Solana servers right now. Check your connection."); }
@@ -19901,8 +19954,48 @@ function bookDelOk() {
   if (!x || x.addr !== e.addr) return closeSheet();
   L.splice(e.i, 1); saveS(); closeSheet(); bookPaint(); toast('Deleted.');
 }
+function drawMy() {
+  const net = S.net === 'public' ? '' : ' · ' + NET().name, x = myCfg('xr'), so = myCfg('sol');
+  $('#setXsNet').textContent = net; $('#setMySol').style.display = DEV ? '' : 'none';
+  if (document.activeElement !== $('#setXsUrl')) $('#setXsUrl').value = x && x.url || ''; $('#setXsOnly').checked = !!(x && x.only);
+  $('#setXsSt').innerHTML = x && x.url ? `Using <b style="color:var(--tx)">your server</b> · ${esc(x.url.replace(/^https?:\/\//, ''))}${x.only ? ' only' : ', public servers as backup'}` : 'Using public servers: xrplcluster.com, the Liquidfi server, xrpl.link, xrpl.ws.';
+  if (document.activeElement !== $('#setSsUrl')) $('#setSsUrl').value = so && so.url ? so.url.replace(/(\/v2\/|api-key=)[A-Za-z0-9_-]{6,}/, '$1••••') : ''; $('#setSsOnly').checked = !!(so && so.only);
+  $('#setSsSt').innerHTML = so && so.url ? `Using <b style="color:var(--tx)">your server</b>${so.only ? ' only' : ', the Liquidfi server as backup'}` : 'Using the Liquidfi server.';
+}
+async function myCheck(k) {
+  const X = k === 'xr', inp = $(X ? '#setXsUrl' : '#setSsUrl'), only = $(X ? '#setXsOnly' : '#setSsOnly').checked, st = $(X ? '#setXsSt' : '#setSsSt');
+  let u = (inp.value || '').trim(); const old = myCfg(k);
+  if (!X && old && old.url && /••••/.test(u)) u = old.url;   /* unchanged (the key part is hidden on screen) */
+  if (!/^[a-z]+:\/\//i.test(u)) u = 'https://' + u;
+  let url; try { url = new URL(u); } catch (e) { return toast('That is not a web address.'); }
+  if (url.protocol !== 'https:') return toast('The address must start with https://. A phone page can’t reach plain http or a bare IP address.');
+  u = url.href.replace(/\/+$/, url.pathname === '/' ? '/' : '');
+  st.textContent = 'Checking…';
+  const post = async (body) => { const c = new AbortController(), tm = setTimeout(() => c.abort(), 10000); try { const r = await fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: c.signal }); return await r.json(); } finally { clearTimeout(tm); } };
+  try {
+    if (X) {
+      const j = await post({ method: 'server_info', params: [{}] }), i = j && j.result && j.result.info; if (!i) throw new Error('not an XRP Ledger server');
+      const nid = +(i.network_id || 0), want = S.net === 'public' ? 0 : 1;
+      if (nid !== want) { st.innerHTML = `<span class="red">That server is on ${nid === 0 ? 'Mainnet' : nid === 1 ? 'Testnet' : 'network ' + nid}, and the app is on ${S.net === 'public' ? 'Mainnet' : 'Testnet'}. Not saved.</span>`; return; }
+      const age = i.validated_ledger ? i.validated_ledger.age : null;
+      if (!['full', 'proposing', 'validating'].includes(i.server_state) || age == null || age > 60) { st.innerHTML = `<span class="amb">That server isn't in sync yet (${esc(i.server_state || '?')}${age != null ? ', ledger ' + age + ' s old' : ''}). Not saved.</span>`; return; }
+      NS().my = { ...(NS().my || {}), xr: { url: u, only } }; saveS(); try { XLT.key = ''; } catch (e) {}
+      toast(`Saved: XRP Ledger ledger ${i.validated_ledger.seq}${only ? ', your server only' : ''}.`);
+    } else {
+      const j = await post({ jsonrpc: '2.0', id: 1, method: 'getGenesisHash', params: [] }), g = j && j.result;
+      const want = S.net === 'public' ? '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d' : 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG';
+      if (!g) throw new Error((j && j.error && j.error.message) || 'not a Solana server');
+      if (g !== want) { st.innerHTML = `<span class="red">That server is on another Solana network (the app is on ${S.net === 'public' ? 'Mainnet' : 'Devnet'}). Not saved.</span>`; return; }
+      NS().my = { ...(NS().my || {}), sol: { url: u, only } }; saveS(); for (const a in SOLA) delete SOLA[a];
+      toast('Saved: your Solana server' + (only ? ' only.' : '.'));
+    }
+    drawMy();
+  } catch (e) { st.innerHTML = `<span class="red">Could not use that server (${esc(e.name === 'AbortError' ? 'no answer in 10 s' : e.message)}). It needs https, and must let web pages read it (CORS). Not saved.</span>`; }
+}
+function myOff(k) { const N = NS(); if (N.my) delete N.my[k]; saveS(); if (k === 'sol') for (const a in SOLA) delete SOLA[a]; else try { XLT.key = ''; } catch (e) {} drawMy(); toast(k === 'xr' ? 'Back to the public XRP Ledger servers.' : 'Back to the Liquidfi server for Solana.'); }
 function drawSet() {
   try { bookPaint(); } catch (e) {}
+  try { drawMy(); } catch (e) {}
   $('#setNetCard').style.display = DEV ? '' : 'none';
   try { drawTax(); } catch (e) {}
   $$('#setNet button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.net));
@@ -20274,7 +20367,7 @@ document.addEventListener('click', async (e) => {
     },
     rmBot: () => { const i = +t.dataset.i, b = NS().bots[i]; if (!b) return; pending = null; sheet(`<h2>Remove ${esc(b.name)}?</h2><div class="mu" style="font-size:14px">Only removes it from this phone's list. The account and the emergency signer on it stay as they are (remove the signer from the PC with Remove-Emergency-Signer.bat).</div><button class="b-red big" data-act="rmBotOk" data-i="${i}">Remove</button><button class="b-out" data-act="closeSheet">Cancel</button>`); },
     rmBotOk: () => { NS().bots.splice(+t.dataset.i, 1); saveS(); closeSheet(); P.res = {}; if (cur === 'bot') go('bots'); else drawSet(); toast('Removed.'); },
-    hzCheck: () => hzCheck(), stopCheck, homeAll: () => { HOME_ALL = homeAddr; if (HOME_PAINT) HOME_PAINT(); },
+    hzCheck: () => hzCheck(), stopCheck, myCheck: () => myCheck(t.dataset.k), myOff: () => myOff(t.dataset.k), homeAll: () => { HOME_ALL = homeAddr; if (HOME_PAINT) HOME_PAINT(); },
     resetAsk: () => resetSheet(),
     saveBots: () => { const bad = []; $$('[data-baddr]').forEach((i) => { const v = i.value.trim(); if (v && !SDK.StrKey.isValidEd25519PublicKey(v)) bad.push(NS().bots[+i.dataset.baddr].name); else NS().bots[+i.dataset.baddr].addr = v; }); saveS(); toast(bad.length ? 'Not valid: ' + bad.join(', ') : 'Saved.'); },
     mnOk: () => switchMainnet(),
