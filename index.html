@@ -17923,7 +17923,8 @@ async function fundReview() {
   if (amt > src.free) return toast(`${src.name} has ${fx(src.free, 2)} XLM free to send.`);
   let dest = null; try { dest = await acct(to); } catch (e) { return toast(niceErr(e)); }
   const op = dest ? SDK.Operation.payment({ destination: to, asset: SDK.Asset.native(), amount: amt7(amt) }) : SDK.Operation.createAccount({ destination: to, startingBalance: amt7(amt) });
-  confirmSheet(`Fund ${nm} with ${fx(amt, 2)} XLM`, `${netPre()}between your own wallets`, [{ t: `From ${src.name}`, s: from }, { t: `To ${nm}`, s: to }, { t: dest ? 'Adds XLM' : 'Opens it on Stellar', s: '1 XLM stays as its reserve' }], 'Send', () => personalTx(kpFor(from), from, [op], 'Funded', 'home', null, `${nm} now has ${fx(amt, 2)} XLM`), false, 'b-acc', 'Sending…', true);
+  confirmSheet(`Fund ${nm} with ${fx(amt, 2)} XLM`, `${netPre()}between your own wallets`, [{ t: `From ${src.name}`, s: from }, { t: `To ${nm}`, s: to }, { t: dest ? 'Adds XLM' : 'Opens it on Stellar', s: '1 XLM stays as its reserve' }], 'Send', async () => { await sendTx(kpFor(from), from, [op], null, `Send ${fx(amt, 2)} XLM to ${nm}`, '');   /* v2.40v: same banner as every send (was a result screen) */
+    refreshAcct(to).then(() => { if (cur === 'home' && homeAddr === to) drawHome(); }).catch(() => {}); }, false, 'b-acc', 'Sending…', true);
 }
 
 /* ---------- Close wallet (Stellar account merge) ----------
