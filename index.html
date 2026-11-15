@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42j</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42l</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -448,7 +448,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="seg" id="stSide"><button class="on" data-v="buy">Buy SOL</button><button data-v="sell">Sell SOL</button></div>
   <div class="seg" id="stMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
   <div id="stModeNote" class="note" style="display:none"></div>
-  <div id="stLimW" style="display:none;flex-direction:column;gap:8px"><label><span>Order type</span><select id="stLtSel"><option value="lim">Limit</option><option value="law">Limit AW (fee-aware)</option><option value="post">Post-only</option><option value="ioc">Immediate or cancel (IOC)</option><option value="fok">Fill or kill (FOK)</option></select></label><div class="mu" id="stLtNote" style="font-size:12px"></div></div>
+  <div id="stLimW" style="display:none;flex-direction:column;gap:8px"><label><span>Order type</span><select id="stLtSel"><option value="lim">Limit</option><option value="post">Post-only</option><option value="ioc">Immediate or cancel (IOC)</option><option value="fok">Fill or kill (FOK)</option></select></label><div class="mu" id="stLtNote" style="font-size:12px"></div></div>
   <label>Amount (SOL)<input id="stAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-spct="25">25%</button><button class="b-out sm" data-spct="50">50%</button><button class="b-out sm" data-spct="75">75%</button><button class="b-out sm" data-spct="100">Max</button></div>
   <div class="mu" id="stHave" style="font-size:12px"></div>
@@ -629,7 +629,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42j</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42l</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42j · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42n · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15709,7 +15709,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42j';
+const APP_VER = 'v2.42n';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15776,8 +15776,8 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx4') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx4', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx5') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx5', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
@@ -15797,11 +15797,15 @@ function solTxSum(addr, t) {
   const inn = ch.filter((c) => c.v > 0), out = ch.filter((c) => c.v < 0), f = (c) => `${solAmt(c.v)} ${c.c}`;
   let txt;
   /* v2.42g (Jeff saw "Swapped 0.001488 SOL → 14.00 USDC" for a Move to wallet): Manifest transactions in words */
+  const usdM0 = ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'];
   const mfK = (((t.transaction || {}).message || {}).instructions || []).filter((x) => x.programId === MNF_PROG).map((x) => { try { return b58d(x.data)[0]; } catch (e) { return -1; } });
   if (mfK.length && payer) {
     const coins = (L) => L.filter((c) => c.mint !== 'SOL' || Math.abs(c.v) >= 0.001).map(f).join(' + ');
-    txt = mfK.includes(2) ? `Manifest: order placed${out.length ? ` · ${coins(out)} set aside for it` : ''}` : mfK.includes(3) ? `Manifest: moved to wallet${inn.length ? ` · ${coins(inn) || inn.map(f).join(' + ')}` : ''}${mfK.includes(6) ? ' (order cancelled)' : ''}` : mfK.includes(6) ? 'Manifest: order placed or cancelled' : 'Manifest: account set up';
-    return { txt, fee: payer ? fee : 0, err: !!m.err };
+    let od = '', odx = null; for (const x of (((t.transaction || {}).message || {}).instructions || []).filter((x) => x.programId === MNF_PROG)) { try { const d = b58d(x.data); if (d[0] !== 6) continue; let i = 1 + (d[1] ? 5 : 1); const nc = d[i] | (d[i + 1] << 8); i += 4; for (let c = 0; c < nc; c++) { i += 8; i += d[i] ? 5 : 1; }
+      const no = d[i] | (d[i + 1] << 8); i += 4; if (no) { const dv = new DataView(d.buffer, d.byteOffset); const at = Number(dv.getBigUint64(i, true)), mm = dv.getUint32(i + 8, true), ee = dv.getInt8(i + 12), bd = d[i + 13];
+        od = `${bd ? 'buy' : 'sell'} ${solAmt(at / 1e9)} SOL @ ${+(mm * 10 ** ee * 1000).toFixed(4)}`; odx = { bid: bd ? 1 : 0, sol: at / 1e9, px: mm * 10 ** ee * 1000 }; } } catch (e) {} }
+    txt = mfK.includes(2) || od ? `Manifest: ${od ? od + ' posted' : 'order placed'}${out.length && mfK.includes(2) ? ` · ${coins(out)} set aside for it` : ''}` : mfK.includes(3) ? `Manifest: moved to wallet${inn.length ? ` · ${coins(inn) || inn.map(f).join(' + ')}` : ''}${mfK.includes(6) ? ' (order cancelled)' : ''}` : mfK.includes(6) ? 'Manifest: order placed or cancelled' : 'Manifest: account set up';
+    return { txt, fee: payer ? fee : 0, err: !!m.err, mf: { place: odx, moved: mfK.includes(3) ? inn.filter((c) => c.mint === 'SOL' || usdM0.includes(c.mint)).map((c) => ({ c: c.c, sol: c.mint === 'SOL', v: c.v })) : [] } };
   }
   /* v2.42g (Jeff: "It says Swap. It should say sold .1 at $72.xx"): a SOL ↔ dollar swap reads as a trade, at the price, with
      Liquidfi's fee left out of the SOL amount, and the venue that filled it */
@@ -15826,9 +15830,10 @@ async function solRecent(addr) {
   const el = $('#soRec'); if (!el.querySelector('.recrow')) el.innerHTML = '<div><span class="mu">Loading…</span></div>';
   try { const L = await solRpc('getSignaturesForAddress', [addr, { limit: 15, commitment: 'confirmed' }]);
     if (solSel !== addr) return;
-    const paint = () => { el.innerHTML = (L || []).length ? L.map((s) => { const x = SOLTX[s.signature + addr];
+    const LL = [...(L || []), ...mfFillRows(addr)].sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
+    const paint = () => { const STR = mfStory(L, addr); el.innerHTML = LL.length ? LL.map((s) => { if (s.fill) return `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order (seen ${esc(new Date(s.fill.t).toLocaleString())})</span></div></div></details>`; const x = SOLTX[s.signature + addr];
       const iso = s.blockTime ? new Date(s.blockTime * 1000).toISOString() : '', rw = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
-      return `<details class="recrow"><summary><span${/^No change/.test(x ? x.txt : '') ? ' class="mu"' : ''}>${x ? esc(x.txt) : '<span class="mu">Reading…</span>'}${s.err || (x && x.err) ? ' <span class="sell">failed</span>' : ''}</span><span class="mu" style="font-size:12px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${x && x.fee ? rw('Network fee', solAmt(x.fee) + ' SOL') : ''}${iso ? rw('Time', esc(new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))) : ''}${rw('Transaction', esc(short(s.signature)))}<div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">Nothing yet</span></div>'; };
+      return `<details class="recrow"><summary><span${/^No change/.test(x ? x.txt : '') ? ' class="mu"' : ''}>${x ? esc(STR[s.signature] ? STR[s.signature].txt : x.txt) : '<span class="mu">Reading…</span>'}${s.err || (x && x.err) ? ' <span class="sell">failed</span>' : ''}</span><span class="mu" style="font-size:12px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${x && x.fee ? rw('Network fee', solAmt(x.fee) + ' SOL') : ''}${iso ? rw('Time', esc(new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))) : ''}${rw('Transaction', esc(short(s.signature)))}<div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">Nothing yet</span></div>'; };
     paint();
     const need = (L || []).filter((s) => !SOLTX[s.signature + addr]);
     if (need.length && !JLT) await jlTokens().catch(() => null);
@@ -16350,8 +16355,12 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
   const el = $('#stFills'); if (!el) return; const addr = solSel;
   try { const L = await solRpc('getSignaturesForAddress', [addr, { limit: 15, commitment: 'confirmed' }]); if (cur !== 'strade' || solSel !== addr) return;
     for (const s of (L || []).filter((s) => !SOLTX[s.signature + addr]).slice(0, 6)) { const t = await solRpc('getTransaction', [s.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }]).catch(() => null); if (t) SOLTX[s.signature + addr] = solTxSum(addr, t); }
-    solTxSave(); const R = (L || []).filter((s) => /^(Swapped|Sold|Bought|Manifest)/.test((SOLTX[s.signature + addr] || {}).txt || ''));
-    el.innerHTML = R.length ? R.map((s) => `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
+    solTxSave(); const ST2 = mfStory(L, addr);
+    const hist = (L || []).filter((s) => ST2[s.signature] ? ST2[s.signature].trade : /^(Swapped|Sold|Bought)/.test((SOLTX[s.signature + addr] || {}).txt || ''));
+    const seen = hist.map((s) => ST2[s.signature] && ST2[s.signature].txt).filter(Boolean).join('|');
+    const live = mfFillRows(addr).filter((r) => !seen.includes(`${r.fill.bid ? 'Bought' : 'Sold'} ${solAmt(r.fill.sol)} SOL at ${(+r.fill.px).toFixed(2)}`));
+    const R = [...hist, ...live].sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
+    el.innerHTML = R.length ? R.map((s) => ST2[s.signature] ? `<details class="recrow"><summary><span>${esc(ST2[s.signature].txt)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><a class="b-out sm" href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></details>` : s.fill ? `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order</span></div></div></details>` : `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
   } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || e)}</span></div>`; }
 }
 function stLoop() {   // v2.41d: Manifest every 15 s; the 24 h volume card every 5 min. Coinbase / Kraken stream on their own.
@@ -16434,7 +16443,8 @@ async function fqSend(btn) {
    like any market order; posting on Manifest has no Liquidfi fee (same rule as Stellar limit orders). */
 const MNF_PROG = 'MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms';
 const ST_LT = { lim: 'Limit', law: 'Limit AW', ioc: 'IOC', fok: 'FOK', post: 'Post-only' };
-/* v2.42j "Limit AW" (fee-aware, Jeff's test): the limit counts after Liquidfi's fee. Take now only where a venue pays enough better than
+/* v2.42m: Limit AW removed from the dropdown (Jeff: makers never fill it; use Post-only to skip outbound routing). Inert code kept.
+   v2.42j "Limit AW" (fee-aware, Jeff's test): the limit counts after Liquidfi's fee. Take now only where a venue pays enough better than
    the limit to cover the fee (sell: price ≥ limit × (1 + fee); buy: price ≤ limit ÷ (1 + fee)); post the rest on Manifest at the limit, no fee.
    You never net worse than the number you typed. */
 const stFeeRate = (o) => (SOL_FEE.owner && o && SOL_FEE.owner !== o.addr && solNet() === 'mainnet' ? SOL_FEE.bps / 1e4 : 0);
@@ -16604,12 +16614,14 @@ async function stLimitReview(btn) {
     if (!plan.length && lt === 'ioc') { back(); return toast(`IOC: nothing is available ${buy ? 'at or under' : 'at or over'} ${lim} right now. Nothing sent.`, 6000); }
     back();
     confirmSheet(`${ST_LT[lt]} ${buy ? 'buy' : 'sell'} ${solAmt(amt)} SOL @ ${lim}`, `Solana · ${esc(o.name)} · SOL/${ST.q}`, items, 'Send', async () => {
-      try { const out = await stLimitRun(o, buy, amt, lim, lt, capBps, fokQ); closeSheet(); delete SOLA[solSel]; mfAfterTx(o.addr); toast(out, 8000); drawSTrade(); }
+      MF_BUSY++; try { const out = await stLimitRun(o, buy, amt, lim, lt, capBps, fokQ).finally(() => MF_BUSY--); closeSheet(); delete SOLA[solSel]; mfAfterTx(o.addr); toast(out, 8000); drawSTrade(); }
       catch (e) { closeSheet(); toast(e.message || String(e), 8000); drawSTrade(); } }, false, buy ? 'b-grn' : 'b-red', 'Working…', true);
   } catch (e) { back(); toast(e.message || String(e), 6000); }
 }
 async function stLimitRun(o, buy, amt, lim, lt, capBps, fokQ) {
   const step = (t) => { const b = document.querySelector('#holdBtn span'); if (b) b.textContent = t; };
+  if (ltSweep(lt) || lt === 'fok') { const h = stHave(), R = cxRef(), mkt = lt !== 'lim' || (buy ? R.ask && lim >= R.ask : R.bid && lim <= R.bid);   /* a resting limit uses Manifest funds where they are */
+    if (mkt && (buy ? h.q < amt * lim : h.sol < amt)) { step('Moving Manifest funds to the wallet…'); await mfPullFor(o, buy ? 0 : amt, buy ? amt * lim : 0).catch(() => false); } }
   if (lt === 'fok') {
     const d = SOLA[solSel] || await solLoad(o.addr, true); step('Sending fill or kill…');
     const b = await stChunkBuild(o, d, buy, null, amt, lim, capBps).catch((e) => ({ err: e.message || String(e) }));
@@ -16623,7 +16635,7 @@ async function stLimitRun(o, buy, amt, lim, lt, capBps, fokQ) {
   step('Posting on Manifest…');
   let posted;
   try { const d = SOLA[solSel] || await solLoad(o.addr, true), M = await mfLoad(), P = await mfPostIxs(o, d, M, buy, rest, lim);
-    const r = await solSendIxs(o, P.ixs);
+    const r = await solSendIxs(o, P.ixs); if (r.state === 'ok') mfLoad(M.q).then((M2) => mfTrack(o.addr, M2)).catch(() => {});
     posted = r.state === 'ok' ? `${solAmt(rest)} SOL posted on Manifest at ${P.px.toFixed(4)}` : `posting ${solAmt(rest)} SOL on Manifest ${r.state === 'pending' ? 'not confirmed yet: check Your Manifest orders in a minute' : 'failed (' + (r.state === 'failed' ? solTxErr(r.err) : r.state) + '): nothing posted'}`;
   } catch (e) { const m = e.message || String(e); posted = `${solAmt(rest)} SOL not posted: ${/would cross/i.test(m) ? "Manifest's book moved through your price (post-only refused)" : m}`; }
   const LN = lt === 'law' ? 'Limit AW' : 'Limit';
@@ -16633,33 +16645,43 @@ async function stLimitRun(o, buy, amt, lim, lt, capBps, fokQ) {
 async function mfMinePaint() {
   const el = $('#mfMine'); if (!el) return; const o = solOwn(solSel); if (!o || solNet() !== 'mainnet') { el.innerHTML = ''; return; }
   let M; try { M = await mfLoad(); } catch (e) { el.innerHTML = `<div class="mu" style="padding:8px 0">${esc(e.message || String(e))}</div>`; return; }
-  if (cur !== 'strade') return; ST.mfM = M; { const s1 = mfSeat(M, o.addr); ST.mfFree = { q: M.q, quote: s1 ? Number(s1.quote) / 10 ** M.qd : 0, base: s1 ? Number(s1.base) / 1e9 : 0 }; stPaintForm(); }
+  mfTrack(o.addr, M); if (cur !== 'strade') return; ST.mfM = M; { const s1 = mfSeat(M, o.addr); ST.mfFree = { q: M.q, quote: s1 ? Number(s1.quote) / 10 ** M.qd : 0, base: s1 ? Number(s1.base) / 1e9 : 0 }; stPaintForm(); }
   const s = mfSeat(M, o.addr), all = mfMine(M, o.addr), mine = all.filter((x) => x.sz >= MNF_DUST).sort((a, b) => b.px - a.px), dust = all.length - mine.length, bS = s ? Number(s.base) / 1e9 : 0, qS = s ? Number(s.quote) / 10 ** M.qd : 0;
-  el.innerHTML = (mine.length ? mine.map((x) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)"><span><b class="${x.bid ? 'grn' : 'red'}">${x.bid ? 'Buy' : 'Sell'}</b> ${solAmt(x.sz)} SOL @ <span class="mono">${x.px.toFixed(4)}</span><br><span class="mu" style="font-size:11.5px">Manifest · ${x.t === 2 ? 'post-only' : 'limit'} · #${x.seq}</span></span><button class="b-redout sm" data-act="mfCancel" data-seq="${x.seq}">Cancel</button></div>`).join('') : '<div class="mu" style="padding:8px 0">No open Manifest orders.</div>') +
-    (bS >= 0.000001 || qS >= 0.01 ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0"><span>Filled, on Manifest: <span class="mono">${bS >= 0.000001 ? solAmt(bS) + ' SOL' : ''}${bS >= 0.000001 && qS >= 0.01 ? ' + ' : ''}${qS >= 0.01 ? m2(qS) + ' ' + ST.q : ''}</span><br><span class="mu" style="font-size:11.5px">Manifest holds fills until you move them to your wallet${dust ? ' · clears the leftover rounding dust too' : ''}</span></span><button class="b-acc sm" data-act="mfWithdraw">Move to wallet</button></div>` : '');
+  el.innerHTML = (mine.length ? mine.map((x) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)"><span><b class="${x.bid ? 'grn' : 'red'}">${x.bid ? 'Buy' : 'Sell'}</b> ${solAmt(x.sz)} SOL @ <span class="mono">${x.px.toFixed(4)}</span><br><span class="mu" style="font-size:11.5px">Manifest · ${x.t === 2 ? 'post-only' : 'limit'} · #${x.seq}</span></span><span style="display:flex;gap:6px"><button class="b-out sm" data-act="mfEdit" data-seq="${x.seq}">Edit</button><button class="b-redout sm" data-act="mfCancel" data-seq="${x.seq}">Cancel</button></span></div>`).join('') : '<div class="mu" style="padding:8px 0">No open Manifest orders.</div>') +
+    (bS >= 0.000001 || qS >= 0.01 ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0"><span>Filled, on Manifest: <span class="mono">${bS >= 0.000001 ? solAmt(bS) + ' SOL' : ''}${bS >= 0.000001 && qS >= 0.01 ? ' + ' : ''}${qS >= 0.01 ? m2(qS) + ' ' + ST.q : ''}</span><br><span class="mu" style="font-size:11.5px">Part-fills wait here; they move to your wallet by themselves when the order fills or you cancel${dust ? ' · clears the leftover rounding dust too' : ''}</span></span><button class="b-acc sm" data-act="mfWithdraw">Move to wallet</button></div>` : '');
 }
-async function mfCancel(seq, btn) {
-  const o = solOwn(solSel); if (!o) return; if (btn) { btn.disabled = true; btn.textContent = 'Cancelling…'; }
-  try { const M = await mfLoad(), x = mfMine(M, o.addr).find((y) => String(y.seq) === String(seq)); if (!x) throw new Error('That order is gone (filled or already cancelled).');
-    const d = SOLA[solSel] || await solLoad(o.addr, true), ixs = await mfWithdrawIxs(o, d, M, [x, ...mfMine(M, o.addr).filter((y) => y.sz < MNF_DUST && y.seq !== x.seq)]);
+async function mfCancel(seq, btn, edit) {
+  const o = solOwn(solSel); if (!o) return false; if (btn) { btn.disabled = true; btn.textContent = edit ? 'Pulling…' : 'Cancelling…'; }
+  MF_BUSY++; try { const M = await mfLoad(), x = mfMine(M, o.addr).find((y) => String(y.seq) === String(seq)); if (!x) throw new Error('That order is gone (filled or already cancelled).');
+    const cxl = [x, ...mfMine(M, o.addr).filter((y) => y.sz < MNF_DUST && y.seq !== x.seq)]; mfCxMark(o.addr, M.q, cxl.map((y) => y.seq));
+    const d = SOLA[solSel] || await solLoad(o.addr, true), ixs = await mfWithdrawIxs(o, d, M, cxl);
     const r = await solSendIxs(o, ixs); if (r.state !== 'ok') throw new Error('Cancel did not go through: ' + (r.state === 'failed' ? solTxErr(r.err) : r.state));
-    mfAfterTx(o.addr); delete SOLA[solSel]; toast('Cancelled. The funds are back in your wallet.'); if (cur === 'strade') return drawSTrade();
-  } catch (e) { toast(e.message || String(e), 6000); } if (cur === 'strade') mfMinePaint();
+    mfAfterTx(o.addr); delete SOLA[solSel]; if (ST.mfFree && ST.mfFree.q === M.q) ST.mfFree = { q: M.q, quote: 0, base: 0 };
+    if (edit) return true; toast('Cancelled. The funds are back in your wallet.'); if (cur === 'strade') drawSTrade(); return true;
+  } catch (e) { toast(e.message || String(e), 6000); } finally { MF_BUSY--; } if (cur === 'strade') mfMinePaint(); return false;
+}
+/* Edit = pull the order (its funds come back to the wallet in the same transaction), then the ticket is filled in with it to change and send again. */
+async function mfEdit(seq, btn) {
+  let x; try { const M = await mfLoad(), o = solOwn(solSel); x = o && mfMine(M, o.addr).find((y) => String(y.seq) === String(seq)); } catch (e) {}
+  if (!x) { toast('That order is gone (filled or already cancelled).'); return mfMinePaint(); }
+  if (!(await mfCancel(seq, btn, true))) return;
+  ST.side = x.bid ? 'buy' : 'sell'; ST.mode = 'lim'; ST.lt = x.t === 2 ? 'post' : 'lim'; await drawSTrade();
+  const a = $('#stAmt'), p = $('#stPx'); if (a) a.value = String(+x.sz.toFixed(6)); if (p) p.value = String(+x.px.toFixed(4)); stPaintForm(); if (typeof stEst === 'function') stEst();
+  toast('Order pulled and the funds are back in your wallet. Change it and send again.', 6000);
 }
 async function mfWithdraw(btn, quiet, q) {
   const o = solOwn(solSel); if (!o) return; if (btn) { btn.disabled = true; btn.textContent = 'Moving…'; }
-  try { const d = SOLA[solSel] || await solLoad(o.addr, true), M = await mfLoad(q || ST.q), ixs = await mfWithdrawIxs(o, d, M, mfMine(M, o.addr).filter((y) => y.sz < MNF_DUST)); if (!ixs.length) { if (!quiet) toast('Nothing to move.'); return; }
-    const r = await solSendIxs(o, ixs); if (r.state !== 'ok') throw new Error('Withdraw did not go through: ' + (r.state === 'failed' ? solTxErr(r.err) : r.state));
-    mfAfterTx(o.addr, (items) => items.map((x) => (x.q === M.q ? { ...x, free: { sol: 0, q: 0 } } : x)).filter((x) => x.free.sol + x.held.sol >= 0.000001 || x.free.q + x.held.q >= 0.01));
-    delete SOLA[solSel]; toast('Back in your wallet.'); if (cur === 'strade') drawSTrade(); if (cur === 'sol') drawSol();
+  MF_BUSY++; try { const m = await mfMoveCore(o, q || ST.q, SOLA[solSel]); if (!m) { if (!quiet) toast('Nothing to move.'); if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = 'Move to wallet'; } return; }
+    toast('Back in your wallet.'); if (cur === 'strade') drawSTrade(); if (cur === 'sol') drawSol();
   } catch (e) { toast(e.message || String(e), 6000); if (cur === 'strade') mfMinePaint(); if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = 'Move to wallet'; } }
+  finally { MF_BUSY--; }
 }
 /* v2.42b (Jeff: "It doesn't show the usdc"): the wallet page also shows what this wallet has on Manifest (fills not yet moved,
    and funds held by open orders), counts it in the total, and offers Move to wallet. */
 const MFW = {};
 async function mfWalletLoad(addr) {
   const c = MFW[addr]; if (c && Date.now() - c.at < 30000) return c; const items = [];
-  for (const q of Object.keys(MF_Q)) { try { const M = await mfLoad(q), s = mfSeat(M, addr); if (!s) continue;
+  for (const q of Object.keys(MF_Q)) { try { const M = await mfLoad(q), s = mfSeat(M, addr); mfTrack(addr, M); if (!s) continue;
       const mine = mfMine(M, addr), dust = mine.filter((x) => x.sz < MNF_DUST), live = mine.filter((x) => x.sz >= MNF_DUST);
       let lb = 0n, lq = 0n; for (const x of mine) { const b = mfBack(x); lb += b.base; lq += b.quote; }
       const wl = { sol: Number(s.base) / 1e9, q: Number(s.quote) / 10 ** M.qd }, lk = { sol: Number(lb) / 1e9, q: Number(lq) / 10 ** M.qd };
@@ -16674,13 +16696,89 @@ function mfAfterTx(addr, optimistic) {
   setTimeout(again, 3000); setTimeout(again, 9000);
 }
 const solAllUsd = (addr) => solUsd(SOLA[addr]) + mfWalletUsd(addr);   // wallet + what it has on Manifest (fills and open orders)
+/* v2.42k (Jeff: "Shouldn't it say Bot .1 at 71.85?"): a resting order fills inside someone else's transaction, so the wallet's own
+   history never shows it. Each time the app reads the market it compares this wallet's orders with the last read: an order that shrank,
+   or vanished without us cancelling it, filled. The fill is kept on this phone and shown in Recent / Your trades. */
+const MFT = (() => { try { return JSON.parse(localStorage.getItem('ksw_mft') || '{}') || {}; } catch (e) { return {}; } })();
+function mftSave() { try { localStorage.setItem('ksw_mft', JSON.stringify(MFT)); } catch (e) {} }
+const mftOf = (addr) => (MFT[addr] = MFT[addr] || { snap: {}, fills: [], cx: {} });
+function mfTrack(addr, M) {
+  const T = mftOf(addr), s = mfSeat(M, addr), now = {}; if (s) for (const o of mfMine(M, addr)) now[M.q + ':' + o.seq] = [Number(o.atoms), +o.px.toFixed(6), o.bid ? 1 : 0, M.q];
+  const F = []; let full = 0;
+  for (const [k, [pa, px, bid, q]] of Object.entries(T.snap)) { if (q !== M.q) continue; const na = now[k] ? now[k][0] : 0;
+    if (!now[k] && !T.cx[k]) full++;
+    if (now[k] ? na < pa : !T.cx[k]) { const n = (pa - na) / 1e9; if (n >= 0.000001) F.push({ t: Date.now(), bid, sol: +n.toFixed(9), px, q }); }
+    if (!now[k]) { delete T.snap[k]; delete T.cx[k]; } }
+  Object.assign(T.snap, now);
+  if (F.length) { T.fills.unshift(...F); if (T.fills.length > 60) T.fills.length = 60;
+    const w = solList().find((x) => x.addr === addr); toast(`Order filled: ${F.map(mfFillTxt).join('; ')}${w ? ' · ' + w.name : ''}`, 7000); }
+  mftSave();
+  if (s && (Number(s.base) / 1e9 >= 0.000001 || Number(s.quote) / 10 ** M.qd >= 0.01) && (full || !mfMine(M, addr).some((x) => x.sz >= MNF_DUST))) setTimeout(() => mfAuto(addr, M.q), 0);
+  return F;
+}
+/* v2.42n (Jeff: "It should only move if the order is filled completely or the order is canceled"): partial fills stay on Manifest
+   (each move is a network fee); when an order fills completely, or no orders are left open, what the wallet has sitting on Manifest
+   moves back by itself while the app is open. Cancel and Edit move it in the same transaction. Fills while the app is closed move on
+   next open. Nothing moves while this phone is placing or cancelling an order (MF_BUSY). */
+let MF_BUSY = 0; const MF_AUTO = {};
+async function mfMoveCore(o, q, d) {   /* move everything this wallet has free on Manifest (and clear rounding dust) → amounts moved, or null */
+  const M = await mfLoad(q), s = mfSeat(M, o.addr); if (!s) return null; d = d || await solLoad(o.addr, true);
+  const dl = mfMine(M, o.addr).filter((y) => y.sz < MNF_DUST); mfCxMark(o.addr, M.q, dl.map((y) => y.seq));
+  const mv = { sol: Number(s.base) / 1e9, q: Number(s.quote) / 10 ** M.qd, c: M.q }, ixs = await mfWithdrawIxs(o, d, M, dl); if (!ixs.length) return null;
+  const r = await solSendIxs(o, ixs); if (r.state !== 'ok') throw new Error('Move did not go through: ' + (r.state === 'failed' ? solTxErr(r.err) : r.state));
+  mfAfterTx(o.addr, (items) => items.map((x) => (x.q === M.q ? { ...x, free: { sol: 0, q: 0 } } : x)).filter((x) => x.free.sol + x.held.sol >= 0.000001 || x.free.q + x.held.q >= 0.01));
+  delete SOLA[o.addr]; if (ST.mfFree && ST.mfFree.q === M.q && o.addr === solSel) ST.mfFree = { q: M.q, quote: 0, base: 0 };
+  return mv;
+}
+const mfMovedTxt = (m) => [m.sol >= 0.000001 ? solAmt(m.sol) + ' SOL' : '', m.q >= 0.01 ? m2(m.q) + ' ' + m.c : ''].filter(Boolean).join(' + ');
+async function mfAuto(addr, q) {
+  const k = addr + ':' + q, o = solOwn(addr); if (!o || solNet() !== 'mainnet' || MF_BUSY || MF_AUTO[k] > Date.now()) return;
+  MF_AUTO[k] = Date.now() + 60000;
+  try { const m = await mfMoveCore(o, q); if (m) { MF_AUTO[k] = 0; const w = solList().find((x) => x.addr === addr); toast(`Moved ${mfMovedTxt(m)} from Manifest to your wallet${w ? ' · ' + w.name : ''}.`, 6000);
+      if (cur === 'strade' && addr === solSel) drawSTrade(); else if (cur === 'sol' && addr === solSel) drawSol(); } }
+  catch (e) { MF_AUTO[k] = Date.now() + 300000; }
+}
+/* Jeff: "I buy 100 SOL, then it sits there. Then I try to sell 100…": a trade that needs coins the wallet still has sitting on
+   Manifest moves them back first, then trades. */
+async function mfPullFor(o, needSol, needQ) {
+  const F = ST.mfFree; if (!F || F.q !== ST.q || o.addr !== solSel) return false;
+  if (!((needSol > 0 && F.base >= 0.000001) || (needQ > 0 && F.quote >= 0.01))) return false;
+  toast('Moving your Manifest funds to the wallet first…', 4000); const m = await mfMoveCore(o, ST.q); if (!m) return false;
+  await solLoad(o.addr, true); return true;
+}
+/* v2.42l (Jeff: "Not very clear"): read the wallet's Manifest history as trades. An order placed, later followed by a move to the
+   wallet of the OTHER coin (a buy → SOL; a sell → dollars) of about the right amount = that order filled. A move of the SAME coin back
+   = it was cancelled. → { sig: { txt, trade } } overrides for the list. */
+function mfStory(L, addr) {
+  const out = {}, open = [];
+  for (const s of [...(L || [])].filter((x) => !x.fill).sort((a, b) => (a.blockTime || 0) - (b.blockTime || 0))) {
+    const x = SOLTX[s.signature + addr]; if (!x || !x.mf) continue; const P = x.mf.place;
+    if (P) { open.push({ ...P, sig: s.signature }); out[s.signature] = { txt: `Limit ${P.bid ? 'buy' : 'sell'} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} placed`, trade: false }; continue; }
+    const fills = [], backs = [];
+    for (const c of x.mf.moved || []) {
+      let i = open.findIndex((o) => (c.sol ? o.bid && Math.abs(o.sol - c.v) <= Math.max(0.0005, o.sol * 0.002) : !o.bid && Math.abs(o.sol * o.px - c.v) <= Math.max(0.02, o.sol * o.px * 0.003)));
+      if (i >= 0) { const o = open.splice(i, 1)[0]; fills.push(`${o.bid ? 'Bought' : 'Sold'} ${solAmt(o.sol)} SOL at ${o.px.toFixed(2)} ${c.sol ? 'USDC' : c.c} · Manifest`); continue; }
+      i = open.findIndex((o) => (c.sol ? !o.bid && Math.abs(o.sol - c.v) <= Math.max(0.0005, o.sol * 0.002) : o.bid && Math.abs(o.sol * o.px - c.v) <= Math.max(0.02, o.sol * o.px * 0.003)));
+      if (i >= 0) { const o = open.splice(i, 1)[0]; backs.push(`Limit ${o.bid ? 'buy' : 'sell'} @ ${+o.px.toFixed(4)} cancelled · ${c.sol ? solAmt(c.v) + ' SOL' : m2(c.v) + ' ' + c.c} back`); }
+    }
+    if (fills.length) out[s.signature] = { txt: fills.join('; '), trade: true };
+    else if (backs.length) out[s.signature] = { txt: backs.join('; '), trade: false };
+    else if ((x.mf.moved || []).length) out[s.signature] = { txt: x.txt.replace(/^Manifest: moved to wallet/, 'Moved from Manifest').replace(/ \(order cancelled\)$/, ''), trade: false };
+  }
+  return out;
+}
+const mfFillTxt = (f) => `${f.bid ? 'Bought' : 'Sold'} ${solAmt(f.sol)} SOL at ${(+f.px).toFixed(f.px >= 1 ? 2 : 4)} ${f.q} · Manifest`;
+function mfCxMark(addr, q, seqs) { const T = mftOf(addr); for (const sq of seqs) T.cx[q + ':' + sq] = 1; mftSave(); }
+const mfFillRows = (addr) => (mftOf(addr).fills || []).map((f) => ({ fill: f, blockTime: Math.floor(f.t / 1000), signature: 'fill' + f.t }));
 const mfWalletUsd = (addr) => { const c = MFW[addr]; if (!c) return 0; return c.items.reduce((a, x) => a + (x.free.q + x.held.q) + (x.free.sol + x.held.sol) * (SOLPX.sol || 0), 0); };
 ST.lt = 'lim';
 const numIn = (v) => { let t = String(v || '').trim().replace(/\s/g, ''); if (!t.includes('.') && /^\d*,\d+$/.test(t) && !/^[1-9]\d{0,2},\d{3}$/.test(t)) t = t.replace(',', '.'); return +t.replace(/,/g, ''); };   /* v2.42g: Jeff typed ",1" and got 1 SOL */
 async function stReview(btn) {
   if (ST.mode === 'lim') return stLimitReview(btn);
-  if (ST.mode !== 'mkt') return; const d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
+  if (ST.mode !== 'mkt') return; let d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
   const amt = numIn(($('#stAmt') || {}).value); if (!(amt > 0)) return toast('Enter an amount of SOL.');
+  { const h = stHave(), o = solOwn(solSel), px0 = cxRef().ask || SOLPX.sol; if (o && (ST.side === 'buy' ? h.q < amt * px0 : h.sol < amt)) {
+      MF_BUSY++; try { if (await mfPullFor(o, ST.side === 'buy' ? 0 : amt, ST.side === 'buy' ? amt * px0 : 0)) d = SOLA[solSel] || d; } catch (e) { return toast(e.message || String(e), 6000); } finally { MF_BUSY--; } } }
   const Q = stQ(), C = solCoins(d), T = solTargets(), qc = C.find((c) => c.mint === Q.mint), sc = C.find((c) => c.v === 'SOL');
   if (ST.side === 'buy') { const px = cxRef().ask || SOLPX.sol, pay = Math.ceil(amt * px * 1.0 * 1e6) / 1e6;
     if (!qc) return toast(`No ${ST.q} in this wallet. Buy or swap some first.`); if (pay > qc.a + 1e-9) return toast(`That needs about ${m2(pay)} ${ST.q}; you have ${m2(qc.a)}.`);
@@ -21477,7 +21575,7 @@ document.addEventListener('click', async (e) => {
     acctGo: () => { const b = tradeAccts()[botSel]; if (!b) return; const f = () => { rcvWant = b.addr; go(t.dataset.to === 'receive' ? 'receive' : 'bots'); }; return t.dataset.to === 'receive' ? phGate(f)() : f(); },
     rcvHome: phGate(() => { rcvWant = homeAddr; go('receive'); }),
     homeBuy: phGate(() => homeAddr && onrBuySheet('stellar', homeAddr)), homeSwap: () => { if (!OWN().length) return toast('Add a wallet first.'); go('swap'); },
-    xrBuy: phGate(() => xrSel && onrBuySheet('xrp', xrSel)), solSwap: () => solSwapSheet('swap'), solTrade: () => { if (solNet() !== 'mainnet') return toast('Trading runs on Solana Mainnet only.'); go('strade'); }, stReview: () => stReview(t), mfCancel: () => mfCancel(t.dataset.seq, t), mfWithdraw: () => mfWithdraw(t), mfWalletMove: () => mfWithdraw(t, false, t.dataset.q), fqLadder: () => fqLadder(), fqSend: () => fqSend(t), solSwMax: () => solSwMax(), solSwGo: () => solSwapGo(t),
+    xrBuy: phGate(() => xrSel && onrBuySheet('xrp', xrSel)), solSwap: () => solSwapSheet('swap'), solTrade: () => { if (solNet() !== 'mainnet') return toast('Trading runs on Solana Mainnet only.'); go('strade'); }, stReview: () => stReview(t), mfCancel: () => mfCancel(t.dataset.seq, t), mfEdit: () => mfEdit(t.dataset.seq, t), mfWithdraw: () => mfWithdraw(t), mfWalletMove: () => mfWithdraw(t, false, t.dataset.q), fqLadder: () => fqLadder(), fqSend: () => fqSend(t), solSwMax: () => solSwMax(), solSwGo: () => solSwapGo(t),
     rmWatch: () => { const i = NS().bots.indexOf(tradeAccts()[botSel]); if (i < 0) return; t.dataset.i = i; A.rmBot(); },
     addAcct: () => A.addWallet(),
     xrBackup: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i >= 0) walletKeySheet('xrp', i); },
