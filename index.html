@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42n · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42o · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15709,7 +15709,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42n';
+const APP_VER = 'v2.42o';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15776,8 +15776,8 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx5') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx5', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx6') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx6', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
@@ -15813,7 +15813,7 @@ function solTxSum(addr, t) {
   if (payer && out.length && inn.length) { const so = out.find((c) => c.mint === 'SOL'), si = inn.find((c) => c.mint === 'SOL'), uo = out.find((c) => usdM.includes(c.mint)), ui = inn.find((c) => usdM.includes(c.mint));
     const fi = SOL_FEE.owner && SOL_FEE.owner !== addr ? K.indexOf(SOL_FEE.owner) : -1, feeSol = fi >= 0 ? Math.max(0, ((m.postBalances || [])[fi] - (m.preBalances || [])[fi]) / 1e9) : 0;   /* v2.42h: the fee wallet is one of Jeff's own wallets, still the fee */
     const VEN = { CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: 'Raydium CLMM', whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: 'Orca', LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: 'Meteora', [MNF_PROG]: 'Manifest', '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': 'Raydium' };
-    const ven = [...new Set((m.innerInstructions || []).flatMap((x) => x.instructions || []).map((x) => VEN[x.programId]).filter(Boolean))].join(', ');
+    const ven = [...new Set((m.innerInstructions || []).flatMap((x) => x.instructions || []).map((x) => VEN[x.programId] || JLAB[x.programId]).filter((v) => v && v !== 'Jupiter'))].join(', ');
     if (so && ui && Math.abs(so.v) - feeSol > 0) { const n = Math.abs(so.v) - feeSol; return { txt: `Sold ${solAmt(n)} SOL at ${(ui.v / n).toFixed(4)} ${ui.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err }; }
     if (si && uo) { const n = si.v + feeSol; return { txt: `Bought ${solAmt(n)} SOL at ${(Math.abs(uo.v) / n).toFixed(4)} ${uo.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err }; } }
   if (!ch.length) txt = payer ? 'Account update' : 'No change to this wallet (someone else\'s transaction, often spam)';
@@ -15966,6 +15966,11 @@ async function solFeePlan(o, d, c, units) {   /* c = { mint, d, t22, ata, sol } 
    with as a plain payment in the same transaction: in SOL straight to the fee wallet, in a token only if the fee wallet already
    holds that token (never opens an account at your cost). Only Jupiter's swap program, the token programs and the system program
    are allowed in, and nobody else can be a signer. */
+/* v2.42o: venue names for every program Jupiter routes through (Jeff's buy showed no venue: BisonFi), kept on the phone for a day */
+const JLAB = (() => { try { const j = JSON.parse(localStorage.getItem('ksw_jlab') || 'null'); return j && j.m ? j.m : {}; } catch (e) { return {}; } })();
+JLAB.BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi = JLAB.BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi || 'BisonFi';
+setTimeout(() => { try { const j = JSON.parse(localStorage.getItem('ksw_jlab') || 'null'); if (j && Date.now() - j.at < 864e5) return; } catch (e) {}
+  fetch('https://lite-api.jup.ag/swap/v1/program-id-to-label').then((r) => r.json()).then((m) => { if (!m || typeof m !== 'object') return; Object.assign(JLAB, m); try { localStorage.setItem('ksw_jlab', JSON.stringify({ at: Date.now(), m })); } catch (e) {} }).catch(() => {}); }, 4000);
 const JUP = 'https://lite-api.jup.ag/swap/v1', WSOL = 'So11111111111111111111111111111111111111112', JUP_PROG = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4';
 const SWS = { from: 'SOL', to: '', mode: 'swap' };
 const solCoins = (d) => [{ v: 'SOL', c: 'SOL', a: Math.max(0, d.sol - SOL_KEEP), d: 9, mint: WSOL }, ...d.toks.filter((t) => t.c && t.amt > 0).map((t) => ({ v: t.mint, c: t.c, a: t.amt, d: t.d, mint: t.mint, t22: t.t22, ata: t.ata }))];
