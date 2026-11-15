@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40u</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40z</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -379,7 +379,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SOLANA WALLET -->
 <section class="scr" id="s-sol">
-  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back">‹</button><div><h2 id="soName"></h2><div class="mono mu" style="font-size:12px" id="soAddr"></div></div></div><span id="soLive" style="font-size:12px"></span></div>
+  <div class="top"><div class="l"><button class="ico back" id="soBack" data-go="bots" aria-label="Back">‹</button><div><h2 id="soName"></h2><div class="mono mu" style="font-size:12px" id="soAddr"></div></div></div><span id="soLive" style="font-size:12px"></span></div>
   <div class="card" style="gap:4px"><span class="mu" style="font-size:13px">Total value (USD est.)</span><span class="mono" style="font-size:30px;font-weight:600;color:var(--blu)" id="soTot">–</span></div>
   <div id="soActs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px"></div>
   <div id="soFund"></div>
@@ -443,10 +443,12 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <section class="scr" id="s-strade">
   <div class="top"><div class="l"><button class="ico back" data-go="sol" aria-label="Back">‹</button><h2>Trade SOL</h2></div><span class="mu" id="stFrom" style="font-size:13px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span></div>
   <div class="seg" id="stQ"><button class="on" data-v="USDC">SOL / USDC</button><button data-v="USDT">SOL / USDT</button></div>
-  <div class="card"><div class="top"><span class="lbl" id="stPairL">SOL / USDC · Solana DEXes (Jupiter)</span><span class="grn" style="font-size:11px;font-weight:700" id="stUpd"></span></div><div class="book" id="stBook"></div><div class="mu" id="stSpread" style="font-size:12px"></div></div>
-  <div class="card"><div class="top"><span class="lbl">By venue · best bid / ask</span><span class="mu" style="font-size:11px" id="stVenUpd"></span></div><div id="stVen" style="display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div><div class="mu" id="stNbbo" style="font-size:12px"></div></div>
+  <div class="card"><div class="top"><span class="lbl">Jupiter inside · best on Solana</span><span class="grn" style="font-size:11px;font-weight:700" id="stUpd"></span></div><div id="stJin" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px"></div><div class="mu" id="stJinN" style="font-size:11.5px"></div></div>
+  <div class="card"><div class="top"><span class="lbl" id="stPairL">Order book · SOL / USDC</span><span class="mu" style="font-size:11px" id="stBkUpd"></span></div>
+    <div class="seg" id="stBk"><button class="on" data-v="mf">Manifest</button><button data-v="ph">Phoenix</button><button data-v="ob">OpenBook</button></div>
+    <div id="stBook" style="display:grid;grid-template-columns:1fr 1fr 1fr 0.6fr;gap:2px 8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div><div class="mu" id="stSpread" style="font-size:12px"></div></div>
   <div class="card"><div class="top"><span class="lbl">Last sales · all venues</span><span class="mu" style="font-size:11px" id="stLastSrc"></span></div><div id="stLast" style="display:grid;grid-template-columns:auto 1.3fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
-  <div class="card"><div class="top"><span class="lbl">Where SOL / <span id="stVolQ">USDC</span> trades · 24h</span></div><div id="stVol" style="display:flex;flex-direction:column;gap:6px;font-size:13px"></div><div class="mu" style="font-size:11.5px">From GeckoTerminal's pool data. Some market-maker venues (HumidiFi, SolFi, BisonFi…) quote above but don't publish their trades, so they can be missing from this list and the tape.</div></div>
+  <div class="card"><div class="top"><span class="lbl">Where SOL / <span id="stVolQ">USDC</span> trades · 24h</span></div><div id="stVol" style="display:flex;flex-direction:column;gap:6px;font-size:13px"></div><div class="mu" style="font-size:11.5px">From GeckoTerminal's pool data. Market-maker venues (HumidiFi, SolFi, BisonFi…) often lead Jupiter's inside but don't publish their trades, so they can be missing from this list and the tape.</div></div>
   <div class="seg" id="stSide"><button class="on" data-v="buy">Buy SOL</button><button data-v="sell">Sell SOL</button></div>
   <div class="seg" id="stMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
   <div id="stModeNote" class="note" style="display:none"></div>
@@ -556,15 +558,16 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 </section>
 
 <section class="scr" id="s-earn">
-  <div class="top" id="eTopHome"><div><h1>Earn</h1><span class="mu" style="font-size:12px">Pools built into Stellar and the XRP Ledger</span></div><button class="ico" data-act="earnRefresh" aria-label="Refresh">↻</button></div>
+  <div class="top" id="eTopHome"><div><h1>Earn</h1><span class="mu" style="font-size:12px">Pools on Stellar and the XRP Ledger · lending on Solana</span></div><button class="ico" data-act="earnRefresh" aria-label="Refresh">↻</button></div>
   <div class="top" id="eTopChain" style="display:none"><div class="l"><button class="ico back" data-act="earnHome" aria-label="Back">‹</button><h2 id="eChainT">Stellar pools</h2></div><button class="ico" data-act="earnRefresh" aria-label="Refresh">↻</button></div>
   <div id="eHome" style="display:flex;flex-direction:column;gap:12px">
     <div class="card etot" id="eTotAll" data-act="earnSum" data-ch="all" style="flex-direction:column;align-items:stretch;gap:4px"></div>
     <button class="b-out ebtn" id="eGoSt" data-act="earnView" data-v="st"><span><b>Stellar pools</b><span class="mu ebs" id="eSubSt">XLM, EURC and PYUSD with USDC</span></span><span class="mu">›</span></button>
     <button class="b-out ebtn" id="eGoXr" data-act="earnView" data-v="xr"><span><b>XRP Ledger pools</b><span class="mu ebs" id="eSubXr">XRP with RLUSD or USDC</span></span><span class="mu">›</span></button>
     <button class="b-out ebtn" id="eGoBl" data-act="earnView" data-v="bl"><span><b>Lend on Stellar</b><span class="mu ebs" id="eSubBl">Interest on USDC or EURC · Blend</span></span><span class="mu">›</span></button>
+    <button class="b-out ebtn" id="eGoSo" data-act="earnSol"><span><b>Lend on Solana</b><span class="mu ebs" id="eSubSo">Interest on USDC, USDT, EURC… · Jupiter Lend</span></span><span class="mu">›</span></button>
     <button class="b-out ebtn" id="eGoAdv" data-act="advForm" data-src="Earn"><span><b>Customized Portfolios</b><span class="mu ebs">Talk to our Wealth Advisors</span></span><span class="mu">›</span></button>
-    <div class="mu" style="font-size:12.5px;line-height:1.45">Add to a pool and earn a share of the fees traders pay it. The pool shares stay in your own wallet, and you can withdraw any time. No Liquidfi fee.</div>
+    <div class="mu" style="font-size:12.5px;line-height:1.45">Add to a pool and earn a share of the fees traders pay it. The pool shares stay in your own wallet, and you can withdraw any time. No Liquidfi fee on pools. Lending on Solana: Liquidfi's fee is 0.25% once, when you put money in, paid in SOL.</div>
   </div>
   <div id="eSt" style="display:none;flex-direction:column;gap:12px">
     <label id="eWalW">Stellar wallet<select id="eWal"></select></label>
@@ -611,7 +614,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40u</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40z</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -643,7 +646,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40u · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.40z · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13982,6 +13985,7 @@ function go(name) {
   if (['trade', 'send', 'receive', 'trust', 'swap'].includes(name) && name !== cur) backTo[name] = ['bots', 'home', 'bot', 'port'].includes(cur) ? cur : (backTo[name] || 'home');
   if (name === 'xswap' && cur !== 'xswap') backTo.xswap = ['swap', 'xrp', 'bots', 'home', 'bot', 'port'].includes(cur) ? cur : 'bots';
   if (name === 'set' && cur !== 'set') setFrom = ['bots', 'bot', 'home', 'trade', 'send', 'receive', 'trust', 'port', 'swap', 'xswap'].includes(cur) ? 'bots' : cur === 'act' ? 'act' : 'mkt';
+  if (name === 'sol' && !['sol', 'strade', 'earn'].includes(cur)) SOLBACK = 'bots';
   cur = name;
   $$('.scr').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
   $('#nav').classList.toggle('on', !['lock', 'setup', 'backup'].includes(name));
@@ -15666,7 +15670,7 @@ function solRows(noLoad) {
   if (!noLoad && !solRows.busy) { solRows.busy = 1; solPrices().then(() => Promise.all(L.map((w) => solLoad(w.addr).catch(() => null)))).then(() => { solRows.busy = 0; if (cur === 'bots') solRows(true); }).catch(() => { solRows.busy = 0; }); }   /* repaint only: never starts another load */
 }
 async function drawSol() {
-  const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots');
+  const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots'); $('#soBack').dataset.go = SOLBACK;
   $('#soName').textContent = w.name; $('#soAddr').textContent = short(w.addr) + (solNet() === 'devnet' ? ' · Devnet' : '');
   $('#soFull').textContent = w.addr;
   $('#soActs').innerHTML = `<button class="b-light" data-act="solBuy" style="font-size:12.5px;padding:0 4px">Buy</button><button class="b-out" data-act="solSwap" style="font-size:12.5px;padding:0 4px">Swap</button><button class="b-out" data-act="solTrade" style="font-size:12.5px;padding:0 4px">Trade</button><button class="b-out" data-act="solSendSheet" style="font-size:12.5px;padding:0 4px">Send</button><button class="b-out" data-act="solRcv" style="font-size:12.5px;padding:0 4px">Receive</button>`;
@@ -15687,7 +15691,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.40v';
+const APP_VER = 'v2.40z';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15970,9 +15974,19 @@ async function solSwapCore(F, T, amt, btn, btnTxt, title) {   /* shared by Swap 
     const sw = F.v === 'SOL' ? units : units - FP.tok;
     // one plain transaction holds ~1232 bytes: if Jupiter's best route is too big, ask again for a simpler one (fewer accounts, then one hop)
     let q, ixs, lastErr = null;
-    for (const lim of ['maxAccounts=40', 'maxAccounts=26', 'maxAccounts=20&onlyDirectRoutes=true']) {
+    /* v2.40w best execution: Jupiter's route isn't always the best price (Nov 14: $100 sell paid 69.459 by route vs 69.469 straight at ZeroFi).
+       Also price the two tightest venues directly (from the Trade screen's venue quotes, when fresh) and try the best-paying one first. */
+    const base = `/quote?inputMint=${F.mint}&outputMint=${T.mint}&amount=${sw}&slippageBps=50&asLegacyTransaction=true&restrictIntermediateTokens=true`;
+    let tries = ['maxAccounts=40', 'maxAccounts=26', 'maxAccounts=20&onlyDirectRoutes=true'];
+    if (solNet() === 'mainnet' && [F.mint, T.mint].includes(WSOL)) {   /* v2.40x: priced at order time, the market makers that usually lead plus Orca */
+      const top = ['ZeroFi', 'BisonFi', 'HumidiFi', 'SolFi V2', 'GoonFi V2', 'Whirlpool'].map((dx) => 'onlyDirectRoutes=true&dexes=' + encodeURIComponent(dx));
+      const Qs = await Promise.all(['maxAccounts=40', ...top].map((l) => jupGet(base + '&' + l).then((q) => ({ l, out: +q.outAmount || 0 })).catch(() => ({ l, out: 0 }))));
+      const best = Qs.reduce((m, x) => (x.out > m.out ? x : m), Qs[0]);
+      if (best.l !== 'maxAccounts=40' && best.out > Qs[0].out) tries = [best.l, ...tries];
+    }
+    for (const lim of tries) {
       try {
-        q = await jupGet(`/quote?inputMint=${F.mint}&outputMint=${T.mint}&amount=${sw}&slippageBps=50&asLegacyTransaction=true&restrictIntermediateTokens=true&${lim}`);
+        q = await jupGet(base + '&' + lim);
         const r = await fetch(JUP + '/swap-instructions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quoteResponse: q, userPublicKey: o.addr, wrapAndUnwrapSol: true, asLegacyTransaction: true }) });
         const j = await r.json().catch(() => ({})); if (!r.ok || !j.swapInstruction) throw new Error(j.error || "Jupiter couldn't build this swap.");
         if ((j.addressLookupTableAddresses || []).length) throw new Error('too big');
@@ -16020,6 +16034,87 @@ async function stLoadBook() {
 const ST_VEN = [['Orca', 'Whirlpool'], ['Raydium CLMM', 'Raydium CLMM'], ['Raydium', 'Raydium'], ['Meteora', 'Meteora DLMM'], ['Manifest (book)', 'Manifest'], ['HumidiFi', 'HumidiFi'], ['SolFi', 'SolFi V2'], ['BisonFi', 'BisonFi'], ['ZeroFi', 'ZeroFi'], ['GoonFi', 'GoonFi V2'], ['Tessera', 'TesseraV']];
 const ST_DEX = { orca: 'Orca', 'raydium-clmm': 'Raydium CLMM', raydium: 'Raydium', 'raydium-cp': 'Raydium CP', meteora: 'Meteora', 'meteora-dlmm': 'Meteora', 'meteora-damm-v2': 'Meteora', 'pancakeswap-v3-solana': 'PancakeSwap', phoenix: 'Phoenix', lifinity: 'Lifinity', 'lifinity-v2': 'Lifinity', 'byreal': 'Byreal', zerofi: 'ZeroFi', humidifi: 'HumidiFi', solfi: 'SolFi', bisonfi: 'BisonFi', goonfi: 'GoonFi' };
 const stDexNm = (id) => ST_DEX[id] || String(id || '').split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+/* v2.40w (Jeff: "Is Jupiter always the best bid offer? Can't you determine who their books are and make 1 aggregated book with
+   depth"): no. Jupiter's own $100 price can sit apart from every venue (it splits and routes through other coins, a moment apart).
+   So each venue is quoted on its own at three sizes (~$100, $2.5k, $25k a side); the difference between those quotes says how much
+   SOL that venue fills at each price (its depth). All venues' levels are merged into one book: price, size, running total, venue.
+   An estimate from quotes: Solana pools don't publish order books, and market makers reprice every slot. */
+const ST_DEPTH = [100, 2500, 25000];
+async function stLoadDepth() {
+  const Q = stQ(), px = (await solPrices()).sol; if (!(px > 0)) throw new Error('no price');
+  const qt = (i, o, a, dx) => getJ(`${JUP}/quote?inputMint=${i}&outputMint=${o}&amount=${a}&slippageBps=50${dx ? '&onlyDirectRoutes=true&dexes=' + encodeURIComponent(dx) : '&restrictIntermediateTokens=true'}`).catch(() => null);
+  // which venues: the 6 tightest from last time (all of them the first time, at one size only, to find who quotes)
+  const first = !(ST.ven && ST.ven.length), sp = (v) => (v.bid && v.ask ? v.ask - v.bid : 9e9);
+  const act = first ? ST_VEN : [...ST.ven].sort((x, y) => sp(x) - sp(y)).slice(0, 6).map((v) => ST_VEN.find(([nm]) => nm === v.nm)).filter(Boolean);
+  const sizes = first ? [ST_DEPTH[0]] : ST_DEPTH;
+  const jobs = []; for (const [nm, dx] of act) for (const usd of sizes) { jobs.push({ nm, usd, side: 'b', f: () => qt(WSOL, Q.mint, Math.round(usd / px * 1e9), dx) }); jobs.push({ nm, usd, side: 'a', f: () => qt(Q.mint, WSOL, Math.round(usd * 10 ** Q.d), dx) }); }
+  jobs.push({ nm: '_jup', usd: 100, side: 'b', f: () => qt(WSOL, Q.mint, Math.round(100 / px * 1e9), null) }, { nm: '_jup', usd: 100, side: 'a', f: () => qt(Q.mint, WSOL, Math.round(100 * 10 ** Q.d), null) });
+  for (let k = 0; k < jobs.length; k += 8) { const R = await Promise.all(jobs.slice(k, k + 8).map((j) => j.f())); R.forEach((r, i) => { jobs[k + i].r = r; }); }
+  const G = {}; for (const j of jobs) { if (!j.r || !(+j.r.outAmount > 0)) continue; const g = (G[j.nm] = G[j.nm] || { b: [], a: [] });
+    if (j.side === 'b') g.b.push({ sol: +j.r.inAmount / 1e9, q: +j.r.outAmount / 10 ** Q.d }); else g.a.push({ sol: +j.r.outAmount / 1e9, q: +j.r.inAmount / 10 ** Q.d }); }
+  const bids = [], asks = [], ven = [];
+  for (const [nm, g] of Object.entries(G)) { if (nm === '_jup') continue;
+    g.b.sort((x, y) => x.sol - y.sol); g.a.sort((x, y) => x.sol - y.sol);
+    const lv = (L, out, bid) => { let ps = 0, pq = 0, last = bid ? Infinity : 0;
+      for (const x of L) { const ds = x.sol - ps, dq = x.q - pq; if (ds <= 1e-9 || dq <= 0) continue; let p = dq / ds;
+        p = bid ? Math.min(p, last) : Math.max(p, last); last = p;   // deeper never better than shallower (quotes a moment apart can wobble)
+        out.push({ px: p, sz: ds, v: nm }); ps = x.sol; pq = x.q; } };
+    lv(g.b, bids, true); lv(g.a, asks, false);
+    const b0 = g.b[0], a0 = g.a[0]; ven.push({ nm, bid: b0 ? b0.q / b0.sol : 0, ask: a0 ? a0.q / a0.sol : 0 }); }
+  const J = G._jup; ST.jup = J ? { bid: J.b[0] ? J.b[0].q / J.b[0].sol : 0, ask: J.a[0] ? J.a[0].q / J.a[0].sol : 0 } : null;
+  bids.sort((x, y) => y.px - x.px); asks.sort((x, y) => x.px - y.px);
+  const merge = (L) => { const out = []; for (const x of L) { const k = Math.round(x.px * 1000) / 1000, o = out[out.length - 1];
+      if (o && o.px === k) { o.sz += x.sz; if (!o.vs.includes(x.v)) o.vs.push(x.v); } else out.push({ px: k, sz: x.sz, vs: [x.v] }); } let c = 0; for (const o of out) { c += o.sz; o.cum = c; } return out; };
+  ST.bids = merge(bids); ST.asks = merge(asks); ST.ven = ven; ST.at = ST.venAt = Date.now();
+}
+/* v2.40x (Jeff: "Let's display only limit order books and if Jupiter has their inside w price and quantity"):
+   Order book = real resting limit orders, read straight from the chain. Manifest: the market account (~140 KB, found from a Jupiter
+   quote's ammKey), decoded: 256-byte header, then 80-byte red-black-tree nodes holding each order (price u128 /1e18 quote atoms per
+   base atom, base atoms u64, order type). Levels within ±10% of the market only (the book also holds far-off junk). Phoenix and
+   OpenBook v2: SOL/USDC is idle there (no Jupiter route; OpenBook's last trade Oct 20), so they say so instead of a fake book.
+   Jupiter inside: Jupiter's best route price for ~$100 each side, and how much fills within 1 bp of it (from $1k / $5k / $25k quotes). */
+const ST_BKV = { mf: 'Manifest', ph: 'Phoenix', ob: 'OpenBook' };
+const NIL32 = 0xFFFFFFFF;
+function mfParse(b64, baseDec, quoteDec) {
+  const raw = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)), dv = new DataView(raw.buffer); if (raw.length < 256) throw new Error('short');
+  const u32 = (o) => dv.getUint32(o, true), u64 = (o) => dv.getBigUint64(o, true), u128 = (o) => dv.getBigUint64(o, true) + (dv.getBigUint64(o + 8, true) << 64n);
+  const bd = raw[9], qd = raw[10], D = 256, sc = 10 ** (bd - qd);
+  const walk = (root) => { const out = [], st = []; let i = root, g = 0; while ((i !== NIL32 || st.length) && g++ < 20000) { while (i !== NIL32 && g++ < 20000) { if (D + i + 80 > raw.length) return out; st.push(i); i = u32(D + i); } if (!st.length) break; i = st.pop();
+      const o = D + i; out.push({ px: Number(u128(o + 16)) / 1e18 * sc, sz: Number(u64(o + 32)) / 10 ** bd, t: raw[o + 57] }); i = u32(o + 4); } return out; };
+  return { bids: walk(u32(156)), asks: walk(u32(164)), bd, qd };
+}
+async function stLoadClob() {
+  const Q = stQ(), key = 'mf:' + ST.q; ST.bk = ST.bk || {};
+  if (!ST.mfKey || !ST.mfKey[key]) {   // the Manifest market for this pair, from a Jupiter quote limited to Manifest
+    const q = await getJ(`${JUP}/quote?inputMint=${WSOL}&outputMint=${Q.mint}&amount=100000000&slippageBps=50&onlyDirectRoutes=true&dexes=Manifest`).catch(() => null);
+    const k = q && q.routePlan && q.routePlan[0] && q.routePlan[0].swapInfo.ammKey; ST.mfKey = ST.mfKey || {}; ST.mfKey[key] = k || 'none'; }
+  const mk = ST.mfKey[key]; if (!mk || mk === 'none') { ST.bk.mf = { none: 1, at: Date.now() }; return; }
+  const r = await solRpc('getAccountInfo', [mk, { encoding: 'base64', commitment: 'confirmed' }]); const v = r && r.value; if (!v || !v.data) throw new Error('no market');
+  const B = mfParse(v.data[0]), mid = ST.jin && ST.jin.bid && ST.jin.ask ? (ST.jin.bid + ST.jin.ask) / 2 : (SOLPX.sol || 0), ok = (x) => x.px > 0 && x.sz > 0 && (!mid || Math.abs(x.px / mid - 1) < 0.1);
+  const lv = (L, bid) => { const m = new Map(); for (const x of L.filter(ok)) { const k = Math.round(x.px * 1000) / 1000, o = m.get(k) || { px: k, sz: 0, n: 0 }; o.sz += x.sz; o.n++; m.set(k, o); }
+    const out = [...m.values()].sort((a, b) => (bid ? b.px - a.px : a.px - b.px)); let c = 0; for (const o of out) { c += o.sz; o.cum = c; } return out; };
+  ST.bk.mf = { key: mk, bids: lv(B.bids, true), asks: lv(B.asks, false), n: B.bids.length + B.asks.length, at: Date.now() };
+}
+async function stLoadInside() {
+  const Q = stQ(), px = (await solPrices()).sol; if (!(px > 0)) throw new Error('no price');
+  const qt = (i, o, a) => getJ(`${JUP}/quote?inputMint=${i}&outputMint=${o}&amount=${a}&slippageBps=50&restrictIntermediateTokens=true`).catch(() => null);
+  const S = [100, 1000, 5000, 25000];
+  const R = await Promise.all(S.flatMap((usd) => [qt(WSOL, Q.mint, Math.round(usd / px * 1e9)), qt(Q.mint, WSOL, Math.round(usd * 10 ** Q.d))]));
+  const side = (k) => { const L = S.map((usd, i) => R[2 * i + k]).map((q, i) => (q && +q.outAmount > 0 ? (k === 0 ? { sol: +q.inAmount / 1e9, px: +q.outAmount / 10 ** Q.d / (+q.inAmount / 1e9), via: q.routePlan } : { sol: +q.outAmount / 1e9, px: +q.inAmount / 10 ** Q.d / (+q.outAmount / 1e9), via: q.routePlan }) : null));
+    const top = L[0]; if (!top) return null; let qty = top.sol;
+    for (const x of L.slice(1)) { if (!x) break; if (k === 0 ? x.px >= top.px * (1 - 1e-4) : x.px <= top.px * (1 + 1e-4)) qty = x.sol; else break; }
+    const v = [...new Set((top.via || []).map((r) => (r.swapInfo || {}).label).filter(Boolean))].slice(0, 2).join(' + ');
+    return { px: top.px, qty, via: v, more: qty >= L[L.length - 1 >= 0 ? L.length - 1 : 0]?.sol }; };
+  const b = side(0), a = side(1); ST.jin = { bid: b && b.px, bq: b && b.qty, bv: b && b.via, bm: b && b.more, ask: a && a.px, aq: a && a.qty, av: a && a.via, am: a && a.more }; ST.at = Date.now();
+}
+function stPaintInside() {
+  const el = $('#stJin'); if (!el) return; const j = ST.jin;
+  const cell = (lbl, px, q, more, via, cls) => `<div style="display:flex;flex-direction:column;gap:1px"><span class="mu" style="font-size:11px">${lbl}</span><span class="${cls} mono" style="font-size:20px;font-weight:700">${px ? px.toFixed(3) : '–'}</span><span class="mono" style="font-size:12.5px">${q ? `× ${more ? '≥ ' : '~'}${szFmt(q)} SOL` : ''}</span><span class="mu" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${via ? 'via ' + esc(via) : ''}</span></div>`;
+  el.innerHTML = j ? cell('Bid', j.bid, j.bq, j.bm, j.bv, 'buy') + cell('Ask', j.ask, j.aq, j.am, j.av, 'sell') : '<span class="mu">loading…</span>';
+  const u = $('#stUpd'), last = ST.at ? new Date(ST.at).toLocaleTimeString() : '';
+  u.className = ST.fails > 1 ? 'amb' : ST.fails ? 'mu' : 'grn'; u.textContent = !ST.at ? 'loading…' : ST.fails > 1 ? `retrying… from ${last}` : (ST.fails ? 'updated ' : 'live · ') + last;
+  $('#stJinN').textContent = j && j.bid && j.ask ? `Quantity = how much SOL fills within 1 bp of that price (checked at $1k, $5k, $25k). Spread ${(Math.max(0, (j.ask - j.bid) / ((j.ask + j.bid) / 2) * 1e4)).toFixed(1)} bps.` : '';
+}
 async function stLoadVenues() {
   const Q = stQ(), px = (await solPrices()).sol; if (!(px > 0)) throw new Error('no price');
   const qt = (i, o, a, dx) => getJ(`${JUP}/quote?inputMint=${i}&outputMint=${o}&amount=${a}&slippageBps=50&onlyDirectRoutes=true&dexes=${encodeURIComponent(dx)}`).catch(() => null);
@@ -16070,14 +16165,20 @@ function stPaintVol() {
   el.innerHTML = L.slice(0, 8).map(([nm, v]) => `<div><div style="display:flex;justify-content:space-between"><span>${esc(nm)}</span><span class="mono">$${v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : fx(v, 0)} · ${(v / tot * 100).toFixed(0)}%</span></div><div style="height:5px;border-radius:3px;background:var(--bd);margin-top:3px"><div style="height:5px;border-radius:3px;background:var(--blu);width:${Math.max(1, v / L[0][1] * 100).toFixed(1)}%"></div></div></div>`).join('');
 }
 function stPaint() {
-  const el = $('#stBook'); if (!el) return;
-  const rows = [`<span class="mu s2" style="font-family:inherit;font-weight:600">Bids · size</span><span class="mu s2" style="text-align:right;font-weight:600">Asks · size</span>`];
-  for (let i = 0; i < ST_SIZES.length; i++) { const b = ST.bids[i], a = ST.asks[i]; rows.push(`<span class="buy">${b ? b[0].toFixed(3) : ''}</span><span class="buy sz">${b ? szFmt(b[1]) : ''}</span><span class="sell ap">${a ? a[0].toFixed(3) : ''}</span><span class="sell sz">${a ? szFmt(a[1]) : ''}</span>`); }
-  el.innerHTML = rows.join('');
-  const b = ST.bids[0], a = ST.asks[0], u = $('#stUpd'), last = ST.at ? new Date(ST.at).toLocaleTimeString() : '';
-  u.className = ST.fails > 1 ? 'amb' : ST.fails ? 'mu' : 'grn'; u.textContent = !ST.at ? 'loading…' : ST.fails > 1 ? `retrying… prices from ${last}` : (ST.fails ? 'updated ' : 'live · ') + last;
-  $('#stPairL').textContent = `SOL / ${ST.q} · Solana DEXes (Jupiter)`;
-  $('#stSpread').textContent = b && a ? `Mid ${((a[0] + b[0]) / 2).toFixed(3)} ${ST.q} · spread ${(() => { const v = Math.max(0, ((a[0] - b[0]) / ((a[0] + b[0]) / 2)) * 1e4); return v < 10 ? v.toFixed(1) : v.toFixed(0); })()} bps · each level is the price for that whole size (about $${ST_SIZES.map((x) => x >= 1000 ? x / 1000 + 'k' : x).join(', $')})` : (ST.at ? 'No route right now.' : '');
+  const el = $('#stBook'); if (!el) return; const v = ST.bkv || 'mf', B = (ST.bk || {})[v], N = 8;
+  $$('#stBk button').forEach((b) => b.classList.toggle('on', b.dataset.v === v));
+  $('#stPairL').textContent = `Order book · ${ST_BKV[v]} · SOL / ${ST.q}`;
+  const H = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
+  if (v !== 'mf') { el.innerHTML = `<span class="mu" style="grid-column:1/-1;font-family:inherit;font-size:13px;line-height:1.5">${v === 'ph' ? 'Phoenix: no SOL / ' + ST.q + ' orders to show. The market is nearly idle (a few updates today, no trades routed), and its book is 1.7 MB per read, too heavy to pull on a phone.' : 'OpenBook v2: no SOL / ' + ST.q + ' orders. The market has been idle since Oct 20.'}</span>`; $('#stSpread').textContent = ''; $('#stBkUpd').textContent = ''; return; }
+  if (!B) { el.innerHTML = `<span class="mu" style="grid-column:1/-1">loading…</span>`; return; }
+  if (B.none) { el.innerHTML = `<span class="mu" style="grid-column:1/-1;font-family:inherit">Manifest has no SOL / ${ST.q} market right now.</span>`; $('#stSpread').textContent = ''; return; }
+  const row = (o, cls) => `<span class="${cls}">${o.px.toFixed(3)}</span><span style="text-align:right">${szFmt(o.sz)}</span><span class="mu" style="text-align:right">${szFmt(o.cum)}</span><span class="mu" style="text-align:right;font-family:inherit;font-size:11.5px">${o.n}</span>`;
+  const A = B.asks.slice(0, N).reverse(), Bd = B.bids.slice(0, N), b = B.bids[0], a = B.asks[0], mid = b && a ? (a.px + b.px) / 2 : 0, spr = mid ? (a.px - b.px) / mid * 1e4 : 0;
+  el.innerHTML = H('Price') + H('SOL', 1) + H('Total', 1) + H('Orders', 1) + (A.length || Bd.length
+    ? A.map((o) => row(o, 'sell')).join('') + `<span style="grid-column:1/-1;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:3px 0;font-family:inherit;font-size:12px" class="mu">${mid ? `Mid ${mid.toFixed(3)} · spread ${spr < 10 ? spr.toFixed(1) : spr.toFixed(0)} bps` : ''}</span>` + Bd.map((o) => row(o, 'buy')).join('')
+    : `<span class="mu" style="grid-column:1/-1">No orders near the market right now.</span>`);
+  $('#stBkUpd').textContent = B.at ? 'on-chain · ' + new Date(B.at).toLocaleTimeString() : '';
+  const j = ST.jin; $('#stSpread').textContent = `Real resting limit orders on Manifest (${B.n} on the book; levels within 10% of the market shown).` + (j && b && a && j.bid && j.ask ? ` Jupiter's inside is ${j.bid > b.px ? 'better' : 'not better'} on the bid and ${j.ask < a.px ? 'better' : 'not better'} on the ask.` : '');
 }
 function stPaintSales() {
   const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = ST.src || '';
@@ -16098,7 +16199,7 @@ function stPaintForm() {
 async function stEst() {   // live quote for the amount typed: what you pay / get, the minimum, Liquidfi's fee
   clearTimeout(ST.eT); const el = $('#stEst'); const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, '');
   if (!(amt > 0) || ST.mode !== 'mkt') { el.innerHTML = ''; ST.est = null; return; }
-  ST.eT = setTimeout(async () => { const Q = stQ(), px = ST.asks[0] ? ST.asks[0][0] : 0, buy = ST.side === 'buy';
+  ST.eT = setTimeout(async () => { const Q = stQ(), px = ST.jin && ST.jin.ask ? ST.jin.ask : 0, buy = ST.side === 'buy';
     try { const inAmt = buy ? Math.round(amt * (px || (SOLPX.sol || 0)) * 10 ** Q.d) : Math.round(amt * 1e9); if (!(inAmt > 0)) return;
       const q = await getJ(`${JUP}/quote?inputMint=${buy ? Q.mint : WSOL}&outputMint=${buy ? WSOL : Q.mint}&amount=${inAmt}&slippageBps=50&restrictIntermediateTokens=true`);
       const pay = buy ? inAmt / 10 ** Q.d : amt, get = buy ? +q.outAmount / 1e9 : +q.outAmount / 10 ** Q.d, at = buy ? pay / get : get / amt, fee = (buy ? pay : get) * SOL_FEE.bps / 1e4;
@@ -16118,8 +16219,8 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
 function stLoop() {   // tape + size ladder every 30 s, venue quotes every 60 s; only while this screen is open and visible (GeckoTerminal's free limit is tight)
   clearTimeout(ST.timer); if (cur !== 'strade' || !K) return; let n = 0;
   const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') {
-      try { await stLoadBook(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaint();
-      if (n % 2 === 0) { try { await stLoadVenues(); } catch (e) {} if (cur === 'strade') stPaintVenues(); }
+      try { await stLoadInside(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaintInside();
+      try { await stLoadClob(); } catch (e) {} if (cur === 'strade') stPaint();
       try { await stLoadSales(); ST.salesErr = 0; } catch (e) { ST.salesErr = 1; } if (cur === 'strade') { stPaintSales(); stPaintVol(); }
       n++; }
     ST.timer = setTimeout(run, ST.fails || ST.salesErr ? 60000 : 30000); };
@@ -16127,7 +16228,7 @@ function stLoop() {   // tape + size ladder every 30 s, venue quotes every 60 s;
 }
 async function drawSTrade() {
   const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots');
-  $('#stFrom').textContent = w.name; stPaintForm(); stPaint(); stPaintVenues(); stPaintSales(); stPaintVol(); $('#stEst').innerHTML = '';
+  $('#stFrom').textContent = w.name; stPaintForm(); stPaintInside(); stPaint(); stPaintSales(); stPaintVol(); $('#stEst').innerHTML = '';
   if (!SOLA[solSel]) solLoad(solSel).then(() => { if (cur === 'strade') stPaintForm(); }).catch(() => {});
   stLoop(); stFills();
 }
@@ -16135,15 +16236,16 @@ async function stReview(btn) {
   if (ST.mode !== 'mkt') return; const d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
   const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, ''); if (!(amt > 0)) return toast('Enter an amount of SOL.');
   const Q = stQ(), C = solCoins(d), T = solTargets(), qc = C.find((c) => c.mint === Q.mint), sc = C.find((c) => c.v === 'SOL');
-  if (ST.side === 'buy') { const px = ST.asks[0] ? ST.asks[0][0] : SOLPX.sol, pay = Math.ceil(amt * px * 1.0 * 1e6) / 1e6;
+  if (ST.side === 'buy') { const px = ST.jin && ST.jin.ask ? ST.jin.ask : SOLPX.sol, pay = Math.ceil(amt * px * 1.0 * 1e6) / 1e6;
     if (!qc) return toast(`No ${ST.q} in this wallet. Buy or swap some first.`); if (pay > qc.a + 1e-9) return toast(`That needs about ${m2(pay)} ${ST.q}; you have ${m2(qc.a)}.`);
     return solSwapCore(qc, T.find((c) => c.v === 'SOL'), pay, btn, 'Buy SOL', `Buy about ${solAmt(amt)} SOL`); }
   if (amt > sc.a + 1e-12) return toast(`At most ${m2(sc.a)} SOL: ${SOL_KEEP} stays for fees.`);
   return solSwapCore(sc, T.find((c) => c.mint === Q.mint), amt, btn, 'Sell SOL', `Sell ${solAmt(amt)} SOL`);
 }
-document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, [data-spct]'); if (!b || cur !== 'strade') return;
-  if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, px = ST.asks[0] ? ST.asks[0][0] : SOLPX.sol; const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
-  const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.bids = ST.asks = []; ST.sales = []; ST.salesAt = 0; ST.at = 0; ST.ven = []; ST.venAt = 0; stPaint(); stPaintVenues(); stPaintSales(); stPaintVol(); stLoop(); }
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, #stBk button, [data-spct]'); if (!b || cur !== 'strade') return;
+  if (b.parentElement.id === 'stBk') { ST.bkv = b.dataset.v; return stPaint(); }
+  if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, px = ST.jin && ST.jin.ask ? ST.jin.ask : SOLPX.sol; const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
+  const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.jin = null; ST.bk = {}; ST.sales = []; ST.salesAt = 0; ST.at = 0; stPaintInside(); stPaint(); stPaintSales(); stPaintVol(); stLoop(); }
   if (g === 'stSide') ST.side = b.dataset.v; if (g === 'stMode') ST.mode = b.dataset.v; stPaintForm(); stEst(); });
 document.addEventListener('input', (e) => { if (e.target && e.target.id === 'stAmt') stEst(); });
 
@@ -16158,11 +16260,30 @@ async function jlIx(kind, body) {
   const r = await fetch(`${JL}/earn/${kind}-instructions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error((j && (j.error || j.message)) || "Jupiter Lend couldn't build it.");
   const L = j.instructions || (j.programId ? [j] : []); if (!L.length) throw new Error('Jupiter Lend sent nothing back.');
-  return L.map((x) => { if (x.programId !== 'jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9' && x.programId !== SOL_PROG.ata && x.programId !== SOL_PROG.cb) throw new Error('Unexpected program from Jupiter: ' + x.programId);
+  return L.map((x) => { if (x.programId !== JL_PROG && x.programId !== SOL_PROG.ata && x.programId !== SOL_PROG.cb) throw new Error('Unexpected program from Jupiter: ' + x.programId);
     const signers = x.accounts.filter((a) => a.isSigner).map((a) => a.pubkey); if (signers.some((p) => p !== body.signer)) throw new Error('Jupiter asked for another signer. Stopped.');
     return sIx(x.programId, x.accounts.map((a) => ({ k: a.pubkey, s: a.isSigner ? 1 : 0, w: a.isWritable ? 1 : 0 })), ub64(x.data)); });
 }
 const jlApy = (t) => (+t.totalRate || 0) / 100;
+/* v2.40z (Jeff: "Does the earn show where the lend is coming from? Who did the contract. Just for due diligence"): facts with sources,
+   checked Nov 14 2026 against docs.jup.ag/user-docs/more/security and the Code4rena report. */
+const JL_PROG = 'jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9';
+function jlAbout() {
+  pending = null; const a = (u, t) => `<a href="${u}" target="_blank" rel="noopener">${t} ↗</a>`;
+  sheet(`<h2>Jupiter Lend · due diligence</h2>
+    <div class="card rows" style="padding:4px 14px;font-size:13.5px">
+      <div><span>Run by</span><span style="text-align:right">Jupiter (jup.ag), Solana's main trading aggregator</span></div>
+      <div><span>Code</span><span style="text-align:right">Built on Fluid's lending engine (Instadapp); the public audit links to Instadapp's Fluid Solana code</span></div>
+      <div><span>Where the interest comes from</span><span style="text-align:right">Borrowers who lock more collateral (SOL, JitoSOL, BTC…) than they borrow. Jupiter keeps a cut; the rate shown is what lenders get.</span></div>
+      <div><span>Program</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${JL_PROG}</span></div>
+      <div><span>Audits</span><span style="text-align:right">15 listed (Jul 2025 – Jun 2026): Zenith, Offside Labs, MixBytes, OtterSec, Neodyme; formal verification by Certora (Dec 2025, Mar 2026); public Code4rena contest Feb–Mar 2026: 0 high, 3 medium, reported fixed</span></div>
+      <div><span>Report a bug</span><span style="text-align:right">security@jup.ag</span></div>
+    </div>
+    <div class="note">Liquidfi checks every Jupiter Lend instruction: only this program (plus Solana's token-account and compute programs), and only your wallet as signer, or nothing is signed.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">${a('https://jup.ag/lend/transparency', 'Jupiter Lend transparency page')}${a('https://docs.jup.ag/user-docs/more/security', 'Jupiter audit list')}${a('https://code4rena.com/reports/2026-02-jupiter-lend', 'Code4rena public audit report')}${a('https://solscan.io/account/' + JL_PROG, 'The program on Solscan')}</div>
+    <div class="mu" style="font-size:12px">Audits lower risk; they don't remove it. Not insured, not a bank deposit. Facts as of Nov 14, 2026; check the links for the latest.</div>
+    <button class="b-light big" data-act="closeSheet">Done</button>`);
+}
 async function solEarnDraw() {
   const el = $('#soEarn'); if (!el) return;
   if (solNet() !== 'mainnet') { el.innerHTML = '<div class="note">Earn works on Mainnet only.</div>'; return; }
@@ -16175,7 +16296,7 @@ async function solEarnDraw() {
     const L = T.filter((t) => JL_SHOW.includes(t.asset && t.asset.symbol) || mine(t));
     el.innerHTML = `<div class="card rows" style="padding:4px 14px">${L.map((t) => { const p = mine(t), have = p ? +p.underlyingAssets / 10 ** t.decimals : 0, sym = (t.asset && t.asset.symbol) || t.symbol, wal = (d.toks.find((x) => x.mint === t.assetAddress) || {}).amt || 0;
       return `<div class="row" style="align-items:center"><span><b>${esc(sym)}</b> <span class="grn mono">${jlApy(t).toFixed(2)}%</span>${have > 0 ? `<br><span class="mu" style="font-size:12px">${m2(have)} ${esc(sym)} working${ER[t.address] > 0 ? ` · <span class="grn">+${m2(ER[t.address] / 10 ** t.decimals)} earned</span>` : ''}</span>` : ''}</span><span style="display:flex;gap:6px">${wal > 0 ? `<button class="b-light sm" data-act="jlSheet" data-k="dep" data-m="${esc(t.address)}" style="width:auto">Add</button>` : ''}${have > 0 ? `<button class="b-out sm" data-act="jlSheet" data-k="wd" data-m="${esc(t.address)}" style="width:auto">Withdraw</button>` : ''}</span></div>`; }).join('')}</div>
-      <div class="mu" style="font-size:12px">Jupiter Lend lends your coins to borrowers who put up more collateral than they borrow. Rates move every second. Not insured, and not a bank deposit: a bug or a bad loan could cost some or all of it. Withdraw any time (if the pool is very busy, you might wait a little).</div>`;
+      <div class="mu" style="font-size:12px">Jupiter Lend lends your coins to borrowers who put up more collateral than they borrow. Rates move every second. Not insured, and not a bank deposit: a bug or a bad loan could cost some or all of it. Withdraw any time (if the pool is very busy, you might wait a little).</div><button class="b-out sm" data-act="jlAbout" style="width:auto;align-self:flex-start">Due diligence: who built it, audits ›</button>`;
   } catch (e) { el.innerHTML = `<div class="note amb">${esc(e.message || e)}</div>`; }
 }
 async function jlFeeOn(mint, t22) {   /* fee only when the fee wallet already holds an account for that coin (never opens one at the user's cost) */
@@ -17049,7 +17170,33 @@ const xrLpOf = (d, A) => { const l = d && d.lines && A && A.lpi ? d.lines.find((
 const xrTok = (d, p) => { const l = d && d.lines ? d.lines.find((x) => x.account === p.a2.issuer && x.currency === p.a2.currency) : null; return l ? Math.max(0, +l.balance) : null; };   // null = no trust line
 const pctY = (v) => (v == null ? '–' : (v * 100 < 0.1 && v > 0 ? '<0.1' : (v * 100).toFixed(v * 100 < 10 ? 1 : 0)) + '%');
 
+/* v2.40y (Jeff: "Maybe put the Sol earn in the Earn button area?"): Earn tab gets "Lend on Solana". It shows what your Solana
+   wallets have lent (Jupiter Lend) and the best rate now; tapping opens the wallet right at its Earn section (Back returns to Earn). */
+const EARNSOL = {};
+async function earnSolSum() {
+  const el = $('#eSubSo'); if (!el) return; const W = solList(); if (solNet() !== 'mainnet') { el.textContent = 'Solana lending runs on Mainnet'; return; }
+  try {
+    const T = await jlTokens(), best = Math.max(0, ...T.filter((t) => JL_SHOW.includes(t.asset && t.asset.symbol)).map(jlApy));
+    let tot = 0, n = 0;
+    for (const w of W) { try { const P = await jlPositions(w.addr); let v = 0;
+      for (const p of P || []) { const t = T.find((x) => x.address === (p.token && (p.token.address || p.token.id))); if (t && +p.underlyingAssets > 0) v += +p.underlyingAssets / 10 ** t.decimals * (+(t.asset || {}).price || 0); }
+      EARNSOL[w.addr] = v; if (v > 0.005) { tot += v; n++; } } catch (e) {} }
+    if (cur !== 'earn') return;
+    el.textContent = tot > 0.005 ? `You're lending $${fx(tot)}${n > 1 ? ` from ${n} wallets` : ''} · up to ${best.toFixed(2)}% now` : `Interest on USDC, USDT, EURC… up to ${best.toFixed(2)}% · Jupiter Lend`;
+  } catch (e) {}
+}
+function earnSolOpen(addr) { solSel = addr; SOLBACK = 'earn'; closeSheet(); go('sol'); setTimeout(() => { const e = $('#soEarn'); if (e && cur === 'sol') e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 450); }
+function earnSol() {
+  const W = solList(); if (solNet() !== 'mainnet') return toast('Solana lending runs on Mainnet only.');
+  if (!W.length) return toast('Add a Solana wallet first: Accounts → + Add wallet → Solana.', 5000);
+  if (W.length === 1) return earnSolOpen(W[0].addr);
+  pending = null;
+  sheet(`<h2>Lend on Solana</h2><div class="mu" style="font-size:13px">Which wallet?</div>${W.map((w) => `<button class="b-out" data-act="earnSolW" data-addr="${esc(w.addr)}" style="text-align:left"><b>${esc(w.name)}</b> · <span class="mono mu">${esc(short(w.addr))}</span>${EARNSOL[w.addr] > 0.005 ? ` <span class="grn">· $${fx(EARNSOL[w.addr])} lent</span>` : ''}</button>`).join('')}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+let SOLBACK = 'bots';
+
 async function drawEarn() {
+  earnSolSum();
   if (EARN_VIEW === 'bl' && !DEV) EARN_VIEW = 'home';
   if (EARN_VIEW === 'bl') {   /* Lend on Stellar (Blend) */
     for (const id of ['eHome', 'eSt', 'eXr', 'eTopHome', 'eChainFoot']) $('#' + id).style.display = 'none';
@@ -20792,7 +20939,7 @@ document.addEventListener('click', async (e) => {
   const act = t.dataset.act; if (!act) return;
   const A = {
     setup: doSetup, exportVault, lock,
-    solAddSheet: () => solAddSheet(), solAddOk: () => solAdd(), solRcv: () => solRcvSheet(), updGo: () => { const u = new URL(location.href); u.searchParams.set('u', Date.now()); location.replace(u.toString()); }, solBookCheck: () => solBookCheck(), solScan: () => scanInline($('#soScan'), (r) => { $('#soTo').value = r.addr; SOCHK = null; $('#soChk').innerHTML = ''; $('#soChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseSolQR, 'a Solana address'), solBuy: phGate(() => solSel && onrBuySheet('solana', solSel)), solSendSheet: () => solSendSheet(), solSendGo: () => solSendGo(),
+    solAddSheet: () => solAddSheet(), solAddOk: () => solAdd(), solRcv: () => solRcvSheet(), jlAbout: () => jlAbout(), earnSol: () => earnSol(), earnSolW: () => earnSolOpen(t.dataset.addr), updGo: () => { const u = new URL(location.href); u.searchParams.set('u', Date.now()); location.replace(u.toString()); }, solBookCheck: () => solBookCheck(), solScan: () => scanInline($('#soScan'), (r) => { $('#soTo').value = r.addr; SOCHK = null; $('#soChk').innerHTML = ''; $('#soChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseSolQR, 'a Solana address'), solBuy: phGate(() => solSel && onrBuySheet('solana', solSel)), solSendSheet: () => solSendSheet(), solSendGo: () => solSendGo(),
     solMax: () => { const d = SOLA[solSel], c = $('#soCoin').value; if (!d) return; $('#soAmt').value = c === 'SOL' ? String(Math.max(0, Math.floor((d.sol - SOL_KEEP) * 1e6) / 1e6)) : String((d.toks.find((x) => x.mint === c) || {}).amt || 0); },
     solBackup: () => solBackup(), solRemove: () => solRemove(), solVanPay: () => solVanPay(), solVanDrop: () => { SOLVANHIT = null; closeSheet(); toast('Discarded.'); },
     solSecCopy: () => { const o = solOwn(solSel); if (o && navigator.clipboard) navigator.clipboard.writeText(solSecret(o)).then(() => toast('Secret key copied. Paste it only into your password manager.')).catch(() => toast("Couldn't copy.")); },
