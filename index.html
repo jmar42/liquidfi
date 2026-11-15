@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40z</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.41d</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -443,11 +443,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <section class="scr" id="s-strade">
   <div class="top"><div class="l"><button class="ico back" data-go="sol" aria-label="Back">‹</button><h2>Trade SOL</h2></div><span class="mu" id="stFrom" style="font-size:13px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span></div>
   <div class="seg" id="stQ"><button class="on" data-v="USDC">SOL / USDC</button><button data-v="USDT">SOL / USDT</button></div>
-  <div class="card"><div class="top"><span class="lbl">Jupiter inside · best on Solana</span><span class="grn" style="font-size:11px;font-weight:700" id="stUpd"></span></div><div id="stJin" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px"></div><div class="mu" id="stJinN" style="font-size:11.5px"></div></div>
   <div class="card"><div class="top"><span class="lbl" id="stPairL">Order book · SOL / USDC</span><span class="mu" style="font-size:11px" id="stBkUpd"></span></div>
-    <div class="seg" id="stBk"><button class="on" data-v="mf">Manifest</button><button data-v="ph">Phoenix</button><button data-v="ob">OpenBook</button></div>
-    <div id="stBook" style="display:grid;grid-template-columns:1fr 1fr 1fr 0.6fr;gap:2px 8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div><div class="mu" id="stSpread" style="font-size:12px"></div></div>
-  <div class="card"><div class="top"><span class="lbl">Last sales · all venues</span><span class="mu" style="font-size:11px" id="stLastSrc"></span></div><div id="stLast" style="display:grid;grid-template-columns:auto 1.3fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
+    <div class="seg" id="stBk"><button class="on" data-v="cex">ALL</button><button data-v="cbs">CBS</button><button data-v="krk">KRK</button><button data-v="mf">MNF</button></div>
+    <div id="stBook" style="display:grid;gap:2px 6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px"></div><div class="mu" id="stSpread" style="font-size:12px"></div></div>
+  <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="mu" style="font-size:11px" id="stLastSrc"></span></div><div id="stLast" style="display:grid;grid-template-columns:auto 1.3fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
   <div class="card"><div class="top"><span class="lbl">Where SOL / <span id="stVolQ">USDC</span> trades · 24h</span></div><div id="stVol" style="display:flex;flex-direction:column;gap:6px;font-size:13px"></div><div class="mu" style="font-size:11.5px">From GeckoTerminal's pool data. Market-maker venues (HumidiFi, SolFi, BisonFi…) often lead Jupiter's inside but don't publish their trades, so they can be missing from this list and the tape.</div></div>
   <div class="seg" id="stSide"><button class="on" data-v="buy">Buy SOL</button><button data-v="sell">Sell SOL</button></div>
   <div class="seg" id="stMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
@@ -614,7 +613,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40z</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.41d</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -646,7 +645,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40z · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.41d · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15691,7 +15690,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.40z';
+const APP_VER = 'v2.41d';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16073,7 +16072,7 @@ async function stLoadDepth() {
    base atom, base atoms u64, order type). Levels within ±10% of the market only (the book also holds far-off junk). Phoenix and
    OpenBook v2: SOL/USDC is idle there (no Jupiter route; OpenBook's last trade Oct 20), so they say so instead of a fake book.
    Jupiter inside: Jupiter's best route price for ~$100 each side, and how much fills within 1 bp of it (from $1k / $5k / $25k quotes). */
-const ST_BKV = { mf: 'Manifest', ph: 'Phoenix', ob: 'OpenBook' };
+const ST_BKV = { cex: 'Coinbase + Kraken + Manifest', cbs: 'Coinbase', krk: 'Kraken', all: 'Solana venues', mf: 'Manifest', ph: 'Phoenix', ob: 'OpenBook' };
 const NIL32 = 0xFFFFFFFF;
 function mfParse(b64, baseDec, quoteDec) {
   const raw = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)), dv = new DataView(raw.buffer); if (raw.length < 256) throw new Error('short');
@@ -16090,7 +16089,7 @@ async function stLoadClob() {
     const k = q && q.routePlan && q.routePlan[0] && q.routePlan[0].swapInfo.ammKey; ST.mfKey = ST.mfKey || {}; ST.mfKey[key] = k || 'none'; }
   const mk = ST.mfKey[key]; if (!mk || mk === 'none') { ST.bk.mf = { none: 1, at: Date.now() }; return; }
   const r = await solRpc('getAccountInfo', [mk, { encoding: 'base64', commitment: 'confirmed' }]); const v = r && r.value; if (!v || !v.data) throw new Error('no market');
-  const B = mfParse(v.data[0]), mid = ST.jin && ST.jin.bid && ST.jin.ask ? (ST.jin.bid + ST.jin.ask) / 2 : (SOLPX.sol || 0), ok = (x) => x.px > 0 && x.sz > 0 && (!mid || Math.abs(x.px / mid - 1) < 0.1);
+  const B = mfParse(v.data[0]), mid = cxRef().mid, ok = (x) => x.px > 0 && x.sz > 0 && (!mid || Math.abs(x.px / mid - 1) < 0.1);
   const lv = (L, bid) => { const m = new Map(); for (const x of L.filter(ok)) { const k = Math.round(x.px * 1000) / 1000, o = m.get(k) || { px: k, sz: 0, n: 0 }; o.sz += x.sz; o.n++; m.set(k, o); }
     const out = [...m.values()].sort((a, b) => (bid ? b.px - a.px : a.px - b.px)); let c = 0; for (const o of out) { c += o.sz; o.cum = c; } return out; };
   ST.bk.mf = { key: mk, bids: lv(B.bids, true), asks: lv(B.asks, false), n: B.bids.length + B.asks.length, at: Date.now() };
@@ -16156,7 +16155,7 @@ async function stLoadSales() {
     if (sol > 0 && q > 0) all.push({ t: Date.parse(a.block_timestamp), px: q / sol, x: sol, buy, h: a.tx_hash, v: x.p.dex }); } }
   const seen = new Set(); ST.sales = all.sort((a, b) => b.t - a.t).filter((t) => (seen.has(t.h + t.v) ? false : seen.add(t.h + t.v))).slice(0, 16);
   if (!ST.sales.length && R.every((x) => !x)) throw new Error('no sales');
-  ST.salesAt = Date.now(); ST.src = top.map((p) => p.dex).filter((v, i, a) => a.indexOf(v) === i).join(', ');
+  ST.salesAt = Date.now(); ST.src = top.map((p) => p.dex).filter((v, i, a) => a.indexOf(v) === i).map((v) => mmId(v) + ' ' + v).join(' · ');
 }
 function stPaintVol() {
   const el = $('#stVol'); if (!el) return; $('#stVolQ').textContent = ST.q; const P = ST.pools && ST.pools.q === ST.q ? ST.pools.list : null;
@@ -16164,26 +16163,121 @@ function stPaintVol() {
   const by = {}; for (const p of P) by[p.dex] = (by[p.dex] || 0) + p.vol; const L = Object.entries(by).sort((a, b) => b[1] - a[1]), tot = L.reduce((t, x) => t + x[1], 0) || 1;
   el.innerHTML = L.slice(0, 8).map(([nm, v]) => `<div><div style="display:flex;justify-content:space-between"><span>${esc(nm)}</span><span class="mono">$${v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : fx(v, 0)} · ${(v / tot * 100).toFixed(0)}%</span></div><div style="height:5px;border-radius:3px;background:var(--bd);margin-top:3px"><div style="height:5px;border-radius:3px;background:var(--blu);width:${Math.max(1, v / L[0][1] * 100).toFixed(1)}%"></div></div></div>`).join('');
 }
+/* v2.41a (Jeff: "Book is wrong direction. We want the other way. And integrate Jupiter into the book too. We want a depth of book.
+   Even if it's only the top of their book. Manifest looks good. The others maybe integrate into the depth too?"):
+   bids and asks side by side, best at the top of both (like the Stellar / XRP books), and an "All" Level II montage: Manifest's real
+   resting orders (exact), Jupiter's route inside, and each venue's top of book (ZeroFi, BisonFi, HumidiFi, SolFi, GoonFi, Orca, Raydium,
+   Meteora…): its price for ~$100 and roughly how much fills there (~, from a $5k quote: within 1 bp = about $5k worth). */
+async function stLoadTops() {
+  const Q = stQ(), px = (await solPrices()).sol; if (!(px > 0)) throw new Error('no price');
+  const V = ST_VEN.filter(([nm]) => nm !== 'Manifest (book)'), first = !ST.tops || !ST.tops.length;
+  const act = first ? V : V.filter(([nm]) => ST.tops.some((t) => t.nm === nm)).slice(0, 8);
+  const qt = (i, o, a, dx) => getJ(`${JUP}/quote?inputMint=${i}&outputMint=${o}&amount=${a}&slippageBps=50&onlyDirectRoutes=true&dexes=${encodeURIComponent(dx)}`).catch(() => null);
+  const S = first ? [100] : [100, 5000], jobs = [];
+  for (const [nm, dx] of act) for (const usd of S) jobs.push({ nm, usd, s: 'b', f: () => qt(WSOL, Q.mint, Math.round(usd / px * 1e9), dx) }, { nm, usd, s: 'a', f: () => qt(Q.mint, WSOL, Math.round(usd * 10 ** Q.d), dx) });
+  for (let k = 0; k < jobs.length; k += 8) { const R = await Promise.all(jobs.slice(k, k + 8).map((j) => j.f())); R.forEach((r, i) => { jobs[k + i].r = r; }); }
+  const by = {}; for (const j of jobs) { if (!j.r || !(+j.r.outAmount > 0)) continue; const g = (by[j.nm] = by[j.nm] || {});
+    const sol = j.s === 'b' ? +j.r.inAmount / 1e9 : +j.r.outAmount / 1e9, q = j.s === 'b' ? +j.r.outAmount / 10 ** Q.d : +j.r.inAmount / 10 ** Q.d; (g[j.s] = g[j.s] || []).push({ usd: j.usd, sol, px: q / sol }); }
+  ST.tops = Object.entries(by).map(([nm, g]) => { const side = (L, bid) => { if (!L || !L.length) return null; L.sort((x, y) => x.usd - y.usd); const t = L[0]; let sz = t.sol, more = false;
+      for (const x of L.slice(1)) if (bid ? x.px >= t.px * (1 - 1e-4) : x.px <= t.px * (1 + 1e-4)) { sz = x.sol; more = true; }
+      return { px: t.px, sz, more }; };
+    return { nm, b: side(g.b, true), a: side(g.a, false) }; });
+  ST.topsAt = Date.now();
+}
+const ST_MM = { Coinbase: 'CBS', Kraken: 'KRK', Manifest: 'MNF', Jupiter: 'JUP', ZeroFi: 'ZRO', BisonFi: 'BSN', HumidiFi: 'HMD', SolFi: 'SLF', GoonFi: 'GON', Orca: 'ORC', 'Raydium CLMM': 'RYC', Raydium: 'RAY', 'Raydium CP': 'RCP', Meteora: 'MET', Tessera: 'TSR', PancakeSwap: 'PCS', Phoenix: 'PHX', OpenBook: 'OBK', Lifinity: 'LIF', Byreal: 'BYR' };   /* v2.41a (Jeff: "Just use 3 letters for the markets to save space") */
+const mmId = (nm) => ST_MM[nm] || String(nm || '').replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
+function stL2() {   // the merged montage: [{ mm, px, sz, ex (exact) }] each side, best first
+  const bids = [], asks = [], m = (ST.bk || {}).mf;
+  if (m && !m.none) { for (const o of m.bids.slice(0, 6)) bids.push({ mm: 'Manifest', px: o.px, sz: o.sz, ex: 1 }); for (const o of m.asks.slice(0, 6)) asks.push({ mm: 'Manifest', px: o.px, sz: o.sz, ex: 1 }); }
+  for (const t of ST.tops || []) { if (t.b) bids.push({ mm: t.nm, px: t.b.px, sz: t.b.sz, more: t.b.more }); if (t.a) asks.push({ mm: t.nm, px: t.a.px, sz: t.a.sz, more: t.a.more }); }
+  const j = ST.jin; if (j && j.bid) bids.push({ mm: 'Jupiter', px: j.bid, sz: j.bq, more: j.bm, jup: 1 }); if (j && j.ask) asks.push({ mm: 'Jupiter', px: j.ask, sz: j.aq, more: j.am, jup: 1 });
+  bids.sort((x, y) => y.px - x.px); asks.sort((x, y) => x.px - y.px); return { bids, asks };
+}
+/* v2.41b (Jeff: "Maybe just Coinbase and Kraken as the book instead of Jupiter?"): their real order books, streamed live over WebSocket
+   while Trade SOL is open (Kraken v2 "book" depth 25 + "trade"; Coinbase Advanced Trade "level2" + "market_trades"; public, no keys).
+   They are the price reference; a Liquidfi order still fills on Solana at Jupiter's inside. Prints join the Last sales tape. */
+const CX = { cb: null, kr: null, cbB: new Map(), cbA: new Map(), krB: new Map(), krA: new Map(), prints: [], at: { cb: 0, kr: 0 }, pair: '', wd: 0, pt: 0, tries: { cb: 0, kr: 0 }, retry: { cb: 0, kr: 0 } };
+const cxIds = () => (ST.q === 'USDT' ? { cb: 'SOL-USDT', kr: 'SOL/USDT' } : { cb: 'SOL-USD', kr: 'SOL/USD' });
+function cxStop() { clearInterval(CX.wd); CX.wd = 0; for (const k of ['cb', 'kr']) { const ws = CX[k]; CX[k] = null; if (ws) { ws.onopen = ws.onmessage = ws.onclose = ws.onerror = null; try { ws.close(); } catch (e) {} } } }
+function cxPaintSoon() { if (CX.pt) return; CX.pt = setTimeout(() => { CX.pt = 0; if (cur !== 'strade') return; if (['cex', 'cbs', 'krk'].includes(ST.bkv || 'cex')) stPaint(); stPaintSales(); }, 300); }
+/* v2.41c (Jeff: "We don't need entire book. All we need is maybe 10 deep"): keep only the best few levels a side (Kraken 10; Coinbase 20 as a small buffer, since its feed always starts with the full book). */
+function cxTrim(B, A, n) { if (B.size > n) { const k = [...B.keys()].sort((a, b) => b - a); for (const p of k.slice(n)) B.delete(p); } if (A.size > n) { const k = [...A.keys()].sort((a, b) => a - b); for (const p of k.slice(n)) A.delete(p); } }
+function cxMax(M) { let m = 0; for (const k of M.keys()) if (k > m) m = k; return m; }
+function cxPrint(v, px, x, t, side) { if (!(px > 0 && x > 0)) return; CX.prints.unshift({ t, px, x, v, buy: side === 'buy' }); if (CX.prints.length > 60) CX.prints.length = 60; }
+function cxOpen(k) {
+  if (typeof WebSocket === 'undefined' || Date.now() < CX.retry[k]) return; const id = cxIds(), pair = ST.q; let ws;
+  try { ws = new WebSocket(k === 'kr' ? 'wss://ws.kraken.com/v2' : 'wss://advanced-trade-ws.coinbase.com'); } catch (e) { return; }
+  CX[k] = ws; const B = k === 'kr' ? CX.krB : CX.cbB, A = k === 'kr' ? CX.krA : CX.cbA; B.clear(); A.clear();
+  const fail = () => { if (CX[k] !== ws) return; CX[k] = null; CX.tries[k]++; CX.retry[k] = Date.now() + Math.min(60000, 3000 * 2 ** Math.min(CX.tries[k] - 1, 4)); };
+  ws.onopen = () => { if (k === 'kr') { ws.send(JSON.stringify({ method: 'subscribe', params: { channel: 'book', symbol: [id.kr], depth: 10 } })); ws.send(JSON.stringify({ method: 'subscribe', params: { channel: 'trade', symbol: [id.kr] } })); }
+    else { ws.send(JSON.stringify({ type: 'subscribe', product_ids: [id.cb], channel: 'level2' })); ws.send(JSON.stringify({ type: 'subscribe', product_ids: [id.cb], channel: 'market_trades' })); } };
+  ws.onmessage = (ev) => { if (CX[k] !== ws || ST.q !== pair) return; let m; try { m = JSON.parse(ev.data); } catch (e) { return; } CX.at[k] = Date.now(); CX.tries[k] = 0;
+    if (k === 'kr') {
+      if (m.channel === 'book' && m.data) for (const d of m.data) { if (m.type === 'snapshot') { B.clear(); A.clear(); }
+        for (const x of d.bids || []) { if (+x.qty > 0) B.set(+x.price, +x.qty); else B.delete(+x.price); } for (const x of d.asks || []) { if (+x.qty > 0) A.set(+x.price, +x.qty); else A.delete(+x.price); }
+        cxTrim(B, A, 10); }
+      else if (m.channel === 'trade' && m.data) for (const t of m.data) cxPrint('Kraken', +t.price, +t.qty, Date.parse(t.timestamp) || Date.now(), t.side);
+    } else {
+      if (m.channel === 'l2_data') for (const e of m.events || []) { if (e.type === 'snapshot') { B.clear(); A.clear(); }
+        for (const u of e.updates || []) { const M = u.side === 'bid' ? B : A, p = +u.price_level, q = +u.new_quantity; if (q > 0) M.set(p, q); else M.delete(p); }
+        cxTrim(B, A, 20); }
+      else if (m.channel === 'market_trades') for (const e of m.events || []) if (e.type === 'update') for (const t of e.trades || []) {
+        const bb = cxMax(CX.cbB), px = +t.price; let ba = Infinity; for (const k2 of CX.cbA.keys()) if (k2 < ba) ba = k2; cxPrint('Coinbase', px, +t.size, Date.parse(t.time) || Date.now(), px >= ba ? 'buy' : px <= bb ? 'sell' : px >= (bb + ba) / 2 ? 'buy' : 'sell'); }
+    }
+    cxPaintSoon(); };
+  ws.onclose = ws.onerror = fail;
+}
+function cxStart() {
+  if (CX.pair !== ST.q) { cxStop(); CX.pair = ST.q; CX.prints = []; CX.tries = { cb: 0, kr: 0 }; CX.retry = { cb: 0, kr: 0 }; }
+  if (!CX.cb) cxOpen('cb'); if (!CX.kr) cxOpen('kr');
+  if (!CX.wd) CX.wd = setInterval(() => { if (cur !== 'strade' || !K || document.visibilityState !== 'visible') return cxStop();
+    for (const k of ['cb', 'kr']) { if (CX[k] && Date.now() - CX.at[k] > 20000 && CX.at[k]) { const ws = CX[k]; CX[k] = null; try { ws.close(); } catch (e) {} } if (!CX[k]) cxOpen(k); } }, 3000);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && cur === 'strade') cxStart(); });
+/* v2.41d (Jeff: "We may need only Manifest, CB, KR and that's it. Jupiter kind of pointless if we can't get real prices"): reference price = Coinbase/Kraken best bid/ask; Jupiter is used only to execute (fresh quote when you type an amount and when you trade). */
+function cxRef() { let b = 0, a = Infinity; for (const M of [CX.cbB, CX.krB]) for (const k of M.keys()) if (k > b) b = k; for (const M of [CX.cbA, CX.krA]) for (const k of M.keys()) if (k < a) a = k; return { bid: b || 0, ask: isFinite(a) ? a : 0, mid: b && isFinite(a) ? (a + b) / 2 : (SOLPX.sol || 0) }; }
+const cxLv = (M, bid) => [...M.entries()].map(([px, sz]) => ({ px, sz })).sort((a, b) => (bid ? b.px - a.px : a.px - b.px));
 function stPaint() {
-  const el = $('#stBook'); if (!el) return; const v = ST.bkv || 'mf', B = (ST.bk || {})[v], N = 8;
+  const el = $('#stBook'); if (!el) return; const v = ST.bkv || 'cex', N = 10;
   $$('#stBk button').forEach((b) => b.classList.toggle('on', b.dataset.v === v));
-  $('#stPairL').textContent = `Order book · ${ST_BKV[v]} · SOL / ${ST.q}`;
-  const H = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
-  if (v !== 'mf') { el.innerHTML = `<span class="mu" style="grid-column:1/-1;font-family:inherit;font-size:13px;line-height:1.5">${v === 'ph' ? 'Phoenix: no SOL / ' + ST.q + ' orders to show. The market is nearly idle (a few updates today, no trades routed), and its book is 1.7 MB per read, too heavy to pull on a phone.' : 'OpenBook v2: no SOL / ' + ST.q + ' orders. The market has been idle since Oct 20.'}</span>`; $('#stSpread').textContent = ''; $('#stBkUpd').textContent = ''; return; }
-  if (!B) { el.innerHTML = `<span class="mu" style="grid-column:1/-1">loading…</span>`; return; }
-  if (B.none) { el.innerHTML = `<span class="mu" style="grid-column:1/-1;font-family:inherit">Manifest has no SOL / ${ST.q} market right now.</span>`; $('#stSpread').textContent = ''; return; }
-  const row = (o, cls) => `<span class="${cls}">${o.px.toFixed(3)}</span><span style="text-align:right">${szFmt(o.sz)}</span><span class="mu" style="text-align:right">${szFmt(o.cum)}</span><span class="mu" style="text-align:right;font-family:inherit;font-size:11.5px">${o.n}</span>`;
-  const A = B.asks.slice(0, N).reverse(), Bd = B.bids.slice(0, N), b = B.bids[0], a = B.asks[0], mid = b && a ? (a.px + b.px) / 2 : 0, spr = mid ? (a.px - b.px) / mid * 1e4 : 0;
-  el.innerHTML = H('Price') + H('SOL', 1) + H('Total', 1) + H('Orders', 1) + (A.length || Bd.length
-    ? A.map((o) => row(o, 'sell')).join('') + `<span style="grid-column:1/-1;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:3px 0;font-family:inherit;font-size:12px" class="mu">${mid ? `Mid ${mid.toFixed(3)} · spread ${spr < 10 ? spr.toFixed(1) : spr.toFixed(0)} bps` : ''}</span>` + Bd.map((o) => row(o, 'buy')).join('')
-    : `<span class="mu" style="grid-column:1/-1">No orders near the market right now.</span>`);
-  $('#stBkUpd').textContent = B.at ? 'on-chain · ' + new Date(B.at).toLocaleTimeString() : '';
-  const j = ST.jin; $('#stSpread').textContent = `Real resting limit orders on Manifest (${B.n} on the book; levels within 10% of the market shown).` + (j && b && a && j.bid && j.ask ? ` Jupiter's inside is ${j.bid > b.px ? 'better' : 'not better'} on the bid and ${j.ask < a.px ? 'better' : 'not better'} on the ask.` : '');
+  $('#stPairL').textContent = `Order book · ${ST_BKV[v]} · SOL / ${['cex', 'cbs', 'krk'].includes(v) && ST.q === 'USDC' ? 'USD' : ST.q}`;
+  const H = (t, r) => `<span class="mu" style="font-family:inherit;font-size:10.5px;${r ? 'text-align:right' : ''}">${t}</span>`;
+  const msg = (t) => { el.style.gridTemplateColumns = '1fr'; el.innerHTML = `<span class="mu" style="font-family:inherit;font-size:13px;line-height:1.5">${t}</span>`; $('#stSpread').textContent = ''; };
+  if (v === 'ph') return msg(`Phoenix: no SOL / ${ST.q} orders to show. The market is nearly idle (a few updates today, no trades routed), and its book is 1.7 MB per read, too heavy to pull on a phone.`);
+  if (v === 'ob') return msg(`OpenBook v2: no SOL / ${ST.q} orders. The market has been idle since Oct 20.`);
+  const m = (ST.bk || {}).mf, sz = (o) => (o.ex ? '' : o.more ? '≥' : '~') + szFmt(o.sz);
+  let B, A;
+  if (v === 'cex' || v === 'cbs' || v === 'krk') {
+    const cb = (v !== 'krk' ? [cxLv(CX.cbB, true).map((o) => ({ ...o, mm: 'Coinbase', ex: 1 })), cxLv(CX.cbA, false).map((o) => ({ ...o, mm: 'Coinbase', ex: 1 }))] : [[], []]);
+    const kr = (v !== 'cbs' ? [cxLv(CX.krB, true).map((o) => ({ ...o, mm: 'Kraken', ex: 1 })), cxLv(CX.krA, false).map((o) => ({ ...o, mm: 'Kraken', ex: 1 }))] : [[], []]);
+    const mfl = v === 'cex' && m && !m.none ? [m.bids.map((o) => ({ ...o, mm: 'Manifest', ex: 1 })), m.asks.map((o) => ({ ...o, mm: 'Manifest', ex: 1 }))] : [[], []];
+    B = [...cb[0], ...kr[0], ...mfl[0]].sort((a, b) => b.px - a.px).slice(0, N); A = [...cb[1], ...kr[1], ...mfl[1]].sort((a, b) => a.px - b.px).slice(0, N);
+    if (!B.length && !A.length) return msg(typeof WebSocket === 'undefined' ? 'Live books need WebSocket support.' : 'Connecting to ' + ST_BKV[v] + '…');
+  } else if (v === 'mf') { if (!m) return msg('loading…'); if (m.none) return msg(`Manifest has no SOL / ${ST.q} market right now.`); B = m.bids.slice(0, N).map((o) => ({ ...o, ex: 1 })); A = m.asks.slice(0, N).map((o) => ({ ...o, ex: 1 })); }
+  else { const L = stL2(); B = L.bids.slice(0, N); A = L.asks.slice(0, N); if (!B.length && !A.length) return msg(ST.at ? 'No quotes right now.' : 'loading…'); }
+  const bb = B[0], ba = A[0], mid = bb && ba ? (bb.px + ba.px) / 2 : 0, spr = mid ? (ba.px - bb.px) / mid * 1e4 : 0;
+  const all = v === 'all' || v === 'cex', nm = (o) => `<span class="mu" style="font-family:inherit;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${o.jup ? 'color:var(--blu);font-weight:700' : ''}">${esc(mmId(o.mm))}</span>`;
+  const top = (o, best) => (best && o && Math.abs(o.px - best.px) < 5e-4 ? 'font-weight:800;' : '');
+  el.style.gridTemplateColumns = all ? '0.55fr 0.9fr 1fr 1fr 0.9fr 0.55fr' : '0.8fr 1fr 1fr 0.8fr';
+  const rows = [];
+  rows.push(all ? H('Venue') + H('Size', 1) + H('Bid', 1) + H('Ask') + H('Size') + H('Venue', 1) : H('Size', 1) + H('Bid', 1) + H('Ask') + H('Size'));
+  for (let i = 0; i < Math.max(B.length, A.length); i++) { const b = B[i], a = A[i];
+    const bs = b ? `<span style="text-align:right">${sz(b)}</span><span class="buy" style="text-align:right;${top(b, bb)}">${b.px.toFixed(3)}</span>` : '<span></span><span></span>';
+    const as = a ? `<span class="sell" style="${top(a, ba)}">${a.px.toFixed(3)}</span><span>${sz(a)}</span>` : '<span></span><span></span>';
+    rows.push(all ? (b ? nm(b) : '<span></span>') + bs + as + (a ? nm(a).replace('<span class="mu" style="', '<span class="mu" style="text-align:right;') : '<span></span>') : bs + as); }
+  el.innerHTML = rows.join('');
+  const cxl = v === 'cbs' ? CX.at.cb : v === 'krk' ? CX.at.kr : Math.max(CX.at.cb, CX.at.kr);
+  $('#stBkUpd').innerHTML = ['cex', 'cbs', 'krk'].includes(v) ? (cxl && Date.now() - cxl < 15000 ? '<span class="grn">● streaming</span>' : '<span class="mu">connecting…</span>') : m && m.at ? 'updated ' + new Date(Math.max(m.at || 0, ST.at || 0)).toLocaleTimeString() : '';
+  if (['cex', 'cbs', 'krk'].includes(v)) { $('#stSpread').textContent = (mid ? `Mid ${mid.toFixed(3)} · spread ${spr < 10 ? Math.max(0, spr).toFixed(1) : spr.toFixed(0)} bps. ` : '') + `CBS Coinbase · KRK Kraken (live order books, SOL/${ST.q === 'USDT' ? 'USDT' : 'USD'})${v === 'cex' ? ' · MNF Manifest (on-chain, every 15 s)' : ''}. Your order fills on Solana at the best price at that moment: type an amount to see it.`; return; }
+  $('#stSpread').textContent = (mid ? `Mid ${mid.toFixed(3)} · spread ${spr < 10 ? Math.max(0, spr).toFixed(1) : spr.toFixed(0)} bps. ` : '') + (all
+    ? 'MNF Manifest (real resting orders, exact) · JUP Jupiter best route · ZRO ZeroFi · BSN BisonFi · HMD HumidiFi · SLF SolFi · GON GoonFi · ORC Orca · RYC Raydium CLMM · RAY Raydium · MET Meteora · TSR Tessera · PHX Phoenix · OBK OpenBook. Venues other than MNF show their top of book: price for ~$100, and about how much fills there (~ estimate, ≥ at least).'
+    : `Real resting limit orders on Manifest (${m.n} on the book; within 10% of the market).`);
 }
 function stPaintSales() {
-  const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = ST.src || '';
+  const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = 'CBS · KRK live';
   const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
-  el.innerHTML = H3('Time (PT)') + H3('Venue') + H3('Price', 1) + H3('SOL', 1) + (ST.sales.length ? ST.sales.map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span style="font-family:inherit;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.v || '')}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(3)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
+  const SL = [...CX.prints].sort((a, b) => b.t - a.t).slice(0, 20);
+  el.innerHTML = H3('Time (PT)') + H3('Venue') + H3('Price', 1) + H3('SOL', 1) + (SL.length ? SL.map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span style="font-family:inherit;font-size:12px;white-space:nowrap" title="${esc(t.v || '')}">${esc(mmId(t.v))}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(3)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
     : `<span class="mu" style="grid-column:1/-1">${ST.salesAt ? 'No trades yet.' : ST.salesErr ? (ST.q === 'USDT' ? 'No busy SOL/USDT pools publish trades right now. Most SOL trades are against USDC.' : "Can't load sales right now. Trying again shortly.") : 'loading…'}</span>`);
 }
 function stHave() {
@@ -16199,7 +16293,7 @@ function stPaintForm() {
 async function stEst() {   // live quote for the amount typed: what you pay / get, the minimum, Liquidfi's fee
   clearTimeout(ST.eT); const el = $('#stEst'); const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, '');
   if (!(amt > 0) || ST.mode !== 'mkt') { el.innerHTML = ''; ST.est = null; return; }
-  ST.eT = setTimeout(async () => { const Q = stQ(), px = ST.jin && ST.jin.ask ? ST.jin.ask : 0, buy = ST.side === 'buy';
+  ST.eT = setTimeout(async () => { const Q = stQ(), px = cxRef().ask || SOLPX.sol || 0, buy = ST.side === 'buy';
     try { const inAmt = buy ? Math.round(amt * (px || (SOLPX.sol || 0)) * 10 ** Q.d) : Math.round(amt * 1e9); if (!(inAmt > 0)) return;
       const q = await getJ(`${JUP}/quote?inputMint=${buy ? Q.mint : WSOL}&outputMint=${buy ? WSOL : Q.mint}&amount=${inAmt}&slippageBps=50&restrictIntermediateTokens=true`);
       const pay = buy ? inAmt / 10 ** Q.d : amt, get = buy ? +q.outAmount / 1e9 : +q.outAmount / 10 ** Q.d, at = buy ? pay / get : get / amt, fee = (buy ? pay : get) * SOL_FEE.bps / 1e4;
@@ -16216,27 +16310,26 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
     el.innerHTML = R.length ? R.map((s) => `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
   } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || e)}</span></div>`; }
 }
-function stLoop() {   // tape + size ladder every 30 s, venue quotes every 60 s; only while this screen is open and visible (GeckoTerminal's free limit is tight)
+function stLoop() {   // v2.41d: Manifest every 15 s; the 24 h volume card every 5 min. Coinbase / Kraken stream on their own.
   clearTimeout(ST.timer); if (cur !== 'strade' || !K) return; let n = 0;
   const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') {
-      try { await stLoadInside(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaintInside();
-      try { await stLoadClob(); } catch (e) {} if (cur === 'strade') stPaint();
-      try { await stLoadSales(); ST.salesErr = 0; } catch (e) { ST.salesErr = 1; } if (cur === 'strade') { stPaintSales(); stPaintVol(); }
+      try { await stLoadClob(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaint();
+      if (n % 20 === 0) { try { await stPools(); } catch (e) {} if (cur === 'strade') stPaintVol(); }
       n++; }
-    ST.timer = setTimeout(run, ST.fails || ST.salesErr ? 60000 : 30000); };
+    ST.timer = setTimeout(run, ST.fails ? 45000 : 15000); };
   run();
 }
 async function drawSTrade() {
   const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots');
-  $('#stFrom').textContent = w.name; stPaintForm(); stPaintInside(); stPaint(); stPaintSales(); stPaintVol(); $('#stEst').innerHTML = '';
+  $('#stFrom').textContent = w.name; stPaintForm(); stPaint(); stPaintSales(); stPaintVol(); $('#stEst').innerHTML = '';
   if (!SOLA[solSel]) solLoad(solSel).then(() => { if (cur === 'strade') stPaintForm(); }).catch(() => {});
-  stLoop(); stFills();
+  stLoop(); stFills(); cxStart();
 }
 async function stReview(btn) {
   if (ST.mode !== 'mkt') return; const d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
   const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, ''); if (!(amt > 0)) return toast('Enter an amount of SOL.');
   const Q = stQ(), C = solCoins(d), T = solTargets(), qc = C.find((c) => c.mint === Q.mint), sc = C.find((c) => c.v === 'SOL');
-  if (ST.side === 'buy') { const px = ST.jin && ST.jin.ask ? ST.jin.ask : SOLPX.sol, pay = Math.ceil(amt * px * 1.0 * 1e6) / 1e6;
+  if (ST.side === 'buy') { const px = cxRef().ask || SOLPX.sol, pay = Math.ceil(amt * px * 1.0 * 1e6) / 1e6;
     if (!qc) return toast(`No ${ST.q} in this wallet. Buy or swap some first.`); if (pay > qc.a + 1e-9) return toast(`That needs about ${m2(pay)} ${ST.q}; you have ${m2(qc.a)}.`);
     return solSwapCore(qc, T.find((c) => c.v === 'SOL'), pay, btn, 'Buy SOL', `Buy about ${solAmt(amt)} SOL`); }
   if (amt > sc.a + 1e-12) return toast(`At most ${m2(sc.a)} SOL: ${SOL_KEEP} stays for fees.`);
@@ -16244,8 +16337,8 @@ async function stReview(btn) {
 }
 document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, #stBk button, [data-spct]'); if (!b || cur !== 'strade') return;
   if (b.parentElement.id === 'stBk') { ST.bkv = b.dataset.v; return stPaint(); }
-  if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, px = ST.jin && ST.jin.ask ? ST.jin.ask : SOLPX.sol; const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
-  const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.jin = null; ST.bk = {}; ST.sales = []; ST.salesAt = 0; ST.at = 0; stPaintInside(); stPaint(); stPaintSales(); stPaintVol(); stLoop(); }
+  if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, px = cxRef().ask || SOLPX.sol; const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
+  const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.jin = null; ST.bk = {}; ST.tops = null; cxStart(); ST.sales = []; ST.salesAt = 0; ST.at = 0; stPaint(); stPaintSales(); stPaintVol(); stLoop(); }
   if (g === 'stSide') ST.side = b.dataset.v; if (g === 'stMode') ST.mode = b.dataset.v; stPaintForm(); stEst(); });
 document.addEventListener('input', (e) => { if (e.target && e.target.id === 'stAmt') stEst(); });
 
