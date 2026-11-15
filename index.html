@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40s</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40t</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -439,6 +439,24 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="xtFills" style="padding:8px 14px;font-size:13px"><div class="mu">loading…</div></div>
 </section>
 
+<!-- TRADE ON SOLANA (v2.40t): book = Jupiter's best price at several sizes; last sales = the biggest pool for the pair -->
+<section class="scr" id="s-strade">
+  <div class="top"><div class="l"><button class="ico back" data-go="sol" aria-label="Back">‹</button><h2>Trade SOL</h2></div><span class="mu" id="stFrom" style="font-size:13px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span></div>
+  <div class="seg" id="stQ"><button class="on" data-v="USDC">SOL / USDC</button><button data-v="USDT">SOL / USDT</button></div>
+  <div class="card"><div class="top"><span class="lbl" id="stPairL">SOL / USDC · Solana DEXes (Jupiter)</span><span class="grn" style="font-size:11px;font-weight:700" id="stUpd"></span></div><div class="book" id="stBook"></div><div class="mu" id="stSpread" style="font-size:12px"></div></div>
+  <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="mu" style="font-size:11px" id="stLastSrc"></span></div><div id="stLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
+  <div class="seg" id="stSide"><button class="on" data-v="buy">Buy SOL</button><button data-v="sell">Sell SOL</button></div>
+  <div class="seg" id="stMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
+  <div id="stModeNote" class="note" style="display:none"></div>
+  <label>Amount (SOL)<input id="stAmt" inputmode="decimal" placeholder="0"></label>
+  <div class="g4"><button class="b-out sm" data-spct="25">25%</button><button class="b-out sm" data-spct="50">50%</button><button class="b-out sm" data-spct="75">75%</button><button class="b-out sm" data-spct="100">Max</button></div>
+  <div class="mu" id="stHave" style="font-size:12px"></div>
+  <div class="card rows" id="stEst" style="padding:4px 14px;font-size:14px"></div>
+  <button class="b-grn big" data-act="stReview" id="stGo">Buy</button>
+  <div class="top" style="align-items:baseline"><span class="lbl">Your trades</span><span class="mu" style="font-size:11px">this wallet</span></div>
+  <div class="card" id="stFills" style="padding:4px 14px;font-size:14px"><div><span class="mu">loading…</span></div></div>
+</section>
+
 <section class="scr" id="s-result">
   <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:40px"><div id="rIco"></div><h1 id="rTitle" style="text-align:center"></h1></div>
   <div id="rBody" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -591,7 +609,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40s</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40t</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -623,7 +641,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40s · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.40t · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13965,9 +13983,9 @@ function go(name) {
   cur = name;
   $$('.scr').forEach((s) => s.classList.toggle('on', s.id === 's-' + name));
   $('#nav').classList.toggle('on', !['lock', 'setup', 'backup'].includes(name));
-  $$('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.go === name || (['bot', 'home', 'trade', 'send', 'receive', 'trust', 'port', 'swap', 'xswap', 'xrp', 'xtrade', 'sol', 'act'].includes(name) && b.dataset.go === 'bots') || (name === 'set' && b.dataset.go === setFrom) || (name === 'l2' && b.dataset.go === 'mkt')));
+  $$('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.go === name || (['bot', 'home', 'trade', 'send', 'receive', 'trust', 'port', 'swap', 'xswap', 'xrp', 'xtrade', 'sol', 'strade', 'act'].includes(name) && b.dataset.go === 'bots') || (name === 'set' && b.dataset.go === setFrom) || (name === 'l2' && b.dataset.go === 'mkt')));
   window.scrollTo(0, 0);
-  const f = { lock: drawLock, mkt: drawMkt, l2: drawL2, act: drawAct, earn: drawEarn, home: drawHome, bots: drawBots, bot: drawBot, trade: drawTrade, send: drawSend, receive: drawReceive, trust: drawTrust, set: drawSet, port: drawPort, swap: drawSwap, xswap: drawXSwap, xrp: drawXrp, xtrade: drawXTrade, sol: drawSol }[name];
+  const f = { lock: drawLock, mkt: drawMkt, l2: drawL2, act: drawAct, earn: drawEarn, home: drawHome, bots: drawBots, bot: drawBot, trade: drawTrade, send: drawSend, receive: drawReceive, trust: drawTrust, set: drawSet, port: drawPort, swap: drawSwap, xswap: drawXSwap, xrp: drawXrp, xtrade: drawXTrade, sol: drawSol, strade: drawSTrade }[name];
   if (f) f();
 }
 function toast(msg, ms = 4000) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), ms); }
@@ -15662,7 +15680,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.40s';
+const APP_VER = 'v2.40t';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15921,12 +15939,16 @@ function jupIx(x, me) {
   return sIx(x.programId, x.accounts.map((a) => ({ k: a.pubkey, s: a.isSigner ? 1 : 0, w: a.isWritable ? 1 : 0 })), ub64(x.data));
 }
 async function solSwapGo(btn) {
-  const o = solOwn(solSel), d = SOLA[solSel]; if (!o || !d) return;
+  const d = SOLA[solSel]; if (!d) return;
   const F = solCoins(d).find((c) => c.v === $('#swF').value), T = solTargets().find((c) => c.v === $('#swT').value), amt = +String($('#swA').value).replace(/,/g, '');
-  if (!F || !T) return; if (F.v === T.v) return toast('Pick two different coins.');
+  return solSwapCore(F, T, amt, btn, 'Review');
+}
+async function solSwapCore(F, T, amt, btn, btnTxt, title) {   /* shared by Swap and Trade: quote, build, check, confirm, send */
+  const o = solOwn(solSel), d = SOLA[solSel]; if (!o || !d) return;
+  if (!F) return toast("This wallet doesn't hold that coin yet."); if (!T) return; if (F.v === T.v) return toast('Pick two different coins.');
   if (!(amt > 0)) return toast('Enter an amount.'); if (amt > F.a + 1e-12) return toast(F.v === 'SOL' ? `At most ${m2(F.a)} SOL: ${SOL_KEEP} stays for fees.` : `You have ${m2(F.a)} ${F.c}.`);
   if (btn) { btn.disabled = true; btn.textContent = 'Getting the best price…'; }
-  const back = () => { if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = 'Review'; } };
+  const back = () => { if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = btnTxt || 'Review'; } };
   try {
     let units = BigInt(Math.round(amt * 10 ** F.d));
     const fc = { mint: F.mint, d: F.d, t22: F.t22, ata: F.ata, sol: F.v === 'SOL', sym: F.c };
@@ -15956,10 +15978,117 @@ async function solSwapGo(btn) {
       ...(opens ? [{ foot: `This wallet has never held ${T.c}, so this also opens a ${T.c} account: ${SOL_RENT.tok / 1e9} SOL deposit, refundable if you close it later.` }] : []),
       ...(imp >= 1 ? [{ foot: `⚠ Price impact is ${imp.toFixed(1)}%: this trade moves the price. Consider a smaller amount.` }] : [])];
     back();
-    confirmSheet(`Swap ${m2(amt)} ${F.c} → ${T.c}`, `Solana · ${esc(o.name)} · through Jupiter`, items, 'Swap', async () => {
-      try { solResult(await solSendIxs(o, ixs, solWaitLabel), 'Swap'); } catch (e) { closeSheet(); toast(e.message || String(e), 6000); } }, false, 'b-acc', 'Swapping…', true);
+    confirmSheet(title || `Swap ${m2(amt)} ${F.c} → ${T.c}`, `Solana · ${esc(o.name)} · through Jupiter`, items, title ? 'Confirm' : 'Swap', async () => {
+      try { const r = await solSendIxs(o, ixs, solWaitLabel); if (cur === 'strade' && r.state === 'ok') { closeSheet(); delete SOLA[solSel]; toast('Trade done.'); return drawSTrade(); } solResult(r, title ? 'Trade' : 'Swap'); } catch (e) { closeSheet(); toast(e.message || String(e), 6000); } }, false, 'b-acc', 'Swapping…', true);
   } catch (e) { back(); toast(e.message || String(e), 6000); }
 }
+
+/* v2.40t Trade on Solana (Jeff: "I press the Trade on Solana but there's no book or last sales?"): same layout as Trade XRP.
+   Solana's exchanges are mostly pools, not order books, so the book shows what Jupiter's best route pays at each size
+   ($100 … $50k): bids = selling that much SOL, asks = buying it. Last sales = live trades in the biggest pool for the pair
+   (GeckoTerminal's free feed). Orders run through the same Jupiter engine as Swap (Liquidfi fee in SOL). */
+const ST = { q: 'USDC', side: 'buy', mode: 'mkt', bids: [], asks: [], at: 0, fails: 0, sales: [], salesAt: 0, pool: {}, timer: 0, eT: 0, est: null };
+const ST_SIZES = [100, 1000, 10000, 50000];
+const stQ = () => ({ USDC: { mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', d: 6 }, USDT: { mint: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB', d: 6 } })[ST.q];
+async function stLoadBook() {
+  const Q = stQ(), px = (await solPrices()).sol; if (!(px > 0)) throw new Error('no price');
+  const qt = (i, o, a) => getJ(`${JUP}/quote?inputMint=${i}&outputMint=${o}&amount=${a}&slippageBps=50&restrictIntermediateTokens=true`).catch(() => null);
+  const R = await Promise.all(ST_SIZES.flatMap((usd) => [qt(WSOL, Q.mint, Math.round(usd / px * 1e9)), qt(Q.mint, WSOL, Math.round(usd * 10 ** Q.d))]));
+  const bids = [], asks = [];
+  ST_SIZES.forEach((usd, k) => { const s = R[2 * k], b = R[2 * k + 1];
+    if (s && +s.outAmount > 0) { const sol = +s.inAmount / 1e9; bids.push([+s.outAmount / 10 ** Q.d / sol, sol]); }
+    if (b && +b.outAmount > 0) { const sol = +b.outAmount / 1e9; asks.push([+b.inAmount / 10 ** Q.d / sol, sol]); } });
+  for (let i = 0; i < Math.min(bids.length, asks.length); i++) if (asks[i][0] < bids[i][0]) { const m = (asks[i][0] + bids[i][0]) / 2; asks[i][0] = bids[i][0] = m; }   /* two routes a moment apart can cross by a hair: show the middle */
+  ST.bids = bids; ST.asks = asks; ST.at = Date.now();
+}
+async function stPool() {   // biggest pool for SOL/<quote>, looked up once an hour
+  const k = ST.q; if (ST.pool[k] && Date.now() - ST.pool[k].at < 3600000) return ST.pool[k];
+  const j = await getJ('https://api.geckoterminal.com/api/v2/networks/solana/tokens/' + WSOL + '/pools?page=1');
+  const L = (j.data || []).filter((p) => (p.attributes.name || '').replace(/\s/g, '') === 'SOL/' + k).sort((a, b) => +b.attributes.reserve_in_usd - +a.attributes.reserve_in_usd);
+  if (!L.length) throw new Error('no pool'); const p = L[0];
+  return (ST.pool[k] = { addr: p.attributes.address, dex: (p.relationships.dex.data.id || '').replace(/-.*$/, ''), at: Date.now() });
+}
+async function stLoadSales() {
+  const P = await stPool(), j = await getJ(`https://api.geckoterminal.com/api/v2/networks/solana/pools/${P.addr}/trades`);
+  ST.sales = (j.data || []).map((x) => x.attributes).filter((a) => !a.is_anomalous).slice(0, 12).map((a) => { const buy = a.kind === 'buy', sol = +(buy ? a.to_token_amount : a.from_token_amount), q = +(buy ? a.from_token_amount : a.to_token_amount);
+    return { t: Date.parse(a.block_timestamp), px: q / sol, x: sol, buy, h: a.tx_hash }; }).filter((t) => t.px > 0 && t.x > 0);
+  ST.salesAt = Date.now(); ST.src = P.dex.charAt(0).toUpperCase() + P.dex.slice(1) + ' pool · biggest SOL/' + ST.q;
+}
+function stPaint() {
+  const el = $('#stBook'); if (!el) return;
+  const rows = [`<span class="mu s2" style="font-family:inherit;font-weight:600">Bids · size</span><span class="mu s2" style="text-align:right;font-weight:600">Asks · size</span>`];
+  for (let i = 0; i < ST_SIZES.length; i++) { const b = ST.bids[i], a = ST.asks[i]; rows.push(`<span class="buy">${b ? b[0].toFixed(3) : ''}</span><span class="buy sz">${b ? szFmt(b[1]) : ''}</span><span class="sell ap">${a ? a[0].toFixed(3) : ''}</span><span class="sell sz">${a ? szFmt(a[1]) : ''}</span>`); }
+  el.innerHTML = rows.join('');
+  const b = ST.bids[0], a = ST.asks[0], u = $('#stUpd'), last = ST.at ? new Date(ST.at).toLocaleTimeString() : '';
+  u.className = ST.fails > 1 ? 'amb' : ST.fails ? 'mu' : 'grn'; u.textContent = !ST.at ? 'loading…' : ST.fails > 1 ? `retrying… prices from ${last}` : (ST.fails ? 'updated ' : 'live · ') + last;
+  $('#stPairL').textContent = `SOL / ${ST.q} · Solana DEXes (Jupiter)`;
+  $('#stSpread').textContent = b && a ? `Mid ${((a[0] + b[0]) / 2).toFixed(3)} ${ST.q} · spread ${(() => { const v = Math.max(0, ((a[0] - b[0]) / ((a[0] + b[0]) / 2)) * 1e4); return v < 10 ? v.toFixed(1) : v.toFixed(0); })()} bps · each level is the price for that whole size (about $${ST_SIZES.map((x) => x >= 1000 ? x / 1000 + 'k' : x).join(', $')})` : (ST.at ? 'No route right now.' : '');
+}
+function stPaintSales() {
+  const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = ST.src || '';
+  const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
+  el.innerHTML = H3('Time (PT)') + H3('Price', 1) + H3('SOL', 1) + (ST.sales.length ? ST.sales.map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(3)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
+    : `<span class="mu">${ST.salesAt ? 'No trades yet.' : ST.salesErr ? "Can't load sales right now." : 'loading…'}</span><span></span><span></span>`);
+}
+function stHave() {
+  const d = SOLA[solSel], Q = stQ(); if (!d) return { sol: 0, q: 0, qt: null };
+  const t = d.toks.find((x) => x.mint === Q.mint); return { sol: Math.max(0, d.sol - SOL_KEEP), q: t ? t.amt : 0, qt: t };
+}
+function stPaintForm() {
+  $$('#stSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.side)); $$('#stMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.mode)); $$('#stQ button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.q));
+  const h = stHave(), g = $('#stGo'); g.textContent = ST.mode !== 'mkt' ? 'Coming next' : ST.side === 'buy' ? 'Buy SOL' : 'Sell SOL'; g.className = (ST.side === 'buy' ? 'b-grn' : 'b-red') + ' big'; g.disabled = ST.mode !== 'mkt';
+  $('#stHave').textContent = ST.side === 'buy' ? `You have ${m2(h.q)} ${ST.q} to buy with` : `You have ${m2(h.sol)} SOL to sell (${SOL_KEEP} SOL stays for fees)`;
+  const n = $('#stModeNote'); n.style.display = ST.mode === 'mkt' ? 'none' : ''; n.textContent = ST.mode === 'lim' ? 'Limit orders on Solana are coming next (Jupiter limit orders). Market orders work now.' : ST.mode === 'stop' ? 'Stop orders on Solana are coming next. Market orders work now.' : '';
+}
+async function stEst() {   // live quote for the amount typed: what you pay / get, the minimum, Liquidfi's fee
+  clearTimeout(ST.eT); const el = $('#stEst'); const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, '');
+  if (!(amt > 0) || ST.mode !== 'mkt') { el.innerHTML = ''; ST.est = null; return; }
+  ST.eT = setTimeout(async () => { const Q = stQ(), px = ST.asks[0] ? ST.asks[0][0] : 0, buy = ST.side === 'buy';
+    try { const inAmt = buy ? Math.round(amt * (px || (SOLPX.sol || 0)) * 10 ** Q.d) : Math.round(amt * 1e9); if (!(inAmt > 0)) return;
+      const q = await getJ(`${JUP}/quote?inputMint=${buy ? Q.mint : WSOL}&outputMint=${buy ? WSOL : Q.mint}&amount=${inAmt}&slippageBps=50&restrictIntermediateTokens=true`);
+      const pay = buy ? inAmt / 10 ** Q.d : amt, get = buy ? +q.outAmount / 1e9 : +q.outAmount / 10 ** Q.d, at = buy ? pay / get : get / amt, fee = (buy ? pay : get) * SOL_FEE.bps / 1e4;
+      ST.est = { pay: buy ? pay : amt };
+      if (+String(($('#stAmt') || {}).value || '').replace(/,/g, '') !== amt) return;
+      el.innerHTML = `<div><span>${buy ? 'You pay about' : 'You sell'}</span><span class="mono">${buy ? m2(pay) + ' ' + ST.q : solAmt(amt) + ' SOL'}</span></div><div><span>${buy ? 'You get about' : 'You get about'}</span><span class="mono">${buy ? solAmt(get) + ' SOL' : m2(get) + ' ' + ST.q}</span></div><div><span>Price</span><span class="mono">${at.toFixed(3)} ${ST.q}</span></div>${SOL_FEE.owner && solSel !== SOL_FEE.owner ? `<div><span>Liquidfi fee</span><span class="mono">${(SOL_FEE.bps / 100).toFixed(2)}% · about $${fee.toFixed(2)} in SOL</span></div>` : ''}<div><span class="mu" style="font-size:12px">You get at least 99.5% of this or nothing trades.</span><span></span></div>`;
+    } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || 'No route right now.')}</span></div>`; } }, 350);
+}
+async function stFills() {   // this wallet's recent swaps, from the same reader as Recent
+  const el = $('#stFills'); if (!el) return; const addr = solSel;
+  try { const L = await solRpc('getSignaturesForAddress', [addr, { limit: 15, commitment: 'confirmed' }]); if (cur !== 'strade' || solSel !== addr) return;
+    for (const s of (L || []).filter((s) => !SOLTX[s.signature + addr]).slice(0, 6)) { const t = await solRpc('getTransaction', [s.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }]).catch(() => null); if (t) SOLTX[s.signature + addr] = solTxSum(addr, t); }
+    solTxSave(); const R = (L || []).filter((s) => /^Swapped/.test((SOLTX[s.signature + addr] || {}).txt || ''));
+    el.innerHTML = R.length ? R.map((s) => `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
+  } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || e)}</span></div>`; }
+}
+function stLoop() {   // book every 15 s, sales every 15 s, only while this screen is open and visible
+  clearTimeout(ST.timer); if (cur !== 'strade' || !K) return;
+  const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') {
+      try { await stLoadBook(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaint();
+      try { await stLoadSales(); ST.salesErr = 0; } catch (e) { ST.salesErr = 1; } if (cur === 'strade') stPaintSales(); }
+    ST.timer = setTimeout(run, ST.fails ? Math.min(60000, 15000 * 2 ** Math.min(ST.fails - 1, 2)) : 15000); };
+  run();
+}
+async function drawSTrade() {
+  const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots');
+  $('#stFrom').textContent = w.name; stPaintForm(); stPaint(); stPaintSales(); $('#stEst').innerHTML = '';
+  if (!SOLA[solSel]) solLoad(solSel).then(() => { if (cur === 'strade') stPaintForm(); }).catch(() => {});
+  stLoop(); stFills();
+}
+async function stReview(btn) {
+  if (ST.mode !== 'mkt') return; const d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
+  const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, ''); if (!(amt > 0)) return toast('Enter an amount of SOL.');
+  const Q = stQ(), C = solCoins(d), T = solTargets(), qc = C.find((c) => c.mint === Q.mint), sc = C.find((c) => c.v === 'SOL');
+  if (ST.side === 'buy') { const px = ST.asks[0] ? ST.asks[0][0] : SOLPX.sol, pay = Math.ceil(amt * px * 1.0 * 1e6) / 1e6;
+    if (!qc) return toast(`No ${ST.q} in this wallet. Buy or swap some first.`); if (pay > qc.a + 1e-9) return toast(`That needs about ${m2(pay)} ${ST.q}; you have ${m2(qc.a)}.`);
+    return solSwapCore(qc, T.find((c) => c.v === 'SOL'), pay, btn, 'Buy SOL', `Buy about ${solAmt(amt)} SOL`); }
+  if (amt > sc.a + 1e-12) return toast(`At most ${m2(sc.a)} SOL: ${SOL_KEEP} stays for fees.`);
+  return solSwapCore(sc, T.find((c) => c.mint === Q.mint), amt, btn, 'Sell SOL', `Sell ${solAmt(amt)} SOL`);
+}
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, [data-spct]'); if (!b || cur !== 'strade') return;
+  if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, px = ST.asks[0] ? ST.asks[0][0] : SOLPX.sol; const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
+  const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.bids = ST.asks = []; ST.sales = []; ST.salesAt = 0; ST.at = 0; stPaint(); stPaintSales(); stLoop(); }
+  if (g === 'stSide') ST.side = b.dataset.v; if (g === 'stMode') ST.mode = b.dataset.v; stPaintForm(); stEst(); });
+document.addEventListener('input', (e) => { if (e.target && e.target.id === 'stAmt') stEst(); });
 
 /* Earn: Jupiter Lend (mainnet). Rates come in basis points (389 = 3.89%). Deposit/withdraw instructions come from Jupiter's
    API; the transaction is put together and signed here, with Liquidfi's fee (when on) as a plain token payment in the same transaction. */
@@ -20685,7 +20814,7 @@ document.addEventListener('click', async (e) => {
     acctGo: () => { const b = tradeAccts()[botSel]; if (!b) return; const f = () => { rcvWant = b.addr; go(t.dataset.to === 'receive' ? 'receive' : 'bots'); }; return t.dataset.to === 'receive' ? phGate(f)() : f(); },
     rcvHome: phGate(() => { rcvWant = homeAddr; go('receive'); }),
     homeBuy: phGate(() => homeAddr && onrBuySheet('stellar', homeAddr)), homeSwap: () => { if (!OWN().length) return toast('Add a wallet first.'); go('swap'); },
-    xrBuy: phGate(() => xrSel && onrBuySheet('xrp', xrSel)), solSwap: () => solSwapSheet('swap'), solTrade: () => solSwapSheet('trade'), solSwMax: () => solSwMax(), solSwGo: () => solSwapGo(t),
+    xrBuy: phGate(() => xrSel && onrBuySheet('xrp', xrSel)), solSwap: () => solSwapSheet('swap'), solTrade: () => { if (solNet() !== 'mainnet') return toast('Trading runs on Solana Mainnet only.'); go('strade'); }, stReview: () => stReview(t), solSwMax: () => solSwMax(), solSwGo: () => solSwapGo(t),
     rmWatch: () => { const i = NS().bots.indexOf(tradeAccts()[botSel]); if (i < 0) return; t.dataset.i = i; A.rmBot(); },
     addAcct: () => A.addWallet(),
     xrBackup: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i >= 0) walletKeySheet('xrp', i); },
