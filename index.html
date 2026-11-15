@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40q</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40r</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -591,7 +591,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40q</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40r</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -623,7 +623,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40q · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.40r · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15631,7 +15631,7 @@ function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) f
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
-const solWho = (a) => { if (!a) return ''; if (SOL_KNOWN[a]) return SOL_KNOWN[a]; const w = solList().find((x) => x.addr === a); if (w) return w.name; if (SOL_FEE.owner && a === SOL_FEE.owner) return 'Liquidfi fee'; return short(a); };
+const solWho = (a) => { if (!a) return ''; if (SOL_KNOWN[a]) return SOL_KNOWN[a]; const w = solList().find((x) => x.addr === a); if (w) return w.name; const b = solBook().find((x) => x.addr === a); if (b) return b.name; if (SOL_FEE.owner && a === SOL_FEE.owner) return 'Liquidfi fee'; return short(a); };
 const solAmt = (x) => { const v = Math.abs(x); return v >= 1 ? m2(v) : String(+v.toPrecision(4)); };
 // what this transaction did to `addr`: SOL and token changes (fee left out), who was on the other side
 function solTxSum(addr, t) {
@@ -15681,18 +15681,64 @@ function solRcvSheet() {
 }
 
 /* send SOL or a token */
-function solSendSheet() {
-  const d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
+/* v2.40r (Jeff: "we need to add addresses into our address book in SOL like the others"): like Stellar and XRP, you only send to
+   a saved address you checked (name + address, compared group by group, last 4 typed). Saved per network in NS().ssaved. */
+function solBook() { const n = NS(); if (!Array.isArray(n.ssaved)) n.ssaved = []; return n.ssaved; }
+function solBookSave(name, addr) { const L = solBook(), i = L.findIndex((x) => x.addr === addr); if (i >= 0) { L[i].name = name; saveS(); return i; } L.push({ name, addr }); saveS(); return L.length - 1; }
+function solLookAlike(a) {   /* address poisoning: same first 4 and last 4 as a saved address or one of your Solana wallets, different middle */
+  const K2 = new Set([...solBook().map((x) => x.addr), ...solList().map((w) => w.addr)]);
+  if (!a || K2.has(a)) return null;
+  for (const k of K2) if (k && k.slice(0, 4) === a.slice(0, 4) && k.slice(-4) === a.slice(-4)) return k;
+  return null;
+}
+const parseSolQR = (txt) => { const t = String(txt || '').trim().replace(/^solana:/i, '').split(/[?&#]/)[0]; return solAddrOk(t) ? { addr: t } : null; };
+let SOCHK = null;   /* the address being checked: { name, addr } */
+function solSendSheet(pre = {}) {
+  const d = SOLA[solSel], o = solOwn(solSel); if (!d || !o) return toast('Still loading. Try again in a moment.'); pending = null; SOCHK = null;
   const coins = [{ v: 'SOL', a: Math.max(0, d.sol - SOL_KEEP) }, ...d.toks.filter((t) => t.c && t.amt > 0).map((t) => ({ v: t.mint, c: t.c, a: t.amt }))];
-  sheet(`<h2>Send from Solana</h2><label class="fld"><span>Coin</span><select id="soCoin">${coins.map((c) => `<option value="${esc(c.v)}">${esc(c.c || c.v)} · ${m2(c.a)} available</option>`).join('')}</select></label>
-    <label class="fld"><span>To (Solana address)</span><input id="soTo" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Solana address"></label>
-    <label class="fld"><span>Amount</span><input id="soAmt" inputmode="decimal" placeholder="0.00"></label><button class="b-out sm" data-act="solMax" style="width:auto">Max</button>
-    <div class="mu" style="font-size:12.5px">${SOL_KEEP} SOL stays in the wallet for fees and coin deposits.</div>
-    <button class="b-light big" data-act="solSendGo">Review</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  const SB = solBook(), pick = pre.pick != null && SB[pre.pick] ? String(pre.pick) : '';
+  sheet(`<h2>Send from Solana</h2><div class="mu" style="font-size:13px">From ${esc(o.name)}</div>
+    <label class="fld"><span>Coin</span><select id="soCoin">${coins.map((c) => `<option value="${esc(c.v)}"${c.v === pre.coin ? ' selected' : ''}>${esc(c.c || c.v)} · ${m2(c.a)} available</option>`).join('')}</select></label>
+    <label>To<select id="soBook"><option value="">Choose…</option>${SB.map((x, i) => `<option value="${i}"${String(i) === pick ? ' selected' : ''}>${esc(x.name)} · ${esc(short(x.addr))}</option>`).join('')}<option value="new">+ New address</option></select></label>
+    <div id="soNew" style="display:none;flex-direction:column;gap:10px">
+      <label>Name for this address<input id="soName2" placeholder="e.g. Coinbase" maxlength="30" autocomplete="off"></label>
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px">Solana address</span><div class="scanrow"><input id="soTo" placeholder="Solana address" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"><button class="b-out" data-act="solScan">Scan</button></div><div id="soScan"></div></div>
+      <div id="soChk"></div>
+      <button class="b-out" data-act="solBookCheck" id="soChkBtn">Check and save address</button>
+    </div>
+    <div id="soSendW" style="display:flex;flex-direction:column;gap:10px">
+      <div class="g2" style="align-items:end"><label>Amount<input id="soAmt" inputmode="decimal" placeholder="0" value="${esc(pre.amt || '')}"></label><button class="b-out" data-act="solMax">Max</button></div>
+      <div class="mu" style="font-size:12.5px">${SOL_KEEP} SOL stays in the wallet for fees and coin deposits.</div>
+      <div class="note"><span>Only saved, checked addresses can be sent to.</span></div>
+      <button class="b-light big" data-act="solSendGo">Review send</button></div>
+    <button class="b-out" data-act="closeSheet">Cancel</button>`);
+}
+function solsShow() { const v = ($('#soBook') || {}).value; $('#soNew').style.display = v === 'new' ? 'flex' : 'none'; $('#soSendW').style.display = v === 'new' ? 'none' : 'flex'; }
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'soBook') { SOCHK = null; if ($('#soChk')) $('#soChk').innerHTML = ''; solsShow(); } });
+document.addEventListener('input', (e) => { if (e.target && ['soTo', 'soName2'].includes(e.target.id) && SOCHK) { SOCHK = null; $('#soChk').innerHTML = ''; $('#soChkBtn').textContent = 'Check and save address'; } });
+async function solBookCheck() {
+  if (SOCHK) {   /* step 2: last 4 typed → save and go back to Send with it picked */
+    if ((($('#soChk4') || {}).value || '').trim() !== SOCHK.addr.slice(-4)) return toast('Last 4 do not match.');
+    const amt = ($('#soAmt') || {}).value || '', coin = ($('#soCoin') || {}).value, i = solBookSave(SOCHK.name, SOCHK.addr); SOCHK = null;
+    toast('Saved.'); return solSendSheet({ pick: i, amt, coin });
+  }
+  const name = ($('#soName2').value || '').trim().slice(0, 30), addr = ($('#soTo').value || '').trim();
+  if (!name) return toast('Give the address a name.');
+  if (!solAddrOk(addr)) return toast("That isn't a Solana address.");
+  if (addr === solSel) return toast("That's this wallet.");
+  { const la = solLookAlike(addr); if (la) return toast(`⚠ This looks like ${short(la)} but the middle is different: a scam look-alike. Copy the address from the real source (exchange page or QR), never from your history.`, 9000); }
+  if (!edOnCurve(b58d(addr))) return toast('That address belongs to a program, not a wallet. Sending there would lose the coins.', 6000);
+  let info = null; try { info = await solRpc('getBalance', [addr, { commitment: 'confirmed' }]); } catch (e) {}
+  SOCHK = { name, addr };
+  $('#soChk').innerHTML = `<div class="mu" style="font-size:13.5px">Compare every group with the source (exchange page, QR). Then type the last 4 characters.</div>
+    <div class="card"><div class="addr" style="font-size:15px;line-height:1.7">${[addr.slice(0, 4), ...(addr.slice(4, -4).match(/.{1,4}/g) || []), addr.slice(-4)].map((g) => `<span style="display:inline-block;white-space:nowrap;margin-right:.45em">${esc(g)}</span>`).join('')}</div><div class="mu" style="font-size:13px">${info && info.value > 0 ? 'Exists on Solana' : 'New on Solana (no SOL yet): your first send opens it'}</div></div>
+    <label>Last 4 characters<input id="soChk4" autocomplete="off" autocapitalize="off" spellcheck="false"></label>`;
+  $('#soChkBtn').textContent = 'Save address'; $('#soChk4').focus();
 }
 async function solSendGo() {
   const o = solOwn(solSel), d = SOLA[solSel]; if (!o || !d) return;
-  const coin = $('#soCoin').value, to = $('#soTo').value.trim(), amt = +String($('#soAmt').value).replace(/,/g, '');
+  const bv = ($('#soBook') || {}).value, bk = solBook()[+bv]; if (!bk || bv === '' || bv === 'new') return toast('Choose a saved address.');
+  const coin = $('#soCoin').value, to = bk.addr, amt = +String($('#soAmt').value).replace(/,/g, '');
   if (!solAddrOk(to)) return toast("That isn't a Solana address.");
   if (to === o.addr) return toast("That's this wallet.");
   if (!(amt > 0)) return toast('Enter an amount.');
@@ -15710,7 +15756,7 @@ async function solSendGo() {
     const open = !(has && has.value); if (open) { if (d.sol < SOL_RENT.tok / 1e9 + 0.0001) return toast(`That address has never held ${t.c}. Opening it costs ${SOL_RENT.tok / 1e9} SOL, and this wallet doesn't have it.`, 6000); rentNote = `That address has never held ${t.c}, so this also opens it there: ${SOL_RENT.tok / 1e9} SOL (about $${fx(SOL_RENT.tok / 1e9 * SOLPX.sol)}) goes into that account as its deposit.`; }
     ixs = [...(open ? [ixAtaOpen(o.addr, dAta, to, t.mint, t.t22)] : []), ixTokPay(t.ata, t.mint, dAta, o.addr, units, t.d, t.t22)]; items = [{ k: 'Send', v: `${m2(amt)} ${t.c}`, hl: 1 }];
   }
-  items.push({ k: 'To', v: `${to.slice(0, 6)}…${to.slice(-6)}`, n: 'check the start and end' }, { k: 'Network fee', v: 'about 0.00002 SOL' });
+  items.push({ k: 'To', v: `${bk.name} · ${to.slice(0, 6)}…${to.slice(-6)}`, n: 'check the start and end' }, { k: 'Network fee', v: 'about 0.00002 SOL' });
   if (rentNote) items.push({ foot: rentNote });
   try { await solSim(o, ixs); } catch (e) { return toast(e.message || String(e), 6000); }
   confirmSheet('Send ' + items[0].v.replace(/^Send /, ''), `Solana${solNet() === 'devnet' ? ' Devnet' : ''} · from ${esc(o.name)}`, items, 'Send', async () => {
@@ -20220,13 +20266,14 @@ async function trCheck() {
 }
 
 /* ---------- settings ---------- */
-function bookList() { return [...(NS().saved || []).map((x, i) => ({ k: 'st', i, x })), ...xrBook().map((x, i) => ({ k: 'xr', i, x }))]; }
+function bookList() { return [...(NS().saved || []).map((x, i) => ({ k: 'st', i, x })), ...xrBook().map((x, i) => ({ k: 'xr', i, x })), ...solBook().map((x, i) => ({ k: 'so', i, x }))]; }
+const bookArr = (k) => (k === 'xr' ? xrBook() : k === 'so' ? solBook() : NS().saved || []);
 function bookPaint() {
   const el = $('#setBookL'); if (!el) return; const L = bookList();
   const grp = (k, h) => { const R = L.filter((r) => r.k === k); return R.length ? `<span class="mu" style="font-size:12px;margin-top:4px">${h}</span>` + R.map((r) => `<div class="r" style="gap:8px;align-items:center"><span style="min-width:0;overflow-wrap:anywhere"><b>${esc(r.x.name)}</b> <span class="mu mono" style="font-size:12px">${esc(short(r.x.addr))}${r.x.tag ? ' · tag ' + esc(r.x.tag) : ''}${r.x.memo ? ' · memo ' + esc(r.x.memo) : ''}</span></span><span style="display:flex;gap:6px;flex:none"><button class="b-out sm" data-act="bookRen" data-k="${k}" data-i="${r.i}" style="width:auto;padding:0 10px">Rename</button><button class="b-out sm" data-act="bookDel" data-k="${k}" data-i="${r.i}" style="width:auto;padding:0 10px">Delete</button></span></div>`).join('') : ''; };
-  el.innerHTML = L.length ? grp('st', 'Stellar') + grp('xr', 'XRP Ledger') : '<div class="mu" style="font-size:13px">No saved addresses yet. Add one from Send.</div>';
+  el.innerHTML = L.length ? grp('st', 'Stellar') + grp('xr', 'XRP Ledger') + grp('so', 'Solana') : '<div class="mu" style="font-size:13px">No saved addresses yet. Add one from Send.</div>';
 }
-const bookGet = (k, i) => (k === 'xr' ? xrBook() : NS().saved || [])[+i];
+const bookGet = (k, i) => bookArr(k)[+i];
 function bookRen(k, i) {
   const x = bookGet(k, i); if (!x) return; pending = null; window._bookEd = { k, i: +i, addr: x.addr };
   sheet(`<h2>Rename address</h2><div class="mu mono" style="font-size:13px">${esc(short(x.addr))}${x.tag ? ' · tag ' + esc(x.tag) : ''}</div><label>Name<input id="bookName" maxlength="30" value="${esc(x.name)}" autocomplete="off"></label>
@@ -20243,7 +20290,7 @@ function bookDel(k, i) {
     <button class="b-red big" data-act="bookDelOk">Delete</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
 }
 function bookDelOk() {
-  const e = window._bookEd, L = e && (e.k === 'xr' ? xrBook() : NS().saved || []), x = L && L[e.i];
+  const e = window._bookEd, L = e && bookArr(e.k), x = L && L[e.i];
   if (!x || x.addr !== e.addr) return closeSheet();
   L.splice(e.i, 1); saveS(); closeSheet(); bookPaint(); toast('Deleted.');
 }
@@ -20454,7 +20501,7 @@ document.addEventListener('click', async (e) => {
   const act = t.dataset.act; if (!act) return;
   const A = {
     setup: doSetup, exportVault, lock,
-    solAddSheet: () => solAddSheet(), solAddOk: () => solAdd(), solRcv: () => solRcvSheet(), solBuy: phGate(() => solSel && onrBuySheet('solana', solSel)), solSendSheet: () => solSendSheet(), solSendGo: () => solSendGo(),
+    solAddSheet: () => solAddSheet(), solAddOk: () => solAdd(), solRcv: () => solRcvSheet(), solBookCheck: () => solBookCheck(), solScan: () => scanInline($('#soScan'), (r) => { $('#soTo').value = r.addr; SOCHK = null; $('#soChk').innerHTML = ''; $('#soChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseSolQR, 'a Solana address'), solBuy: phGate(() => solSel && onrBuySheet('solana', solSel)), solSendSheet: () => solSendSheet(), solSendGo: () => solSendGo(),
     solMax: () => { const d = SOLA[solSel], c = $('#soCoin').value; if (!d) return; $('#soAmt').value = c === 'SOL' ? String(Math.max(0, Math.floor((d.sol - SOL_KEEP) * 1e6) / 1e6)) : String((d.toks.find((x) => x.mint === c) || {}).amt || 0); },
     solBackup: () => solBackup(), solRemove: () => solRemove(), solVanPay: () => solVanPay(), solVanDrop: () => { SOLVANHIT = null; closeSheet(); toast('Discarded.'); },
     solSecCopy: () => { const o = solOwn(solSel); if (o && navigator.clipboard) navigator.clipboard.writeText(solSecret(o)).then(() => toast('Secret key copied. Paste it only into your password manager.')).catch(() => toast("Couldn't copy.")); },
