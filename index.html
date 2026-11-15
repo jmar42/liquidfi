@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42t · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42u · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15709,7 +15709,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42t';
+const APP_VER = 'v2.42u';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16814,7 +16814,7 @@ function solGroupHtml(g, L, addr, STR) {   /* v2.42t (Jeff: "why so many updates
   const P = g.place, sd = P.bid ? 'buy' : 'sell', Sd = P.bid ? 'Bought' : 'Sold', tr = [], route = []; let fee = 0, cx = null, mf = null, cxc = null;
   const tm = (t) => (t ? new Date(t * 1000).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit', second: '2-digit' }) : '');
   for (const sig of g.sigs) { const x = SOLTX[sig + addr] || {}, r = STR[sig] || {}; fee += x.fee || 0;
-    if (x.ioc) { route.push(`${x.ioc.ven || 'Jupiter'} (IOC${x.ioc.ok ? ' ' + Sd.toLowerCase() + ' ' + solAmt(x.ioc.sol) : ', not filled'})`); if (x.ioc.ok) tr.push({ sol: x.ioc.sol, px: x.ioc.px, ven: x.ioc.ven || 'Jupiter' }); }
+    if (x.ioc) { route.push(`${x.ioc.ven || 'Jupiter'} (IOC${x.ioc.ok ? ' ' + Sd.toLowerCase() + ' ' + solAmt(x.ioc.sol) : ', not filled'})`); if (x.ioc.ok) tr.push({ sol: x.ioc.sol, px: x.ioc.px, ven: x.ioc.ven || 'Jupiter', t: (L.find((y) => y.signature === sig) || {}).blockTime || 0 }); }
     for (const pt of (r.parts || []).filter((q) => q.o.sig === g.id)) { if (pt.k === 'fill') { mf = pt.n || P.sol; tr.push({ sol: mf, px: P.px, ven: 'Manifest' }); } else { cx = pt; cxc = pt.c; } } }
   const pf = g.pf || [];
   if (mf == null) for (const f of pf) tr.push({ sol: f.sol, px: +f.px, ven: 'Manifest', pf: 1 });
@@ -16827,9 +16827,14 @@ function solGroupHtml(g, L, addr, STR) {   /* v2.42t (Jeff: "why so many updates
   const parts = (mf != null ? Math.max(1, pf.length) : pf.length) + tr.filter((t) => t.ven !== 'Manifest').length;
   const bt = (sig) => (L.find((y) => y.signature === sig) || {}).blockTime || 0, ls = bt(g.last), iso = ls ? new Date(ls * 1000).toISOString() : '';
   const rw = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
+  /* v2.42u (Jeff: "It should show each fill"): every fill with its size, price and time */
+  const FL = [...tr.filter((t) => t.ven !== 'Manifest').map((t) => ({ sol: t.sol, px: t.px, ven: t.ven, t: t.t })), ...pf.map((f) => ({ sol: f.sol, px: +f.px, ven: 'Manifest', t: f.t / 1000 }))];
+  if (mf != null) { const seen = pf.reduce((a, f) => a + f.sol, 0), rest = mf - seen; if (rest > Math.max(1e-6, mf * 0.001)) FL.push({ sol: rest, px: P.px, ven: 'Manifest', t: ls }); }
+  FL.sort((a, b) => a.t - b.t);
+  const fillRows = FL.length > 1 ? FL.map((f, i) => rw(`Fill ${i + 1}`, esc(`${solAmt(f.sol)} SOL @ ${f.ven === 'Manifest' ? f.px.toFixed(2) : f.px.toFixed(4)}${f.ven !== 'Manifest' ? ' · ' + f.ven : ''} · ${tm(f.t)}`))).join('') : '';
   const body = rw('Order', esc(`Limit ${sd} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)}`))
     + (route.length ? rw('Route', esc([...route, 'Manifest'].join(' → '))) : '')
-    + (tot ? rw('Filled', esc(`${solAmt(tot)} SOL${parts > 1 ? ' in ' + parts + ' parts' : ''} · ${m2(tr.reduce((a, b) => a + b.sol * b.px, 0))} ${P.c || 'USDC'}`)) : '')
+    + (tot ? rw('Filled', esc(`${solAmt(tot)} SOL${parts > 1 ? ' in ' + parts + ' parts' : ''} · ${m2(tr.reduce((a, b) => a + b.sol * b.px, 0))} ${P.c || 'USDC'}`)) : '') + fillRows
     + (left > 1e-9 && !tot ? rw('Status', 'resting on Manifest') : left > 1e-9 ? rw('Still resting', esc(solAmt(left) + ' SOL')) : '')
     + (cx ? rw('Cancelled', esc(`${cxc.sol ? solAmt(cxc.v) + ' SOL' : m2(cxc.v) + ' ' + cxc.c} back in your wallet`)) : '')
     + rw('Placed', esc(tm(g.t))) + (ls && g.last !== g.id ? rw(cx && !tot ? 'Cancelled at' : 'Done', esc(tm(ls))) : '')
