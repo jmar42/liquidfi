@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42g</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42i</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -629,7 +629,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42g</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42i</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42g · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42i · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15709,7 +15709,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42g';
+const APP_VER = 'v2.42i';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15776,13 +15776,13 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx2') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx2', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx4') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx4', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
 const solWho = (a) => { if (!a) return ''; if (SOL_KNOWN[a]) return SOL_KNOWN[a]; const w = solList().find((x) => x.addr === a); if (w) return w.name; const b = solBook().find((x) => x.addr === a); if (b) return b.name; if (SOL_FEE.owner && a === SOL_FEE.owner) return 'Liquidfi fee'; return short(a); };
-const solAmt = (x) => { const v = Math.abs(x); return v >= 1 ? m2(v) : String(+v.toPrecision(4)); };
+const solAmt = (x) => { const v = Math.abs(x); if (v >= 1) return m2(v); if (v > 0 && v < 1e-6) return v.toFixed(9).replace(/0+$/, ''); return String(+v.toPrecision(4)); };   /* v2.42i: no '1e-9' */
 // what this transaction did to `addr`: SOL and token changes (fee left out), who was on the other side
 function solTxSum(addr, t) {
   const m = t.meta || {}, keys = ((t.transaction || {}).message || {}).accountKeys || [], K = keys.map((k) => (typeof k === 'string' ? k : k.pubkey));
@@ -15807,7 +15807,7 @@ function solTxSum(addr, t) {
      Liquidfi's fee left out of the SOL amount, and the venue that filled it */
   const usdM = ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'];
   if (payer && out.length && inn.length) { const so = out.find((c) => c.mint === 'SOL'), si = inn.find((c) => c.mint === 'SOL'), uo = out.find((c) => usdM.includes(c.mint)), ui = inn.find((c) => usdM.includes(c.mint));
-    const fi = SOL_FEE.owner ? K.indexOf(SOL_FEE.owner) : -1, feeSol = fi >= 0 && !solOwn(SOL_FEE.owner) ? Math.max(0, ((m.postBalances || [])[fi] - (m.preBalances || [])[fi]) / 1e9) : 0;
+    const fi = SOL_FEE.owner && SOL_FEE.owner !== addr ? K.indexOf(SOL_FEE.owner) : -1, feeSol = fi >= 0 ? Math.max(0, ((m.postBalances || [])[fi] - (m.preBalances || [])[fi]) / 1e9) : 0;   /* v2.42h: the fee wallet is one of Jeff's own wallets, still the fee */
     const VEN = { CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: 'Raydium CLMM', whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: 'Orca', LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: 'Meteora', [MNF_PROG]: 'Manifest', '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': 'Raydium' };
     const ven = [...new Set((m.innerInstructions || []).flatMap((x) => x.instructions || []).map((x) => VEN[x.programId]).filter(Boolean))].join(', ');
     if (so && ui && Math.abs(so.v) - feeSol > 0) { const n = Math.abs(so.v) - feeSol; return { txt: `Sold ${solAmt(n)} SOL at ${(ui.v / n).toFixed(4)} ${ui.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err }; }
@@ -15816,7 +15816,8 @@ function solTxSum(addr, t) {
   else if (out.length && inn.length && inn.some((c) => solJl(c.mint)) && !out.some((c) => solJl(c.mint))) txt = `Earn: put in ${out.filter((c) => c.mint !== 'SOL' || out.length === 1).map(f).join(', ')}`;
   else if (out.length && inn.length && out.some((c) => solJl(c.mint)) && !inn.some((c) => solJl(c.mint))) txt = `Earn: took out ${inn.filter((c) => c.mint !== 'SOL' || inn.length === 1).map(f).join(', ')}`;
   else if (out.length && inn.length) txt = `Swapped ${out.map(f).join(' + ')} → ${inn.map(f).join(' + ')}`;
-  else if (inn.length) { const src = payer ? '' : K[0]; txt = `Received ${inn.map(f).join(' + ')}${src ? ' from ' + solWho(src) : ''}`; }
+  else if (inn.length) { const src = payer ? '' : K[0], isFee = SOL_FEE.owner === addr && src && src !== addr && (((t.transaction || {}).message || {}).instructions || []).some((x) => x.programId === JUP_PROG || x.programId === MNF_PROG);
+    txt = isFee ? `Liquidfi fee ${inn.map(f).join(' + ')} from ${solWho(src)}'s trade` : `Received ${inn.map(f).join(' + ')}${src ? ' from ' + solWho(src) : ''}${inn.every((c) => c.mint === 'SOL' && Math.abs(c.v) < 0.00001) ? ' (dust, often spam: ignore it)' : ''}`; }
   else { const to = [...dl].sort((a, b) => b.d - a.d)[0], dst = out.some((c) => c.mint !== 'SOL') ? Object.keys(tko)[0] : to && to.d > 0 ? to.k : '';
     txt = dst && SOL_FEE.owner && dst === SOL_FEE.owner && !solOwn(dst) ? `Liquidfi fee ${out.map(f).join(' + ')}` : `Sent ${out.map(f).join(' + ')}${dst ? ' to ' + solWho(dst) : ''}`; }
   return { txt, fee: payer ? fee : 0, err: !!m.err };
