@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42i</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42j</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -448,7 +448,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="seg" id="stSide"><button class="on" data-v="buy">Buy SOL</button><button data-v="sell">Sell SOL</button></div>
   <div class="seg" id="stMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
   <div id="stModeNote" class="note" style="display:none"></div>
-  <div id="stLimW" style="display:none;flex-direction:column;gap:8px"><label><span>Order type</span><select id="stLtSel"><option value="lim">Limit</option><option value="post">Post-only</option><option value="ioc">Immediate or cancel (IOC)</option><option value="fok">Fill or kill (FOK)</option></select></label><div class="mu" id="stLtNote" style="font-size:12px"></div></div>
+  <div id="stLimW" style="display:none;flex-direction:column;gap:8px"><label><span>Order type</span><select id="stLtSel"><option value="lim">Limit</option><option value="law">Limit AW (fee-aware)</option><option value="post">Post-only</option><option value="ioc">Immediate or cancel (IOC)</option><option value="fok">Fill or kill (FOK)</option></select></label><div class="mu" id="stLtNote" style="font-size:12px"></div></div>
   <label>Amount (SOL)<input id="stAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-spct="25">25%</button><button class="b-out sm" data-spct="50">50%</button><button class="b-out sm" data-spct="75">75%</button><button class="b-out sm" data-spct="100">Max</button></div>
   <div class="mu" id="stHave" style="font-size:12px"></div>
@@ -629,7 +629,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42i</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42j</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42i · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42j · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15709,7 +15709,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42i';
+const APP_VER = 'v2.42j';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16329,7 +16329,7 @@ function stPaintForm() {
   $$('#stSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.side)); $$('#stMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.mode)); $$('#stQ button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.q));
   const h = stHave(), g = $('#stGo'); g.textContent = ST.mode === 'stop' ? 'Coming next' : ST.mode === 'lim' ? `Review ${ST_LT[ST.lt] || 'Limit'} ${ST.side === 'buy' ? 'buy' : 'sell'}` : ST.side === 'buy' ? 'Buy SOL' : 'Sell SOL'; g.className = (ST.side === 'buy' ? 'b-grn' : 'b-red') + ' big'; g.disabled = ST.mode === 'stop';
   { const w = $('#stLimW'); if (w) w.style.display = ST.mode === 'lim' ? 'flex' : 'none'; const pw = $('#stPxW'); if (pw) pw.style.display = ST.mode === 'lim' ? '' : 'none'; { const ls = $('#stLtSel'); if (ls && ls.value !== ST.lt) ls.value = ST.lt; } const pq = $('#stPxQ'); if (pq) pq.textContent = ST.q;
-    const ln = $('#stLtNote'); if (ln) ln.textContent = { lim: 'Takes everything shown at or better than your price across Solana now (each venue fill or kill), then posts the rest on Manifest at your price.', ioc: 'Takes everything shown at or better than your price now; the rest is cancelled. Nothing is posted.', fok: 'All of it now at or better than your price, or nothing trades.', post: 'Posts on Manifest at your price and never trades on arrival. If it would cross Manifest’s book it is rejected.' }[ST.lt] || ''; }
+    const ln = $('#stLtNote'); if (ln) ln.textContent = { lim: 'Takes everything shown at or better than your price across Solana now (each venue fill or kill), then posts the rest on Manifest at your price.', law: 'Fee-aware: takes now only where a venue pays enough better than your price to cover the 0.25% fee, so you never net worse than your price. The rest posts on Manifest at your price, no fee.', ioc: 'Takes everything shown at or better than your price now; the rest is cancelled. Nothing is posted.', fok: 'All of it now at or better than your price, or nothing trades.', post: 'Posts on Manifest at your price and never trades on arrival. If it would cross Manifest’s book it is rejected.' }[ST.lt] || ''; }
   { const mf = ST.mode === 'lim' && ST.mfFree && ST.mfFree.q === ST.q ? ST.mfFree : null, onM = mf ? (ST.side === 'buy' ? (mf.quote >= 0.01 ? ` + ${m2(mf.quote)} on Manifest` : '') : (mf.base >= 0.000001 ? ` + ${solAmt(mf.base)} on Manifest` : '')) : '';
     $('#stHave').textContent = ST.side === 'buy' ? `You have ${m2(h.q)} ${ST.q}${onM} to buy with` : `You have ${m2(h.sol)} SOL${onM} to sell (${SOL_KEEP} SOL stays for fees)`; }
   const n = $('#stModeNote'); n.style.display = ST.mode === 'stop' ? '' : 'none'; n.textContent = ST.mode === 'stop' ? 'Stop orders on Solana are coming next. Market and limit orders work now.' : '';
@@ -16433,7 +16433,13 @@ async function fqSend(btn) {
    If a piece fails because the price moved: one re-check, then sweep less or post it. Liquidfi's 0.25% is on the swept (taken) part,
    like any market order; posting on Manifest has no Liquidfi fee (same rule as Stellar limit orders). */
 const MNF_PROG = 'MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms';
-const ST_LT = { lim: 'Limit', ioc: 'IOC', fok: 'FOK', post: 'Post-only' };
+const ST_LT = { lim: 'Limit', law: 'Limit AW', ioc: 'IOC', fok: 'FOK', post: 'Post-only' };
+/* v2.42j "Limit AW" (fee-aware, Jeff's test): the limit counts after Liquidfi's fee. Take now only where a venue pays enough better than
+   the limit to cover the fee (sell: price ≥ limit × (1 + fee); buy: price ≤ limit ÷ (1 + fee)); post the rest on Manifest at the limit, no fee.
+   You never net worse than the number you typed. */
+const stFeeRate = (o) => (SOL_FEE.owner && o && SOL_FEE.owner !== o.addr && solNet() === 'mainnet' ? SOL_FEE.bps / 1e4 : 0);
+const stSweepLim = (lt, buy, lim, o) => { if (lt !== 'law') return lim; const f = stFeeRate(o); return buy ? lim / (1 + f) : lim * (1 + f); };
+const ltPost = (lt) => lt === 'lim' || lt === 'law' || lt === 'post', ltSweep = (lt) => lt === 'lim' || lt === 'law' || lt === 'ioc';
 const ST_SWEEP_V = ['HumidiFi', 'ZeroFi', 'BisonFi', 'SolFi V2', 'GoonFi V2', 'TesseraV', 'Whirlpool', 'Raydium CLMM', 'Meteora DLMM', 'Manifest'];
 const MNF_MAX_CHUNKS = 4, MNF_MIN_USD = 1;
 const optNone = Uint8Array.of(0);
@@ -16570,26 +16576,26 @@ async function stLimitReview(btn) {
   const amt = numIn(($('#stAmt') || {}).value), lim = numIn(($('#stPx') || {}).value), buy = ST.side === 'buy', lt = ST.lt || 'lim', Q = stQ();
   if (!(amt > 0)) return toast('Enter an amount of SOL.'); if (!(lim > 0)) return toast('Enter your limit price.');
   const ref = cxRef().mid || SOLPX.sol; if (ref > 0 && Math.abs(lim / ref - 1) > 0.2) return toast(`That limit is more than 20% from the market (${ref.toFixed(2)}). Check the price.`);
-  const h = stHave(), mf = (lt === 'lim' || lt === 'post') && ST.mfFree && ST.mfFree.q === ST.q ? ST.mfFree : { quote: 0, base: 0 }, haveQ = h.q + mf.quote, haveS = h.sol + mf.base;
+  const h = stHave(), mf = ltPost(lt) && ST.mfFree && ST.mfFree.q === ST.q ? ST.mfFree : { quote: 0, base: 0 }, haveQ = h.q + mf.quote, haveS = h.sol + mf.base;
   if (buy && amt * lim > haveQ + 1e-6) return toast(`That needs about ${m2(amt * lim)} ${ST.q}; you have ${m2(h.q)} ${ST.q}${mf.quote >= 0.01 ? ' + ' + m2(mf.quote) + ' on Manifest' : ''}.`);
   if (!buy && amt > haveS + 1e-9) return toast(`At most ${solAmt(haveS)} SOL${mf.base >= 0.000001 ? ' (including ' + solAmt(mf.base) + ' on Manifest)' : ''}: ${SOL_KEEP} SOL stays for fees.`);
   const capBps = +(($('#fqSlip') || {}).value) || 10;
   if (btn) { btn.disabled = true; btn.textContent = 'Checking prices…'; } const back = () => { if (btn && btn.isConnected) { btn.disabled = false; stPaintForm(); } };
   try {
-    let M = null, plan = [], fokQ = null; const needPost = lt === 'lim' || lt === 'post';
+    let M = null, plan = [], fokQ = null; const needPost = ltPost(lt), sLim = stSweepLim(lt, buy, lim, o);
     if (needPost) { M = await mfLoad(); const bestOpp = buy ? Math.min(...M.asks.filter((x) => x.sz > 0).map((x) => x.px), Infinity) : Math.max(...M.bids.filter((x) => x.sz > 0).map((x) => x.px), 0);
       if (lt === 'post' && (buy ? lim >= bestOpp : lim <= bestOpp)) { back(); return toast(`Post-only: ${lim} would trade against Manifest's ${buy ? 'offer' : 'bid'} at ${bestOpp.toFixed(3)}. Use Limit, or a ${buy ? 'lower' : 'higher'} price.`, 6000); } }
     const sweepMax = Math.min(amt, buy ? h.q / lim : h.sol);   // taking now spends wallet funds; Manifest funds only back the posted part
-    if ((lt === 'lim' || lt === 'ioc') && sweepMax * lim >= MNF_MIN_USD) plan = await stSweepPlan(buy, sweepMax, lim);
+    if (ltSweep(lt) && sweepMax * lim >= MNF_MIN_USD) plan = await stSweepPlan(buy, sweepMax, sLim);
     if (lt === 'fok') { fokQ = await stQt(buy ? Q.mint : WSOL, buy ? WSOL : Q.mint, buy ? amt * lim * 10 ** Q.d : amt * 1e9, null); const p = stQpx(fokQ, buy, Q), s = fokQ ? stQsol(fokQ, buy) : 0;
       if (!(p > 0) || (buy ? p > lim : p < lim) || (buy && s < amt * 0.999)) { back(); return toast(`FOK: all ${solAmt(amt)} SOL can't fill at ${buy ? 'or under' : 'or over'} ${lim} right now (${p > 0 ? 'about ' + p.toFixed(3) : 'no price'}). Nothing sent.`, 6000); } }
     const take = plan.reduce((a, x) => a + x.sol, 0), rest = Math.max(0, amt - take);
     const items = [{ k: buy ? 'Buy' : 'Sell', v: `${solAmt(amt)} SOL`, hl: 1 }, { k: buy ? 'Limit (at most)' : 'Limit (at least)', v: `${lim} ${ST.q}` }, { k: 'Order type', v: ST_LT[lt] }];
     if (lt === 'fok') items.push({ k: 'Take now', v: `all ${solAmt(amt)} SOL or nothing`, n: `quoted about ${stQpx(fokQ, buy, Q).toFixed(3)} · Jupiter route` });
     if (plan.length) items.push(...plan.map((x) => ({ k: 'Take now', v: `${solAmt(x.sol)} SOL · ${x.dx}`, n: `quoted about ${x.est.toFixed(3)} · fill or kill, capped at its quote` })));
-    else if ((lt === 'lim' || lt === 'ioc') && sweepMax * lim < MNF_MIN_USD) items.push({ k: 'Take now', v: 'nothing', n: `taking now spends wallet funds and this wallet has little ${buy ? ST.q : 'SOL'} free; the order uses your Manifest balance` });
-    else if (lt === 'lim' || lt === 'ioc') items.push({ k: 'Take now', v: 'nothing', n: `no venue shows a price ${buy ? 'at or under' : 'at or over'} ${lim} right now` });
-    if (lt === 'lim' && rest > 1e-9) items.push({ k: 'Post on Manifest', v: `${solAmt(rest)} SOL at ${lim}`, n: 'rests on the book until it fills or you cancel · no Liquidfi fee' });
+    else if (ltSweep(lt) && sweepMax * lim < MNF_MIN_USD) items.push({ k: 'Take now', v: 'nothing', n: `taking now spends wallet funds and this wallet has little ${buy ? ST.q : 'SOL'} free; the order uses your Manifest balance` });
+    else if (ltSweep(lt)) items.push({ k: 'Take now', v: 'nothing', n: lt === 'law' ? `no venue pays enough better than ${lim} to cover the fee right now` : `no venue shows a price ${buy ? 'at or under' : 'at or over'} ${lim} right now` });
+    if ((lt === 'lim' || lt === 'law') && rest > 1e-9) items.push({ k: 'Post on Manifest', v: `${solAmt(rest)} SOL at ${lim}`, n: 'rests on the book until it fills or you cancel · no Liquidfi fee' });
     if (lt === 'post') items.push({ k: 'Post on Manifest', v: `${solAmt(amt)} SOL at ${lim}`, n: 'post-only: never trades on arrival · no Liquidfi fee' });
     if (lt === 'ioc' && rest > 1e-9) items.push({ k: 'Not filled', v: `${solAmt(rest)} SOL`, n: 'cancelled (immediate or cancel)' });
     if (lt === 'fok' || plan.length) items.push({ k: 'Liquidfi fee', v: `${(SOL_FEE.bps / 100).toFixed(2)}% of what's taken now`, n: 'same as a market order' });
@@ -16611,16 +16617,17 @@ async function stLimitRun(o, buy, amt, lim, lt, capBps, fokQ) {
     const r = await stChunkSend(o, b, buy); return r.ok ? `FOK filled: ${solAmt(r.sol)} SOL.` : 'FOK killed: the price moved before it landed. Nothing traded.';
   }
   let got = 0, note = '';
-  if (lt === 'lim' || lt === 'ioc') { const h0 = stHave(), mx = Math.min(amt, buy ? h0.q / lim : h0.sol); if (mx * lim >= MNF_MIN_USD) { const s = await stSweepRun(o, buy, mx, lim, capBps, step); got = s.got; if (s.fails) note = ` (${s.fails} piece${s.fails > 1 ? 's' : ''} faded)`; } }
+  if (ltSweep(lt)) { const h0 = stHave(), mx = Math.min(amt, buy ? h0.q / lim : h0.sol); if (mx * lim >= MNF_MIN_USD) { const s = await stSweepRun(o, buy, mx, stSweepLim(lt, buy, lim, o), capBps, step); got = s.got; if (s.fails) note = ` (${s.fails} piece${s.fails > 1 ? 's' : ''} faded)`; } }
   const rest = Math.floor((amt - got) * 1e9) / 1e9;
-  if (lt === 'ioc' || rest * lim < 0.01) return `${lt === 'ioc' ? 'IOC' : 'Limit'}: took ${solAmt(got)} SOL now${note}.${lt === 'ioc' && rest > 1e-9 ? ` ${solAmt(rest)} SOL cancelled.` : ''}`;
+  if (lt === 'ioc' || rest * lim < 0.01) return `${lt === 'ioc' ? 'IOC' : lt === 'law' ? 'Limit AW' : 'Limit'}: took ${solAmt(got)} SOL now${note}.${lt === 'ioc' && rest > 1e-9 ? ` ${solAmt(rest)} SOL cancelled.` : ''}`;
   step('Posting on Manifest…');
   let posted;
   try { const d = SOLA[solSel] || await solLoad(o.addr, true), M = await mfLoad(), P = await mfPostIxs(o, d, M, buy, rest, lim);
     const r = await solSendIxs(o, P.ixs);
     posted = r.state === 'ok' ? `${solAmt(rest)} SOL posted on Manifest at ${P.px.toFixed(4)}` : `posting ${solAmt(rest)} SOL on Manifest ${r.state === 'pending' ? 'not confirmed yet: check Your Manifest orders in a minute' : 'failed (' + (r.state === 'failed' ? solTxErr(r.err) : r.state) + '): nothing posted'}`;
   } catch (e) { const m = e.message || String(e); posted = `${solAmt(rest)} SOL not posted: ${/would cross/i.test(m) ? "Manifest's book moved through your price (post-only refused)" : m}`; }
-  return lt === 'post' ? `Post-only: ${posted}.` : got > 1e-9 ? `Limit: took ${solAmt(got)} SOL now${note}; ${posted}.` : `Limit: ${posted}${note}.`;
+  const LN = lt === 'law' ? 'Limit AW' : 'Limit';
+  return lt === 'post' ? `Post-only: ${posted}.` : got > 1e-9 ? `${LN}: took ${solAmt(got)} SOL now${note}; ${posted}.` : `${LN}: ${posted}${note}.`;
 }
 /* your Manifest orders + what the market holds for you */
 async function mfMinePaint() {
