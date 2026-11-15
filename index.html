@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42a</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42b</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -626,7 +626,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42a</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42b</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -658,7 +658,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42a · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42b · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15687,11 +15687,13 @@ async function drawSol() {
   $('#soFull').textContent = w.addr;
   $('#soActs').innerHTML = `<button class="b-light" data-act="solBuy" style="font-size:12.5px;padding:0 4px">Buy</button><button class="b-out" data-act="solSwap" style="font-size:12.5px;padding:0 4px">Swap</button><button class="b-out" data-act="solTrade" style="font-size:12.5px;padding:0 4px">Trade</button><button class="b-out" data-act="solSendSheet" style="font-size:12.5px;padding:0 4px">Send</button><button class="b-out" data-act="solRcv" style="font-size:12.5px;padding:0 4px">Receive</button>`;
   const paint = SOLPAINT = () => { const d = SOLA[w.addr]; if (solSel !== w.addr) return;
-    $('#soTot').textContent = d ? '$' + fx(solUsd(d)) : '…';
+    $('#soTot').textContent = d ? '$' + fx(solUsd(d) + mfWalletUsd(w.addr)) : '…';
     if (!d) return;
     const rows = [{ c: 'SOL', a: d.sol, u: d.sol * SOLPX.sol }, ...d.toks.filter((t) => t.amt > 0 || t.c).map((t) => ({ c: t.c || (JLT && (JLT.find((j) => j.address === t.mint) || {}).symbol) || 'Unknown token', a: t.amt, u: solTokUsd(t), n: t.c ? '' : (JLT && JLT.find((j) => j.address === t.mint)) ? '' : t.mint, jl: !!(JLT && JLT.find((j) => j.address === t.mint)) }))];
     const sub = (r) => r.c === 'SOL' ? `${m2(Math.min(r.a, SOL_KEEP))} kept for fees` : r.n ? short(r.n) : r.jl ? 'Earn · Jupiter Lend · withdraw any time' : 'Solana';
     $('#soBal').innerHTML = rows.map((r) => `<div><div><div style="font-weight:600">${esc(r.c)}</div><div class="mu" style="font-size:12px">${esc(sub(r))}</div></div><div style="text-align:right"><div class="mono" style="font-weight:600">${m2(r.a)}</div>${r.u ? `<div class="mu" style="font-size:12px">$${fx(r.u)}</div>` : ''}</div></div>`).join('');
+    { const MI = (MFW[w.addr] || { items: [] }).items; if (MI.length) $('#soBal').insertAdjacentHTML('beforeend', MI.map((x) => { const f = [x.free.q >= 0.01 ? m2(x.free.q) + ' ' + x.q : '', x.free.sol >= 0.000001 ? solAmt(x.free.sol) + ' SOL' : ''].filter(Boolean).join(' + '), h = [x.held.q >= 0.01 ? m2(x.held.q) + ' ' + x.q : '', x.held.sol >= 0.000001 ? solAmt(x.held.sol) + ' SOL' : ''].filter(Boolean).join(' + ');
+      return `<div><div><div style="font-weight:600">On Manifest · SOL/${x.q}</div><div class="mu" style="font-size:12px">${f ? 'filled, not in the wallet yet: ' + f : ''}${f && h && x.orders ? ' · ' : ''}${h && x.orders ? `in ${x.orders} open order${x.orders > 1 ? 's' : ''}: ${h}` : ''}</div></div><div style="text-align:right">${f ? `<button class="b-acc sm" data-act="mfWalletMove" data-q="${x.q}">Move to wallet</button>` : `<span class="mu" style="font-size:12px">Trade → Your Manifest orders</span>`}</div></div>`; }).join('')); }
     $('#soFund').innerHTML = d.lam === 0 ? `<div class="note amb">Empty. Send it a little SOL first (about 0.01 SOL, ~$${fx(0.01 * (SOLPX.sol || 75))}): Solana needs SOL for fees and a small refundable deposit for each coin it holds.</div>` : d.sol < SOL_KEEP ? `<div class="note amb">Low on SOL. Keep at least ${SOL_KEEP} SOL for network fees and coin deposits.</div>` : '';
   };
   paint(); solEarnDraw(); solRecent(w.addr);
@@ -15699,11 +15701,12 @@ async function drawSol() {
   await solPrices().catch(() => null);
   try { await solLoad(w.addr, true); } catch (e) { $('#soBal').innerHTML = `<div class="note amb">${esc(e.message || e)}</div>`; }
   if (cur === 'sol' && solSel === w.addr) { paint(); solEarnDraw(); solWatch(w.addr); }
+  if (solNet() === 'mainnet') mfWalletLoad(w.addr).then(() => { if (cur === 'sol' && solSel === w.addr) paint(); }).catch(() => {});
 }
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42a';
+const APP_VER = 'v2.42b';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16425,16 +16428,23 @@ function mfFull(raw) {
   const seats = nodes(u32(172)).map((i) => ({ i, trader: pk(D + i + 16), base: u64(D + i + 48), quote: u64(D + i + 56) }));
   return { bd, qd, baseMint: pk(16), quoteMint: pk(48), baseVault: pk(80), quoteVault: pk(112), bids: nodes(u32(156)).map(ord), asks: nodes(u32(164)).map(ord), seats };
 }
-async function mfLoad() {   /* fresh read of this pair's Manifest market (SOL must be the base, the dollar coin the quote) */
-  if (!ST.mfKey || !ST.mfKey['mf:' + ST.q]) await stLoadClob().catch(() => null);
-  const mk = ST.mfKey && ST.mfKey['mf:' + ST.q]; if (!mk || mk === 'none') throw new Error(`No Manifest market for SOL/${ST.q}.`);
+const MF_Q = { USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', USDT: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' };
+async function mfKeyFor(q) {   /* the Manifest SOL/q market, from a Jupiter quote limited to Manifest (kept once found) */
+  ST.mfKey = ST.mfKey || {}; const k = 'mf:' + q; if (ST.mfKey[k]) return ST.mfKey[k];
+  const r = await getJ(`${JUP}/quote?inputMint=${WSOL}&outputMint=${MF_Q[q]}&amount=100000000&slippageBps=50&onlyDirectRoutes=true&dexes=Manifest`).catch(() => null);
+  const a = r && r.routePlan && r.routePlan[0] && r.routePlan[0].swapInfo.ammKey; if (a) ST.mfKey[k] = a; return a || 'none';
+}
+async function mfLoad(q = ST.q) {   /* fresh read of a pair's Manifest market (SOL must be the base, the dollar coin the quote) */
+  const mk = await mfKeyFor(q); if (!mk || mk === 'none') throw new Error(`No Manifest market for SOL/${q}.`);
   const r = await solRpc('getAccountInfo', [mk, { encoding: 'base64', commitment: 'confirmed' }]); const v = r && r.value; if (!v || !v.data) throw new Error("Couldn't read the Manifest market.");
   if (v.owner && v.owner !== MNF_PROG) throw new Error('That market is not a Manifest market. Stopped.');
-  const M = mfFull(ub64(v.data[0])); if (M.baseMint !== WSOL || M.quoteMint !== stQ().mint) throw new Error('Unexpected Manifest market layout. Stopped.');
-  M.key = mk; return M;
+  const M = mfFull(ub64(v.data[0])); if (M.baseMint !== WSOL || M.quoteMint !== MF_Q[q]) throw new Error('Unexpected Manifest market layout. Stopped.');
+  M.key = mk; M.q = q; return M;
 }
 const mfSeat = (M, addr) => M.seats.find((s) => s.trader === addr) || null;
 const mfMine = (M, addr) => { const s = mfSeat(M, addr); if (!s) return []; return [...M.bids, ...M.asks].filter((o) => o.ti === s.i); };
+const MNF_DUST = 0.0001;   /* v2.42b (Jeff's first fill left 2.72e-7 SOL resting): a remainder this small is rounding dust, not an order */
+const mfBack = (o) => (o.bid ? { base: 0n, quote: o.atoms * o.pxA / 10n ** 18n } : { base: o.atoms, quote: 0n });   // what a cancel hands back to the seat (rounded down: never withdraw more than is there)
 function mfPrice(px, bd, qd, bid) {   /* USDC per SOL → Manifest's mantissa × 10^exponent (quote atoms per base atom); bids round down, asks up */
   const pa = px * 10 ** (qd - bd); let e = -18; while (e < 8 && pa * 10 ** -e > 4294967295) e++;
   const v = pa * 10 ** -e, m = bid ? Math.floor(v + 1e-6) : Math.ceil(v - 1e-6); return { m, e, px: m * 10 ** e / 10 ** (qd - bd) };
@@ -16461,8 +16471,9 @@ async function mfPostIxs(o, d, M, bid, sol, px) {   /* claim a seat if needed, d
   ixs.push(ixMfBatch(o.addr, M.key, [], [{ atoms, m: P.m, e: P.e, bid, t: 2 }]));
   return { ixs, px: P.px, atoms };
 }
-async function mfWithdrawIxs(o, d, M) {   /* everything the seat holds back to the wallet (SOL unwrapped) */
-  const s = mfSeat(M, o.addr); if (!s) return []; const ixs = [];
+async function mfWithdrawIxs(o, d, M, cancel = []) {   /* cancel these orders and move everything the seat holds back to the wallet (SOL unwrapped), one transaction */
+  const s0 = mfSeat(M, o.addr); if (!s0) return []; const s = { base: s0.base, quote: s0.quote }; const ixs = [];
+  if (cancel.length) { ixs.push(ixMfBatch(o.addr, M.key, cancel.map((x) => x.seq), [])); for (const x of cancel) { const b = mfBack(x); s.base += b.base; s.quote += b.quote; } }
   if (s.base > 0n) { const w = await solAta(o.addr, WSOL); ixs.push(ixAtaOpen(o.addr, w, o.addr, WSOL), ixMfWd(o.addr, M.key, w, M.baseVault, WSOL, s.base), ixTokClose(w, o.addr, o.addr)); }
   if (s.quote > 0n) { const t = d.toks.find((x) => x.mint === M.quoteMint), a = (t && t.ata) || await solAta(o.addr, M.quoteMint); if (!t || !t.ata) ixs.push(ixAtaOpen(o.addr, a, o.addr, M.quoteMint)); ixs.push(ixMfWd(o.addr, M.key, a, M.quoteVault, M.quoteMint, s.quote)); }
   return ixs;
@@ -16592,24 +16603,38 @@ async function mfMinePaint() {
   const el = $('#mfMine'); if (!el) return; const o = solOwn(solSel); if (!o || solNet() !== 'mainnet') { el.innerHTML = ''; return; }
   let M; try { M = await mfLoad(); } catch (e) { el.innerHTML = `<div class="mu" style="padding:8px 0">${esc(e.message || String(e))}</div>`; return; }
   if (cur !== 'strade') return; ST.mfM = M;
-  const s = mfSeat(M, o.addr), mine = mfMine(M, o.addr).sort((a, b) => b.px - a.px), bS = s ? Number(s.base) / 1e9 : 0, qS = s ? Number(s.quote) / 10 ** M.qd : 0;
+  const s = mfSeat(M, o.addr), all = mfMine(M, o.addr), mine = all.filter((x) => x.sz >= MNF_DUST).sort((a, b) => b.px - a.px), dust = all.length - mine.length, bS = s ? Number(s.base) / 1e9 : 0, qS = s ? Number(s.quote) / 10 ** M.qd : 0;
   el.innerHTML = (mine.length ? mine.map((x) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)"><span><b class="${x.bid ? 'grn' : 'red'}">${x.bid ? 'Buy' : 'Sell'}</b> ${solAmt(x.sz)} SOL @ <span class="mono">${x.px.toFixed(4)}</span><br><span class="mu" style="font-size:11.5px">Manifest · ${x.t === 2 ? 'post-only' : 'limit'} · #${x.seq}</span></span><button class="b-redout sm" data-act="mfCancel" data-seq="${x.seq}">Cancel</button></div>`).join('') : '<div class="mu" style="padding:8px 0">No open Manifest orders.</div>') +
-    (bS > 0 || qS > 0 ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0"><span>On Manifest, ready to withdraw: <span class="mono">${bS > 0 ? solAmt(bS) + ' SOL' : ''}${bS > 0 && qS > 0 ? ' + ' : ''}${qS > 0 ? m2(qS) + ' ' + ST.q : ''}</span><br><span class="mu" style="font-size:11.5px">fills and cancelled orders land here</span></span><button class="b-out sm" data-act="mfWithdraw">Withdraw</button></div>` : '');
+    (bS >= 0.000001 || qS >= 0.01 ? `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0"><span>Filled, on Manifest: <span class="mono">${bS >= 0.000001 ? solAmt(bS) + ' SOL' : ''}${bS >= 0.000001 && qS >= 0.01 ? ' + ' : ''}${qS >= 0.01 ? m2(qS) + ' ' + ST.q : ''}</span><br><span class="mu" style="font-size:11.5px">Manifest holds fills until you move them to your wallet${dust ? ' · clears the leftover rounding dust too' : ''}</span></span><button class="b-acc sm" data-act="mfWithdraw">Move to wallet</button></div>` : '');
 }
 async function mfCancel(seq, btn) {
   const o = solOwn(solSel); if (!o) return; if (btn) { btn.disabled = true; btn.textContent = 'Cancelling…'; }
   try { const M = await mfLoad(), x = mfMine(M, o.addr).find((y) => String(y.seq) === String(seq)); if (!x) throw new Error('That order is gone (filled or already cancelled).');
-    const r = await solSendIxs(o, [ixMfBatch(o.addr, M.key, [x.seq], [])]); if (r.state !== 'ok') throw new Error('Cancel did not go through: ' + (r.state === 'failed' ? solTxErr(r.err) : r.state));
-    toast('Cancelled. Moving the funds back to your wallet…'); await mfWithdraw(null, true);
+    const d = SOLA[solSel] || await solLoad(o.addr, true), ixs = await mfWithdrawIxs(o, d, M, [x, ...mfMine(M, o.addr).filter((y) => y.sz < MNF_DUST && y.seq !== x.seq)]);
+    const r = await solSendIxs(o, ixs); if (r.state !== 'ok') throw new Error('Cancel did not go through: ' + (r.state === 'failed' ? solTxErr(r.err) : r.state));
+    delete SOLA[solSel]; toast('Cancelled. The funds are back in your wallet.'); if (cur === 'strade') return drawSTrade();
   } catch (e) { toast(e.message || String(e), 6000); } if (cur === 'strade') mfMinePaint();
 }
-async function mfWithdraw(btn, quiet) {
-  const o = solOwn(solSel); if (!o) return; if (btn) { btn.disabled = true; btn.textContent = 'Withdrawing…'; }
-  try { const d = SOLA[solSel] || await solLoad(o.addr, true), M = await mfLoad(), ixs = await mfWithdrawIxs(o, d, M); if (!ixs.length) { if (!quiet) toast('Nothing to withdraw.'); return; }
+async function mfWithdraw(btn, quiet, q) {
+  const o = solOwn(solSel); if (!o) return; if (btn) { btn.disabled = true; btn.textContent = 'Moving…'; }
+  try { const d = SOLA[solSel] || await solLoad(o.addr, true), M = await mfLoad(q || ST.q), ixs = await mfWithdrawIxs(o, d, M, mfMine(M, o.addr).filter((y) => y.sz < MNF_DUST)); if (!ixs.length) { if (!quiet) toast('Nothing to move.'); return; }
     const r = await solSendIxs(o, ixs); if (r.state !== 'ok') throw new Error('Withdraw did not go through: ' + (r.state === 'failed' ? solTxErr(r.err) : r.state));
-    delete SOLA[solSel]; toast('Back in your wallet.'); if (cur === 'strade') drawSTrade();
-  } catch (e) { toast(e.message || String(e), 6000); if (cur === 'strade') mfMinePaint(); }
+    delete SOLA[solSel]; delete MFW[o.addr]; toast('Back in your wallet.'); if (cur === 'strade') drawSTrade(); if (cur === 'sol') drawSol();
+  } catch (e) { toast(e.message || String(e), 6000); if (cur === 'strade') mfMinePaint(); if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = 'Move to wallet'; } }
 }
+/* v2.42b (Jeff: "It doesn't show the usdc"): the wallet page also shows what this wallet has on Manifest (fills not yet moved,
+   and funds held by open orders), counts it in the total, and offers Move to wallet. */
+const MFW = {};
+async function mfWalletLoad(addr) {
+  const c = MFW[addr]; if (c && Date.now() - c.at < 30000) return c; const items = [];
+  for (const q of Object.keys(MF_Q)) { try { const M = await mfLoad(q), s = mfSeat(M, addr); if (!s) continue;
+      const mine = mfMine(M, addr), dust = mine.filter((x) => x.sz < MNF_DUST), live = mine.filter((x) => x.sz >= MNF_DUST);
+      let lb = 0n, lq = 0n; for (const x of mine) { const b = mfBack(x); lb += b.base; lq += b.quote; }
+      const wl = { sol: Number(s.base) / 1e9, q: Number(s.quote) / 10 ** M.qd }, lk = { sol: Number(lb) / 1e9, q: Number(lq) / 10 ** M.qd };
+      if (wl.sol + lk.sol >= 0.000001 || wl.q + lk.q >= 0.01) items.push({ q, free: wl, held: lk, orders: live.length, dust: dust.length }); } catch (e) {} }
+  return (MFW[addr] = { at: Date.now(), items });
+}
+const mfWalletUsd = (addr) => { const c = MFW[addr]; if (!c) return 0; return c.items.reduce((a, x) => a + (x.free.q + x.held.q) + (x.free.sol + x.held.sol) * (SOLPX.sol || 0), 0); };
 ST.lt = 'lim';
 async function stReview(btn) {
   if (ST.mode === 'lim') return stLimitReview(btn);
@@ -21401,7 +21426,7 @@ document.addEventListener('click', async (e) => {
     acctGo: () => { const b = tradeAccts()[botSel]; if (!b) return; const f = () => { rcvWant = b.addr; go(t.dataset.to === 'receive' ? 'receive' : 'bots'); }; return t.dataset.to === 'receive' ? phGate(f)() : f(); },
     rcvHome: phGate(() => { rcvWant = homeAddr; go('receive'); }),
     homeBuy: phGate(() => homeAddr && onrBuySheet('stellar', homeAddr)), homeSwap: () => { if (!OWN().length) return toast('Add a wallet first.'); go('swap'); },
-    xrBuy: phGate(() => xrSel && onrBuySheet('xrp', xrSel)), solSwap: () => solSwapSheet('swap'), solTrade: () => { if (solNet() !== 'mainnet') return toast('Trading runs on Solana Mainnet only.'); go('strade'); }, stReview: () => stReview(t), mfCancel: () => mfCancel(t.dataset.seq, t), mfWithdraw: () => mfWithdraw(t), fqLadder: () => fqLadder(), fqSend: () => fqSend(t), solSwMax: () => solSwMax(), solSwGo: () => solSwapGo(t),
+    xrBuy: phGate(() => xrSel && onrBuySheet('xrp', xrSel)), solSwap: () => solSwapSheet('swap'), solTrade: () => { if (solNet() !== 'mainnet') return toast('Trading runs on Solana Mainnet only.'); go('strade'); }, stReview: () => stReview(t), mfCancel: () => mfCancel(t.dataset.seq, t), mfWithdraw: () => mfWithdraw(t), mfWalletMove: () => mfWithdraw(t, false, t.dataset.q), fqLadder: () => fqLadder(), fqSend: () => fqSend(t), solSwMax: () => solSwMax(), solSwGo: () => solSwapGo(t),
     rmWatch: () => { const i = NS().bots.indexOf(tradeAccts()[botSel]); if (i < 0) return; t.dataset.i = i; A.rmBot(); },
     addAcct: () => A.addWallet(),
     xrBackup: () => { const i = (K.xr || []).findIndex((o) => o.w && o.w.classicAddress === xrSel); if (i >= 0) walletKeySheet('xrp', i); },
