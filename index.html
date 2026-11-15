@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42f</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42g</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -385,8 +385,6 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div id="soFund"></div>
   <span class="lbl">Balances</span>
   <div class="card rows" id="soBal" style="padding:4px 14px"></div>
-  <span class="lbl">Earn · Jupiter Lend</span>
-  <div id="soEarn" style="display:flex;flex-direction:column;gap:8px"></div>
   <span class="lbl">Recent</span>
   <div class="card" id="soRec" style="padding:4px 14px;font-size:14px"></div>
   <div id="soBk" style="display:flex;flex-direction:column"></div>
@@ -461,6 +459,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="mfMine" style="padding:4px 14px;font-size:14px"><div class="mu" style="padding:8px 0">loading…</div></div>
   <div class="top" style="align-items:baseline"><span class="lbl">Your trades</span><span class="mu" style="font-size:11px">this wallet</span></div>
   <div class="card" id="stFills" style="padding:4px 14px;font-size:14px"><div><span class="mu">loading…</span></div></div>
+  <div id="fqW" style="display:none;flex-direction:column;gap:12px">
   <div class="top" style="align-items:baseline"><span class="lbl">Router test</span><span class="mu" style="font-size:11px">fills vs Coinbase + Kraken for the same size</span></div>
   <div class="card" style="gap:8px">
     <div style="display:flex;gap:8px;align-items:end"><label style="flex:1">Test size ($)<input id="fqUsd" inputmode="decimal" value="5"></label>
@@ -470,6 +469,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <div class="mu" style="font-size:11.5px">The ladder only asks Jupiter for prices: nothing is sent. A test sends one real fill-or-kill swap on the Buy / Sell side above: it fills within the cap or nothing trades. Every SOL trade from this wallet is scored: the fill price vs walking the Coinbase + Kraken books for the same amount of SOL (bps; + = you paid more than the lit market, − = you did better). "lit + fee" adds Kraken Pro's 0.40% retail taker fee.</div>
   </div>
   <div class="card" id="fqLog" style="padding:4px 14px;font-size:12.5px"></div>
+  </div>
 </section>
 
 <section class="scr" id="s-result">
@@ -595,6 +595,10 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <label id="eBWalW">Stellar wallet<select id="eBWal"></select></label>
     <div id="eBBody" style="display:flex;flex-direction:column;gap:12px"><div class="note">Loading Blend…</div></div>
   </div>
+  <div id="eSo" style="display:none;flex-direction:column;gap:12px">
+    <label id="eSoWalW">Solana wallet<select id="eSoWal"></select></label>
+    <div id="soEarn" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
   <div id="eChainFoot" style="display:none;flex-direction:column;gap:12px">
   <div class="card" id="eAdv" style="gap:10px;margin-top:6px"><div><b style="font-size:18px">Customized Portfolios</b><div class="mu" style="font-size:13.5px;margin-top:2px">Want more than a pool? Treveri Capital builds portfolios around your goals.</div></div>
     <button class="b-light big" data-act="advForm" data-src="Earn">Talk to our Wealth Advisors</button>
@@ -625,7 +629,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42f</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.42g</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -657,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42f · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42g · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15666,7 +15670,7 @@ const solTxLink = (sig) => `https://solscan.io/tx/${sig}${solNet() === 'devnet' 
 function solWaitLabel(ms) { const b = document.querySelector('#holdBtn span'); if (b && $('#holdBtn').disabled) b.textContent = `Sent · waiting for Solana ${Math.round(ms / 1000)}s`; }
 function solResult(r, what) {
   closeSheet(); delete SOLA[solSel];
-  if (r.state === 'ok') { toast(what + ' done.'); return drawSol(); }
+  if (r.state === 'ok') { toast(what + ' done.'); return cur === 'earn' ? drawEarn() : drawSol(); }
   showResult(false, r.state === 'expired' ? 'Not sent' : r.state === 'pending' ? 'Not confirmed yet' : 'Solana refused it',
     [`<div class="note">${r.state === 'expired' ? 'It expired before Solana took it. Nothing moved. You can try again.' : r.state === 'pending' ? 'It was sent but not confirmed yet. Check the wallet in a minute before trying again.' : esc(solTxErr(r.err))}</div>`, `<a class="b-out" href="${solTxLink(r.sig)}" target="_blank" rel="noopener">Look it up on Solscan</a>`], 'sol');
 }
@@ -15695,17 +15699,17 @@ async function drawSol() {
       return `<div><div><div style="font-weight:600">On Manifest · SOL/${x.q}</div><div class="mu" style="font-size:12px">${f ? 'filled, not in the wallet yet: ' + f : ''}${f && h && x.orders ? ' · ' : ''}${h && x.orders ? `in ${x.orders} open order${x.orders > 1 ? 's' : ''}: ${h}` : ''}</div></div><div style="text-align:right">${f ? `<button class="b-acc sm" data-act="mfWalletMove" data-q="${x.q}">Move to wallet</button>` : `<span class="mu" style="font-size:12px">Trade → Your Manifest orders</span>`}</div></div>`; }).join('')); }
     $('#soFund').innerHTML = d.lam === 0 ? `<div class="note amb">Empty. Send it a little SOL first (about 0.01 SOL, ~$${fx(0.01 * (SOLPX.sol || 75))}): Solana needs SOL for fees and a small refundable deposit for each coin it holds.</div>` : d.sol < SOL_KEEP ? `<div class="note amb">Low on SOL. Keep at least ${SOL_KEEP} SOL for network fees and coin deposits.</div>` : '';
   };
-  paint(); solEarnDraw(); solRecent(w.addr);
+  paint(); solRecent(w.addr);
   { const o = solOwn(w.addr); $('#soBk').innerHTML = `<div style="display:flex;flex-direction:column;gap:8px"><button class="b-out sm" data-act="solBackup">${o && o.hd != null && K.ph ? 'Back up: show key and recovery phrase' : 'Back up: show secret key'}</button><button class="b-out sm" data-act="solRemove" style="color:var(--redt)">Remove this wallet from the phone</button></div>`; }
   await solPrices().catch(() => null);
   try { await solLoad(w.addr, true); } catch (e) { $('#soBal').innerHTML = `<div class="note amb">${esc(e.message || e)}</div>`; }
-  if (cur === 'sol' && solSel === w.addr) { paint(); solEarnDraw(); solWatch(w.addr); }
+  if (cur === 'sol' && solSel === w.addr) { paint(); solWatch(w.addr); }
   if (solNet() === 'mainnet') mfWalletLoad(w.addr).then(() => { if (cur === 'sol' && solSel === w.addr) paint(); }).catch(() => {});
 }
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42f';
+const APP_VER = 'v2.42g';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15734,7 +15738,7 @@ function solQuiet(addr) {   // new activity: reload balances + Recent without bl
     const keep = SW.addr; drawSolQuiet(addr); if (keep === addr) {} }, 1200);
 }
 function drawSolQuiet(addr) { const w = solList().find((x) => x.addr === addr); if (!w) return; const d = SOLA[addr]; if (!d) return;
-  $('#soTot').textContent = '$' + fx(solAllUsd(addr)); SOLPAINT && SOLPAINT(); solEarnDraw(); solRecent(addr); }
+  $('#soTot').textContent = '$' + fx(solAllUsd(addr)); SOLPAINT && SOLPAINT(); solRecent(addr); }
 let SOLPAINT = null;
 function solWatch(addr) {
   if (SW.addr === addr && (SW.ws || SW.pt)) return;
@@ -15772,8 +15776,8 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx2') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx2', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
@@ -15792,6 +15796,22 @@ function solTxSum(addr, t) {
   const tko = {}; for (const b of [...(m.preTokenBalances || []), ...(m.postTokenBalances || [])]) if (b.owner && b.owner !== addr) tko[b.owner] = 1;
   const inn = ch.filter((c) => c.v > 0), out = ch.filter((c) => c.v < 0), f = (c) => `${solAmt(c.v)} ${c.c}`;
   let txt;
+  /* v2.42g (Jeff saw "Swapped 0.001488 SOL → 14.00 USDC" for a Move to wallet): Manifest transactions in words */
+  const mfK = (((t.transaction || {}).message || {}).instructions || []).filter((x) => x.programId === MNF_PROG).map((x) => { try { return b58d(x.data)[0]; } catch (e) { return -1; } });
+  if (mfK.length && payer) {
+    const coins = (L) => L.filter((c) => c.mint !== 'SOL' || Math.abs(c.v) >= 0.001).map(f).join(' + ');
+    txt = mfK.includes(2) ? `Manifest: order placed${out.length ? ` · ${coins(out)} set aside for it` : ''}` : mfK.includes(3) ? `Manifest: moved to wallet${inn.length ? ` · ${coins(inn) || inn.map(f).join(' + ')}` : ''}${mfK.includes(6) ? ' (order cancelled)' : ''}` : mfK.includes(6) ? 'Manifest: order placed or cancelled' : 'Manifest: account set up';
+    return { txt, fee: payer ? fee : 0, err: !!m.err };
+  }
+  /* v2.42g (Jeff: "It says Swap. It should say sold .1 at $72.xx"): a SOL ↔ dollar swap reads as a trade, at the price, with
+     Liquidfi's fee left out of the SOL amount, and the venue that filled it */
+  const usdM = ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'];
+  if (payer && out.length && inn.length) { const so = out.find((c) => c.mint === 'SOL'), si = inn.find((c) => c.mint === 'SOL'), uo = out.find((c) => usdM.includes(c.mint)), ui = inn.find((c) => usdM.includes(c.mint));
+    const fi = SOL_FEE.owner ? K.indexOf(SOL_FEE.owner) : -1, feeSol = fi >= 0 && !solOwn(SOL_FEE.owner) ? Math.max(0, ((m.postBalances || [])[fi] - (m.preBalances || [])[fi]) / 1e9) : 0;
+    const VEN = { CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: 'Raydium CLMM', whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: 'Orca', LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: 'Meteora', [MNF_PROG]: 'Manifest', '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': 'Raydium' };
+    const ven = [...new Set((m.innerInstructions || []).flatMap((x) => x.instructions || []).map((x) => VEN[x.programId]).filter(Boolean))].join(', ');
+    if (so && ui && Math.abs(so.v) - feeSol > 0) { const n = Math.abs(so.v) - feeSol; return { txt: `Sold ${solAmt(n)} SOL at ${(ui.v / n).toFixed(4)} ${ui.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err }; }
+    if (si && uo) { const n = si.v + feeSol; return { txt: `Bought ${solAmt(n)} SOL at ${(Math.abs(uo.v) / n).toFixed(4)} ${uo.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err }; } }
   if (!ch.length) txt = payer ? 'Account update' : 'No change to this wallet (someone else\'s transaction, often spam)';
   else if (out.length && inn.length && inn.some((c) => solJl(c.mint)) && !out.some((c) => solJl(c.mint))) txt = `Earn: put in ${out.filter((c) => c.mint !== 'SOL' || out.length === 1).map(f).join(', ')}`;
   else if (out.length && inn.length && out.some((c) => solJl(c.mint)) && !inn.some((c) => solJl(c.mint))) txt = `Earn: took out ${inn.filter((c) => c.mint !== 'SOL' || inn.length === 1).map(f).join(', ')}`;
@@ -16314,14 +16334,14 @@ function stPaintForm() {
   const n = $('#stModeNote'); n.style.display = ST.mode === 'stop' ? '' : 'none'; n.textContent = ST.mode === 'stop' ? 'Stop orders on Solana are coming next. Market and limit orders work now.' : '';
 }
 async function stEst() {   // live quote for the amount typed: what you pay / get, the minimum, Liquidfi's fee
-  clearTimeout(ST.eT); const el = $('#stEst'); const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, '');
+  clearTimeout(ST.eT); const el = $('#stEst'); const amt = numIn(($('#stAmt') || {}).value);
   if (!(amt > 0) || ST.mode !== 'mkt') { el.innerHTML = ''; ST.est = null; return; }
   ST.eT = setTimeout(async () => { const Q = stQ(), px = cxRef().ask || SOLPX.sol || 0, buy = ST.side === 'buy';
     try { const inAmt = buy ? Math.round(amt * (px || (SOLPX.sol || 0)) * 10 ** Q.d) : Math.round(amt * 1e9); if (!(inAmt > 0)) return;
       const q = await getJ(`${JUP}/quote?inputMint=${buy ? Q.mint : WSOL}&outputMint=${buy ? WSOL : Q.mint}&amount=${inAmt}&slippageBps=50&restrictIntermediateTokens=true`);
       const pay = buy ? inAmt / 10 ** Q.d : amt, get = buy ? +q.outAmount / 1e9 : +q.outAmount / 10 ** Q.d, at = buy ? pay / get : get / amt, fee = (buy ? pay : get) * SOL_FEE.bps / 1e4;
       ST.est = { pay: buy ? pay : amt };
-      if (+String(($('#stAmt') || {}).value || '').replace(/,/g, '') !== amt) return;
+      if (numIn(($('#stAmt') || {}).value) !== amt) return;
       el.innerHTML = `<div><span>${buy ? 'You pay about' : 'You sell'}</span><span class="mono">${buy ? m2(pay) + ' ' + ST.q : solAmt(amt) + ' SOL'}</span></div><div><span>${buy ? 'You get about' : 'You get about'}</span><span class="mono">${buy ? solAmt(get) + ' SOL' : m2(get) + ' ' + ST.q}</span></div><div><span>Price</span><span class="mono">${at.toFixed(3)} ${ST.q}</span></div>${SOL_FEE.owner && solSel !== SOL_FEE.owner ? `<div><span>Liquidfi fee</span><span class="mono">${(SOL_FEE.bps / 100).toFixed(2)}% · about $${fee.toFixed(2)} in SOL</span></div>` : ''}<div><span class="mu" style="font-size:12px">You get at least 99.5% of this or nothing trades.</span><span></span></div>`;
     } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || 'No route right now.')}</span></div>`; } }, 350);
 }
@@ -16329,7 +16349,7 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
   const el = $('#stFills'); if (!el) return; const addr = solSel;
   try { const L = await solRpc('getSignaturesForAddress', [addr, { limit: 15, commitment: 'confirmed' }]); if (cur !== 'strade' || solSel !== addr) return;
     for (const s of (L || []).filter((s) => !SOLTX[s.signature + addr]).slice(0, 6)) { const t = await solRpc('getTransaction', [s.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }]).catch(() => null); if (t) SOLTX[s.signature + addr] = solTxSum(addr, t); }
-    solTxSave(); const R = (L || []).filter((s) => /^Swapped/.test((SOLTX[s.signature + addr] || {}).txt || ''));
+    solTxSave(); const R = (L || []).filter((s) => /^(Swapped|Sold|Bought|Manifest)/.test((SOLTX[s.signature + addr] || {}).txt || ''));
     el.innerHTML = R.length ? R.map((s) => `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
   } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || e)}</span></div>`; }
 }
@@ -16346,7 +16366,7 @@ async function drawSTrade() {
   const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots');
   $('#stFrom').textContent = w.name + ' ▾'; stPaintForm(); stPaint(); stPaintSales(); stPaintVol(); $('#stEst').innerHTML = '';
   if (!SOLA[solSel]) solLoad(solSel).then(() => { if (cur === 'strade') stPaintForm(); }).catch(() => {});
-  stLoop(); stFills(); cxStart(); fqPaint(); mfMinePaint();
+  stLoop(); stFills(); cxStart(); { const fw = $('#fqW'); if (fw) fw.style.display = DEV ? 'flex' : 'none'; } if (DEV) fqPaint(); mfMinePaint();
 }
 /* v2.41f router test + fill quality (Jeff: "Cb kraken mid price not valid unless size"): every SOL trade is scored against
    what the same amount of SOL would have cost walking the live Coinbase + Kraken books (VWAP), not the mid. */
@@ -16546,7 +16566,7 @@ async function stSweepRun(o, buy, sol, lim, capBps, onStep) {   /* plan → buil
 async function stLimitReview(btn) {
   const o = solOwn(solSel), d = SOLA[solSel]; if (!o || !d) return toast('Still loading. Try again in a moment.');
   if (solNet() !== 'mainnet') return toast('Trading runs on Solana Mainnet only.');
-  const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, ''), lim = +String(($('#stPx') || {}).value || '').replace(/,/g, ''), buy = ST.side === 'buy', lt = ST.lt || 'lim', Q = stQ();
+  const amt = numIn(($('#stAmt') || {}).value), lim = numIn(($('#stPx') || {}).value), buy = ST.side === 'buy', lt = ST.lt || 'lim', Q = stQ();
   if (!(amt > 0)) return toast('Enter an amount of SOL.'); if (!(lim > 0)) return toast('Enter your limit price.');
   const ref = cxRef().mid || SOLPX.sol; if (ref > 0 && Math.abs(lim / ref - 1) > 0.2) return toast(`That limit is more than 20% from the market (${ref.toFixed(2)}). Check the price.`);
   const h = stHave(), mf = (lt === 'lim' || lt === 'post') && ST.mfFree && ST.mfFree.q === ST.q ? ST.mfFree : { quote: 0, base: 0 }, haveQ = h.q + mf.quote, haveS = h.sol + mf.base;
@@ -16648,10 +16668,11 @@ function mfAfterTx(addr, optimistic) {
 const solAllUsd = (addr) => solUsd(SOLA[addr]) + mfWalletUsd(addr);   // wallet + what it has on Manifest (fills and open orders)
 const mfWalletUsd = (addr) => { const c = MFW[addr]; if (!c) return 0; return c.items.reduce((a, x) => a + (x.free.q + x.held.q) + (x.free.sol + x.held.sol) * (SOLPX.sol || 0), 0); };
 ST.lt = 'lim';
+const numIn = (v) => { let t = String(v || '').trim().replace(/\s/g, ''); if (!t.includes('.') && /^\d*,\d+$/.test(t) && !/^[1-9]\d{0,2},\d{3}$/.test(t)) t = t.replace(',', '.'); return +t.replace(/,/g, ''); };   /* v2.42g: Jeff typed ",1" and got 1 SOL */
 async function stReview(btn) {
   if (ST.mode === 'lim') return stLimitReview(btn);
   if (ST.mode !== 'mkt') return; const d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
-  const amt = +String(($('#stAmt') || {}).value || '').replace(/,/g, ''); if (!(amt > 0)) return toast('Enter an amount of SOL.');
+  const amt = numIn(($('#stAmt') || {}).value); if (!(amt > 0)) return toast('Enter an amount of SOL.');
   const Q = stQ(), C = solCoins(d), T = solTargets(), qc = C.find((c) => c.mint === Q.mint), sc = C.find((c) => c.v === 'SOL');
   if (ST.side === 'buy') { const px = cxRef().ask || SOLPX.sol, pay = Math.ceil(amt * px * 1.0 * 1e6) / 1e6;
     if (!qc) return toast(`No ${ST.q} in this wallet. Buy or swap some first.`); if (pay > qc.a + 1e-9) return toast(`That needs about ${m2(pay)} ${ST.q}; you have ${m2(qc.a)}.`);
@@ -16661,11 +16682,11 @@ async function stReview(btn) {
 }
 document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, #stLt button, #stBk button, [data-spct]'); if (!b || cur !== 'strade') return;
   if (b.parentElement.id === 'stBk') { ST.bkv = b.dataset.v; return stPaint(); }
-  if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, lp = ST.mode === 'lim' ? +String(($('#stPx') || {}).value || '').replace(/,/g, '') : 0, px = lp > 0 ? lp : cxRef().ask || SOLPX.sol;   /* a limit buy sizes off your limit price */ const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
+  if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, lp = ST.mode === 'lim' ? numIn(($('#stPx') || {}).value) : 0, px = lp > 0 ? lp : cxRef().ask || SOLPX.sol;   /* a limit buy sizes off your limit price */ const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
   const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.jin = null; ST.bk = {}; ST.tops = null; cxStart(); ST.sales = []; ST.salesAt = 0; ST.at = 0; stPaint(); stPaintSales(); stPaintVol(); stLoop(); }
   if (g === 'stSide') ST.side = b.dataset.v; if (g === 'stMode') ST.mode = b.dataset.v; if (g === 'stLt') ST.lt = b.dataset.v; stPaintForm(); stEst(); });
 document.addEventListener('input', (e) => { if (e.target && e.target.id === 'stAmt') stEst(); });
-document.addEventListener('change', (e) => { if (e.target && e.target.id === 'stLtSel' && cur === 'strade') { ST.lt = e.target.value; stPaintForm(); } });
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'eSoWal' && cur === 'earn') { solSel = e.target.value; return solEarnDraw(); } if (e.target && e.target.id === 'stLtSel' && cur === 'strade') { ST.lt = e.target.value; stPaintForm(); } });
 
 /* Earn: Jupiter Lend (mainnet). Rates come in basis points (389 = 3.89%). Deposit/withdraw instructions come from Jupiter's
    API; the transaction is put together and signed here, with Liquidfi's fee (when on) as a plain token payment in the same transaction. */
@@ -16707,7 +16728,7 @@ async function solEarnDraw() {
   if (solNet() !== 'mainnet') { el.innerHTML = '<div class="note">Earn works on Mainnet only.</div>'; return; }
   el.innerHTML = '<div class="mu" style="padding:8px 0">Loading rates…</div>';
   try {
-    const [T, P] = await Promise.all([jlTokens(), jlPositions(solSel).catch(() => [])]); if (cur !== 'sol') return;
+    const [T, P] = await Promise.all([jlTokens(), jlPositions(solSel).catch(() => [])]); if (cur !== 'earn' || EARN_VIEW !== 'so') return;
     const held = (P || []).filter((p) => +p.shares > 0).map((p) => p.token && p.token.address).filter(Boolean), ER = {};
     if (held.length) { try { const r = await fetch(`${JL}/earn/earnings?user=${solSel}&positions=${held.join(',')}`); const j2 = await r.json(); for (const e of [].concat(j2 || [])) ER[e.address] = +e.earnings || 0; } catch (e) {} }
     const d = SOLA[solSel] || { toks: [] }, mine = (t) => (P || []).find((p) => (p.token && (p.token.address || p.token.id)) === t.address);
@@ -17603,11 +17624,11 @@ async function earnSolSum() {
     el.textContent = tot > 0.005 ? `You're lending $${fx(tot)}${n > 1 ? ` from ${n} wallets` : ''} · up to ${best.toFixed(2)}% now` : `Interest on USDC, USDT, EURC… up to ${best.toFixed(2)}% · Jupiter Lend`;
   } catch (e) {}
 }
-function earnSolOpen(addr) { solSel = addr; SOLBACK = 'earn'; closeSheet(); go('sol'); setTimeout(() => { const e = $('#soEarn'); if (e && cur === 'sol') e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 450); }
+function earnSolOpen(addr) { if (addr) solSel = addr; closeSheet(); if (cur !== 'earn') { EARN_VIEW = 'home'; go('earn'); } earnOpenView('so'); }
 function earnSol() {
   const W = solList(); if (solNet() !== 'mainnet') return toast('Solana lending runs on Mainnet only.');
   if (!W.length) return toast('Add a Solana wallet first: Accounts → + Add wallet → Solana.', 5000);
-  if (W.length === 1) return earnSolOpen(W[0].addr);
+  return earnSolOpen(W.some((w) => w.addr === solSel) ? solSel : W[0].addr);
   pending = null;
   sheet(`<h2>Lend on Solana</h2><div class="mu" style="font-size:13px">Which wallet?</div>${W.map((w) => `<button class="b-out" data-act="earnSolW" data-addr="${esc(w.addr)}" style="text-align:left"><b>${esc(w.name)}</b> · <span class="mono mu">${esc(short(w.addr))}</span>${EARNSOL[w.addr] > 0.005 ? ` <span class="grn">· $${fx(EARNSOL[w.addr])} lent</span>` : ''}</button>`).join('')}<button class="b-out" data-act="closeSheet">Cancel</button>`);
 }
@@ -17621,6 +17642,15 @@ async function drawEarn() {
     $('#eTopChain').style.display = ''; $('#eChainT').textContent = 'Lend on Stellar'; $('#eBl').style.display = 'flex';
     return blDraw();
   }
+  if (EARN_VIEW === 'so') {   /* v2.42g (Jeff: "This should be in the Earn under the Solana section"): Jupiter Lend lives here now */
+    for (const id of ['eHome', 'eSt', 'eXr', 'eTopHome', 'eBl']) $('#' + id).style.display = 'none';
+    $('#eTopChain').style.display = ''; $('#eChainT').textContent = 'Lend on Solana'; $('#eSo').style.display = 'flex'; $('#eChainFoot').style.display = 'flex';
+    const W = solList(); if (!W.some((w) => w.addr === solSel)) solSel = (W[0] || {}).addr || null;
+    $('#eSoWal').innerHTML = W.map((w) => `<option value="${esc(w.addr)}">${esc(w.name)} · ${short(w.addr)}</option>`).join(''); if (solSel) $('#eSoWal').value = solSel;
+    $('#eSoWalW').style.display = W.length > 1 ? '' : 'none';
+    return solEarnDraw();
+  }
+  $('#eSo').style.display = 'none';
   $('#eBl').style.display = 'none';
   $('#eGoBl').style.display = DEV ? '' : 'none';   /* Blend lending: hidden from users while every Blend pool is on ice or frozen (2026 hacks); ?dev shows it */
   const L = OWN(), XL = xrList().filter((w) => w.own);
@@ -21713,12 +21743,15 @@ async function pushDetail(on) {
 }
 function pushWallets() {   /* own wallets that can get fill alerts: [{c, a, n, on}] — personal on, bot (trading) wallets off unless chosen */
   const C = (S.push && S.push.watch) || {}, d = (a, def) => (a in C ? !!C[a] : def);
-  return [...OWN().map((o) => ({ c: 'xlm', a: o.addr, n: o.name, on: d(o.addr, o.type !== 'trading') })), ...xrList().filter((w) => w.own).map((w) => ({ c: 'xrp', a: w.addr, n: w.name, on: d(w.addr, true) }))];
+  return [...OWN().map((o) => ({ c: 'xlm', a: o.addr, n: o.name, on: d(o.addr, o.type !== 'trading') })), ...xrList().filter((w) => w.own).map((w) => ({ c: 'xrp', a: w.addr, n: w.name, on: d(w.addr, true) })),
+    ...(solNet() === 'mainnet' ? solList().map((w) => ({ c: 'sol', a: w.addr, n: w.name, on: d(w.addr, true) })) : [])];   /* v2.42g: Manifest order fills (stop server 3.0) */
 }
 async function pushWatchSync() {   /* tell the stop server which wallets to watch for fills (needs stop server 2.1) */
   if (!S.push || !S.push.on || !S.stopUrl) return false;
-  const W = pushWallets().filter((w) => w.on).slice(0, 12)   /* the server takes 12 per phone: the first 12 ticked */.map((w) => ({ c: w.c, net: S.net, a: w.a, n: w.n.slice(0, 24) }));
-  try { await stopApi('/push/watch', { pid: S.push.pid, sec: S.push.sec, wallets: W }); S.push.fillsOk = true; } catch (e) { S.push.fillsOk = !/not found|404/.test(e.message || '') ? S.push.fillsOk : false; if (/not on/i.test(e.message || '')) setTimeout(() => pushResync(), 100); }
+  let W = pushWallets().filter((w) => w.on).slice(0, 12)   /* the server takes 12 per phone: the first 12 ticked */.map((w) => ({ c: w.c, net: w.c === 'sol' ? 'mainnet' : S.net, a: w.a, n: w.n.slice(0, 24) }));
+  try { try { await stopApi('/push/watch', { pid: S.push.pid, sec: S.push.sec, wallets: W }); }
+    catch (e) { if (!/Bad wallet/i.test(e.message || '') || !W.some((w) => w.c === 'sol')) throw e; W = W.filter((w) => w.c !== 'sol'); await stopApi('/push/watch', { pid: S.push.pid, sec: S.push.sec, wallets: W }); }   /* server older than 3.0: Stellar / XRP alerts keep working */
+    S.push.fillsOk = true; } catch (e) { S.push.fillsOk = !/not found|404/.test(e.message || '') ? S.push.fillsOk : false; if (/not on/i.test(e.message || '')) setTimeout(() => pushResync(), 100); }
   saveS(); return S.push.fillsOk;
 }
 function pushPaint() {
