@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.42o · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.42q · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15709,7 +15709,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.42o';
+const APP_VER = 'v2.42q';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15776,17 +15776,21 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx6') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx6', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx8') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx8', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
 const solWho = (a) => { if (!a) return ''; if (SOL_KNOWN[a]) return SOL_KNOWN[a]; const w = solList().find((x) => x.addr === a); if (w) return w.name; const b = solBook().find((x) => x.addr === a); if (b) return b.name; if (SOL_FEE.owner && a === SOL_FEE.owner) return 'Liquidfi fee'; return short(a); };
 const solAmt = (x) => { const v = Math.abs(x); if (v >= 1) return m2(v); if (v > 0 && v < 1e-6) return v.toFixed(9).replace(/0+$/, ''); return String(+v.toPrecision(4)); };   /* v2.42i: no '1e-9' */
 // what this transaction did to `addr`: SOL and token changes (fee left out), who was on the other side
+/* v2.42q: the venue(s) a Jupiter swap went through, by program id */
+const SOL_VEN = { CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: 'Raydium CLMM', whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: 'Orca', LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: 'Meteora', MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms: 'Manifest', '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': 'Raydium' };
+const solVen = (m) => [...new Set((m.innerInstructions || []).flatMap((x) => x.instructions || []).map((x) => SOL_VEN[x.programId] || JLAB[x.programId]).filter((v) => v && v !== 'Jupiter'))].join(', ');
 function solTxSum(addr, t) {
   const m = t.meta || {}, keys = ((t.transaction || {}).message || {}).accountKeys || [], K = keys.map((k) => (typeof k === 'string' ? k : k.pubkey));
   const i = K.indexOf(addr), payer = K[0] === addr, fee = (m.fee || 0) / 1e9;
+  if (m.err && payer && K.includes('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4')) { const v = solVen(m); return { txt: 'Swap not filled: the price moved past your limit, so nothing traded. Only the network fee was paid.', fee, err: true, ioc: { ok: false, ven: v } }; }   /* v2.42p: a killed fill-or-kill piece */
   let sol = i >= 0 ? ((m.postBalances || [])[i] - (m.preBalances || [])[i]) / 1e9 : 0; if (payer) sol += fee;
   const tk = {}; const add = (L, sg) => { for (const b of L || []) if (b.owner === addr) tk[b.mint] = (tk[b.mint] || 0) + sg * (+(b.uiTokenAmount || {}).uiAmountString || 0); };
   add(m.postTokenBalances, 1); add(m.preTokenBalances, -1);
@@ -15812,10 +15816,9 @@ function solTxSum(addr, t) {
   const usdM = ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'];
   if (payer && out.length && inn.length) { const so = out.find((c) => c.mint === 'SOL'), si = inn.find((c) => c.mint === 'SOL'), uo = out.find((c) => usdM.includes(c.mint)), ui = inn.find((c) => usdM.includes(c.mint));
     const fi = SOL_FEE.owner && SOL_FEE.owner !== addr ? K.indexOf(SOL_FEE.owner) : -1, feeSol = fi >= 0 ? Math.max(0, ((m.postBalances || [])[fi] - (m.preBalances || [])[fi]) / 1e9) : 0;   /* v2.42h: the fee wallet is one of Jeff's own wallets, still the fee */
-    const VEN = { CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: 'Raydium CLMM', whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: 'Orca', LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: 'Meteora', [MNF_PROG]: 'Manifest', '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': 'Raydium' };
-    const ven = [...new Set((m.innerInstructions || []).flatMap((x) => x.instructions || []).map((x) => VEN[x.programId] || JLAB[x.programId]).filter((v) => v && v !== 'Jupiter'))].join(', ');
-    if (so && ui && Math.abs(so.v) - feeSol > 0) { const n = Math.abs(so.v) - feeSol; return { txt: `Sold ${solAmt(n)} SOL at ${(ui.v / n).toFixed(4)} ${ui.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err }; }
-    if (si && uo) { const n = si.v + feeSol; return { txt: `Bought ${solAmt(n)} SOL at ${(Math.abs(uo.v) / n).toFixed(4)} ${uo.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err }; } }
+    const ven = solVen(m), jup = K.includes('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4');
+    if (so && ui && Math.abs(so.v) - feeSol > 0) { const n = Math.abs(so.v) - feeSol; return { txt: `Sold ${solAmt(n)} SOL at ${(ui.v / n).toFixed(4)} ${ui.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err, ioc: jup ? { ok: true, bid: 0, sol: n, px: ui.v / n, ven } : null }; }
+    if (si && uo) { const n = si.v + feeSol; return { txt: `Bought ${solAmt(n)} SOL at ${(Math.abs(uo.v) / n).toFixed(4)} ${uo.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err, ioc: jup ? { ok: true, bid: 1, sol: n, px: Math.abs(uo.v) / n, ven } : null }; } }
   if (!ch.length) txt = payer ? 'Account update' : 'No change to this wallet (someone else\'s transaction, often spam)';
   else if (out.length && inn.length && inn.some((c) => solJl(c.mint)) && !out.some((c) => solJl(c.mint))) txt = `Earn: put in ${out.filter((c) => c.mint !== 'SOL' || out.length === 1).map(f).join(', ')}`;
   else if (out.length && inn.length && out.some((c) => solJl(c.mint)) && !inn.some((c) => solJl(c.mint))) txt = `Earn: took out ${inn.filter((c) => c.mint !== 'SOL' || inn.length === 1).map(f).join(', ')}`;
@@ -15831,9 +15834,13 @@ async function solRecent(addr) {
   try { const L = await solRpc('getSignaturesForAddress', [addr, { limit: 15, commitment: 'confirmed' }]);
     if (solSel !== addr) return;
     const LL = [...(L || []), ...mfFillRows(addr)].sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
-    const paint = () => { const STR = mfStory(L, addr); el.innerHTML = LL.length ? LL.map((s) => { if (s.fill) return `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order (seen ${esc(new Date(s.fill.t).toLocaleString())})</span></div></div></details>`; const x = SOLTX[s.signature + addr];
+    const paint = () => { const STR = mfStory(L, addr), GR = solGroups(L, addr, STR), GH = {}; for (const g of Object.values(GR.G)) GH[g.last] = solGroupHtml(g, L, addr, STR);
+      const gTxt = Object.values(GH).map((h) => h.head).join('|');
+      el.innerHTML = LL.length ? LL.map((s) => { if (GH[s.signature]) return GH[s.signature].html; if (GR.of[s.signature]) return '';
+        if (s.fill && gTxt.includes(`${s.fill.bid ? 'Bought' : 'Sold'} ${solAmt(s.fill.sol)} SOL at ${(+s.fill.px).toFixed(2)}`)) return '';
+        if (s.fill) return `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:12px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order (seen ${esc(new Date(s.fill.t).toLocaleString())})</span></div></div></details>`; const x = SOLTX[s.signature + addr];
       const iso = s.blockTime ? new Date(s.blockTime * 1000).toISOString() : '', rw = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
-      return `<details class="recrow"><summary><span${/^No change/.test(x ? x.txt : '') ? ' class="mu"' : ''}>${x ? esc(STR[s.signature] ? STR[s.signature].txt : x.txt) : '<span class="mu">Reading…</span>'}${s.err || (x && x.err) ? ' <span class="sell">failed</span>' : ''}</span><span class="mu" style="font-size:12px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${x && x.fee ? rw('Network fee', solAmt(x.fee) + ' SOL') : ''}${iso ? rw('Time', esc(new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))) : ''}${rw('Transaction', esc(short(s.signature)))}<div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">Nothing yet</span></div>'; };
+      return `<details class="recrow"><summary><span${/^No change/.test(x ? x.txt : '') ? ' class="mu"' : ''}>${x ? esc(STR[s.signature] ? STR[s.signature].txt : x.txt) : '<span class="mu">Reading…</span>'}${(s.err || (x && x.err)) && !/^Swap not filled/.test(x ? x.txt : '') ? ' <span class="sell">failed</span>' : ''}</span><span class="mu" style="font-size:12px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${x && x.fee ? rw('Network fee', solAmt(x.fee) + ' SOL') : ''}${iso ? rw('Time', esc(new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))) : ''}${rw('Transaction', esc(short(s.signature)))}<div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">Nothing yet</span></div>'; };
     paint();
     const need = (L || []).filter((s) => !SOLTX[s.signature + addr]);
     if (need.length && !JLT) await jlTokens().catch(() => null);
@@ -16370,7 +16377,7 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
 }
 function stLoop() {   // v2.41d: Manifest every 15 s; the 24 h volume card every 5 min. Coinbase / Kraken stream on their own.
   clearTimeout(ST.timer); if (cur !== 'strade' || !K) return; let n = 0;
-  const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') {
+  const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') { if (n % 2 === 1) stFills();
       try { await stLoadClob(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaint();
       if (n % 2 === 1 && cur === 'strade') mfMinePaint().catch(() => {});
       n++; }
@@ -16640,7 +16647,7 @@ async function stLimitRun(o, buy, amt, lim, lt, capBps, fokQ) {
   step('Posting on Manifest…');
   let posted;
   try { const d = SOLA[solSel] || await solLoad(o.addr, true), M = await mfLoad(), P = await mfPostIxs(o, d, M, buy, rest, lim);
-    const r = await solSendIxs(o, P.ixs); if (r.state === 'ok') mfLoad(M.q).then((M2) => mfTrack(o.addr, M2)).catch(() => {});
+    const r = await solSendIxs(o, P.ixs); if (r.state === 'ok') { mftOf(o.addr).pend = { bid: buy ? 1 : 0, sol: +rest.toFixed(9), px: +P.px.toFixed(6), q: M.q, t: Date.now() }; mftSave(); mfLoad(M.q).then((M2) => mfTrack(o.addr, M2)).catch(() => {}); }
     posted = r.state === 'ok' ? `${solAmt(rest)} SOL posted on Manifest at ${P.px.toFixed(4)}` : `posting ${solAmt(rest)} SOL on Manifest ${r.state === 'pending' ? 'not confirmed yet: check Your Manifest orders in a minute' : 'failed (' + (r.state === 'failed' ? solTxErr(r.err) : r.state) + '): nothing posted'}`;
   } catch (e) { const m = e.message || String(e); posted = `${solAmt(rest)} SOL not posted: ${/would cross/i.test(m) ? "Manifest's book moved through your price (post-only refused)" : m}`; }
   const LN = lt === 'law' ? 'Limit AW' : 'Limit';
@@ -16715,6 +16722,7 @@ function mfTrack(addr, M) {
     if (now[k] ? na < pa : !T.cx[k]) { const n = (pa - na) / 1e9; if (n >= 0.000001) F.push({ t: Date.now(), bid, sol: +n.toFixed(9), px, q }); }
     if (!now[k]) { delete T.snap[k]; delete T.cx[k]; } }
   Object.assign(T.snap, now);
+  if (T.pend && T.pend.q === M.q && Object.values(now).some((v) => v[2] === T.pend.bid && Math.abs(v[1] - T.pend.px) < 1e-6)) delete T.pend;
   if (F.length) { T.fills.unshift(...F); if (T.fills.length > 60) T.fills.length = 60;
     const w = solList().find((x) => x.addr === addr); toast(`Order filled: ${F.map(mfFillTxt).join('; ')}${w ? ' · ' + w.name : ''}`, 7000); }
   mftSave();
@@ -16735,11 +16743,16 @@ async function mfMoveCore(o, q, d) {   /* move everything this wallet has free o
   delete SOLA[o.addr]; if (ST.mfFree && ST.mfFree.q === M.q && o.addr === solSel) ST.mfFree = { q: M.q, quote: 0, base: 0 };
   return mv;
 }
-const mfMovedTxt = (m) => [m.sol >= 0.000001 ? solAmt(m.sol) + ' SOL' : '', m.q >= 0.01 ? m2(m.q) + ' ' + m.c : ''].filter(Boolean).join(' + ');
+const mfMovedTxt = (m) => [m.sol >= 0.00001 ? solAmt(m.sol) + ' SOL' : '', m.q >= 0.01 ? m2(m.q) + ' ' + m.c : ''].filter(Boolean).join(' + ');
 async function mfAuto(addr, q) {
   const k = addr + ':' + q, o = solOwn(addr); if (!o || solNet() !== 'mainnet' || MF_BUSY || MF_AUTO[k] > Date.now()) return;
   MF_AUTO[k] = Date.now() + 60000;
-  try { const m = await mfMoveCore(o, q); if (m) { MF_AUTO[k] = 0; const w = solList().find((x) => x.addr === addr); toast(`Moved ${mfMovedTxt(m)} from Manifest to your wallet${w ? ' · ' + w.name : ''}.`, 6000);
+  try { const m = await mfMoveCore(o, q); if (m) { MF_AUTO[k] = 0; const w = solList().find((x) => x.addr === addr), T = mftOf(addr), P = T.pend; let fl = '';
+      /* v2.42p (Jeff: "Where's my fill?"): it filled within seconds of posting, before the app ever saw it resting */
+      if (P && P.q === q && Date.now() - P.t < 864e5 && (P.bid ? Math.abs(m.sol - P.sol) <= Math.max(0.0005, P.sol * 0.002) : Math.abs(m.q - P.sol * P.px) <= Math.max(0.02, P.sol * P.px * 0.003))) {
+        const f = { t: Date.now(), bid: P.bid, sol: P.sol, px: P.px, q }; T.fills.unshift(f); if (T.fills.length > 60) T.fills.length = 60; delete T.pend; mftSave(); fl = 'Order filled: ' + mfFillTxt(f) + '. '; }
+      toast(`${fl}Moved ${mfMovedTxt(m)} from Manifest to your wallet${w ? ' · ' + w.name : ''}.`, 7000);
+      setTimeout(() => { if (cur === 'strade' && solSel === addr) stFills(); }, 4000);
       if (cur === 'strade' && addr === solSel) drawSTrade(); else if (cur === 'sol' && addr === solSel) drawSol(); } }
   catch (e) { MF_AUTO[k] = Date.now() + 300000; }
 }
@@ -16758,19 +16771,50 @@ function mfStory(L, addr) {
   const out = {}, open = [];
   for (const s of [...(L || [])].filter((x) => !x.fill).sort((a, b) => (a.blockTime || 0) - (b.blockTime || 0))) {
     const x = SOLTX[s.signature + addr]; if (!x || !x.mf) continue; const P = x.mf.place;
-    if (P) { open.push({ ...P, sig: s.signature }); out[s.signature] = { txt: `Limit ${P.bid ? 'buy' : 'sell'} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} placed`, trade: false }; continue; }
-    const fills = [], backs = [];
+    if (P) { open.push({ ...P, sig: s.signature }); out[s.signature] = { txt: `Limit ${P.bid ? 'buy' : 'sell'} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} placed`, trade: false, place: P }; continue; }
+    const fills = [], backs = [], w = [], parts = [];
     for (const c of x.mf.moved || []) {
       let i = open.findIndex((o) => (c.sol ? o.bid && Math.abs(o.sol - c.v) <= Math.max(0.0005, o.sol * 0.002) : !o.bid && Math.abs(o.sol * o.px - c.v) <= Math.max(0.02, o.sol * o.px * 0.003)));
-      if (i >= 0) { const o = open.splice(i, 1)[0]; fills.push(`${o.bid ? 'Bought' : 'Sold'} ${solAmt(o.sol)} SOL at ${o.px.toFixed(2)} ${c.sol ? 'USDC' : c.c} · Manifest`); continue; }
+      if (i >= 0) { const o = open.splice(i, 1)[0]; fills.push(`${o.bid ? 'Bought' : 'Sold'} ${solAmt(o.sol)} SOL at ${o.px.toFixed(2)} ${c.sol ? 'USDC' : c.c} · Manifest`); w.push(o.sig); parts.push({ k: 'fill', o, c }); continue; }
       i = open.findIndex((o) => (c.sol ? !o.bid && Math.abs(o.sol - c.v) <= Math.max(0.0005, o.sol * 0.002) : o.bid && Math.abs(o.sol * o.px - c.v) <= Math.max(0.02, o.sol * o.px * 0.003)));
-      if (i >= 0) { const o = open.splice(i, 1)[0]; backs.push(`Limit ${o.bid ? 'buy' : 'sell'} @ ${+o.px.toFixed(4)} cancelled · ${c.sol ? solAmt(c.v) + ' SOL' : m2(c.v) + ' ' + c.c} back`); }
+      if (i >= 0) { const o = open.splice(i, 1)[0]; backs.push(`Limit ${o.bid ? 'buy' : 'sell'} @ ${+o.px.toFixed(4)} cancelled · ${c.sol ? solAmt(c.v) + ' SOL' : m2(c.v) + ' ' + c.c} back`); w.push(o.sig); parts.push({ k: 'cx', o, c }); }
     }
-    if (fills.length) out[s.signature] = { txt: fills.join('; '), trade: true };
-    else if (backs.length) out[s.signature] = { txt: backs.join('; '), trade: false };
+    if (fills.length) out[s.signature] = { txt: fills.join('; '), trade: true, w, parts };
+    else if (backs.length) out[s.signature] = { txt: backs.join('; '), trade: false, w, parts };
     else if ((x.mf.moved || []).length) out[s.signature] = { txt: x.txt.replace(/^Manifest: moved to wallet/, 'Moved from Manifest').replace(/ \(order cancelled\)$/, ''), trade: false };
   }
   return out;
+}
+/* v2.42q (Jeff: "It should just be 1 update of the sale not 3"): one order = one line in Recent. The IOC piece(s) sent just before
+   the post, the post on Manifest, and its fill or cancel are folded into a single entry; the steps are listed inside. */
+function solGroups(L, addr, STR) {
+  const byT = [...(L || [])].filter((x) => !x.fill).sort((a, b) => (a.blockTime || 0) - (b.blockTime || 0)), G = {}, of = {};
+  for (const s of byT) { const r = STR[s.signature]; if (r && r.place) { G[s.signature] = { id: s.signature, t: s.blockTime || 0, sigs: [s.signature], place: r.place }; of[s.signature] = s.signature; } }
+  for (const s of byT) { const r = STR[s.signature]; if (r && r.w) for (const ps of r.w) if (G[ps] && !G[ps].sigs.includes(s.signature)) { G[ps].sigs.push(s.signature); if (!of[s.signature]) of[s.signature] = ps; } }
+  for (const s of byT) { const x = SOLTX[s.signature + addr]; if (!x || !x.ioc || of[s.signature]) continue;
+    const g = Object.values(G).find((g) => { const dt = g.t - (s.blockTime || 0); return dt >= 0 && dt <= 30 && (!x.ioc.ok || x.ioc.bid === g.place.bid); });
+    if (g) { g.sigs.unshift(s.signature); of[s.signature] = g.id; } }
+  for (const g of Object.values(G)) g.last = g.sigs.reduce((a, b) => ((L.find((y) => y.signature === b) || {}).blockTime || 0) >= ((L.find((y) => y.signature === a) || {}).blockTime || 0) ? b : a);
+  return { G, of };
+}
+function solGroupHtml(g, L, addr, STR) {
+  const P = g.place, sd = P.bid ? 'buy' : 'sell', Sd = P.bid ? 'Bought' : 'Sold', tr = [], steps = []; let fee = 0, cx = null;
+  const tm = (s) => (s && s.blockTime ? new Date(s.blockTime * 1000).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit', second: '2-digit' }) : '');
+  for (const sig of g.sigs) { const s = L.find((y) => y.signature === sig) || {}, x = SOLTX[sig + addr] || {}, r = STR[sig] || {}; fee += x.fee || 0; let lab = '';
+    if (x.ioc && !x.ioc.ok) lab = `${x.ioc.ven || 'Jupiter'}: IOC not filled`;
+    else if (x.ioc) { tr.push({ sol: x.ioc.sol, px: x.ioc.px, ven: x.ioc.ven || 'Jupiter' }); lab = `${x.ioc.ven || 'Jupiter'}: IOC ${Sd.toLowerCase()} ${solAmt(x.ioc.sol)} SOL at ${x.ioc.px.toFixed(4)}`; }
+    else if (sig === g.id) lab = `Manifest: ${sd} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)}`;
+    else for (const pt of (r.parts || []).filter((q) => q.o.sig === g.id)) {
+      if (pt.k === 'fill') { tr.push({ sol: P.sol, px: P.px, ven: 'Manifest' }); lab = `Filled on Manifest: ${Sd.toLowerCase()} ${solAmt(P.sol)} SOL at ${P.px.toFixed(2)} · ${pt.c.sol ? solAmt(pt.c.v) + ' SOL' : m2(pt.c.v) + ' ' + pt.c.c}`; }
+      else { cx = pt; lab = `Cancelled on Manifest · ${pt.c.sol ? solAmt(pt.c.v) + ' SOL' : m2(pt.c.v) + ' ' + pt.c.c} back`; } }
+    if (lab) steps.push(`<div style="display:block;padding:4px 0"><span>${esc(lab)}</span><br><span class="mu mono" style="font-size:11.5px">${esc(tm(s))} · <a href="${solTxLink(sig)}" target="_blank" rel="noopener">Solscan ↗</a></span></div>`); }
+  const tot = tr.reduce((a, b) => a + b.sol, 0), vens = [...new Set(tr.map((t) => t.ven))], mFill = tr.some((t) => t.ven === 'Manifest');
+  const tail = tr.length && !mFill ? (cx ? ' · rest cancelled' : ` · ${solAmt(P.sol)} resting @ ${+P.px.toFixed(4)}`) : '';
+  const head = (tr.length === 1 ? `${Sd} ${solAmt(tr[0].sol)} SOL at ${tr[0].px.toFixed(tr[0].ven === 'Manifest' ? 2 : 4)} ${P.c || 'USDC'} · ${tr[0].ven}`
+    : tr.length ? `${Sd} ${solAmt(tot)} SOL at ${(tr.reduce((a, b) => a + b.sol * b.px, 0) / tot).toFixed(4)} avg · ${vens.join(' + ')}`
+    : cx ? `Limit ${sd} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} cancelled` : `Limit ${sd} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} · resting on Manifest`) + tail;
+  const ls = L.find((y) => y.signature === g.last) || {}, iso = ls.blockTime ? new Date(ls.blockTime * 1000).toISOString() : '';
+  return { head, html: `<details class="recrow"><summary><span>${esc(head)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${steps.join('')}<div><span>Network fees</span><span class="mono">${solAmt(fee)} SOL</span></div></div></details>` };
 }
 const mfFillTxt = (f) => `${f.bid ? 'Bought' : 'Sold'} ${solAmt(f.sol)} SOL at ${(+f.px).toFixed(f.px >= 1 ? 2 : 4)} ${f.q} · Manifest`;
 function mfCxMark(addr, q, seqs) { const T = mftOf(addr); for (const sq of seqs) T.cx[q + ':' + sq] = 1; mftSave(); }
