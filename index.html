@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40t</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40u</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -444,7 +444,9 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="top"><div class="l"><button class="ico back" data-go="sol" aria-label="Back">‹</button><h2>Trade SOL</h2></div><span class="mu" id="stFrom" style="font-size:13px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span></div>
   <div class="seg" id="stQ"><button class="on" data-v="USDC">SOL / USDC</button><button data-v="USDT">SOL / USDT</button></div>
   <div class="card"><div class="top"><span class="lbl" id="stPairL">SOL / USDC · Solana DEXes (Jupiter)</span><span class="grn" style="font-size:11px;font-weight:700" id="stUpd"></span></div><div class="book" id="stBook"></div><div class="mu" id="stSpread" style="font-size:12px"></div></div>
-  <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="mu" style="font-size:11px" id="stLastSrc"></span></div><div id="stLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
+  <div class="card"><div class="top"><span class="lbl">By venue · best bid / ask</span><span class="mu" style="font-size:11px" id="stVenUpd"></span></div><div id="stVen" style="display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div><div class="mu" id="stNbbo" style="font-size:12px"></div></div>
+  <div class="card"><div class="top"><span class="lbl">Last sales · all venues</span><span class="mu" style="font-size:11px" id="stLastSrc"></span></div><div id="stLast" style="display:grid;grid-template-columns:auto 1.3fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></div></div>
+  <div class="card"><div class="top"><span class="lbl">Where SOL / <span id="stVolQ">USDC</span> trades · 24h</span></div><div id="stVol" style="display:flex;flex-direction:column;gap:6px;font-size:13px"></div><div class="mu" style="font-size:11.5px">From GeckoTerminal's pool data. Some market-maker venues (HumidiFi, SolFi, BisonFi…) quote above but don't publish their trades, so they can be missing from this list and the tape.</div></div>
   <div class="seg" id="stSide"><button class="on" data-v="buy">Buy SOL</button><button data-v="sell">Sell SOL</button></div>
   <div class="seg" id="stMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
   <div id="stModeNote" class="note" style="display:none"></div>
@@ -609,7 +611,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40t</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40u</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -641,7 +643,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40t · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.40u · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14611,7 +14613,7 @@ async function xrSendReview() {
   } else if (memoS) memos = [{ Memo: { MemoType: strHex('text'), MemoFormat: strHex('text/plain'), MemoData: strHex(memoS) } }];
   const items = [...await xrBusy(xrSel), { k: 'Send', v: `${m2(amt)} XRP`, hl: 1 }, { k: 'To', v: `${to.slice(0, 8)}…${to.slice(-6)}`, n: bk.name || (xrList().find((w) => w.addr === to) || {}).name || 'check the start and end' }, ...(tagS ? [{ k: 'Destination tag', v: tagS }] : []), ...(memoS ? [{ k: priv ? '🔒 Private memo' : 'Memo', v: memoS, n: priv ? `encrypted: only you and ${bk.name} can read it, in Liquidfi` : 'public' }] : []), { k: 'Network fee', v: `${m2(drops / 1e6)} XRP` },
     ...(dst.error === 'actNotFound' ? [{ foot: `This opens a new XRP Ledger address: ${m2(sv.base)} XRP of it stays there as the ledger's reserve.` }] : []), { foot: XR_BOT_NOTE }];
-  confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops, memos), false, 'b-acc', 'Sending…', true);
+  confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops, memos, bk.name), false, 'b-acc', 'Sending…', true);
 }
 // sign + submit + wait until the outcome is CERTAIN. A payment is only "not sent" once the ledger has passed its
 // LastLedgerSequence without it. Timeouts, tef/ter/tel answers (e.g. tefPAST_SEQ from a second server that already has it)
@@ -14741,14 +14743,19 @@ async function xrBusyN(addr) {
 const xrBusyItems = (n) => n >= 2 ? [{ t: '⚠ A bot is trading from this wallet right now', s: `it sent ${n} transactions in the last 90 seconds (XRP Sweepr?). Pause it first: two programs on one wallet collide and this may not go through.`, hl: 1 }] : [];
 async function xrBusy(addr) { return xrBusyItems(await xrBusyN(addr)); }
 const XR_BOT_NOTE = 'If a bot (like XRP Sweepr) trades from this wallet, pause it first so the two don\'t clash.';
-async function xrSendRun(o, to, tag, amt, drops, memos) {
+/* v2.40v: like a Stellar send, the sheet closes on the tap and the big banner at the top goes Sending… → ✓ Sent (or Not sent / Still
+   pending with the reason). A send that did not go through also opens the full result screen with the link. */
+async function xrSendRun(o, to, tag, amt, drops, memos, toName) {
+  const me = o.w.classicAddress, nm = toName || short(to), p = tPend(`Send ${m2(amt)} XRP to ${nm}`, 'xsend', me);
   try {
     const tx = { TransactionType: 'Payment', Destination: to, Amount: String(Math.round(amt * 1e6)) };
     if (tag != null) tx.DestinationTag = tag;
     if (memos && memos.length) tx.Memos = memos;
     const r = await xrSubmit(o, tx, drops);
+    if (r.state === 'ok') { tPendSet(p, '✓ Sent', 'grn', `confirmed · ledger ${+r.ledger || ''}${tag != null ? ' · tag ' + tag : ''}`, true); delete XRA[me]; if (cur === 'xrp' && xrSel === me) drawXrp(true); return; }
+    tPendSet(p, r.state === 'pending' ? 'Still pending' : 'Not sent', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? "not confirmed yet: don't send it again" : r.code ? xrErr(r.code) : 'it never reached the ledger; nothing moved', true);
     return xrOutcome(r, 'Sent', `${m2(amt)} XRP to ${esc(short(to))}${tag != null ? ' · tag ' + tag : ''}`, 'Not sent');
-  } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
+  } catch (e) { tPendSet(p, 'Not sent', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
 }
 function xrErr(code, msg) {
   const m = { tecUNFUNDED_PAYMENT: 'Not enough XRP after the ledger reserve.', tecNO_DST_INSUF_XRP: "That address isn't activated; send at least the reserve to open it.", tecDST_TAG_NEEDED: 'That address needs a destination tag.', tefPAST_SEQ: 'Another transaction from this wallet took the same slot first (is XRP Sweepr running on it?). Pause the bot, then try again.', tefMAX_LEDGER: 'It took too long to reach the ledger. Try again.', telCAN_NOT_QUEUE: 'The network queue for this wallet is full (a bot may be sending from it). Try again in a moment.', telCAN_NOT_QUEUE_FULL: 'The network is busy. Try again in a moment.', telINSUF_FEE_P: 'Network busy. Try again in a moment.', tecNO_PERMISSION: 'That address does not accept this payment.', tecPATH_DRY: 'No path for this payment.', tecKILLED: 'Not enough on the book at your price right now, so nothing traded.', tecUNFUNDED_OFFER: 'Not enough funds for that order.', tecINSUF_RESERVE_OFFER: 'Not enough XRP for the reserve an open order needs.', tecNO_LINE: 'Add RLUSD to this wallet first.', tecNO_LINE_INSUF_RESERVE: 'Not enough XRP for the RLUSD trust line reserve.', tecNO_DST: "That address doesn't exist yet." };
@@ -15680,7 +15687,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.40t';
+const APP_VER = 'v2.40v';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15880,8 +15887,13 @@ async function solSendGo() {
   items.push({ k: 'To', v: `${bk.name} · ${to.slice(0, 6)}…${to.slice(-6)}`, n: 'check the start and end' }, { k: 'Network fee', v: 'about 0.00002 SOL' });
   if (rentNote) items.push({ foot: rentNote });
   try { await solSim(o, ixs); } catch (e) { return toast(e.message || String(e), 6000); }
-  confirmSheet('Send ' + items[0].v.replace(/^Send /, ''), `Solana${solNet() === 'devnet' ? ' Devnet' : ''} · from ${esc(o.name)}`, items, 'Send', async () => {
-    try { solResult(await solSendIxs(o, ixs, solWaitLabel), 'Send'); } catch (e) { closeSheet(); toast(e.message || String(e), 6000); } }, false, 'b-acc', 'Sending…', true);
+  confirmSheet('Send ' + items[0].v.replace(/^Send /, ''), `Solana${solNet() === 'devnet' ? ' Devnet' : ''} · from ${esc(o.name)}`, items, 'Send', async () => {   /* v2.40v: same as Stellar / XRP sends: sheet closes, big banner Sending… → ✓ Sent */
+    const what = items[0].v, p = tPend(`Send ${what} to ${bk.name}`, 'solsend', o.addr);
+    try { const r = await solSendIxs(o, ixs, null);
+      if (r.state === 'ok') { tPendSet(p, '✓ Sent', 'grn', 'confirmed on Solana', true); delete SOLA[o.addr]; if (cur === 'sol' && solSel === o.addr) drawSol(); return; }
+      tPendSet(p, r.state === 'pending' ? 'Not confirmed yet' : 'Not sent', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'check the wallet in a minute before trying again' : r.state === 'expired' ? 'it expired before Solana took it; nothing moved' : solTxErr(r.err), true);
+      solResult(r, 'Send');
+    } catch (e) { tPendSet(p, 'Not sent', 'red', e.message || String(e), true); toast(e.message || String(e), 6000); } }, false, 'b-acc', 'Sending…', true);
 }
 
 /* v2.40q (Jeff: "why not just send SOL fees instead of USDC?"): Liquidfi's fee is paid in SOL, worth SOL_FEE.bps of what you
@@ -16001,6 +16013,39 @@ async function stLoadBook() {
   for (let i = 0; i < Math.min(bids.length, asks.length); i++) if (asks[i][0] < bids[i][0]) { const m = (asks[i][0] + bids[i][0]) / 2; asks[i][0] = bids[i][0] = m; }   /* two routes a moment apart can cross by a hair: show the middle */
   ST.bids = bids; ST.asks = asks; ST.at = Date.now();
 }
+/* v2.40u (Jeff: "1 and 2 … and 3 · lets see where all the trades coming from"): each venue's own best bid / ask for ~$100 (Jupiter
+   limited to that one venue), the best of them highlighted (the Solana "NBBO"); a tape merged from the busiest pools with the venue
+   on each print; and 24 h volume by venue. Phoenix: Jupiter has no route to it right now and its book is 1.7 MB per read, so it's
+   left out until it trades again. Venue quotes refresh every 60 s, the tape every 20 s (free APIs, kept well under their limits). */
+const ST_VEN = [['Orca', 'Whirlpool'], ['Raydium CLMM', 'Raydium CLMM'], ['Raydium', 'Raydium'], ['Meteora', 'Meteora DLMM'], ['Manifest (book)', 'Manifest'], ['HumidiFi', 'HumidiFi'], ['SolFi', 'SolFi V2'], ['BisonFi', 'BisonFi'], ['ZeroFi', 'ZeroFi'], ['GoonFi', 'GoonFi V2'], ['Tessera', 'TesseraV']];
+const ST_DEX = { orca: 'Orca', 'raydium-clmm': 'Raydium CLMM', raydium: 'Raydium', 'raydium-cp': 'Raydium CP', meteora: 'Meteora', 'meteora-dlmm': 'Meteora', 'meteora-damm-v2': 'Meteora', 'pancakeswap-v3-solana': 'PancakeSwap', phoenix: 'Phoenix', lifinity: 'Lifinity', 'lifinity-v2': 'Lifinity', 'byreal': 'Byreal', zerofi: 'ZeroFi', humidifi: 'HumidiFi', solfi: 'SolFi', bisonfi: 'BisonFi', goonfi: 'GoonFi' };
+const stDexNm = (id) => ST_DEX[id] || String(id || '').split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+async function stLoadVenues() {
+  const Q = stQ(), px = (await solPrices()).sol; if (!(px > 0)) throw new Error('no price');
+  const qt = (i, o, a, dx) => getJ(`${JUP}/quote?inputMint=${i}&outputMint=${o}&amount=${a}&slippageBps=50&onlyDirectRoutes=true&dexes=${encodeURIComponent(dx)}`).catch(() => null);
+  const R = [];
+  for (let k = 0; k < ST_VEN.length; k += 4) R.push(...await Promise.all(ST_VEN.slice(k, k + 4).flatMap(([, dx]) => [qt(WSOL, Q.mint, Math.round(100 / px * 1e9), dx), qt(Q.mint, WSOL, Math.round(100 * 10 ** Q.d), dx)])));
+  ST.ven = ST_VEN.map(([nm], k) => { const s = R[2 * k], b = R[2 * k + 1];
+    return { nm, bid: s && +s.outAmount > 0 ? +s.outAmount / 10 ** Q.d / (+s.inAmount / 1e9) : 0, ask: b && +b.outAmount > 0 ? +b.inAmount / 10 ** Q.d / (+b.outAmount / 1e9) : 0 }; }).filter((v) => v.bid || v.ask);
+  ST.venAt = Date.now();
+}
+function stPaintVenues() {
+  const el = $('#stVen'); if (!el) return; const V = ST.ven || [];
+  const bb = V.reduce((m, v) => (v.bid > (m ? m.bid : 0) ? v : m), null), ba = V.reduce((m, v) => (v.ask > 0 && (!m || v.ask < m.ask) ? v : m), null);
+  const H = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
+  const rows = [...V].sort((a, b) => (b.bid || 0) - (a.bid || 0));
+  el.innerHTML = H('Venue') + H('Bid', 1) + H('Ask', 1) + (rows.length ? rows.map((v) => `<span style="font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(v.nm)}</span><span class="buy" style="text-align:right;${v === bb ? 'font-weight:800;text-decoration:underline' : ''}">${v.bid ? v.bid.toFixed(3) : '–'}</span><span class="sell" style="text-align:right;${v === ba ? 'font-weight:800;text-decoration:underline' : ''}">${v.ask ? v.ask.toFixed(3) : '–'}</span>`).join('')
+    : `<span class="mu">${ST.venAt ? 'No venue quotes right now.' : 'loading…'}</span><span></span><span></span>`);
+  $('#stNbbo').textContent = bb && ba ? `Best bid ${bb.bid.toFixed(3)} (${bb.nm}) · best ask ${ba.ask.toFixed(3)} (${ba.nm})${bb.bid >= ba.ask ? ' · crossed: quotes come a moment apart, and market makers update fast' : ''} · for about $100. Jupiter's route can beat any one venue by splitting across them.` : '';
+  $('#stVenUpd').textContent = ST.venAt ? 'updated ' + new Date(ST.venAt).toLocaleTimeString() : '';
+}
+async function stPools() {   // the pair's pools, busiest first (24 h volume), looked up every 5 minutes
+  const k = ST.q; if (ST.pools && ST.pools.q === k && Date.now() - ST.pools.at < 300000) return ST.pools;
+  const j = await getJ('https://api.geckoterminal.com/api/v2/networks/solana/tokens/' + WSOL + '/pools?page=1');
+  const L = (j.data || []).filter((p) => (p.attributes.name || '').replace(/\s/g, '') === 'SOL/' + k).map((p) => ({ addr: p.attributes.address, dex: stDexNm(p.relationships.dex.data.id), vol: +((p.attributes.volume_usd || {}).h24 || 0), tvl: +p.attributes.reserve_in_usd || 0 })).sort((a, b) => b.vol - a.vol);
+  if (!L.length) throw new Error('no pool');
+  return (ST.pools = { q: k, list: L, at: Date.now() });
+}
 async function stPool() {   // biggest pool for SOL/<quote>, looked up once an hour
   const k = ST.q; if (ST.pool[k] && Date.now() - ST.pool[k].at < 3600000) return ST.pool[k];
   const j = await getJ('https://api.geckoterminal.com/api/v2/networks/solana/tokens/' + WSOL + '/pools?page=1');
@@ -16009,10 +16054,20 @@ async function stPool() {   // biggest pool for SOL/<quote>, looked up once an h
   return (ST.pool[k] = { addr: p.attributes.address, dex: (p.relationships.dex.data.id || '').replace(/-.*$/, ''), at: Date.now() });
 }
 async function stLoadSales() {
-  const P = await stPool(), j = await getJ(`https://api.geckoterminal.com/api/v2/networks/solana/pools/${P.addr}/trades`);
-  ST.sales = (j.data || []).map((x) => x.attributes).filter((a) => !a.is_anomalous).slice(0, 12).map((a) => { const buy = a.kind === 'buy', sol = +(buy ? a.to_token_amount : a.from_token_amount), q = +(buy ? a.from_token_amount : a.to_token_amount);
-    return { t: Date.parse(a.block_timestamp), px: q / sol, x: sol, buy, h: a.tx_hash }; }).filter((t) => t.px > 0 && t.x > 0);
-  ST.salesAt = Date.now(); ST.src = P.dex.charAt(0).toUpperCase() + P.dex.slice(1) + ' pool · biggest SOL/' + ST.q;
+  const P = await stPools(), top = P.list.slice(0, 3);
+  const R = await Promise.all(top.map((p) => getJ(`https://api.geckoterminal.com/api/v2/networks/solana/pools/${p.addr}/trades`).then((j) => ({ p, j })).catch(() => null)));
+  const all = [];
+  for (const x of R) { if (!x) continue; for (const a of (x.j.data || []).map((d) => d.attributes).filter((a) => !a.is_anomalous).slice(0, 25)) { const buy = a.kind === 'buy', sol = +(buy ? a.to_token_amount : a.from_token_amount), q = +(buy ? a.from_token_amount : a.to_token_amount);
+    if (sol > 0 && q > 0) all.push({ t: Date.parse(a.block_timestamp), px: q / sol, x: sol, buy, h: a.tx_hash, v: x.p.dex }); } }
+  const seen = new Set(); ST.sales = all.sort((a, b) => b.t - a.t).filter((t) => (seen.has(t.h + t.v) ? false : seen.add(t.h + t.v))).slice(0, 16);
+  if (!ST.sales.length && R.every((x) => !x)) throw new Error('no sales');
+  ST.salesAt = Date.now(); ST.src = top.map((p) => p.dex).filter((v, i, a) => a.indexOf(v) === i).join(', ');
+}
+function stPaintVol() {
+  const el = $('#stVol'); if (!el) return; $('#stVolQ').textContent = ST.q; const P = ST.pools && ST.pools.q === ST.q ? ST.pools.list : null;
+  if (!P) { el.innerHTML = '<span class="mu">loading…</span>'; return; }
+  const by = {}; for (const p of P) by[p.dex] = (by[p.dex] || 0) + p.vol; const L = Object.entries(by).sort((a, b) => b[1] - a[1]), tot = L.reduce((t, x) => t + x[1], 0) || 1;
+  el.innerHTML = L.slice(0, 8).map(([nm, v]) => `<div><div style="display:flex;justify-content:space-between"><span>${esc(nm)}</span><span class="mono">$${v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : fx(v, 0)} · ${(v / tot * 100).toFixed(0)}%</span></div><div style="height:5px;border-radius:3px;background:var(--bd);margin-top:3px"><div style="height:5px;border-radius:3px;background:var(--blu);width:${Math.max(1, v / L[0][1] * 100).toFixed(1)}%"></div></div></div>`).join('');
 }
 function stPaint() {
   const el = $('#stBook'); if (!el) return;
@@ -16027,8 +16082,8 @@ function stPaint() {
 function stPaintSales() {
   const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = ST.src || '';
   const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11px;${r ? 'text-align:right' : ''}">${t}</span>`;
-  el.innerHTML = H3('Time (PT)') + H3('Price', 1) + H3('SOL', 1) + (ST.sales.length ? ST.sales.map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(3)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
-    : `<span class="mu">${ST.salesAt ? 'No trades yet.' : ST.salesErr ? "Can't load sales right now." : 'loading…'}</span><span></span><span></span>`);
+  el.innerHTML = H3('Time (PT)') + H3('Venue') + H3('Price', 1) + H3('SOL', 1) + (ST.sales.length ? ST.sales.map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span style="font-family:inherit;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.v || '')}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(3)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
+    : `<span class="mu" style="grid-column:1/-1">${ST.salesAt ? 'No trades yet.' : ST.salesErr ? (ST.q === 'USDT' ? 'No busy SOL/USDT pools publish trades right now. Most SOL trades are against USDC.' : "Can't load sales right now. Trying again shortly.") : 'loading…'}</span>`);
 }
 function stHave() {
   const d = SOLA[solSel], Q = stQ(); if (!d) return { sol: 0, q: 0, qt: null };
@@ -16060,17 +16115,19 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
     el.innerHTML = R.length ? R.map((s) => `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:12px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
   } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || e)}</span></div>`; }
 }
-function stLoop() {   // book every 15 s, sales every 15 s, only while this screen is open and visible
-  clearTimeout(ST.timer); if (cur !== 'strade' || !K) return;
+function stLoop() {   // tape + size ladder every 30 s, venue quotes every 60 s; only while this screen is open and visible (GeckoTerminal's free limit is tight)
+  clearTimeout(ST.timer); if (cur !== 'strade' || !K) return; let n = 0;
   const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') {
       try { await stLoadBook(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaint();
-      try { await stLoadSales(); ST.salesErr = 0; } catch (e) { ST.salesErr = 1; } if (cur === 'strade') stPaintSales(); }
-    ST.timer = setTimeout(run, ST.fails ? Math.min(60000, 15000 * 2 ** Math.min(ST.fails - 1, 2)) : 15000); };
+      if (n % 2 === 0) { try { await stLoadVenues(); } catch (e) {} if (cur === 'strade') stPaintVenues(); }
+      try { await stLoadSales(); ST.salesErr = 0; } catch (e) { ST.salesErr = 1; } if (cur === 'strade') { stPaintSales(); stPaintVol(); }
+      n++; }
+    ST.timer = setTimeout(run, ST.fails || ST.salesErr ? 60000 : 30000); };
   run();
 }
 async function drawSTrade() {
   const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots');
-  $('#stFrom').textContent = w.name; stPaintForm(); stPaint(); stPaintSales(); $('#stEst').innerHTML = '';
+  $('#stFrom').textContent = w.name; stPaintForm(); stPaint(); stPaintVenues(); stPaintSales(); stPaintVol(); $('#stEst').innerHTML = '';
   if (!SOLA[solSel]) solLoad(solSel).then(() => { if (cur === 'strade') stPaintForm(); }).catch(() => {});
   stLoop(); stFills();
 }
@@ -16086,7 +16143,7 @@ async function stReview(btn) {
 }
 document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, [data-spct]'); if (!b || cur !== 'strade') return;
   if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, px = ST.asks[0] ? ST.asks[0][0] : SOLPX.sol; const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
-  const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.bids = ST.asks = []; ST.sales = []; ST.salesAt = 0; ST.at = 0; stPaint(); stPaintSales(); stLoop(); }
+  const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.bids = ST.asks = []; ST.sales = []; ST.salesAt = 0; ST.at = 0; ST.ven = []; ST.venAt = 0; stPaint(); stPaintVenues(); stPaintSales(); stPaintVol(); stLoop(); }
   if (g === 'stSide') ST.side = b.dataset.v; if (g === 'stMode') ST.mode = b.dataset.v; stPaintForm(); stEst(); });
 document.addEventListener('input', (e) => { if (e.target && e.target.id === 'stAmt') stEst(); });
 
@@ -19705,7 +19762,8 @@ async function fillPriceOf(hash, me) {
 }
 /* Big "order sent" banner at the top of the screen (orders and swaps): Sending… → Order sent · confirming… → ✓ Filled /
    On the book, or Failed. Follows the same status as the row under the order form; tap to close; closes itself when done. */
-const OBN = { p: null, t: 0 }, OBN_SCR = ['trade', 'xtrade', 'swap', 'xswap'];
+/* v2.40v (Jeff: "It has to be consistent on all the coins"): sends get the same big banner as orders and swaps, on Stellar, XRP and Solana */
+const OBN = { p: null, t: 0 }, OBN_SCR = ['trade', 'xtrade', 'swap', 'xswap', 'send', 'xsend', 'solsend'];
 function obnPaint() {
   const p = OBN.p, el = $('#obn'); if (!p || !el) return;
   const what = p.scr === 'swap' || p.scr === 'xswap' ? 'swap' : 'order', bad = p.cls === 'red', warn = !p.busy && !bad && /amb/.test(p.cls || '');
