@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40m</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40n</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -302,7 +302,6 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="list" id="bXrp" style="display:flex;flex-direction:column;gap:10px"></div>
   <div class="list" id="bSol" style="display:flex;flex-direction:column;gap:10px"></div>
   <button class="b-out" data-act="addAcct">+ Add wallet</button>
-  <button class="b-out" data-act="solAddSheet" id="bSolAdd" style="display:none">+ Add Solana wallet</button>
   <button class="b-out" data-go="act" id="bAct">Activity · all wallets</button>
   <div id="bTrade" style="display:flex;flex-direction:column;gap:12px">
     <div id="pHero" style="display:none"></div>
@@ -597,7 +596,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40m</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40n</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -629,7 +628,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40m · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.40n · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15603,7 +15602,7 @@ function solResult(r, what) {
 /* the wallet page */
 function solRows(noLoad) {
   const el = $('#bSol'), ab = $('#bSolAdd'); if (!el) return;
-  if (ab) ab.style.display = '';
+  if (ab) ab.style.display = 'none';   /* v2.40n: one Add wallet button (Solana is a choice inside it) */
   const L = solList(); if (!L.length) { el.innerHTML = ''; return; }
   el.innerHTML = L.map((w) => { const d = SOLA[w.addr];
     return `<div class="wrow"><button class="acct" data-sol="${esc(w.addr)}"><div class="r"><span style="font-size:17px;font-weight:600">${esc(w.name)} <span class="mu" style="font-weight:400">· SOL</span></span><span class="mono" style="font-weight:600">${d ? '$' + fx(solUsd(d)) : '…'}</span></div><div class="r"><span class="mono mu" style="font-size:12px">${short(w.addr)}</span><span class="mu" style="font-size:12px">${d ? m2(d.sol) + ' SOL' : ''}</span></div></button></div>`; }).join('');
