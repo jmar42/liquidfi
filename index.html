@@ -239,7 +239,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:13px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40r</p>
+  <p class="mu" style="font-size:12px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.40s</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -379,7 +379,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SOLANA WALLET -->
 <section class="scr" id="s-sol">
-  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back">‹</button><div><h2 id="soName"></h2><div class="mono mu" style="font-size:12px" id="soAddr"></div></div></div></div>
+  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back">‹</button><div><h2 id="soName"></h2><div class="mono mu" style="font-size:12px" id="soAddr"></div></div></div><span id="soLive" style="font-size:12px"></span></div>
   <div class="card" style="gap:4px"><span class="mu" style="font-size:13px">Total value (USD est.)</span><span class="mono" style="font-size:30px;font-weight:600;color:var(--blu)" id="soTot">–</span></div>
   <div id="soActs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px"></div>
   <div id="soFund"></div>
@@ -395,7 +395,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- XRP LEDGER WALLET -->
 <section class="scr" id="s-xrp">
-  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back">‹</button><div><h2 id="xrName"></h2><div class="mono mu" style="font-size:12px" id="xrAddr"></div></div></div></div>
+  <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back">‹</button><div><h2 id="xrName"></h2><div class="mono mu" style="font-size:12px" id="xrAddr"></div></div></div><span id="xrLive" style="font-size:12px"></span></div>
   <div class="card" style="gap:4px"><span class="mu" style="font-size:13px">Total value (USD est.)</span><span class="mono" style="font-size:30px;font-weight:600;color:var(--blu)" id="xrTot">–</span></div>
   <div class="g2" id="xrActs"></div>
   <div id="xrFund"></div>
@@ -591,7 +591,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40r</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:13px">v2.40s</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
@@ -623,7 +623,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.40r · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.40s · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15325,7 +15325,42 @@ function xtOfferCard(f, own) {
 }
 // Open orders on the XRP wallet page: every order this address has on the XRP Ledger DEX (a bot's too), with Cancel
 let XRWT = 0, XRW_LAST = null;
-function xrWatch(addr) {   // wallet page: look for new activity every 8 s (fills by others, a bot's orders), redraw only on a change
+/* v2.40s (Jeff: "is it refreshing every 8 seconds? Why is not streaming? Why not use websockets?"): the wallet page now listens on a
+   WebSocket to a public XRPL server (subscribe to this account + closed ledgers): a fill, deposit or a bot's order shows within a
+   ledger (~4 s) and nothing is re-read in between. The 8 s check below only runs while the socket is down. Read-only. */
+const XA = { ws: null, addr: null, live: false, last: 0, i: 0, tries: 0, wd: 0, rt: 0, deb: 0, retryAt: 0 };
+function xaStop() { clearInterval(XA.wd); clearTimeout(XA.rt); clearTimeout(XA.deb); XA.wd = XA.rt = 0; XA.live = false; const ws = XA.ws; XA.ws = null; XA.addr = null; if (ws) { ws.onopen = ws.onmessage = ws.onclose = ws.onerror = null; try { ws.close(); } catch (e) {} } liveTag('#xrLive', ''); }
+function liveTag(sel, mode) { const el = $(sel); if (!el) return; el.innerHTML = mode === 'live' ? '<span class="grn">● live</span>' : mode === 'poll' ? '<span class="mu">updates every few seconds</span>' : ''; }
+function xaStart(addr) {
+  if (XA.ws && XA.addr === addr) return true;   // already listening for this wallet
+  xaStop(); if (typeof WebSocket === 'undefined' || Date.now() < XA.retryAt) return false;
+  const L = xrWsList(S.net), net = S.net; let ws; try { ws = new WebSocket(L[XA.i % L.length]); } catch (e) { return false; }
+  XA.ws = ws; XA.addr = addr; XA.last = Date.now();
+  const fail = () => { if (XA.ws !== ws) return; xaStop(); XA.i++; XA.tries++; XA.retryAt = Date.now() + Math.min(60000, 5000 * 2 ** Math.min(XA.tries - 1, 4)); if (cur === 'xrp' && xrSel === addr) { liveTag('#xrLive', 'poll'); xrPoll(addr); } };
+  ws.onopen = () => { if (XA.ws !== ws) return; ws.send(JSON.stringify({ id: 1, command: 'subscribe', streams: ['ledger'], accounts: [addr] })); };
+  ws.onmessage = (ev) => {
+    if (XA.ws !== ws) return; let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+    if (m.id === 1) { if (m.status === 'success') { XA.live = true; XA.tries = 0; XA.last = Date.now(); clearTimeout(XRWT); liveTag('#xrLive', 'live'); } else fail(); return; }
+    if (m.type === 'ledgerClosed') { XA.last = Date.now(); return; }
+    if (m.type === 'transaction' && m.validated) {
+      const tx = m.transaction || m.tx_json || m.tx || {}, h = m.hash || tx.hash;
+      if (tx.Account !== addr && xrTradeText(xrMyDelta(m.meta, addr, tx))) xrFillToast(addr, h, m.meta, tx);
+      if (h) XRW_LAST = { addr, h };
+      clearTimeout(XA.deb); XA.deb = setTimeout(() => { if (cur === 'xrp' && xrSel === addr) { XRKEEP[addr] = XRA[addr]; delete XRA[addr]; drawXrp(true); } }, 700);   // a burst of fills = one redraw
+    }
+  };
+  ws.onclose = ws.onerror = fail;
+  XA.wd = setInterval(() => {   // left the page, locked, switched network, or the stream went quiet (phone slept)
+    if (cur !== 'xrp' || xrSel !== addr || !K || S.net !== net) return xaStop();
+    if (Date.now() - XA.last > 15000) fail();
+  }, 3000);
+  return true;
+}
+function xrWatch(addr) {
+  if (xaStart(addr)) return;   // push updates on; the timer below is the fallback
+  liveTag('#xrLive', 'poll'); xrPoll(addr);
+}
+function xrPoll(addr) {   // fallback: look for new activity every 8 s, redraw only on a change
   clearTimeout(XRWT);
   const step = async () => {
     if (cur !== 'xrp' || xrSel !== addr || !K) return;
@@ -15335,11 +15370,11 @@ function xrWatch(addr) {   // wallet page: look for new activity every 8 s (fill
       if (XRW_LAST && XRW_LAST.addr === addr && top && top !== XRW_LAST.h && cur === 'xrp' && xrSel === addr) {
         for (const x of T) { const h = x.hash || (x.tx || x.tx_json || {}).hash; if (h === XRW_LAST.h) break; const tx = x.tx || x.tx_json || {};
           if (tx.Account !== addr && xrTradeText(xrMyDelta(x.meta, addr, tx))) { xrFillToast(addr, h, x.meta, tx); break; } }
-        XRW_LAST = { addr, h: top }; XRKEEP[addr] = XRA[addr]; delete XRA[addr]; drawXrp(true); return;   // quiet: old numbers stay until the new ones come; drawXrp starts the next watch
+        XRW_LAST = { addr, h: top }; XRKEEP[addr] = XRA[addr]; delete XRA[addr]; drawXrp(true); return;   // quiet: old numbers stay until the new ones come; drawXrp starts the next watch (push again if it's back)
       }
       if (top) XRW_LAST = { addr, h: top };
     } catch (e) {}
-    if (cur === 'xrp' && xrSel === addr) XRWT = setTimeout(step, 8000);
+    if (cur === 'xrp' && xrSel === addr) { if (Date.now() >= XA.retryAt && xaStart(addr)) return; XRWT = setTimeout(step, 8000); }
   };
   XRWT = setTimeout(step, XRW_LAST && XRW_LAST.addr === addr ? 8000 : 0);
 }
@@ -15610,7 +15645,7 @@ async function drawSol() {
   $('#soName').textContent = w.name; $('#soAddr').textContent = short(w.addr) + (solNet() === 'devnet' ? ' · Devnet' : '');
   $('#soFull').textContent = w.addr;
   $('#soActs').innerHTML = `<button class="b-light" data-act="solBuy" style="font-size:12.5px;padding:0 4px">Buy</button><button class="b-out" data-act="solSwap" style="font-size:12.5px;padding:0 4px">Swap</button><button class="b-out" data-act="solTrade" style="font-size:12.5px;padding:0 4px">Trade</button><button class="b-out" data-act="solSendSheet" style="font-size:12.5px;padding:0 4px">Send</button><button class="b-out" data-act="solRcv" style="font-size:12.5px;padding:0 4px">Receive</button>`;
-  const paint = () => { const d = SOLA[w.addr];
+  const paint = SOLPAINT = () => { const d = SOLA[w.addr]; if (solSel !== w.addr) return;
     $('#soTot').textContent = d ? '$' + fx(solUsd(d)) : '…';
     if (!d) return;
     const rows = [{ c: 'SOL', a: d.sol, u: d.sol * SOLPX.sol }, ...d.toks.filter((t) => t.amt > 0 || t.c).map((t) => ({ c: t.c || (JLT && (JLT.find((j) => j.address === t.mint) || {}).symbol) || 'Unknown token', a: t.amt, u: solTokUsd(t), n: t.c ? '' : (JLT && JLT.find((j) => j.address === t.mint)) ? '' : t.mint, jl: !!(JLT && JLT.find((j) => j.address === t.mint)) }))];
@@ -15622,7 +15657,75 @@ async function drawSol() {
   { const o = solOwn(w.addr); $('#soBk').innerHTML = `<div style="display:flex;flex-direction:column;gap:8px"><button class="b-out sm" data-act="solBackup">${o && o.hd != null && K.ph ? 'Back up: show key and recovery phrase' : 'Back up: show secret key'}</button><button class="b-out sm" data-act="solRemove" style="color:var(--redt)">Remove this wallet from the phone</button></div>`; }
   await solPrices().catch(() => null);
   try { await solLoad(w.addr, true); } catch (e) { $('#soBal').innerHTML = `<div class="note amb">${esc(e.message || e)}</div>`; }
-  if (cur === 'sol' && solSel === w.addr) { paint(); solEarnDraw(); }
+  if (cur === 'sol' && solSel === w.addr) { paint(); solEarnDraw(); solWatch(w.addr); }
+}
+/* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
+   open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
+   Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
+const APP_VER = 'v2.40s';
+let UPD_AT = 0;
+async function updCheck(force) {
+  if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
+  if (!/^https?:/.test(location.protocol)) return;
+  try { const t = await (await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })).text(), m = t.match(/Liquidfi (v\d+\.\d+[a-z]*) ·/);
+    if (!m || m[1] === APP_VER) return; const a = APP_VER.match(/v(\d+)\.(\d+)([a-z]*)/), b = m[1].match(/v(\d+)\.(\d+)([a-z]*)/);
+    const newer = +b[1] > +a[1] || (+b[1] === +a[1] && (+b[2] > +a[2] || (+b[2] === +a[2] && (b[3].length > a[3].length || (b[3].length === a[3].length && b[3] > a[3])))));
+    if (!newer || $('#updBar')) return;
+    document.body.insertAdjacentHTML('beforeend', `<button id="updBar" data-act="updGo" style="position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:60;min-height:48px;border-radius:12px;background:var(--blu);color:#fff;border:0;font-weight:700;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.4)">New version ${esc(m[1])} ready · Tap to update</button>`);
+  } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updCheck(); });
+setInterval(() => { if (document.visibilityState === 'visible') updCheck(true); }, 600000);
+setTimeout(() => updCheck(true), 5000);
+
+/* v2.40s live updates: a WebSocket to Solana (your own server if set in Settings, else the public one) told about every transaction
+   that mentions this wallet; on one, balances and Recent refresh quietly. If the socket can't open, a light check every 15 s
+   (newest transaction only, through the Liquidfi server) does the same. Read-only. */
+const SW = { ws: null, addr: null, live: false, last: 0, i: 0, tries: 0, wd: 0, deb: 0, retryAt: 0, top: null, pt: 0 };
+function solWsList() { const me = myCfg('sol'), mine = me && me.url ? [me.url.replace(/^http/, 'ws')] : [];
+  return me && me.only ? mine : [...mine, solNet() === 'devnet' ? 'wss://api.devnet.solana.com' : 'wss://api.mainnet-beta.solana.com']; }
+function swStop() { clearInterval(SW.wd); clearTimeout(SW.deb); clearTimeout(SW.pt); SW.wd = SW.pt = 0; SW.live = false; const ws = SW.ws; SW.ws = null; SW.addr = null; if (ws) { ws.onopen = ws.onmessage = ws.onclose = ws.onerror = null; try { ws.close(); } catch (e) {} } liveTag('#soLive', ''); }
+function solQuiet(addr) {   // new activity: reload balances + Recent without blanking the page
+  clearTimeout(SW.deb); SW.deb = setTimeout(async () => { if (cur !== 'sol' || solSel !== addr) return;
+    try { await solLoad(addr, true); } catch (e) { return; } if (cur !== 'sol' || solSel !== addr) return;
+    const keep = SW.addr; drawSolQuiet(addr); if (keep === addr) {} }, 1200);
+}
+function drawSolQuiet(addr) { const w = solList().find((x) => x.addr === addr); if (!w) return; const d = SOLA[addr]; if (!d) return;
+  $('#soTot').textContent = '$' + fx(solUsd(d)); SOLPAINT && SOLPAINT(); solEarnDraw(); solRecent(addr); }
+let SOLPAINT = null;
+function solWatch(addr) {
+  if (SW.addr === addr && (SW.ws || SW.pt)) return;
+  swStop(); SW.addr = addr;
+  const L = solWsList(); let ws = null;
+  if (typeof WebSocket !== 'undefined' && L.length && Date.now() >= SW.retryAt) { try { ws = new WebSocket(L[SW.i % L.length]); } catch (e) { ws = null; } }
+  if (!ws) return solPollStart(addr);
+  SW.ws = ws; SW.last = Date.now();
+  const fail = () => { if (SW.ws !== ws) return; const a = SW.addr; swStop(); SW.i++; SW.tries++; SW.retryAt = Date.now() + Math.min(120000, 10000 * 2 ** Math.min(SW.tries - 1, 4)); if (cur === 'sol' && solSel === a) { SW.addr = a; solPollStart(a); } };
+  ws.onopen = () => { if (SW.ws !== ws) return; ws.send(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'logsSubscribe', params: [{ mentions: [addr] }, { commitment: 'confirmed' }] })); };
+  ws.onmessage = (ev) => {
+    if (SW.ws !== ws) return; let m; try { m = JSON.parse(ev.data); } catch (e) { return; } SW.last = Date.now();
+    if (m.id === 1) { if (m.result != null) { SW.live = true; SW.tries = 0; liveTag('#soLive', 'live'); } else fail(); return; }
+    if (m.method === 'logsNotification') solQuiet(addr);
+  };
+  ws.onclose = ws.onerror = fail;
+  SW.wd = setInterval(() => {   // left the page, locked, switched network; keep the socket honest with a tiny request every 30 s
+    if (cur !== 'sol' || solSel !== addr || !K) return swStop();
+    if (Date.now() - SW.last > 75000) return fail();
+    if (Date.now() - SW.last > 30000) { try { ws.send(JSON.stringify({ jsonrpc: '2.0', id: 9, method: 'getHealth' })); } catch (e) { fail(); } }
+  }, 10000);
+  setTimeout(() => { if (SW.ws === ws && !SW.live) fail(); }, 8000);   // no answer to the subscribe: use the fallback
+}
+function solPollStart(addr) {
+  liveTag('#soLive', 'poll'); clearTimeout(SW.pt);
+  const step = async () => {
+    if (cur !== 'sol' || solSel !== addr || !K) return swStop();
+    try { const L = await solRpc('getSignaturesForAddress', [addr, { limit: 1, commitment: 'confirmed' }]); const t = L && L[0] && L[0].signature;
+      if (t && SW.top && t !== SW.top) solQuiet(addr); if (t) SW.top = t; } catch (e) {}
+    if (cur !== 'sol' || solSel !== addr) return;
+    if (Date.now() >= SW.retryAt && SW.tries > 0) { SW.pt = 0; SW.addr = null; return solWatch(addr); }   // try the socket again now and then
+    SW.pt = setTimeout(step, 15000);
+  };
+  SW.pt = setTimeout(step, SW.top ? 15000 : 0);
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
@@ -20501,7 +20604,7 @@ document.addEventListener('click', async (e) => {
   const act = t.dataset.act; if (!act) return;
   const A = {
     setup: doSetup, exportVault, lock,
-    solAddSheet: () => solAddSheet(), solAddOk: () => solAdd(), solRcv: () => solRcvSheet(), solBookCheck: () => solBookCheck(), solScan: () => scanInline($('#soScan'), (r) => { $('#soTo').value = r.addr; SOCHK = null; $('#soChk').innerHTML = ''; $('#soChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseSolQR, 'a Solana address'), solBuy: phGate(() => solSel && onrBuySheet('solana', solSel)), solSendSheet: () => solSendSheet(), solSendGo: () => solSendGo(),
+    solAddSheet: () => solAddSheet(), solAddOk: () => solAdd(), solRcv: () => solRcvSheet(), updGo: () => { const u = new URL(location.href); u.searchParams.set('u', Date.now()); location.replace(u.toString()); }, solBookCheck: () => solBookCheck(), solScan: () => scanInline($('#soScan'), (r) => { $('#soTo').value = r.addr; SOCHK = null; $('#soChk').innerHTML = ''; $('#soChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseSolQR, 'a Solana address'), solBuy: phGate(() => solSel && onrBuySheet('solana', solSel)), solSendSheet: () => solSendSheet(), solSendGo: () => solSendGo(),
     solMax: () => { const d = SOLA[solSel], c = $('#soCoin').value; if (!d) return; $('#soAmt').value = c === 'SOL' ? String(Math.max(0, Math.floor((d.sol - SOL_KEEP) * 1e6) / 1e6)) : String((d.toks.find((x) => x.mint === c) || {}).amt || 0); },
     solBackup: () => solBackup(), solRemove: () => solRemove(), solVanPay: () => solVanPay(), solVanDrop: () => { SOLVANHIT = null; closeSheet(); toast('Discarded.'); },
     solSecCopy: () => { const o = solOwn(solSel); if (o && navigator.clipboard) navigator.clipboard.writeText(solSecret(o)).then(() => toast('Secret key copied. Paste it only into your password manager.')).catch(() => toast("Couldn't copy.")); },
