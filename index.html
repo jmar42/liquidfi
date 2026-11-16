@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.44a · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.44b · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15728,7 +15728,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.44a';
+const APP_VER = 'v2.44b';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16441,7 +16441,7 @@ const CH = { tf: CH_TF[chGet('ksw_chtf', '15m')] ? chGet('ksw_chtf', '15m') : '1
 const chMaSet = (tf) => (tf === '1W' ? CH_MA.w : tf === '1D' ? CH_MA.d : CH_MA.i);
 function chHtml(k) {
   return `<div class="card chc" id="ch-${k}" style="padding:10px 12px;gap:6px"><div class="top"><span class="lbl chl" style="font-size:11px">Chart</span><button class="b-out sm" data-chtog="1" style="font-size:12px;padding:4px 10px">${CH.on ? 'Hide' : 'Show chart'}</button></div>
-    <div class="chb" style="display:${CH.on ? 'flex' : 'none'};flex-direction:column;gap:6px"><div class="seg chtf" style="font-size:12px">${Object.keys(CH_TF).map((t) => `<button data-chtf="${t}"${t === CH.tf ? ' class="on"' : ''}>${t}</button>`).join('')}</div>
+    <div class="chb" style="display:${CH.on ? 'flex' : 'none'};flex-direction:column;gap:6px"><div class="seg chtf" style="font-size:12px;display:flex;gap:2px;overflow:hidden">${Object.keys(CH_TF).map((t) => `<button data-chtf="${t}"${t === CH.tf ? ' class="on"' : ''} style="flex:1 1 0;min-width:0;padding:7px 0;font-size:12.5px">${t}</button>`).join('')}</div>
     <canvas class="chcv" style="width:100%;height:270px;display:block;touch-action:pan-y"></canvas><div class="chlg mono" style="font-size:11px;line-height:1.5;min-height:16px"></div></div></div>`;
 }
 /* candles: Coinbase [time, low, high, open, close, volume], newest first, max 300 a request */
@@ -16474,7 +16474,7 @@ const chDp = (p) => (p < 1 ? 5 : p < 10 ? 4 : 2);
 const chVol = (v) => (v >= 1e9 ? (v / 1e9).toFixed(2) + 'B' : v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : v >= 1e3 ? (v / 1e3).toFixed(1) + 'K' : v.toFixed(0));
 function chTime(t, tf, full) {
   const d = new Date(t * 1000), z = { timeZone: tf === '1D' || tf === '1W' ? 'UTC' : TZ };
-  if (tf === '1W') return d.toLocaleDateString('en-US', { ...z, month: 'short', day: 'numeric', year: full ? 'numeric' : '2-digit' });
+  if (tf === '1W') return full ? d.toLocaleDateString('en-US', { ...z, month: 'short', day: 'numeric', year: 'numeric' }) : d.toLocaleDateString('en-US', { ...z, month: 'short' }) + " '" + String(d.getUTCFullYear()).slice(2);
   if (tf === '1D') return d.toLocaleDateString('en-US', { ...z, month: 'short', day: 'numeric', ...(full ? { year: 'numeric' } : {}) });
   return full ? d.toLocaleString('en-US', { ...z, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : d.toLocaleTimeString('en-US', { ...z, hour: 'numeric', minute: '2-digit' });
 }
@@ -16487,7 +16487,7 @@ function chPaint() {
   const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
   const B = CH.bars || []; x.font = '10px ui-monospace,Menlo,Consolas,monospace';
   if (!B.length) { x.fillStyle = '#9AA4B2'; x.fillText(CH.err || 'loading…', 8, 20); lg.innerHTML = ''; return; }
-  const wk = CH.tf === '1W', AX = 50, pW = W - AX, sp = wk ? 9 : 6, n = Math.max(10, Math.floor(pW / sp));
+  const wk = CH.tf === '1W', AX = 50, pW = W - AX, sp = wk ? 8 : 7, n = Math.max(10, Math.floor(pW / sp));
   CH.off = Math.max(0, Math.min(CH.off, Math.max(0, B.length - n))); const e = B.length - Math.round(CH.off), s = Math.max(0, e - n), V = B.slice(s, e);
   const TA = 14, pH = Math.round((H - TA) * 0.74), vT = pH + 6, vH = H - TA - vT;
   let hi = -Infinity, lo = Infinity; for (const b of V) { if (b.h > hi) hi = b.h; if (b.l < lo) lo = b.l; }
@@ -16495,22 +16495,22 @@ function chPaint() {
   const pad = (hi - lo) * 0.06 || hi * 0.01; hi += pad; lo -= pad;
   const Y = (p) => 4 + (hi - p) / (hi - lo) * (pH - 8), X = (i) => pW - (e - i - 0.5) * sp, dp = chDp(B[B.length - 1].c);
   /* grid + price labels */
-  x.strokeStyle = '#1D2430'; x.lineWidth = 1; x.fillStyle = '#9AA4B2'; x.textAlign = 'left';
-  for (let k = 0; k <= 4; k++) { const p = lo + (hi - lo) * (k + 0.5) / 5, y = Math.round(Y(p)) + 0.5; x.beginPath(); x.moveTo(0, y); x.lineTo(pW, y); x.stroke(); x.fillText(p.toFixed(dp), pW + 4, y + 3); }
+  x.strokeStyle = '#1D2430'; x.lineWidth = 1; x.fillStyle = '#9AA4B2'; x.textAlign = 'left'; const tagY = Math.min(pH - 6, Math.max(6, Y(B[B.length - 1].c)));
+  for (let k = 0; k <= 4; k++) { const p = lo + (hi - lo) * (k + 0.5) / 5, y = Math.round(Y(p)) + 0.5; x.beginPath(); x.moveTo(0, y); x.lineTo(pW, y); x.stroke(); if (Math.abs(y - tagY) > 13) x.fillText(p.toFixed(dp), pW + 4, y + 3); }
   x.beginPath(); x.moveTo(0, vT - 3.5); x.lineTo(W, vT - 3.5); x.stroke();
   /* volume + its 20-bar average */
   let vMax = 0; for (const b of V) if (b.v > vMax) vMax = b.v; const vY = (v) => vT + vH - (v / (vMax || 1)) * vH;
-  const up = (i) => (i > 0 ? B[i].c >= B[i - 1].c : B[i].c >= B[i].o);
+  const up = (i) => (wk ? (i > 0 ? B[i].c >= B[i - 1].c : B[i].c >= B[i].o) : B[i].c >= B[i].o);   /* candles: close vs open; weekly HLC bar: close vs prior close */
   for (let i = s; i < e; i++) { x.fillStyle = up(i) ? CH_UP : CH_DN; x.globalAlpha = i === CH.sel ? 0.95 : 0.5; const bw = Math.max(1, sp - 2); x.fillRect(X(i) - bw / 2, vY(B[i].v), bw, vT + vH - vY(B[i].v)); }
   x.globalAlpha = 1; const VA = CH.vavg || [];
   x.strokeStyle = '#E9EDF2'; x.lineWidth = 1.2; x.beginPath(); let on = false;
   for (let i = s; i < e; i++) { const v = VA[i]; if (v == null) { on = false; continue; } const yy = Math.max(vT, vY(v)); if (on) x.lineTo(X(i), yy); else { x.moveTo(X(i), yy); on = true; } } x.stroke();
-  /* price bars: HLC (high-low line + close tick to the right); weekly = thick high-low bar + close line across */
+  /* v2.44b (Jeff: "The 5 min style is what the weekly should look like. The others need to be candle sticks"): candles on 5m-1D; weekly = high-low bar + close tick */
   x.save(); x.beginPath(); x.rect(0, 0, pW, pH); x.clip();
   for (let i = s; i < e; i++) { const b = B[i], cx = X(i), c = up(i) ? CH_UP : CH_DN;
-    if (wk) { const bw = Math.max(3, sp - 4); x.fillStyle = c; x.globalAlpha = 0.85; x.fillRect(cx - bw / 2, Y(b.h), bw, Math.max(1, Y(b.l) - Y(b.h))); x.globalAlpha = 1;
-      x.strokeStyle = '#E9EDF2'; x.lineWidth = 1.6; x.beginPath(); x.moveTo(cx - bw / 2 - 1.5, Y(b.c)); x.lineTo(cx + bw / 2 + 1.5, Y(b.c)); x.stroke(); }
-    else { x.strokeStyle = c; x.lineWidth = 1.5; x.beginPath(); x.moveTo(cx, Y(b.h)); x.lineTo(cx, Y(b.l) + 0.5); x.moveTo(cx, Y(b.c)); x.lineTo(cx + sp / 2, Y(b.c)); x.stroke(); }
+    if (!wk) { const bw = Math.max(2, sp - 2), yo = Y(b.o), yc = Y(b.c), top = Math.min(yo, yc), bh = Math.max(1, Math.abs(yc - yo));   /* candlestick: wick high-low, body open-close */
+      x.strokeStyle = c; x.lineWidth = 1; x.beginPath(); x.moveTo(cx, Y(b.h)); x.lineTo(cx, Y(b.l) + 0.5); x.stroke(); x.fillStyle = c; x.fillRect(cx - bw / 2, top, bw, bh); }
+    else { x.strokeStyle = c; x.lineWidth = 1.5; x.beginPath(); x.moveTo(cx, Y(b.h)); x.lineTo(cx, Y(b.l) + 0.5); x.moveTo(cx, Y(b.c)); x.lineTo(cx + sp / 2, Y(b.c)); x.stroke(); }   /* weekly: high-low bar + close tick, no open */
     if (i === CH.sel) { x.strokeStyle = 'rgba(233,237,242,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(cx, 0); x.lineTo(cx, pH); x.stroke(); } }
   for (const m of MS) { x.strokeStyle = m.c; x.lineWidth = 1.2; x.beginPath(); on = false;
     for (let i = s; i < e; i++) { const v = m.v[i]; if (v == null) { on = false; continue; } if (on) x.lineTo(X(i), Y(v)); else { x.moveTo(X(i), Y(v)); on = true; } } x.stroke(); }
@@ -16525,7 +16525,7 @@ function chPaint() {
   const j = CH.sel >= 0 && CH.sel < B.length ? CH.sel : B.length - 1, b = B[j], va = VA[j], pct = va ? Math.round(b.v / va * 100) : null;
   const sw = (c, t) => `<span style="color:${c};white-space:nowrap">${t}</span>`;
   lg.innerHTML = `<div>${MS.map((m) => sw(m.c, `${m.e ? 'EMA' : 'MA'}${m.n} ${m.v[j] != null ? m.v[j].toFixed(dp) : '–'}`)).join(' · ')}</div>`
-    + `<div class="mu">${esc(chTime(b.t, CH.tf, 1))}${CH.sel >= 0 ? ` · H ${b.h.toFixed(dp)} L ${b.l.toFixed(dp)} C ${b.c.toFixed(dp)}` : ''} · Vol ${chVol(b.v)}${pct != null ? ` (${pct}% of 20-bar avg${j === B.length - 1 ? ', bar still open' : ''})` : ''}${CH.off >= 1 ? ' · <a href="#" data-chend="1">latest ›</a>' : ''}</div>`;
+    + `<div class="mu">${esc(chTime(b.t, CH.tf, 1))}${CH.sel >= 0 ? ` · ${CH.tf === '1W' ? '' : `O ${b.o.toFixed(dp)} `}H ${b.h.toFixed(dp)} L ${b.l.toFixed(dp)} C ${b.c.toFixed(dp)}` : ''} · Vol ${chVol(b.v)}${pct != null ? ` (${pct}% of 20-bar avg${j === B.length - 1 ? ', bar still open' : ''})` : ''}${Math.round(CH.off) >= 1 ? ' · <a href="#" data-chend="1">latest ›</a>' : ''}</div>`;
 }
 function chCalc() {
   const B = CH.bars = chBars(CH.pid, CH.tf); CH.mas = chMaSet(CH.tf).map((m) => ({ ...m, v: chMa(B, m.n, m.e) })); CH.vavg = chVolAvg(B, 20);
@@ -16562,9 +16562,9 @@ function chInit() {
   /* drag sideways to scroll back in time; tap a bar to read it */
   let d = null;
   document.addEventListener('pointerdown', (ev) => { const cv = ev.target.closest && ev.target.closest('.chcv'); if (!cv) return; d = { cv, x0: ev.clientX, y0: ev.clientY, off0: CH.off, mv: false }; }, { passive: true });
-  document.addEventListener('pointermove', (ev) => { if (!d) return; const dx = ev.clientX - d.x0; if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(ev.clientY - d.y0)) { d.mv = true; CH.off = d.off0 + dx / (CH.tf === '1W' ? 9 : 6); CH.sel = -1; chPaint(); } }, { passive: true });
-  document.addEventListener('pointerup', (ev) => { if (!d) return; const D = d; d = null; if (D.mv || !CH.bars || !CH.bars.length) return;
-    const r = D.cv.getBoundingClientRect(), sp = CH.tf === '1W' ? 9 : 6, pW = r.width - 50, px = ev.clientX - r.left; if (px > pW) { CH.sel = -1; return chPaint(); }
+  document.addEventListener('pointermove', (ev) => { if (!d) return; const dx = ev.clientX - d.x0; const dy = Math.abs(ev.clientY - d.y0); if (dy > 12 && !d.mv) { d.no = true; } if (!d.no && (d.mv || (Math.abs(dx) > 14 && Math.abs(dx) > 2 * dy))) { d.mv = true; CH.off = Math.max(0, Math.round(d.off0 + dx / (CH.tf === '1W' ? 8 : 7))); CH.sel = -1; chPaint(); } }, { passive: true });
+  document.addEventListener('pointerup', (ev) => { if (!d) return; const D = d; d = null; if (D.mv || D.no || !CH.bars || !CH.bars.length) return;
+    const r = D.cv.getBoundingClientRect(), sp = CH.tf === '1W' ? 8 : 7, pW = r.width - 50, px = ev.clientX - r.left; if (px > pW) { CH.sel = -1; return chPaint(); }
     const e = CH.bars.length - Math.round(CH.off), i = e - 1 - Math.floor((pW - px) / sp); CH.sel = i === CH.sel || i < 0 ? -1 : i; chPaint(); }, { passive: true });
   document.addEventListener('pointercancel', () => { d = null; }, { passive: true });
   window.addEventListener('resize', () => { if (CH.k && cur === CH.k) chPaint(); });
