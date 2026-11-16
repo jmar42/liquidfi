@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.44b · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.44c · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15728,7 +15728,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.44b';
+const APP_VER = 'v2.44c';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16440,7 +16440,7 @@ const chPut = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
 const CH = { tf: CH_TF[chGet('ksw_chtf', '15m')] ? chGet('ksw_chtf', '15m') : '15m', on: chGet('ksw_chon', '1') === '1', raw: {}, full: {}, k: null, pid: null, off: 0, sel: -1, timer: 0, busy: 0, err: '' };
 const chMaSet = (tf) => (tf === '1W' ? CH_MA.w : tf === '1D' ? CH_MA.d : CH_MA.i);
 function chHtml(k) {
-  return `<div class="card chc" id="ch-${k}" style="padding:10px 12px;gap:6px"><div class="top"><span class="lbl chl" style="font-size:11px">Chart</span><button class="b-out sm" data-chtog="1" style="font-size:12px;padding:4px 10px">${CH.on ? 'Hide' : 'Show chart'}</button></div>
+  return `<div class="card chc" id="ch-${k}" style="padding:10px 12px;gap:6px"><div class="top"><span class="lbl chl" style="font-size:11px">Chart</span><span style="display:flex;gap:6px"><button class="b-out sm" data-chsave="1" style="font-size:12px;padding:4px 10px;display:${CH.on ? '' : 'none'}">Save</button><button class="b-out sm" data-chtog="1" style="font-size:12px;padding:4px 10px">${CH.on ? 'Hide' : 'Show chart'}</button></span></div>
     <div class="chb" style="display:${CH.on ? 'flex' : 'none'};flex-direction:column;gap:6px"><div class="seg chtf" style="font-size:12px;display:flex;gap:2px;overflow:hidden">${Object.keys(CH_TF).map((t) => `<button data-chtf="${t}"${t === CH.tf ? ' class="on"' : ''} style="flex:1 1 0;min-width:0;padding:7px 0;font-size:12.5px">${t}</button>`).join('')}</div>
     <canvas class="chcv" style="width:100%;height:270px;display:block;touch-action:pan-y"></canvas><div class="chlg mono" style="font-size:11px;line-height:1.5;min-height:16px"></div></div></div>`;
 }
@@ -16486,6 +16486,7 @@ function chPaint() {
   if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
   const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
   const B = CH.bars || []; x.font = '10px ui-monospace,Menlo,Consolas,monospace';
+  { const L = chLogo(); if (L && L.complete && L.naturalWidth) { const lh = Math.min(H * 0.42, 120), lw = lh * L.naturalWidth / L.naturalHeight; x.globalAlpha = 0.07; x.drawImage(L, (W - 50 - lw) / 2, (H * 0.74 - lh) / 2, lw, lh); x.globalAlpha = 1; } }   /* v2.44c watermark */
   if (!B.length) { x.fillStyle = '#9AA4B2'; x.fillText(CH.err || 'loading…', 8, 20); lg.innerHTML = ''; return; }
   const wk = CH.tf === '1W', AX = 50, pW = W - AX, sp = wk ? 8 : 7, n = Math.max(10, Math.floor(pW / sp));
   CH.off = Math.max(0, Math.min(CH.off, Math.max(0, B.length - n))); const e = B.length - Math.round(CH.off), s = Math.max(0, e - n), V = B.slice(s, e);
@@ -16527,6 +16528,33 @@ function chPaint() {
   lg.innerHTML = `<div>${MS.map((m) => sw(m.c, `${m.e ? 'EMA' : 'MA'}${m.n} ${m.v[j] != null ? m.v[j].toFixed(dp) : '–'}`)).join(' · ')}</div>`
     + `<div class="mu">${esc(chTime(b.t, CH.tf, 1))}${CH.sel >= 0 ? ` · ${CH.tf === '1W' ? '' : `O ${b.o.toFixed(dp)} `}H ${b.h.toFixed(dp)} L ${b.l.toFixed(dp)} C ${b.c.toFixed(dp)}` : ''} · Vol ${chVol(b.v)}${pct != null ? ` (${pct}% of 20-bar avg${j === B.length - 1 ? ', bar still open' : ''})` : ''}${Math.round(CH.off) >= 1 ? ' · <a href="#" data-chend="1">latest ›</a>' : ''}</div>`;
 }
+/* v2.44c (Jeff: "put our logo on the chart ... a save or can you put your finger in it to save it? Would be great marketing"):
+   faint logo watermark; Save button or hold a finger on the chart ~0.65 s = a branded picture through the phone's share sheet (save to photos, X, Telegram...), else a download */
+function chLogo() { if (CH.logo !== undefined) return CH.logo; const el = document.querySelector('.logoimg'); if (!el || !el.src) return (CH.logo = null); const I = new Image(); I.onload = () => { if (CH.k && cur === CH.k) chPaint(); }; I.src = el.src; return (CH.logo = I); }
+async function chSave() {
+  const root = CH.k && $('#ch-' + CH.k), cv = root && root.querySelector('.chcv'); if (!cv || !CH.bars || !CH.bars.length) return toast('Chart is still loading.');
+  const sc = cv.width / cv.clientWidth, W = cv.width, P = Math.round(18 * sc), hdr = Math.round(64 * sc), leg = Math.round(46 * sc), ft = Math.round(30 * sc);
+  const o = document.createElement('canvas'); o.width = W + P * 2; o.height = hdr + cv.height + leg + ft + P; const x = o.getContext('2d');
+  x.fillStyle = '#0B0E13'; x.fillRect(0, 0, o.width, o.height); const L = chLogo(); let lx = P;
+  if (L && L.complete && L.naturalWidth) { const lh = Math.round(40 * sc), lw = lh * L.naturalWidth / L.naturalHeight; x.drawImage(L, P, Math.round(12 * sc), lw, lh); lx = P + lw + Math.round(10 * sc); }
+  x.fillStyle = '#E9EDF2'; x.font = `700 ${Math.round(20 * sc)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`; x.textBaseline = 'alphabetic'; x.fillText('Liquidfi', lx, Math.round(32 * sc));
+  const B = CH.bars, b = B[B.length - 1], dp = chDp(b.c);
+  x.fillStyle = '#9AA4B2'; x.font = `${Math.round(12.5 * sc)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`;
+  x.fillText(`${(CH.pid || '').replace('-', '/')} · ${CH.tf} · ${new Date().toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}`, lx, Math.round(52 * sc));
+  x.textAlign = 'right'; x.fillStyle = up2(B) ? CH_UP : CH_DN; x.font = `700 ${Math.round(18 * sc)}px ui-monospace,Menlo,Consolas,monospace`; x.fillText(b.c.toFixed(dp), o.width - P, Math.round(34 * sc)); x.textAlign = 'left';
+  x.drawImage(cv, P, hdr);
+  let tx = P; const ly = hdr + cv.height + Math.round(22 * sc), j = CH.sel >= 0 && CH.sel < B.length ? CH.sel : B.length - 1; x.font = `${Math.round(11.5 * sc)}px ui-monospace,Menlo,Consolas,monospace`;
+  for (const m of CH.mas || []) { const t = `${m.e ? 'EMA' : 'MA'}${m.n} ${m.v[j] != null ? m.v[j].toFixed(dp) : '–'}   `; x.fillStyle = m.c; x.fillText(t, tx, ly); tx += x.measureText(t).width; }
+  { const va = (CH.vavg || [])[j]; if (va) { x.fillStyle = '#9AA4B2'; x.fillText(`Vol ${Math.round(B[j].v / va * 100)}% of 20-bar avg`, P, ly + Math.round(18 * sc)); } }
+  x.fillStyle = '#6EA8FF'; x.font = `600 ${Math.round(12 * sc)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`; x.fillText('liquidfi.com', P, o.height - P);
+  x.textAlign = 'right'; x.fillStyle = '#9AA4B2'; x.font = `${Math.round(10.5 * sc)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`; x.fillText('Chart data: Coinbase', o.width - P, o.height - P); x.textAlign = 'left';
+  const blob = await new Promise((r) => o.toBlob(r, 'image/png')); if (!blob) return toast('Couldn\'t make the picture.');
+  const name = `Liquidfi-${(CH.pid || 'chart').replace('-', '')}-${CH.tf}-${new Date().toISOString().slice(0, 16).replace('T', '-').replace(':', '')}.png`;
+  try { const f = new File([blob], name, { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Liquidfi chart' }); return; } }
+  catch (e) { if (e && e.name === 'AbortError') return; }
+  const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); toast('Chart saved.');
+}
+const up2 = (B) => B.length < 2 || B[B.length - 1].c >= (CH.tf === '1W' ? B[B.length - 2].c : B[B.length - 1].o);
 function chCalc() {
   const B = CH.bars = chBars(CH.pid, CH.tf); CH.mas = chMaSet(CH.tf).map((m) => ({ ...m, v: chMa(B, m.n, m.e) })); CH.vavg = chVolAvg(B, 20);
 }
@@ -16551,22 +16579,24 @@ function chShow(k, pid) {
 function chInit() {
   for (const [k, after] of [['trade', '#s-trade > .top'], ['xtrade', '#xtQ'], ['strade', '#stQ']]) { const a = $(after); if (a && !$('#ch-' + k)) a.insertAdjacentHTML('afterend', chHtml(k)); }
   document.addEventListener('click', (ev) => {
-    const t = ev.target.closest && ev.target.closest('[data-chtf],[data-chtog],[data-chend]'); if (!t || !t.closest('.chc')) return; ev.preventDefault(); ev.stopPropagation();
+    const t = ev.target.closest && ev.target.closest('[data-chtf],[data-chtog],[data-chend],[data-chsave]'); if (!t || !t.closest('.chc')) return; ev.preventDefault(); ev.stopPropagation();
     if (t.dataset.chend) { CH.off = 0; CH.sel = -1; return chPaint(); }
+    if (t.dataset.chsave) return chSave();
     if (t.dataset.chtog) { CH.on = !CH.on; chPut('ksw_chon', CH.on ? '1' : '0');
-      $$('.chc').forEach((c) => { c.querySelector('.chb').style.display = CH.on ? 'flex' : 'none'; c.querySelector('[data-chtog]').textContent = CH.on ? 'Hide' : 'Show chart'; });
+      $$('.chc').forEach((c) => { c.querySelector('.chb').style.display = CH.on ? 'flex' : 'none'; c.querySelector('[data-chtog]').textContent = CH.on ? 'Hide' : 'Show chart'; c.querySelector('[data-chsave]').style.display = CH.on ? '' : 'none'; });
       if (CH.on && CH.k) { chCalc(); chPaint(); chLoad(true); } return; }
     CH.tf = t.dataset.chtf; chPut('ksw_chtf', CH.tf); CH.off = 0; CH.sel = -1;
     $$('.chtf button').forEach((b) => b.classList.toggle('on', b.dataset.chtf === CH.tf)); chCalc(); chPaint(); chLoad(true); chLoop();
   }, true);
   /* drag sideways to scroll back in time; tap a bar to read it */
   let d = null;
-  document.addEventListener('pointerdown', (ev) => { const cv = ev.target.closest && ev.target.closest('.chcv'); if (!cv) return; d = { cv, x0: ev.clientX, y0: ev.clientY, off0: CH.off, mv: false }; }, { passive: true });
-  document.addEventListener('pointermove', (ev) => { if (!d) return; const dx = ev.clientX - d.x0; const dy = Math.abs(ev.clientY - d.y0); if (dy > 12 && !d.mv) { d.no = true; } if (!d.no && (d.mv || (Math.abs(dx) > 14 && Math.abs(dx) > 2 * dy))) { d.mv = true; CH.off = Math.max(0, Math.round(d.off0 + dx / (CH.tf === '1W' ? 8 : 7))); CH.sel = -1; chPaint(); } }, { passive: true });
-  document.addEventListener('pointerup', (ev) => { if (!d) return; const D = d; d = null; if (D.mv || D.no || !CH.bars || !CH.bars.length) return;
+  document.addEventListener('pointerdown', (ev) => { const cv = ev.target.closest && ev.target.closest('.chcv'); if (!cv) return; d = { cv, x0: ev.clientX, y0: ev.clientY, off0: CH.off, mv: false }; const me = d; me.lp = setTimeout(() => { if (d === me && !me.mv && !me.no) { me.done = true; chSave(); } }, 650); }, { passive: true });
+  document.addEventListener('pointermove', (ev) => { if (!d) return; const dx = ev.clientX - d.x0; const dy = Math.abs(ev.clientY - d.y0); if (dy > 12 && !d.mv) { d.no = true; } if (Math.abs(dx) > 8 || dy > 8) clearTimeout(d.lp); if (!d.no && (d.mv || (Math.abs(dx) > 14 && Math.abs(dx) > 2 * dy))) { d.mv = true; CH.off = Math.max(0, Math.round(d.off0 + dx / (CH.tf === '1W' ? 8 : 7))); CH.sel = -1; chPaint(); } }, { passive: true });
+  document.addEventListener('pointerup', (ev) => { if (!d) return; const D = d; d = null; clearTimeout(D.lp); if (D.done || D.mv || D.no || !CH.bars || !CH.bars.length) return;
     const r = D.cv.getBoundingClientRect(), sp = CH.tf === '1W' ? 8 : 7, pW = r.width - 50, px = ev.clientX - r.left; if (px > pW) { CH.sel = -1; return chPaint(); }
     const e = CH.bars.length - Math.round(CH.off), i = e - 1 - Math.floor((pW - px) / sp); CH.sel = i === CH.sel || i < 0 ? -1 : i; chPaint(); }, { passive: true });
-  document.addEventListener('pointercancel', () => { d = null; }, { passive: true });
+  document.addEventListener('pointercancel', () => { if (d) clearTimeout(d.lp); d = null; }, { passive: true });
+  document.addEventListener('contextmenu', (ev) => { if (ev.target.closest && ev.target.closest('.chcv')) ev.preventDefault(); });   /* the hold saves; no browser menu */
   window.addEventListener('resize', () => { if (CH.k && cur === CH.k) chPaint(); });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && CH.k && cur === CH.k && CH.on) chLoad(false); });
 }
