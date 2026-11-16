@@ -340,6 +340,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <!-- LEVEL 2: book depth and last sales by venue -->
 <section class="scr" id="s-l2">
   <div class="top"><div class="l"><button class="ico back" data-go="mkt" aria-label="Back to Markets">‹</button><div><h1 id="lSym">XLM</h1><span class="mu" style="font-size:12px" id="lUpd"></span></div></div><button class="b-out sm" data-act="rmSym" style="min-height:36px;font-size:13px;padding:0 12px">Remove</button></div>
+  <button class="b-grn" data-act="l2Trade" id="lTrade" style="display:none;min-height:40px;font-size:14px">Trade</button>
   <div id="lVen" style="display:flex;gap:6px;overflow-x:auto;margin:0 -18px;padding:2px 18px;scrollbar-width:none"></div>
   <div id="lTop" class="g3"></div>
   <span class="lbl">Book depth</span>
@@ -661,7 +662,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.44e · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.44f · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13840,7 +13841,21 @@ function paintMkt() {
     + `<button class="madd" data-act="addSym">+ Add symbol</button>`;
   $('#mUpd').textContent = 'Live · ' + new Date().toLocaleTimeString();
 }
-function drawL2() { L2.d = {}; mktsOn(); paintL2(); }
+function drawL2() { L2.d = {}; mktsOn(); paintL2();
+  /* v2.44f (Jeff: "We should be able to access the chart also in the markets section too ... Maybe it directs to the chart trading area?"):
+     the symbol page shows the same chart (no wallet needed), plus a Trade button that opens that coin's Trade screen */
+  const w = L2.sym; if (!w) return; const cs = vSym('cb', kName(w.b), kName(w.q)); chShow('l2', cs ? cs.id : null);
+  const tb = $('#lTrade'), tk = l2TradeKind(w); if (tb) { tb.style.display = tk ? '' : 'none'; tb.textContent = tk ? `Trade ${kName(w.b)}` : 'Trade'; } }
+function l2TradeKind(w) { const b = kName(w.b), q = kName(w.q); if (b === 'SOL' && ['USDC', 'USDT', 'USD'].includes(q)) return 'sol'; if (b === 'XRP' && ['RLUSD', 'USDC', 'USD'].includes(q)) return 'xrp'; if (b === 'XLM' && USDQ.includes(q)) return 'xlm'; return null; }
+function l2Trade() {
+  const w = L2.sym, k = w && l2TradeKind(w); if (!k) return;
+  if (k === 'sol') { const L = solList(); if (!L.length) return toast('Add a Solana wallet first (Accounts → Add wallet).'); if (solNet() !== 'mainnet') return toast('Trading runs on Solana Mainnet only.');
+    if (!L.some((x) => x.addr === solSel)) solSel = L[0].addr; { const q = kName(w.q) === 'USDT' ? 'USDT' : 'USDC'; if (ST.q !== q) { ST.q = q; ST.jin = null; ST.bk = {}; ST.tops = null; ST.sales = []; ST.salesAt = 0; ST.at = 0; } } return go('strade'); }
+  if (k === 'xrp') { const L = xrList().filter((x) => x.own); if (!L.length) return toast('Add an XRP wallet first (Accounts → Add wallet).');
+    if (!L.some((x) => x.addr === xrSel)) xrSel = L[0].addr; try { xtUseQ(kName(w.q) === 'USDC' ? 'uc' : 'rl'); } catch (e) {} return go('xtrade'); }
+  if (!firstWallet()) return toast('Add a Stellar wallet first (Accounts → Add wallet).');
+  if (kName(w.q) === 'USDC') NS().tPair = { b: 'XLM', q: uKey() }; go('trade');
+}
 function paintL2() {
   const w = L2.sym; if (!w) return;
   const have = VALL.filter((k) => vSym(k, w.b, w.q));
@@ -15728,7 +15743,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.44e';
+const APP_VER = 'v2.44f';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16577,7 +16592,7 @@ function chShow(k, pid) {
   if (CH.on) { chCalc(); chPaint(); chLoad(true); } chLoop();
 }
 function chInit() {
-  for (const [k, after] of [['trade', '#s-trade > .top'], ['xtrade', '#xtQ'], ['strade', '#stQ']]) { const a = $(after); if (a && !$('#ch-' + k)) a.insertAdjacentHTML('afterend', chHtml(k)); }
+  for (const [k, after] of [['trade', '#s-trade > .top'], ['xtrade', '#xtQ'], ['strade', '#stQ'], ['l2', '#lVen']]) { const a = $(after); if (a && !$('#ch-' + k)) a.insertAdjacentHTML('afterend', chHtml(k)); }
   document.addEventListener('click', (ev) => {
     const t = ev.target.closest && ev.target.closest('[data-chtf],[data-chtog],[data-chend],[data-chsave]'); if (!t || !t.closest('.chc')) return; ev.preventDefault(); ev.stopPropagation();
     if (t.dataset.chend) { CH.off = 0; CH.sel = -1; return chPaint(); }
@@ -22051,7 +22066,7 @@ document.addEventListener('click', async (e) => {
         ${XL.length ? `<span class="lbl">XRP Ledger</span><div class="card" style="padding:0 14px;gap:0">${XL.map((w) => { const d = XRA[w.addr]; return row(w.addr, w.name, d && d.a ? '$' + fx(xrUsd(d)) : d && d.a === null ? 'not activated' : '', 'xrp'); }).join('')}</div>` : ''}
         ${SL.length ? `<span class="lbl">Solana</span><div class="card" style="padding:0 14px;gap:0">${SL.map((w) => { const d = SOLA[w.addr]; return row(w.addr, w.name, d ? '$' + fx(solUsd(d)) : '', 'sol'); }).join('')}</div>` : ''}<button class="b-out" data-act="closeSheet">Close</button>`);
     },
-    tWalGo: () => { closeSheet(); if (t.dataset.k === 'sol') { solSel = t.dataset.addr; return cur === 'strade' ? drawSTrade() : go('strade'); } if (t.dataset.k === 'xrp') { xrSel = t.dataset.addr; return cur === 'xtrade' ? drawXTrade() : go('xtrade'); }
+    l2Trade: () => l2Trade(), tWalGo: () => { closeSheet(); if (t.dataset.k === 'sol') { solSel = t.dataset.addr; return cur === 'strade' ? drawSTrade() : go('strade'); } if (t.dataset.k === 'xrp') { xrSel = t.dataset.addr; return cur === 'xtrade' ? drawXTrade() : go('xtrade'); }
       homeAddr = t.dataset.addr; S.tradeLast = homeAddr; saveS(); return cur === 'trade' ? drawTrade() : go('trade'); },
     fundOpen: phGate(() => fundSheet()), fundReview: () => fundReview(),
     pinChange: () => pinChangeSheet(), pinChangeOk: () => pinChangeOk(),
