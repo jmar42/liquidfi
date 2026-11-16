@@ -661,7 +661,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.44c · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.44e · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15728,7 +15728,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.44c';
+const APP_VER = 'v2.44e';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16430,10 +16430,10 @@ function stLoop() {   // v2.41d: Manifest every 15 s; the 24 h volume card every
    Runs only while its Trade screen is open and the phone screen is on. Up = close above the prior close (blue), down = pink. */
 const CH_TF = { '5m': { g: 300, pg: 1 }, '15m': { g: 900, pg: 1 }, '1h': { g: 3600, pg: 1 }, '4h': { g: 3600, pg: 3, agg: 14400 }, '1D': { g: 86400, pg: 2 }, '1W': { g: 86400, pg: 3, agg: 'w' } };
 const CH_UP = '#60A5FA', CH_DN = '#F472B6';
-const CH_MA = {
-  i: [{ n: 5, c: '#BAE6FD' }, { n: 6, c: '#38BDF8' }, { n: 20, c: '#F9A8D4' }, { n: 30, c: '#DB2777' }],
-  d: [{ n: 3, c: '#DBEAFE' }, { n: 6, c: '#93C5FD' }, { n: 10, c: '#3B82F6' }, { n: 20, c: '#FBCFE8', e: 1 }, { n: 50, c: '#EC4899' }, { n: 200, c: '#BE185D' }],
-  w: [{ n: 10, c: '#93C5FD' }, { n: 40, c: '#EC4899' }],
+const CH_MA = {   /* v2.44d (Jeff): 5/20 intraday; daily 5/20/50/200; weekly 4/10/40 (= 20/50/200 day). All simple MAs. */
+  i: [{ n: 5, c: '#93C5FD' }, { n: 20, c: '#F9A8D4' }],
+  d: [{ n: 5, c: '#93C5FD' }, { n: 20, c: '#3B82F6' }, { n: 50, c: '#F9A8D4' }, { n: 200, c: '#EC4899' }],
+  w: [{ n: 4, c: '#93C5FD' }, { n: 10, c: '#3B82F6' }, { n: 40, c: '#EC4899' }],
 };
 const chGet = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } };
 const chPut = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -16486,7 +16486,7 @@ function chPaint() {
   if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
   const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
   const B = CH.bars || []; x.font = '10px ui-monospace,Menlo,Consolas,monospace';
-  { const L = chLogo(); if (L && L.complete && L.naturalWidth) { const lh = Math.min(H * 0.42, 120), lw = lh * L.naturalWidth / L.naturalHeight; x.globalAlpha = 0.07; x.drawImage(L, (W - 50 - lw) / 2, (H * 0.74 - lh) / 2, lw, lh); x.globalAlpha = 1; } }   /* v2.44c watermark */
+  { const L = chLogo(); if (L && L.complete && L.naturalWidth) { const lh = Math.min(H * 0.42, 120), lw = lh * L.naturalWidth / L.naturalHeight; x.globalAlpha = 0.13; x.drawImage(L, (W - 50 - lw) / 2, (H * 0.74 - lh) / 2, lw, lh); x.globalAlpha = 1; } }   /* v2.44c watermark */
   if (!B.length) { x.fillStyle = '#9AA4B2'; x.fillText(CH.err || 'loading…', 8, 20); lg.innerHTML = ''; return; }
   const wk = CH.tf === '1W', AX = 50, pW = W - AX, sp = wk ? 8 : 7, n = Math.max(10, Math.floor(pW / sp));
   CH.off = Math.max(0, Math.min(CH.off, Math.max(0, B.length - n))); const e = B.length - Math.round(CH.off), s = Math.max(0, e - n), V = B.slice(s, e);
@@ -16533,7 +16533,7 @@ function chPaint() {
 function chLogo() { if (CH.logo !== undefined) return CH.logo; const el = document.querySelector('.logoimg'); if (!el || !el.src) return (CH.logo = null); const I = new Image(); I.onload = () => { if (CH.k && cur === CH.k) chPaint(); }; I.src = el.src; return (CH.logo = I); }
 async function chSave() {
   const root = CH.k && $('#ch-' + CH.k), cv = root && root.querySelector('.chcv'); if (!cv || !CH.bars || !CH.bars.length) return toast('Chart is still loading.');
-  const sc = cv.width / cv.clientWidth, W = cv.width, P = Math.round(18 * sc), hdr = Math.round(64 * sc), leg = Math.round(46 * sc), ft = Math.round(30 * sc);
+  const sc = cv.width / cv.clientWidth, W = cv.width, P = Math.round(18 * sc), hdr = Math.round(64 * sc), leg = Math.round(64 * sc), ft = Math.round(30 * sc);
   const o = document.createElement('canvas'); o.width = W + P * 2; o.height = hdr + cv.height + leg + ft + P; const x = o.getContext('2d');
   x.fillStyle = '#0B0E13'; x.fillRect(0, 0, o.width, o.height); const L = chLogo(); let lx = P;
   if (L && L.complete && L.naturalWidth) { const lh = Math.round(40 * sc), lw = lh * L.naturalWidth / L.naturalHeight; x.drawImage(L, P, Math.round(12 * sc), lw, lh); lx = P + lw + Math.round(10 * sc); }
@@ -16544,8 +16544,8 @@ async function chSave() {
   x.textAlign = 'right'; x.fillStyle = up2(B) ? CH_UP : CH_DN; x.font = `700 ${Math.round(18 * sc)}px ui-monospace,Menlo,Consolas,monospace`; x.fillText(b.c.toFixed(dp), o.width - P, Math.round(34 * sc)); x.textAlign = 'left';
   x.drawImage(cv, P, hdr);
   let tx = P; const ly = hdr + cv.height + Math.round(22 * sc), j = CH.sel >= 0 && CH.sel < B.length ? CH.sel : B.length - 1; x.font = `${Math.round(11.5 * sc)}px ui-monospace,Menlo,Consolas,monospace`;
-  for (const m of CH.mas || []) { const t = `${m.e ? 'EMA' : 'MA'}${m.n} ${m.v[j] != null ? m.v[j].toFixed(dp) : '–'}   `; x.fillStyle = m.c; x.fillText(t, tx, ly); tx += x.measureText(t).width; }
-  { const va = (CH.vavg || [])[j]; if (va) { x.fillStyle = '#9AA4B2'; x.fillText(`Vol ${Math.round(B[j].v / va * 100)}% of 20-bar avg`, P, ly + Math.round(18 * sc)); } }
+  let lyy = ly; for (const m of CH.mas || []) { const t = `${m.e ? 'EMA' : 'MA'}${m.n} ${m.v[j] != null ? m.v[j].toFixed(dp) : '–'}`, tw = x.measureText(t).width; if (tx > P && tx + tw > o.width - P) { tx = P; lyy += Math.round(18 * sc); } x.fillStyle = m.c; x.fillText(t, tx, lyy); tx += tw + x.measureText('   ').width; }
+  { const va = (CH.vavg || [])[j]; if (va) { x.fillStyle = '#9AA4B2'; x.fillText(`Vol ${Math.round(B[j].v / va * 100)}% of 20-bar avg`, P, lyy + Math.round(18 * sc)); } }
   x.fillStyle = '#6EA8FF'; x.font = `600 ${Math.round(12 * sc)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`; x.fillText('liquidfi.com', P, o.height - P);
   x.textAlign = 'right'; x.fillStyle = '#9AA4B2'; x.font = `${Math.round(10.5 * sc)}px system-ui,-apple-system,Segoe UI,Roboto,sans-serif`; x.fillText('Chart data: Coinbase', o.width - P, o.height - P); x.textAlign = 'left';
   const blob = await new Promise((r) => o.toBlob(r, 'image/png')); if (!blob) return toast('Couldn\'t make the picture.');
