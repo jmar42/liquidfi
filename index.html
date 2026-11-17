@@ -670,7 +670,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45f · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45g · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15753,7 +15753,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45f';
+const APP_VER = 'v2.45g';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -17458,7 +17458,7 @@ async function jlGo(kind, jm) {
     { foot: `You get j${sym} shares back. They grow in value as interest comes in; withdraw any time. The first time, Solana keeps ${SOL_RENT.tok / 1e9} SOL as the refundable deposit for the share account.` }]
     : [{ k: 'Withdraw', v: `${amt >= mx - 1e-9 ? 'all, about ' : ''}${m2(amt)} ${sym}`, hl: 1 }, { k: 'Network fee', v: 'about 0.00003 SOL' }];
   confirmSheet(dep ? `Earn on ${show(units - fee)} ${sym}` : `Withdraw ${m2(amt)} ${sym}`, `Jupiter Lend · ${esc(o.name)}`, items, dep ? 'Confirm' : 'Withdraw', async () => {
-    try { solResult(await solSendIxs(o, ixs, solWaitLabel), dep ? 'Deposit' : 'Withdrawal'); } catch (e) { closeSheet(); toast(e.message || String(e), 6000); } }, false, 'b-acc', dep ? 'Depositing…' : 'Withdrawing…', true);
+    try { const r = await solSendIxs(o, ixs, solWaitLabel); if (dep && r.state === 'ok') { const J = (NS().jls = NS().jls || {}), k = o.addr + ':' + t.address; if (!J[k]) { J[k] = Date.now(); saveS(); } } solResult(r, dep ? 'Deposit' : 'Withdrawal'); } catch (e) { closeSheet(); toast(e.message || String(e), 6000); } }, false, 'b-acc', dep ? 'Depositing…' : 'Withdrawing…', true);
 }
 
 /* add / back up / remove */
@@ -18338,12 +18338,25 @@ async function earnSolSum() {
   } catch (e) {}
 }
 /* v2.45e (Jeff: "Shouldn't it be in the section of the other Earns when you press it?"): Solana lending in the Earn details sheet */
-function earnLendRows() {
-  if (solNet() !== 'mainnet') return ''; const T = JLT || [], rows = [];
+const JLER = {};   /* Jupiter's own "earned since deposit" (USD) per wallet:token */
+function earnLendList() {   /* [{ addr, name, sym, k, usd, apy, start, all }] the Solana lending you have now */
+  if (solNet() !== 'mainnet') return []; const T = JLT || [], out = [], J = (NS().jls = NS().jls || {}); let ch = false;
   for (const w of solList()) for (const p of JLPOS[w.addr] || []) { const t = T.find((x) => x.address === (p.token && (p.token.address || p.token.id))); if (!t || !(+p.underlyingAssets > 0)) continue;
-    const usd = +p.underlyingAssets / 10 ** t.decimals * (+(t.asset || {}).price || 0); if (usd < 0.005) continue;
-    rows.push(`<div class="ekv" data-act="earnSolGo" data-addr="${esc(w.addr)}" style="cursor:pointer;padding:6px 0"><span>${esc((t.asset && t.asset.symbol) || t.symbol)} · ${esc(w.name)} ›</span><span class="mono"><b>$${fxv(usd)}</b> <span class="grn">${jlApy(t).toFixed(2)}%</span></span></div>`); }
-  return rows.length ? `<div class="elbl">Lending · Solana (Jupiter Lend)</div><div class="card" style="gap:2px">${rows.join('')}</div>` : '';
+    const px = +(t.asset || {}).price || 0, usd = +p.underlyingAssets / 10 ** t.decimals * px; if (usd < 0.005) continue;
+    const k = w.addr + ':' + t.address, apy = jlApy(t) / 100, all = JLER[k];
+    if (!J[k]) { J[k] = all > 0 && apy > 0 ? Date.now() - all / (usd * apy) * 31557600000 : Date.now(); ch = true; }   /* held since: your deposit, else worked back from what it earned */
+    out.push({ addr: w.addr, name: w.name, sym: (t.asset && t.asset.symbol) || t.symbol, k, usd, apy, start: J[k], all }); }
+  if (ch) saveS(); return out;
+}
+/* earned between lo and hi (ms), from the rate over the time you held it; Jupiter only reports the total */
+const lendIn = (L, lo, hi) => L.reduce((t, x) => t + x.usd * x.apy * Math.max(0, Math.min(hi, Date.now()) - Math.max(lo, x.start)) / 31557600000, 0);
+const lendAll = (L) => L.reduce((t, x) => t + (x.all != null ? x.all : x.usd * x.apy * Math.max(0, Date.now() - x.start) / 31557600000), 0);
+async function earnLendLoad() {   /* Jupiter's earnings since deposit, for each wallet with lending */
+  if (solNet() !== 'mainnet') return; let ch = false;
+  for (const w of solList()) { try { const P = JLPOS[w.addr] || await jlPositions(w.addr), held = (P || []).filter((p) => +p.shares > 0).map((p) => p.token && (p.token.address || p.token.id)).filter(Boolean); if (!held.length) continue;
+    const j2 = await (await fetch(`${JL}/earn/earnings?user=${w.addr}&positions=${held.join(',')}`)).json(), T = JLT || await jlTokens();
+    for (const e of [].concat(j2 || [])) { const t = T.find((x) => x.address === e.address); if (t) { JLER[w.addr + ':' + t.address] = (+e.earnings || 0) / 10 ** t.decimals * (+(t.asset || {}).price || 0); ch = true; } } } catch (e) {} }
+  if (ch && EDET.mode === 'sum' && eDetOpen(EDET.gen)) earnDetPaint(false);
 }
 function earnSolOpen(addr) { if (addr) solSel = addr; closeSheet(); if (cur !== 'earn') { EARN_VIEW = 'home'; go('earn'); } earnOpenView('so'); }
 function earnSol() {
@@ -18606,7 +18619,7 @@ function poolPos(ch, k) {
   return { p, name: p && p.name, where: `XRP Ledger pool · ${p ? p.tok + ' by ' + p.who : ''}`, mine: lp, total: A.lp || 0, hold: A.at && !A.none && p ? [[A.x, 'XRP'], [A.u, p.tok]] : null, now: lp > 0 && A.lp > 0 ? lp / A.lp * A.tvl : 0, E, add: `data-act="xrEarnAdd" data-xp="${k}"`, out: `data-act="xrEarnOut" data-xp="${k}"` };
 }
 const heldKeys = (ch) => (ch === 'st' ? earnPools().map((p) => p.id) : xrPools().map((p) => p.key)).filter((k) => poolPos(ch, k).mine > 0);
-function earnSum(ch) { Object.assign(EDET, { mode: 'sum', ch, k: null, per: 'today' }); earnDetPaint(true); }   /* opens on Today every time */
+function earnSum(ch) { Object.assign(EDET, { mode: 'sum', ch, k: null, per: 'today' }); earnDetPaint(true); if (ch === 'all') earnLendLoad(); }   /* opens on Today every time */
 function earnPoolSheet(ch, k) { const fromSum = EDET.mode === 'sum' && eDetOpen(EDET.gen); Object.assign(EDET, { mode: 'pool', ch, k }); if (!fromSum || !EPERS_POOL.includes(EDET.per)) EDET.per = 'today'; earnDetPaint(true); }   /* Today, unless you tapped the pool from Your pools (keeps that period) */
 const eDetOpen = (gen) => $('#sheet').classList.contains('on') && !!$(`#sheetIn [data-edet="${gen}"]`);   // still showing THIS Earn sheet (not an Add / Withdraw / confirm sheet opened since)
 function earnDetPaint(load) {
@@ -18644,20 +18657,23 @@ function earnDetPaint(load) {
     for (let i = 0; i < 7; i++) { const lo = eMidnight(P0.y, P0.m, P0.d - i), hi = i ? eMidnight(P0.y, P0.m, P0.d - i + 1) : nowT; let n = 0; F.forEach((f) => (f && !f.err ? f.trades : []).forEach((t) => { if (t.t >= lo && t.t < hi) n++; })); days.push({ lo, c: earnSumIn(lo, hi), n, nOK: covers(lo) && !failed }); }
     const rowsOf = (c) => pairs.map((pr, i) => [pr, i]).filter(([pr]) => pr[0] === c).map(([pr, i]) => `<div class="ekv" data-act="earnPool" data-ch="${pr[0]}" data-k="${esc(pr[1])}" style="cursor:pointer;padding:6px 0"><span>${esc(pos[i].name)} ›</span><b class="mono grn">${vx(earnIn(i, perLo, perHi))}</b></div>`).join('');
     const chainName = { st: 'Stellar', xr: 'XRP Ledger' };
-    h = `<h2 style="margin-bottom:0">${ch === 'all' ? 'Your pools' : chainName[ch] + ' pools'}</h2>${chips(EPERS)}
-      <div class="card" style="gap:10px;padding:16px"><div class="r" style="align-items:baseline"><span style="font-size:17px">Worth now</span><b class="mono" style="font-size:27px">$${fxv(now)}</b></div>
-        <div class="r" style="align-items:baseline"><span style="font-size:17px">Earned ${perName}</span><b class="mono grn" style="font-size:25px">${vx(earnSumIn(perLo, perHi))}</b></div>
+    /* v2.45g (Jeff: "It shows the amount saved. But the others shows earnings instead. And the SOL shows yield while the others dont"): lending is counted like the pools */
+    const LL = ch === 'all' ? earnLendList() : [], lw = LL.reduce((t, x) => t + x.usd, 0), la = LL.length ? lendAll(LL) : 0, plus = (a2, b2) => (a2 == null ? null : a2 + b2);
+    const lendRows = LL.map((x) => `<div class="ekv" data-act="earnSolGo" data-addr="${esc(x.addr)}" style="cursor:pointer;padding:6px 0"><span>${esc(x.sym)} · ${esc(x.name)} ›</span><b class="mono grn">${esg(lendIn([x], perLo, perHi))}</b></div>`).join('');
+    h = `<h2 style="margin-bottom:0">${ch === 'all' ? (LL.length ? 'Your earnings' : 'Your pools') : chainName[ch] + ' pools'}</h2>${chips(EPERS)}
+      <div class="card" style="gap:10px;padding:16px"><div class="r" style="align-items:baseline"><span style="font-size:17px">Worth now</span><b class="mono" style="font-size:27px">$${fxv(now + lw)}</b></div>
+        <div class="r" style="align-items:baseline"><span style="font-size:17px">Earned ${perName}</span><b class="mono grn" style="font-size:25px">${vx(plus(earnSumIn(perLo, perHi), lendIn(LL, perLo, perHi)))}</b></div>
         <div class="ekv"><span>Trades through your pools</span><span class="mono">${v(sums.reduce((s2, x) => s2 + x.n, 0).toLocaleString())}</span></div></div>
       <div class="elbl">Since you joined</div>
-      <div class="card" style="gap:2px"><div class="ekv"><span>Earned${!shareAll && win ? ' (last 62 days)' : ''}</span><b class="mono grn">${vx(ea)}</b></div>
+      <div class="card" style="gap:2px"><div class="ekv"><span>Earned${!shareAll && win ? ' (last 62 days)' : ''}</span><b class="mono grn">${vx(plus(ea, la))}</b></div>
         <div class="ekv"><span>Price change</span><b class="mono ${pl - (eaPL || 0) >= 0 ? 'grn' : 'red'}">${!histOK ? SY : !withPL.length || !pcOK ? '–' : eaPL == null ? SY : esg(pl - eaPL)}</b></div>
-        <div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Profit / Loss</span><b class="mono ${pl >= 0 ? 'grn' : 'red'}">${!histOK ? SY : withPL.length ? esg(pl) : '–'}</b></div></div>
+        <div class="ekv" style="border-top:1px solid var(--bd);margin-top:4px;padding-top:7px"><span>Profit / Loss</span><b class="mono ${pl + la >= 0 ? 'grn' : 'red'}">${!histOK ? SY : withPL.length || LL.length ? esg(pl + la) : '–'}</b></div></div>
       ${pos.length ? ['st', 'xr'].filter((c) => pairs.some((pr) => pr[0] === c)).map((c) => `<div class="elbl">${chainName[c]} · earned ${perName}</div><div class="card" style="gap:2px">${rowsOf(c)}</div>`).join('')
         : `<div class="card"><span class="mu">You're not in any pool yet. Go back and pick Stellar pools or XRP Ledger pools to start.</span></div>`}
-      ${ch === 'all' ? earnLendRows() : ''}
+      ${LL.length ? `<div class="elbl">Solana lending · earned ${perName}</div><div class="card" style="gap:2px">${lendRows}</div>` : ''}
       <div class="elbl">By day</div>
-      <div class="card" style="gap:2px">${days.map((d2) => `<div class="ekv"><span>${esc(new Date(d2.lo + 12 * HR).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }))}</span><span class="mono">${d2.c == null ? vx(null) : esg(d2.c) + (d2.nOK ? ` · ${d2.n.toLocaleString()} trade${d2.n === 1 ? '' : 's'}` : '')}</span></div>`).join('')}</div>
-      <div class="mu" style="font-size:13px">Tap a pool for your shares, what it holds, and every trade's cut.</div>
+      <div class="card" style="gap:2px">${days.map((d2) => `<div class="ekv"><span>${esc(new Date(d2.lo + 12 * HR).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }))}</span><span class="mono">${d2.c == null ? vx(null) : esg(d2.c + lendIn(LL, d2.lo, d2.lo + 86400000)) + (d2.nOK ? ` · ${d2.n.toLocaleString()} trade${d2.n === 1 ? '' : 's'}` : '')}</span></div>`).join('')}</div>
+      <div class="mu" style="font-size:13px">Tap a pool for your shares, what it holds, and every trade's cut.</div>${LL.length ? `<div class="mu" style="font-size:13px">Solana lending: earned per day is figured from its rate over the time you've held it; since you joined is Jupiter's own total.</div>` : ''}
       ${note}<button class="b-out" data-act="closeSheet">Close</button>`;
   } else {
     const x = poolPos(ch, k), f = F[0], ok = f && !f.err, sum = ok ? ePerSum(f.trades, per) : null, ea = earnIn(0, 0, nowT), pl = allPL(x), my = x.total > 0 ? x.mine / x.total : 0, eP = earnIn(0, perLo, perHi);
