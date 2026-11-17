@@ -671,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45i · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45j · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15755,7 +15755,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45i';
+const APP_VER = 'v2.45j';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16395,7 +16395,8 @@ function stPaint() {
 }
 function stQuote() {   /* best Solana bid / ask (the venues your order goes to), else Coinbase / Kraken; last = the newest print */
   let b = 0, a = 0; try { const L = stL2(); b = (L.bids[0] || {}).px || 0; a = (L.asks[0] || {}).px || 0; } catch (e) {} if (!b || !a) { const r = cxRef(); b = b || r.bid; a = a || r.ask; }
-  const P = [...CX.prints].sort((x, y) => y.t - x.t)[0]; qLine('#stQuote', b, a, P && P.px, P && P.buy, (v) => v.toFixed(2));
+  /* v2.45j (Jeff: "should we do last SOL DEX only?"): Last = the newest trade on Solana's busiest pools; Coinbase / Kraken only until those load */
+  const D = (ST.sales || [])[0], P = D && Date.now() - D.t < 15 * 60000 ? D : [...CX.prints].sort((x, y) => y.t - x.t)[0]; qLine('#stQuote', b, a, P && P.px, P && P.buy, (v) => v.toFixed(2));
 }
 function stPaintSales() {
   stQuote(); const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = 'CBS · KRK live';
@@ -16452,6 +16453,7 @@ function stLoop() {   // v2.41d: Manifest every 15 s; the 24 h volume card every
   const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') { if (n % 2 === 1) stFills();
       try { await stLoadClob(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaint();
       if (n % 2 === 1 && cur === 'strade') { mfMinePaint().catch(() => {}); sstPaint().catch(() => {}); }
+      if (n % 2 === 0) stLoadSales().then(() => { if (cur === 'strade') stQuote(); }).catch(() => {});   /* Solana DEX trades for Last, every 30 s */
       n++; }
     ST.timer = setTimeout(run, ST.fails ? 45000 : 15000); };
   run();
