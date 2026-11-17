@@ -662,7 +662,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.44f · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.44h · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15743,7 +15743,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.44f';
+const APP_VER = 'v2.44h';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16447,8 +16447,8 @@ const CH_TF = { '5m': { g: 300, pg: 1 }, '15m': { g: 900, pg: 1 }, '1h': { g: 36
 const CH_UP = '#60A5FA', CH_DN = '#F472B6';
 const CH_MA = {   /* v2.44d (Jeff): 5/20 intraday; daily 5/20/50/200; weekly 4/10/40 (= 20/50/200 day). All simple MAs. */
   i: [{ n: 5, c: '#93C5FD' }, { n: 20, c: '#F9A8D4' }],
-  d: [{ n: 5, c: '#93C5FD' }, { n: 20, c: '#3B82F6' }, { n: 50, c: '#F9A8D4' }, { n: 200, c: '#EC4899' }],
-  w: [{ n: 4, c: '#93C5FD' }, { n: 10, c: '#3B82F6' }, { n: 40, c: '#EC4899' }],
+  d: [{ n: 5, c: '#93C5FD' }, { n: 10, c: '#FACC15' }, { n: 20, c: '#3B82F6' }, { n: 50, c: '#EF4444' }, { n: 200, c: '#1D4ED8' }],   /* v2.44g (Jeff): the 10 DMA back on the daily */
+  w: [{ n: 4, c: '#3B82F6' }, { n: 10, c: '#EF4444' }, { n: 50, c: '#1D4ED8' }],   /* v2.44h (Jeff): weekly 4 blue, 10 red, 50-week dark blue */
 };
 const chGet = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } };
 const chPut = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
