@@ -111,6 +111,7 @@ a{color:var(--blu)}
 
 /* ---- Liquidfi theme ---- */
 :root{--acc:#3B82F6;--acc2:#2563EB;--s0:#0F131A}
+/* v2.45i quote line under Available */.qline{font-size:14px;color:var(--mu);margin-top:-4px}.qline b{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-weight:600}
 html,body{font-family:'IBM Plex Sans',system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.45}
 .mono,.addr,.book,.ops small,#tLast{font-family:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace!important}
 h1{font-size:27px;font-weight:700;letter-spacing:-.01em}h2{font-size:21px;font-weight:700}
@@ -419,7 +420,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="seg" id="xtMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div>
   <label>Amount (XRP)<input id="xtAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-xpct="25">25%</button><button class="b-out sm" data-xpct="50">50%</button><button class="b-out sm" data-xpct="75">75%</button><button class="b-out sm" data-xpct="100">Max</button></div>
-  <div class="mu" id="xtHave" style="font-size:13px"></div>
+  <div class="mu" id="xtHave" style="font-size:13px"></div><div class="qline" id="xtQuote"></div>
   <label id="xtPxW" style="display:none"><span id="xtPxL">Limit price (RLUSD per XRP)</span><input id="xtPx" inputmode="decimal"></label>
   <div id="xtStopW" style="display:none;flex-direction:column;gap:10px">
     <label><span id="xtStL">Stop price (RLUSD per XRP)</span><input id="xtStop" inputmode="decimal"></label>
@@ -452,7 +453,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div id="stLimW" style="display:none;flex-direction:column;gap:8px"><label><span>Order type</span><select id="stLtSel"><option value="lim">Limit</option><option value="post">Post-only</option><option value="ioc">Immediate or cancel (IOC)</option><option value="fok">Fill or kill (FOK)</option></select></label><div class="mu" id="stLtNote" style="font-size:13px"></div></div>
   <label>Amount (SOL)<input id="stAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-spct="25">25%</button><button class="b-out sm" data-spct="50">50%</button><button class="b-out sm" data-spct="75">75%</button><button class="b-out sm" data-spct="100">Max</button></div>
-  <div class="mu" id="stHave" style="font-size:13px"></div>
+  <div class="mu" id="stHave" style="font-size:13px"></div><div class="qline" id="stQuote"></div>
   <label id="stPxW" style="display:none"><span>Limit price (<span id="stPxQ">USDC</span> per SOL)</span><input id="stPx" inputmode="decimal" placeholder="0.00"></label>
   <div id="stStopW" style="display:none;flex-direction:column;gap:10px">
     <label><span id="stStL">Stop price (USDC per SOL)</span><input id="stStop" inputmode="decimal"></label>
@@ -494,7 +495,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" style="padding:10px 14px;gap:6px"><div class="top"><span class="lbl" style="font-size:12px">Last sales</span><span class="grn" style="font-size:12px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px"></div></div>
   <div class="trow"><div class="seg tsm" id="tSide"><button class="on" data-v="buy" id="tSideB">Buy</button><button data-v="sell" id="tSideS">Sell</button></div>
   <div class="seg tsm" id="tMode"><button class="on" data-v="mkt">Market</button><button data-v="lim">Limit</button><button data-v="stop">Stop</button></div></div>
-  <div class="tbal" id="tBal"></div>
+  <div class="tbal" id="tBal"></div><div class="qline" id="tQuote"></div>
   <label><span id="tAmtL">Amount (XLM)</span><input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
   <div class="mu" id="tMktNote" style="font-size:13px;display:none">Fills now at the best price (book or AMM pools), within your slippage cap. Includes a 0.25% fee; limit orders have no fee.</div>
@@ -670,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45g · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45i · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14943,8 +14944,9 @@ async function xtLoadSales() {
   XT.sales = (r.transactions || []).map(xtSaleOf).filter(Boolean).sort((a, b) => b.t - a.t).slice(0, 12);
   XT.salesAt = Date.now();
 }
+function xtQuote() { const b = XT.bids[0], a = XT.asks[0], L0 = XT.sales[0]; qLine('#xtQuote', b && b[0], a && a[0], L0 && L0.px, L0 && L0.buy, (v) => v.toFixed(5)); }
 function xtPaintSales() {
-  const el = $('#xtLast'); if (!el) return;
+  xtQuote(); const el = $('#xtLast'); if (!el) return;
   const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:12px;${r ? 'text-align:right' : ''}">${t}</span>`;
   el.innerHTML = H3('Time (PT)') + H3('Price', 1) + H3('XRP', 1) + (XT.sales.length ? XT.sales.map((t) => `<span class="mu">${t.t ? new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false }) : ''}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(5)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
     : `<span class="mu">${XT.salesAt ? `No XRP/${xtC().tok} trades in the latest ${xtC().tok} activity.` : 'loading…'}</span><span></span><span></span>`);
@@ -15073,7 +15075,7 @@ function xwStart() {
   }, 3000);
 }
 function xtPaint() {
-  const el = $('#xtBook'); if (!el) return;
+  xtQuote(); const el = $('#xtBook'); if (!el) return;
   const n = 7, rows = [`<span class="mu s2" style="font-family:inherit;font-weight:600">Bids</span><span class="mu s2" style="text-align:right;font-weight:600">Asks</span>`];
   for (let i = 0; i < n; i++) { const b = XT.bids[i], a = XT.asks[i]; rows.push(`<span class="buy">${b ? b[0].toFixed(5) : ''}</span><span class="buy sz">${b ? szFmt(b[1]) : ''}</span><span class="sell ap">${a ? a[0].toFixed(5) : ''}</span><span class="sell sz">${a ? szFmt(a[1]) : ''}</span>`); }
   el.innerHTML = rows.join('');
@@ -15753,7 +15755,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45g';
+const APP_VER = 'v2.45i';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15820,8 +15822,8 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx10') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx10', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx11') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx11', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
@@ -15871,8 +15873,9 @@ function solTxSum0(addr, t) {
   else if (out.length && inn.length && inn.some((c) => solJl(c.mint)) && !out.some((c) => solJl(c.mint))) txt = `Earn: put in ${out.filter((c) => c.mint !== 'SOL' || out.length === 1).map(f).join(', ')}`;
   else if (out.length && inn.length && out.some((c) => solJl(c.mint)) && !inn.some((c) => solJl(c.mint))) txt = `Earn: took out ${inn.filter((c) => c.mint !== 'SOL' || inn.length === 1).map(f).join(', ')}`;
   else if (out.length && inn.length) txt = `Swapped ${out.map(f).join(' + ')} → ${inn.map(f).join(' + ')}`;
-  else if (inn.length) { const src = payer ? '' : K[0], isFee = SOL_FEE.owner === addr && src && src !== addr && (((t.transaction || {}).message || {}).instructions || []).some((x) => x.programId === JUP_PROG || x.programId === MNF_PROG);
-    txt = isFee ? `Liquidfi fee ${inn.map(f).join(' + ')} from ${solWho(src)}'s trade` : `Received ${inn.map(f).join(' + ')}${src ? ' from ' + solWho(src) : ''}${inn.every((c) => c.mint === 'SOL' && Math.abs(c.v) < 0.00001) ? ' (dust, often spam: ignore it)' : ''}`; }
+  else if (inn.length) { const src = payer ? '' : K[0], prs = (((t.transaction || {}).message || {}).instructions || []).map((x) => x.programId), lend = prs.includes(JL_PROG);
+    const isFee = SOL_FEE.owner === addr && src && src !== addr && (prs.includes(JUP_PROG) || prs.includes(MNF_PROG) || lend);   /* v2.45h: Earn (Jupiter Lend) fees too */
+    txt = isFee ? `Liquidfi fee ${inn.map(f).join(' + ')} from ${solWho(src)}'s ${lend ? 'Earn deposit' : 'trade'}` : `Received ${inn.map(f).join(' + ')}${src ? ' from ' + solWho(src) : ''}${!solList().some((w) => w.addr === src) && inn.every((c) => c.mint === 'SOL' && Math.abs(c.v) < 0.00001) ? ' (dust, often spam: ignore it)' : ''}`; }   /* never call your own wallet spam */
   else { const to = [...dl].sort((a, b) => b.d - a.d)[0], dst = out.some((c) => c.mint !== 'SOL') ? Object.keys(tko)[0] : to && to.d > 0 ? to.k : '';
     txt = dst && SOL_FEE.owner && dst === SOL_FEE.owner && !solOwn(dst) ? `Liquidfi fee ${out.map(f).join(' + ')}` : `Sent ${out.map(f).join(' + ')}${dst ? ' to ' + solWho(dst) : ''}`; }
   return { txt, fee: payer ? fee : 0, err: !!m.err };
@@ -16355,7 +16358,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function cxRef() { let b = 0, a = Infinity; for (const M of [CX.cbB, CX.krB]) for (const k of M.keys()) if (k > b) b = k; for (const M of [CX.cbA, CX.krA]) for (const k of M.keys()) if (k < a) a = k; return { bid: b || 0, ask: isFinite(a) ? a : 0, mid: b && isFinite(a) ? (a + b) / 2 : (SOLPX.sol || 0) }; }
 const cxLv = (M, bid) => [...M.entries()].map(([px, sz]) => ({ px, sz })).sort((a, b) => (bid ? b.px - a.px : a.px - b.px));
 function stPaint() {
-  const el = $('#stBook'); if (!el) return; const v = ST.bkv || 'cex', N = 10;
+  stQuote(); const el = $('#stBook'); if (!el) return; const v = ST.bkv || 'cex', N = 10;
   $$('#stBk button').forEach((b) => b.classList.toggle('on', b.dataset.v === v));
   $('#stPairL').textContent = `Order book · ${ST_BKV[v]} · SOL / ${['cex', 'cbs', 'krk'].includes(v) && ST.q === 'USDC' ? 'USD' : ST.q}`;
   const H = (t, r) => `<span class="mu" style="font-family:inherit;font-size:11.5px;${r ? 'text-align:right' : ''}">${t}</span>`;
@@ -16390,8 +16393,12 @@ function stPaint() {
     ? 'MNF Manifest (real resting orders, exact) · JUP Jupiter best route · ZRO ZeroFi · BSN BisonFi · HMD HumidiFi · SLF SolFi · GON GoonFi · ORC Orca · RYC Raydium CLMM · RAY Raydium · MET Meteora · TSR Tessera · PHX Phoenix · OBK OpenBook. Venues other than MNF show their top of book: price for ~$100, and about how much fills there (~ estimate, ≥ at least).'
     : `Real resting limit orders on Manifest (${m.n} on the book; within 10% of the market).`);
 }
+function stQuote() {   /* best Solana bid / ask (the venues your order goes to), else Coinbase / Kraken; last = the newest print */
+  let b = 0, a = 0; try { const L = stL2(); b = (L.bids[0] || {}).px || 0; a = (L.asks[0] || {}).px || 0; } catch (e) {} if (!b || !a) { const r = cxRef(); b = b || r.bid; a = a || r.ask; }
+  const P = [...CX.prints].sort((x, y) => y.t - x.t)[0]; qLine('#stQuote', b, a, P && P.px, P && P.buy, (v) => v.toFixed(2));
+}
 function stPaintSales() {
-  const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = 'CBS · KRK live';
+  stQuote(); const el = $('#stLast'); if (!el) return; $('#stLastSrc').textContent = 'CBS · KRK live';
   const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:12px;${r ? 'text-align:right' : ''}">${t}</span>`;
   const SL = [...CX.prints].sort((a, b) => b.t - a.t).slice(0, 20);
   el.innerHTML = H3('Time (PT)') + H3('Venue') + H3('Price', 1) + H3('SOL', 1) + (SL.length ? SL.map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span style="font-family:inherit;font-size:13px;white-space:nowrap" title="${esc(t.v || '')}">${esc(mmId(t.v))}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${t.px.toFixed(3)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
@@ -21119,12 +21126,19 @@ function tPairSet(b, q) {
   if (!stopPairOK() && T.mode === 'stop') T.mode = 'mkt';
   closeSheet(); drawTrade();
 }
+/* v2.45i (Jeff: "the next line below [Available] show the Bid Ask price and Last. So a user can see their balance quickly, the market price
+   then enter the order right there without scrolling up"): one live line on every Trade screen */
+function qLine(id, bid, ask, last, lastBuy, fmt) {
+  const el = $(id); if (!el) return; if (!(bid > 0 || ask > 0 || last > 0)) { el.innerHTML = ''; return; }
+  el.innerHTML = `Bid <b class="buy">${bid > 0 ? fmt(bid) : '–'}</b> · Ask <b class="sell">${ask > 0 ? fmt(ask) : '–'}</b>${last > 0 ? ` · Last <b class="${lastBuy ? 'buy' : 'sell'}">${fmt(last)}</b>` : ''}`;
+}
 function drawTradeBook() {
   if (!$('#tBook')) return;
   const M = TBK(), nB = kName(TP().b), n = 5, rows = [`<span class="mu s2" style="font-family:inherit;font-weight:600">Bids</span><span class="mu s2" style="text-align:right;font-weight:600">Asks</span>`];
   if (!M.bids.length && !M.asks.length && !isDefPair()) rows.push('<span class="mu" style="font-family:inherit;grid-column:span 4">No orders on this book yet…</span>');
   for (let i = 0; i < n; i++) { const b = M.bids[i], a = M.asks[i]; if (!b && !a) continue; rows.push(`<span class="buy">${b ? pxF(b[0]) : ''}</span><span class="buy sz">${b ? szFmt(b[1]) : ''}</span><span class="sell ap">${a ? pxF(a[0]) : ''}</span><span class="sell sz">${a ? szFmt(a[1]) : ''}</span>`); }
   $('#tBook').innerHTML = rows.join('');
+  { const L0 = (M.tr || []).length ? tick(M.tr.slice(0, 6))[0] : null; qLine('#tQuote', M.bids[0] && M.bids[0][0], M.asks[0] && M.asks[0][0], L0 && L0.px, L0 && L0.buy, pxF); }
   const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:12px;${r ? 'text-align:right' : ''}">${t}</span>`;
   $('#tLast').innerHTML = H3('Time (PT)') + H3('Price', 1) + H3(esc(nB), 1) + (M.tr.length ? tick(M.tr.slice(0, 6)).map((t) => `<span class="mu">${new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false })}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${pxF(t.px)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('') : '<span class="mu">waiting…</span><span></span><span></span>');
   if (T.mode === 'lim' && !$('#tPx').value) { const b = T.side === 'buy' ? M.bids[0] : M.asks[0]; if (b) { $('#tPx').value = b[0].toFixed(7); tradeEst(); } }
