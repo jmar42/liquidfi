@@ -454,8 +454,16 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="g4"><button class="b-out sm" data-spct="25">25%</button><button class="b-out sm" data-spct="50">50%</button><button class="b-out sm" data-spct="75">75%</button><button class="b-out sm" data-spct="100">Max</button></div>
   <div class="mu" id="stHave" style="font-size:12px"></div>
   <label id="stPxW" style="display:none"><span>Limit price (<span id="stPxQ">USDC</span> per SOL)</span><input id="stPx" inputmode="decimal" placeholder="0.00"></label>
+  <div id="stStopW" style="display:none;flex-direction:column;gap:10px">
+    <label><span id="stStL">Stop price (USDC per SOL)</span><input id="stStop" inputmode="decimal"></label>
+    <div class="seg" id="stSk"><button class="on" data-v="mkt">Stop-market</button><button data-v="lim">Stop-limit</button></div>
+    <label id="stSlW" style="display:none"><span id="stSlL">Limit price</span><input id="stSl" inputmode="decimal"></label>
+    <label>Ends after<select id="stDays"><option value="1">1 day</option><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select></label>
+    <div class="mu" id="stStNote" style="font-size:12px"></div>
+  </div>
   <div class="card rows" id="stEst" style="padding:4px 14px;font-size:14px"></div>
   <button class="b-grn big" data-act="stReview" id="stGo">Buy</button>
+  <div id="sstCards" style="display:flex;flex-direction:column;gap:8px"></div>
   <div class="top" style="align-items:baseline"><span class="lbl">Your Manifest orders</span><span class="mu" style="font-size:11px">resting on the book</span></div>
   <div class="card" id="mfMine" style="padding:4px 14px;font-size:14px"><div class="mu" style="padding:8px 0">loading…</div></div>
   <div class="top" style="align-items:baseline"><span class="lbl">Your trades</span><span class="mu" style="font-size:11px">this wallet</span></div>
@@ -494,7 +502,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="note" id="tEditBar" style="display:none"></div>
   <div id="tStopW" style="display:none;flex-direction:column;gap:10px">
     <label>Stop price<input id="tStop" inputmode="decimal"></label>
-    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px" id="tLimLbl">Fill no worse than</span><div class="seg" id="tLimMode" style="font-size:13.5px"><button data-v="mkt">Market</button><button data-v="0.5">0.5%</button><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="custom">Custom</button></div></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:13px;display:none" id="tLimLbl"></span><div class="seg" id="tLimMode" style="font-size:13.5px"><button data-v="mkt">Stop-market</button><button data-v="custom">Stop-limit</button></div></div>
     <label id="tLimW" style="display:none">Limit price<input id="tLim" inputmode="decimal"></label>
     <div id="tLimTxt" style="font-size:15px;font-weight:600;line-height:1.5"></div>
     <div class="g2"><label>Trigger on<select id="tFeed"><option value="avg">3-exchange avg</option><option value="stellar">Stellar last sale</option><option value="cb">Coinbase</option><option value="kr">Kraken</option><option value="bn">Binance</option></select></label><label>Ends after<select id="tDays"><option value="1" selected>1 day</option><option value="7">7 days</option><option value="30">30 days</option></select></label></div>
@@ -635,7 +643,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:12px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setMySol" style="display:none"><span class="lbl">Solana server <span class="tag">beta</span></span><div class="mu" style="font-size:12px">Your own Solana RPC (yours, or a Helius / Alchemy / QuickNode address with your key). Without one, Solana goes through the Liquidfi server.</div><label>Your server (https)<input id="setSsUrl" placeholder="https://solana-mainnet.g.alchemy.com/v2/…" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setSsOnly" style="width:auto"> Only my server (no Liquidfi backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="sol">Save</button><button class="b-out sm" data-act="myOff" data-k="sol">Use Liquidfi server</button></div><div class="mu" id="setSsSt" style="font-size:12px;line-height:1.5"></div></div>
-  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
+  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:12px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:12px;line-height:1.5"></div><span style="margin-top:6px;font-weight:600">Market stops go at most this far past your stop</span><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>XLM</span><div class="seg" id="setCapXlm" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>XRP</span><div class="seg" id="setCapXrp" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>SOL</span><div class="seg" id="setCapSol" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:12px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:12px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:12px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone).</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:12px;line-height:1.5"></div></div>
   <div class="card" id="setTax"><span class="lbl">Taxes</span><div class="mu" style="font-size:12px">Everything your wallets did in a year (trades, swaps, sends, receives, pools, fees) with dollar values at the time, in two files: one for tax software (Koinly format) and a broker-style statement of buys, sells and totals for you or your tax pro. Made on this phone from the public ledgers; Liquidfi never sees it. Not tax advice.</div>
     <label>Year<select id="taxYear"></select></label><div id="taxW" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -662,7 +670,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:12px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:13px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:12px">Liquidfi v2.44h · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:12px">Liquidfi v2.45d · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15206,6 +15214,7 @@ async function xtReview() {
    The stop server watches XRP-USD (Coinbase, Kraken, Binance) and sends the order when two agree for 3 s; it sends the
    fee only if the order filled completely. It holds no keys. Cancel: the phone uses up the tickets itself. */
 const XST_MKT = 5;   /* a market stop accepts up to 5% past the stop price (any part that can't fill there waits on the book) */
+const xstCap = () => stopCap('xrp');   /* v2.45c: Settings → Stop orders */
 function xtModeUI() {
   const stp = XT.mode === 'stop', C = xtC(); XT.sk = XT.sk || 'mkt';
   $$('#xtMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.mode)); $$('#xtSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.side));
@@ -15215,16 +15224,17 @@ function xtModeUI() {
     $('#xtStopW').style.display = stp ? 'flex' : 'none'; $('#xtSlW').style.display = stp && XT.sk === 'lim' ? '' : 'none';
     $('#xtStL').textContent = `Stop price (${C.tok} per XRP)`; $('#xtSlL').textContent = `Worst price you'll accept (${C.tok} per XRP)`;
     if (stp && !$('#xtStop').value) { const b = XT.bids[0], a = XT.asks[0], m = b && a ? (b[0] + a[0]) / 2 : 0; if (m) $('#xtStop').value = (m * (XT.side === 'sell' ? 0.98 : 1.02)).toFixed(4); }
-    $('#xtStNote').textContent = !stp ? '' : XT.sk === 'mkt'
-      ? `When XRP-USD reaches your stop, it ${XT.side === 'sell' ? 'sells' : 'buys'} at up to ${XST_MKT}% ${XT.side === 'sell' ? 'below' : 'above'} it. Any part that can't fill there stays open as an order.`
-      : `When XRP-USD reaches your stop, it places a limit order at your worst price. It fills at that price or better; the rest stays open as an order.`;
+    { const sv = +$('#xtStop').value || 0, dn = XT.side === 'sell';
+      $('#xtStNote').innerHTML = !stp ? '' : XT.sk === 'mkt'
+        ? `When XRP-USD ${dn ? 'falls' : 'rises'} to ${sv > 0 ? sv.toFixed(4) : 'your stop'}, it ${dn ? 'sells' : 'buys'} at market, at most ${xstCap()}% ${dn ? 'below' : 'above'} the stop${sv > 0 ? ` (${xtStopLim().toFixed(4)})` : ''}. <a href="#" data-go="set">Change in Settings</a>`
+        : `When XRP-USD ${dn ? 'falls' : 'rises'} to ${sv > 0 ? sv.toFixed(4) : 'your stop'}, it places your limit order.`; }
   }
   const g = $('#xtGo'); if (g) { g.textContent = (XT.side === 'buy' ? 'Buy' : 'Sell') + (stp ? ' stop' : ''); g.className = (XT.side === 'buy' ? 'b-grn' : 'b-pur') + ' big'; }
 }
 function xtStopLim() {   /* worst price: market stop = stop ∓ 5%, stop-limit = what you typed */
   const st = +($('#xtStop') || {}).value || 0; if (!(st > 0)) return 0;
   if (XT.sk === 'lim') return +$('#xtSl').value || 0;
-  return +(st * (XT.side === 'sell' ? 1 - XST_MKT / 100 : 1 + XST_MKT / 100)).toFixed(6);
+  return +(st * (XT.side === 'sell' ? 1 - xstCap() / 100 : 1 + xstCap() / 100)).toFixed(6);
 }
 const xstAll = () => (NS().xst = NS().xst || []);
 const xstOf = (addr) => xstAll().filter((x) => x.addr === addr);
@@ -15289,7 +15299,7 @@ async function xtStopReview2(o, C, q, buy) {
   const lines = [...await xrBusy(o.w.classicAddress),   /* warnings (a bot on this wallet …) stay as their own lines */
     { k: 'Triggers when', v: `XRP-USD ${buy ? 'rises' : 'falls'} to ${st.toFixed(4)}`, n: 'Coinbase, Kraken, Binance', hl: 1 },
     { k: buy ? 'Buy' : 'Sell', v: `${m2(q)} XRP` },
-    { k: 'Worst price', v: `${lim.toFixed(4)} ${tk}`, n: XT.sk === 'mkt' ? `market stop · up to ${XST_MKT}% past` : 'stop-limit' },
+    { k: 'Worst price', v: `${lim.toFixed(4)} ${tk}`, n: XT.sk === 'mkt' ? `market stop · up to ${xstCap()}% past` : 'stop-limit' },
     ...(lf ? [{ k: 'Liquidfi fee', v: `${xq4(lf)} XRP`, n: `${XR_FEE.bps / 100}% · only if it fills` }] : []),
     { k: 'Ends', v: xstEnds(Date.now() + days * 86400000), n: `${days} day${days > 1 ? 's' : ''}` },
     { k: 'Set aside', v: `${m2(nT * sv.inc)} XRP`, n: 'back when it ends' },
@@ -15743,7 +15753,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.44h';
+const APP_VER = 'v2.45d';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16393,12 +16403,12 @@ function stHave() {
 }
 function stPaintForm() {
   $$('#stSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.side)); $$('#stMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.mode)); $$('#stQ button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.q));
-  const h = stHave(), g = $('#stGo'); g.textContent = ST.mode === 'stop' ? 'Coming next' : ST.mode === 'lim' ? `Review ${ST_LT[ST.lt] || 'Limit'} ${ST.side === 'buy' ? 'buy' : 'sell'}` : ST.side === 'buy' ? 'Buy SOL' : 'Sell SOL'; g.className = (ST.side === 'buy' ? 'b-grn' : 'b-red') + ' big'; g.disabled = ST.mode === 'stop';
+  const h = stHave(), g = $('#stGo'); g.textContent = ST.mode === 'stop' ? `Review ${ST.side === 'buy' ? 'buy' : 'sell'} stop` : ST.mode === 'lim' ? `Review ${ST_LT[ST.lt] || 'Limit'} ${ST.side === 'buy' ? 'buy' : 'sell'}` : ST.side === 'buy' ? 'Buy SOL' : 'Sell SOL'; g.className = (ST.side === 'buy' ? 'b-grn' : 'b-red') + ' big'; g.disabled = false; sstPaintForm();
   { const w = $('#stLimW'); if (w) w.style.display = ST.mode === 'lim' ? 'flex' : 'none'; const pw = $('#stPxW'); if (pw) pw.style.display = ST.mode === 'lim' ? '' : 'none'; { const ls = $('#stLtSel'); if (ls && ls.value !== ST.lt) ls.value = ST.lt; } const pq = $('#stPxQ'); if (pq) pq.textContent = ST.q;
     const ln = $('#stLtNote'); if (ln) ln.textContent = { lim: 'Takes everything shown at or better than your price across Solana now (each venue fill or kill), then posts the rest on Manifest at your price.', law: 'Fee-aware: takes now only where a venue pays enough better than your price to cover the 0.25% fee, so you never net worse than your price. The rest posts on Manifest at your price, no fee.', ioc: 'Takes everything shown at or better than your price now; the rest is cancelled. Nothing is posted.', fok: 'All of it now at or better than your price, or nothing trades.', post: 'Posts on Manifest at your price and never trades on arrival. If it would cross Manifest’s book it is rejected.' }[ST.lt] || ''; }
   { const mf = ST.mode === 'lim' && ST.mfFree && ST.mfFree.q === ST.q ? ST.mfFree : null, onM = mf ? (ST.side === 'buy' ? (mf.quote >= 0.01 ? ` + ${m2(mf.quote)} on Manifest` : '') : (mf.base >= 0.000001 ? ` + ${solAmt(mf.base)} on Manifest` : '')) : '';
     $('#stHave').textContent = ST.side === 'buy' ? `You have ${m2(h.q)} ${ST.q}${onM} to buy with` : `You have ${m2(h.sol)} SOL${onM} to sell (${SOL_KEEP} SOL stays for fees)`; }
-  const n = $('#stModeNote'); n.style.display = ST.mode === 'stop' ? '' : 'none'; n.textContent = ST.mode === 'stop' ? 'Stop orders on Solana are coming next. Market and limit orders work now.' : '';
+  const n = $('#stModeNote'); n.style.display = 'none'; n.textContent = '';
 }
 async function stEst() {   // live quote for the amount typed: what you pay / get, the minimum, Liquidfi's fee
   clearTimeout(ST.eT); const el = $('#stEst'); const amt = numIn(($('#stAmt') || {}).value);
@@ -16434,7 +16444,7 @@ function stLoop() {   // v2.41d: Manifest every 15 s; the 24 h volume card every
   clearTimeout(ST.timer); if (cur !== 'strade' || !K) return; let n = 0;
   const run = async () => { if (cur !== 'strade' || !K) return; if (document.visibilityState === 'visible') { if (n % 2 === 1) stFills();
       try { await stLoadClob(); ST.fails = 0; } catch (e) { ST.fails++; } if (cur === 'strade') stPaint();
-      if (n % 2 === 1 && cur === 'strade') mfMinePaint().catch(() => {});
+      if (n % 2 === 1 && cur === 'strade') { mfMinePaint().catch(() => {}); sstPaint().catch(() => {}); }
       n++; }
     ST.timer = setTimeout(run, ST.fails ? 45000 : 15000); };
   run();
@@ -16615,11 +16625,198 @@ function chInit() {
   window.addEventListener('resize', () => { if (CH.k && cur === CH.k) chPaint(); });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && CH.k && cur === CH.k && CH.on) chLoad(false); });
 }
+/* v2.45a SOL stops (Jeff: "lets get started w/ the stops for SOL" · "if it's a limit then our normal limit method. If it's market then
+   jupiter. Make sure we dont charge twice. These orders are the 25bps"). Signed here, held by a durable nonce, sent by your stop server.
+   - A small nonce account (authority = this wallet, ~0.0015 SOL, refunded) keeps the signed orders valid until they're used or cancelled.
+   - Two versions are signed on that ONE nonce, so at most one can ever land (the fee can never be charged twice):
+       'jup' = a Jupiter swap at your limit (stop-limit) / the 2% cap (stop-market), Liquidfi's 0.25% fee inside it;
+       'mf'  = the same order on Manifest (stop-limit: a resting limit order at your price; stop-market: IOC), same 0.25% fee
+       (Jeff: "we charge 25bps regardless if it goes to jupiter or manifest").
+   - The server sends 'jup' when SOL-USD crosses the stop; if Solana refuses it, it sends 'mf'.
+   - Cancel / cleanup = close the nonce account here: the signed orders can never apply, and its SOL comes back. */
+const SST_MKT = 2;   /* a market stop accepts up to 2% past the stop price (v2.45b: or 5%, the user's pick) */
+const sstCap = () => stopCap('sol');   /* v2.45c: Settings → Stop orders */
+const SST_SEED = 'lfstop';
+const SYSV_RBH = 'SysvarRecentB1ockHashes11111111111111111111', SYSV_RENT = 'SysvarRent111111111111111111111111111111111';
+const sstAll = () => (NS().sst = NS().sst || []);
+const sstOf = (addr) => sstAll().filter((x) => x.addr === addr);
+const sstLive = (x) => x.st === 'armed' || x.st === 'sending';
+const ixNonceCreate = (me, nonce, seed, lam) => sIx(SOL_PROG.sys, [{ k: me, s: 1, w: 1 }, { k: nonce, w: 1 }],
+  u8cat(u32le(3), b58d(me), u64le(seed.length), te.encode(seed), u64le(lam), u64le(80), b58d(SOL_PROG.sys)));
+const ixNonceInit = (nonce, auth) => sIx(SOL_PROG.sys, [{ k: nonce, w: 1 }, { k: SYSV_RBH }, { k: SYSV_RENT }], u8cat(u32le(6), b58d(auth)));
+const ixNonceAdvance = (nonce, auth) => sIx(SOL_PROG.sys, [{ k: nonce, w: 1 }, { k: SYSV_RBH }, { k: auth, s: 1 }], u32le(4));
+const ixNonceWithdraw = (nonce, auth, to, lam) => sIx(SOL_PROG.sys, [{ k: nonce, w: 1 }, { k: to, w: 1 }, { k: SYSV_RBH }, { k: SYSV_RENT }, { k: auth, s: 1 }], u8cat(u32le(5), u64le(lam)));
+async function sstNonceAddr(me, seed) { return b58e(new Uint8Array(await crypto.subtle.digest('SHA-256', u8cat(b58d(me), te.encode(seed), b58d(SOL_PROG.sys))))); }
+async function sstNonceRead(addr) {   /* → { auth, val, lam } or null */
+  const r = await solRpc('getAccountInfo', [addr, { encoding: 'base64', commitment: 'confirmed' }]), v = r && r.value; if (!v || v.owner !== SOL_PROG.sys) return null;
+  const d = ub64(v.data[0]); if (d.length !== 80 || d[4] !== 1) return null;
+  return { auth: b58e(d.slice(8, 40)), val: b58e(d.slice(40, 72)), lam: v.lamports };
+}
+/* tick/bin-based pools (concentrated liquidity) need accounts for the price range at the moment of the swap: a route signed days
+   earlier can break after a move. Stop routes leave them out; constant-product, market-maker and order-book venues work at any price. */
+const SST_NOTICK = /CLMM|Whirlpool|DLMM|Invariant|Crema|Byreal|Tuna|Pancake|Concentrated|Cropper|Stabble/i;
+const sstExclude = () => [...new Set(['Raydium CLMM', 'Whirlpool', 'Meteora DLMM', ...Object.values(JLAB || {}).filter((l) => SST_NOTICK.test(l))])].join(',');   /* the big three even before Jupiter's label list has loaded */
+function sstWorst(side, kind, stop, lim) { const c = sstCap(); return kind === 'lim' ? lim : +(stop * (side === 'sell' ? 1 - c / 100 : 1 + c / 100)).toFixed(6); }
+/* the Jupiter version: same building blocks as a Trade SOL swap, but its minimum is set from your stop/limit, not from today's price */
+async function sstJupIxs(o, d, a, Q, fits) {
+  const C = solCoins(d), buy = a.side === 'buy', F = buy ? C.find((c) => c.mint === Q.mint) : C.find((c) => c.v === 'SOL'), T = buy ? solTargets().find((c) => c.v === 'SOL') : solTargets().find((c) => c.mint === Q.mint);
+  if (!F || !T) throw new Error(buy ? `No ${a.q} in this wallet.` : 'No SOL in this wallet.');
+  const units = BigInt(Math.round(buy ? a.amt * a.worst * 10 ** F.d : a.amt * 1e9));
+  if (units > BigInt(Math.floor(F.a * 10 ** F.d))) throw new Error(buy ? `That needs ${m2(a.amt * a.worst)} ${a.q}; you have ${m2(F.a)}.` : `At most ${solAmt(F.a)} SOL.`);
+  const fc = { mint: F.mint, d: F.d, t22: F.t22, ata: F.ata, sol: F.v === 'SOL', sym: F.c }, FP = await solFeePlan(o, d, fc, units), sw = F.v === 'SOL' ? units : units - FP.tok;
+  const minOut = buy ? a.amt * 1e9 * (1 - 1e-9) : a.amt * a.worst * 10 ** Q.d, ex = sstExclude(); let last = null;
+  for (const lm of ['maxAccounts=30', 'maxAccounts=22', 'maxAccounts=16&onlyDirectRoutes=true']) {   /* the nonce instruction takes room too */
+    try {
+      const base = `${JUP}/quote?inputMint=${F.mint}&outputMint=${T.mint}&amount=${sw}&asLegacyTransaction=true&restrictIntermediateTokens=true&${lm}${ex ? '&excludeDexes=' + encodeURIComponent(ex) : ''}`;
+      const q0 = await getJ(base + '&slippageBps=1'); if (!q0 || !(+q0.outAmount > 0)) throw new Error('no route');
+      const out = +q0.outAmount; if (out < minOut) throw new Error(buy ? 'At today\'s price that would already be past your stop.' : 'SOL is already below that price: use a market or limit order.');
+      const slip = Math.max(1, Math.min(9900, Math.floor((1 - minOut / out) * 1e4)));
+      const q = await getJ(base + '&slippageBps=' + slip);
+      const r = await fetch(JUP + '/swap-instructions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quoteResponse: q, userPublicKey: o.addr, wrapAndUnwrapSol: true, asLegacyTransaction: true }) });
+      const j = await r.json().catch(() => ({})); if (!r.ok || !j.swapInstruction) throw new Error(j.error || "Jupiter couldn't build this swap.");
+      if ((j.addressLookupTableAddresses || []).length) throw new Error('too big');
+      const ixs = [...(FP.ix ? [FP.ix] : []), ...(j.setupInstructions || []).map((x) => jupIx(x, o.addr)), jupIx(j.swapInstruction, o.addr), ...(j.cleanupInstruction ? [jupIx(j.cleanupInstruction, o.addr)] : [])];
+      if (fits && !fits(ixs)) throw new Error('too big');   /* with the nonce step it must still fit one transaction: try a smaller route */
+      return { ixs, FP, via: [...new Set((q.routePlan || []).map((x) => (x.swapInfo || {}).label).filter(Boolean))].join(', '), min: +q.otherAmountThreshold };
+    } catch (e) { last = e; if (!/too big/.test(e.message || '')) throw e; }
+  }
+  throw last;
+}
+/* the Manifest version: the Liquidfi fee, then deposit what the order locks (all of it: the seat may be empty by then) and place it */
+async function sstMfIxs(o, M, a, d) {
+  const buy = a.side === 'buy', P = mfPrice(a.worst, M.bd, M.qd, buy), atoms = BigInt(Math.floor(a.amt * 1e9 + 1e-6)); if (atoms <= 0n || P.m <= 0) throw new Error('Order too small.');
+  const C = solCoins(d), F = buy ? C.find((c) => c.mint === M.quoteMint) : C.find((c) => c.v === 'SOL'); if (!F) throw new Error(buy ? `No ${a.q} in this wallet.` : 'No SOL in this wallet.');
+  const FP = await solFeePlan(o, d, { mint: F.mint, d: F.d, t22: F.t22, ata: F.ata, sol: F.v === 'SOL', sym: F.c }, BigInt(Math.round(buy ? a.amt * a.worst * 10 ** F.d : a.amt * 1e9)));
+  const ixs = FP.ix ? [FP.ix] : [];
+  if (buy) { const t = (SOLA[o.addr] || { toks: [] }).toks.find((x) => x.mint === M.quoteMint); if (!t || !t.ata) throw new Error(`No ${a.q} in this wallet.`);
+    ixs.push(ixMfDep(o.addr, M.key, t.ata, M.quoteVault, M.quoteMint, mfQuoteAtoms(atoms, P.m, P.e) + 1n)); }
+  else { const w = await solAta(o.addr, WSOL); ixs.push(ixAtaOpen(o.addr, w, o.addr, WSOL), ixSolPay(o.addr, w, Number(atoms)), ixSyncNative(w), ixMfDep(o.addr, M.key, w, M.baseVault, WSOL, atoms), ixTokClose(w, o.addr, o.addr)); }
+  ixs.push(ixMfBatch(o.addr, M.key, [], [{ atoms, m: P.m, e: P.e, bid: buy, t: a.kind === 'lim' ? 0 : 1 }]));   /* 0 = limit (crosses, rest rests), 1 = IOC */
+  return ixs;
+}
+function sstSign(o, nonce, val, ixs, cu) { const msg = solCompile(o.addr, [ixNonceAdvance(nonce, o.addr), ixCuLimit(cu), ixCuPrice(100000), ...ixs], val); if (msg.length > 1167) throw new Error('too big'); return solSign(solKp(o), msg); }
+async function sstCu(o, ixs) { try { return Math.max(60000, await solSim(o, ixs)); } catch (e) { return 400000; } }
+
+function sstPaintForm() {   /* the Stop fields on Trade SOL */
+  const w = $('#stStopW'); if (!w) return; const on = ST.mode === 'stop'; ST.sk = ST.sk || 'mkt'; w.style.display = on ? 'flex' : 'none'; if (!on) return;
+  $$('#stSk button').forEach((b) => b.classList.toggle('on', b.dataset.v === ST.sk)); $('#stSlW').style.display = ST.sk === 'lim' ? '' : 'none';
+  $('#stStL').textContent = `Stop price (${ST.q} per SOL)`; $('#stSlL').textContent = `Limit price (${ST.q} per SOL)`;
+  if (!$('#stStop').value) { const r = cxRef(), m = r.mid || SOLPX.sol; if (m) $('#stStop').value = (m * (ST.side === 'sell' ? 0.97 : 1.03)).toFixed(2); }
+  if (ST.sk === 'lim' && !$('#stSl').value && numIn($('#stStop').value) > 0) $('#stSl').value = sstWorst(ST.side, 'mkt', numIn($('#stStop').value)).toFixed(2);   /* a starting limit one Settings step past the stop */
+  const sv = numIn($('#stStop').value), sw = sstWorst(ST.side, 'mkt', sv), dn = ST.side === 'sell';
+  $('#stStNote').innerHTML = ST.sk === 'mkt'
+    ? `When SOL-USD ${dn ? 'falls' : 'rises'} to ${sv > 0 ? sv.toFixed(2) : 'your stop'}, it ${dn ? 'sells' : 'buys'} at market, at most ${sstCap()}% ${dn ? 'below' : 'above'} the stop${sv > 0 ? ` (${sw.toFixed(2)})` : ''}. <a href="#" data-go="set">Change in Settings</a>`
+    : `When SOL-USD ${dn ? 'falls' : 'rises'} to ${sv > 0 ? sv.toFixed(2) : 'your stop'}, it places your limit order.`;
+}
+async function sstReview(btn) {
+  const o = solOwn(solSel), d = SOLA[solSel]; if (!o || !d) return toast('Still loading. Try again in a moment.');
+  if (solNet() !== 'mainnet') return toast('SOL stops run on Solana Mainnet only.');
+  const amt = numIn(($('#stAmt') || {}).value), stop = numIn(($('#stStop') || {}).value), side = ST.side, kind = ST.sk === 'lim' ? 'lim' : 'mkt';
+  if (!(amt > 0)) return toast('Enter an amount of SOL.'); if (!(stop > 0)) return toast('Enter a stop price.');
+  const lim = kind === 'lim' ? numIn(($('#stSl') || {}).value) : sstWorst(side, 'mkt', stop); if (!(lim > 0)) return toast('Enter a limit price.');
+  if (side === 'buy' ? lim < stop : lim > stop) return toast(side === 'buy' ? 'For a buy stop the limit must be at or above the stop.' : 'For a sell stop the limit must be at or below the stop.');
+  if (Math.abs(lim / stop - 1) > 0.5) return toast('The limit is too far from the stop.');
+  const px = cxRef().mid || SOLPX.sol; if (px && (side === 'sell' ? stop >= px : stop <= px)) return toast(side === 'sell' ? `A sell stop must be below the price now (${px.toFixed(2)}). For a higher price use a limit order.` : `A buy stop must be above the price now (${px.toFixed(2)}). For a lower price use a limit order.`, 8000);
+  if (sstOf(o.addr).filter(sstLive).length >= 5) return toast('At most 5 SOL stops per wallet.');
+  const days = [1, 7, 30, 90].includes(+($('#stDays') || {}).value) ? +$('#stDays').value : 30;
+  let h; try { h = await stopApi('/health'); } catch (e) { return toast(niceErr(e)); } if (!h || !h.solStops) return toast('Your stop server needs the update for SOL stops (stopd 3.1): run Update-Stops-On-Vultr.bat.', 8000);
+  let rent = 1447680; try { rent = +(await solRpc('getMinimumBalanceForRentExemption', [80])) || rent; } catch (e) {}
+  const feeSol = side === 'sell' ? amt * SOL_FEE.bps / 1e4 : amt * lim * SOL_FEE.bps / 1e4 / (px || lim);
+  const needSol = rent / 1e9 + 0.0003 + feeSol + (side === 'sell' ? amt : 0), h2 = stHave();
+  if (d.sol < needSol + SOL_KEEP) return toast(`Not enough SOL: needs about ${solAmt(needSol)} (${side === 'sell' ? solAmt(amt) + ' to sell, ' : ''}${solAmt(rent / 1e9)} held while it waits, refunded${feeSol ? ', ' + solAmt(feeSol) + ' fee' : ''}) plus ${SOL_KEEP} kept for fees.`, 8000);
+  if (side === 'buy' && h2.q < amt * lim) return toast(`Not enough ${ST.q}: needs up to ${m2(amt * lim)} (have ${m2(h2.q)}).`);
+  const until = Date.now() + days * 86400000;
+  confirmSheet(`${side === 'buy' ? 'Buy' : 'Sell'} stop ${solAmt(amt)} SOL`, `Solana · ${esc(o.name)}`, [
+    { k: 'Triggers when', v: `SOL-USD ${side === 'buy' ? 'rises' : 'falls'} to ${stop.toFixed(2)}`, n: 'Coinbase, Kraken, Binance', hl: 1 },
+    { k: side === 'buy' ? 'Buy' : 'Sell', v: `${solAmt(amt)} SOL` },
+    { k: kind === 'lim' ? 'Limit' : 'Worst price', v: `${lim.toFixed(2)} ${ST.q}`, n: kind === 'lim' ? 'stop-limit · Jupiter, else your limit order on Manifest' : `stop-market · Jupiter, up to ${sstCap()}% past` },
+    { k: 'Liquidfi fee', v: `${SOL_FEE.bps / 100}%`, n: 'charged once, when it triggers (Jupiter or Manifest)' },
+    { k: 'Ends', v: xstEnds(until), n: `${days} day${days > 1 ? 's' : ''}` },
+    { k: 'Set aside', v: `${solAmt(rent / 1e9)} SOL`, n: 'back when it ends' },
+    { foot: `Keep the ${side === 'buy' ? ST.q : 'SOL'} in this wallet until then. Your stop server only sends what this phone signed; it never has your key.` }],
+    `Place ${side} stop`, () => sstArm(o, { side, kind, amt, stop, lim, worst: lim, q: ST.q, days, until, rent }), false, side === 'buy' ? 'b-grn' : 'b-red', 'Placing…', true);
+}
+async function sstArm(o, a) {
+  const me = o.addr, p = tPend(`Stop ${a.side} ${solAmt(a.amt)} SOL at ${a.stop.toFixed(2)}`, 'strade', me); let nonce = null;
+  MF_BUSY++;
+  try {
+    const seed = SST_SEED + Math.random().toString(36).slice(2, 10); nonce = await sstNonceAddr(me, seed);
+    let M = await mfLoad(a.q, true); const d0 = await solLoad(me, true);
+    tPendSet(p, 'Setting up…', 'mu', 'opening its nonce account' + (mfSeat(M, me) ? '' : ' and a Manifest seat'));
+    const setup = [ixNonceCreate(me, nonce, seed, a.rent), ixNonceInit(nonce, me), ...(mfSeat(M, me) ? [] : [ixMfClaim(me, M.key)])];
+    const r0 = await solSendIxs(o, setup); if (r0.state !== 'ok') { nonce = r0.state === 'failed' ? null : nonce; throw new Error(r0.state === 'failed' ? solTxErr(r0.err) : 'Setting up did not confirm.'); }
+    let N = null; for (let i = 0; i < 8 && !N; i++) { N = await sstNonceRead(nonce).catch(() => null); if (!N) await sleep(1500); }
+    if (!N || N.auth !== me) throw new Error("Couldn't read the new nonce account.");
+    tPendSet(p, 'Signing…', 'mu', 'both versions are signed on this phone');
+    const d = await solLoad(me, true), Q = stQ(); M = await mfLoad(a.q, true);
+    const fits = (ixs) => { try { sstSign(o, nonce, N.val, ixs, 400000); return true; } catch (e) { return false; } };
+    const J = await sstJupIxs(o, d, a, Q, fits).catch((e) => ({ err: e })), B = await sstMfIxs(o, M, a, d);
+    const txs = [];
+    if (!J.err) { try { txs.push({ k: 'jup', b64: u8b64(sstSign(o, nonce, N.val, J.ixs, await sstCu(o, J.ixs))) }); } catch (e) { J.err = e; } }
+    txs.push({ k: 'mf', b64: u8b64(sstSign(o, nonce, N.val, B, await sstCu(o, B))) });
+    tPendSet(p, 'Sending to your stop server…', 'mu', J.err ? 'Jupiter had no route right now: Manifest only' : '');
+    const j = await stopApi('/solstop/arm', { net: 'mainnet', wallet: me, side: a.side, q: a.q, kind: a.kind, amount: a.amt, stop: a.stop, limit: a.lim, end_at: Math.floor(a.until / 1000), nonce, txs });
+    sstAll().push({ id: j.id, token: j.token, addr: me, side: a.side, q: a.amt, quote: a.q, stop: a.stop, lim: a.lim, kind: a.kind, nonce, seed, st: 'armed', at: Date.now(), until: a.until, jup: !J.err }); saveS();
+    nonce = null; sstPaint();
+    tPendSet(p, '✓ Stop armed', 'grn', `${a.side === 'sell' ? 'sells' : 'buys'} if SOL-USD ${a.side === 'sell' ? 'falls' : 'rises'} to ${a.stop.toFixed(2)} · ends ${xstEnds(a.until)}${J.err ? ' · Manifest only (no Jupiter route now)' : ''}`, true);
+  } catch (e) {
+    tPendSet(p, 'Not placed', 'red', (e && e.message ? e.message : String(e)) + (nonce ? ' Closing its nonce account…' : ''), true);
+    if (nonce) sstClose(o, nonce).then((ok) => { if (ok) toast('Closed the stop\'s nonce account: its SOL is back.'); }).catch(() => {});
+  } finally { MF_BUSY--; }
+}
+async function sstClose(o, nonce) {   /* close a nonce account → its signed orders can never apply; the SOL comes back. true if closed (or already gone) */
+  const N = await sstNonceRead(nonce).catch(() => undefined); if (N === null) return true; if (!N || N.auth !== o.addr) return false;
+  const r = await solSendIxs(o, [ixNonceWithdraw(nonce, o.addr, o.addr, N.lam)]); return r.state === 'ok';
+}
+let SST_AT = 0;
+async function sstSync(addr, force) {
+  const L = sstOf(addr).filter((x) => sstLive(x) || Date.now() - (x.endAt || 0) < 86400000); if (!L.length || (!force && Date.now() - SST_AT < 8000)) return; SST_AT = Date.now();
+  let r; try { r = await stopApi('/solstop/status', { items: L.map((x) => ({ id: x.id, token: x.token })) }); } catch (e) { return; }
+  let ch = false;
+  for (const v of r.stops || []) { const x = sstAll().find((y) => y.id === v.id); if (!x) continue;
+    if (x.st === 'cancelled' && sstLive({ st: v.status })) continue;
+    if (x.st === v.status) { if ((v.note || '') !== (x.note || '')) { x.note = v.note || ''; ch = true; } continue; }
+    const was = x.st; Object.assign(x, { st: v.status, note: v.note || '', via: v.via, sig: v.sig }); if (!sstLive(x)) x.endAt = x.endAt || Date.now(); ch = true;
+    if (sstLive({ st: was }) && !sstLive(x)) toast(v.status === 'filled' ? `✓ SOL stop filled: ${x.side === 'sell' ? 'sold' : 'bought'} ${solAmt(x.q)} SOL` : v.status === 'placed' ? (x.kind === 'lim' ? `SOL stop triggered: your limit order went to Manifest at ${(+x.lim).toFixed(2)}` : 'SOL stop triggered: sent to Manifest (Jupiter could not fill it)') : v.status === 'expired' ? 'SOL stop ended: its time ran out.' : `SOL stop: ${v.note || v.status}`, 7000); }
+  if (ch) saveS();
+}
+async function sstCleanup(addr) {   /* ended stops: close their nonce accounts (refund) */
+  const o = solOwn(addr); if (!o) return;
+  for (const x of sstOf(addr)) { if (x.closed || sstLive(x) || !x.nonce || Date.now() - (x.closeTry || 0) < 300000) continue;
+    x.closeTry = Date.now(); try { if (await sstClose(o, x.nonce)) { x.closed = true; saveS(); } } catch (e) {} }
+}
+async function sstPaint() {
+  const el = $('#sstCards'); if (!el) return; const addr = solSel; await sstSync(addr); if (cur !== 'strade' || solSel !== addr) return;
+  const L = sstOf(addr).filter((x) => sstLive(x) || Date.now() - (x.endAt || 0) < 86400000);
+  el.innerHTML = L.map((x) => { const live = sstLive(x);
+    const t = x.st === 'armed' ? `waiting · ends ${xstEnds(x.until)}` : x.st === 'sending' ? 'triggered · sending' : x.st === 'filled' ? '✓ filled' + (x.via === 'mf' ? ' on Manifest' : ' through Jupiter') : x.st === 'placed' ? (x.kind === 'lim' ? 'triggered · limit order on Manifest' : 'triggered · sent to Manifest') : x.st === 'expired' ? 'ended · time ran out' : x.st === 'cancelled' ? 'cancelled' : 'did not fill' + (x.note ? ' · ' + x.note : '');
+    return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${x.side === 'sell' ? 't-sell' : 't-buy'}">STOP</span> <b class="mono">${x.side === 'sell' ? 'Sell' : 'Buy'} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}</b><div class="mono mu" style="font-size:12px">${x.kind === 'mkt' ? 'stop-market' : 'stop-limit ' + (+x.lim).toFixed(2)} ${esc(x.quote)} · <span class="${live ? 'amb' : x.st === 'filled' ? 'grn' : ''}">${esc(t)}</span></div></div>${live && x.st === 'armed' ? `<button class="b-redout sm" data-act="sstCancel" data-ss="${esc(x.id)}">Cancel</button>` : ''}</div>`; }).join('');
+  if (L.some((x) => !sstLive(x) && !x.closed)) sstCleanup(addr).catch(() => {});
+}
+function sstCancelSheet(id) {
+  const x = sstAll().find((y) => y.id === id), o = x && solOwn(x.addr); if (!x || !o) return;
+  confirmSheet('Cancel stop', `${x.side === 'sell' ? 'Sell' : 'Buy'} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}`, [
+    { t: 'Tell your stop server not to send it', hl: 1 },
+    { t: 'Close its nonce account on Solana', s: 'so the signed orders can never apply · its SOL comes back · tiny network fee' }], 'Cancel stop', async () => {
+    const p = tPend(`Cancel stop ${x.side} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}`, 'strade', x.addr, true);
+    try {
+      let sv = null; try { sv = await stopApi('/solstop/cancel', { id: x.id, token: x.token }); } catch (e) {}
+      const ss = sv && sv.stop && sv.stop.status;
+      if (ss && !['armed', 'cancelled'].includes(ss)) { Object.assign(x, { st: ss, note: sv.stop.note || '' }); if (!sstLive(x)) x.endAt = x.endAt || Date.now(); saveS(); sstPaint();
+        return tPendSet(p, 'Too late to cancel', 'amb', ss === 'sending' ? 'It already triggered: the order is going in now.' : `It already ${ss}.`, true); }
+      tPendSet(p, 'Cancelling…', 'mu', 'closing its nonce account');
+      const ok = await sstClose(o, x.nonce);
+      if (ok || ss === 'cancelled') { Object.assign(x, { st: 'cancelled', note: 'cancelled from the phone', endAt: Date.now(), closed: ok }); saveS(); sstPaint();
+        return tPendSet(p, '✓ Cancelled', 'grn', ok ? "the signed orders can't apply any more · its SOL is back" : 'your stop server won\'t send it · its SOL comes back next time you open Trade SOL', true); }
+      tPendSet(p, 'Not cancelled yet', 'red', "Couldn't reach your stop server or close the nonce account. The stop may still fire. Try again in a minute.", true);
+    } catch (e) { tPendSet(p, 'Not cancelled', 'red', e && e.message ? e.message : String(e), true); }
+  }, true, null, 'Cancelling…', true);
+}
 async function drawSTrade() {
   const w = solList().find((x) => x.addr === solSel); if (!w) return go('bots');
   $('#stFrom').textContent = w.name + ' ▾'; stPaintForm(); stPaint(); stPaintSales(); stPaintVol(); $('#stEst').innerHTML = '';
   if (!SOLA[solSel]) solLoad(solSel).then(() => { if (cur === 'strade') stPaintForm(); }).catch(() => {});
-  stLoop(); stFills(); cxStart(); chShow('strade', 'SOL-USD'); { const fw = $('#fqW'); if (fw) fw.style.display = DEV ? 'flex' : 'none'; } if (DEV) fqPaint(); mfMinePaint();
+  stLoop(); stFills(); cxStart(); chShow('strade', 'SOL-USD'); sstPaint().catch(() => {}); { const fw = $('#fqW'); if (fw) fw.style.display = DEV ? 'flex' : 'none'; } if (DEV) fqPaint(); mfMinePaint();
 }
 /* v2.41f router test + fill quality (Jeff: "Cb kraken mid price not valid unless size"): every SOL trade is scored against
    what the same amount of SOL would have cost walking the live Coinbase + Kraken books (VWAP), not the mid. */
@@ -17140,6 +17337,7 @@ ST.lt = 'lim';
 const numIn = (v) => { let t = String(v || '').trim().replace(/\s/g, ''); if (!t.includes('.') && /^\d*,\d+$/.test(t) && !/^[1-9]\d{0,2},\d{3}$/.test(t)) t = t.replace(',', '.'); return +t.replace(/,/g, ''); };   /* v2.42g: Jeff typed ",1" and got 1 SOL */
 async function stReview(btn) {
   if (ST.mode === 'lim') return stLimitReview(btn);
+  if (ST.mode === 'stop') return sstReview(btn);
   if (ST.mode !== 'mkt') return; let d = SOLA[solSel]; if (!d) return toast('Still loading. Try again in a moment.');
   const amt = numIn(($('#stAmt') || {}).value); if (!(amt > 0)) return toast('Enter an amount of SOL.');
   { const h = stHave(), o = solOwn(solSel), px0 = cxRef().ask || SOLPX.sol; if (o && (ST.side === 'buy' ? h.q < amt * px0 : h.sol < amt)) {
@@ -17151,12 +17349,12 @@ async function stReview(btn) {
   if (amt > sc.a + 1e-12) return toast(`At most ${m2(sc.a)} SOL: ${SOL_KEEP} stays for fees.`);
   return solSwapCore(sc, T.find((c) => c.mint === Q.mint), amt, btn, 'Sell SOL', `Sell ${solAmt(amt)} SOL`);
 }
-document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, #stLt button, #stBk button, [data-spct]'); if (!b || cur !== 'strade') return;
+document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#stQ button, #stSide button, #stMode button, #stLt button, #stBk button, #stSk button, [data-spct]'); if (!b || cur !== 'strade') return;
   if (b.parentElement.id === 'stBk') { ST.bkv = b.dataset.v; return stPaint(); }
   if (b.dataset.spct) { const h = stHave(), f = +b.dataset.spct / 100, lp = ST.mode === 'lim' ? numIn(($('#stPx') || {}).value) : 0, px = lp > 0 ? lp : cxRef().ask || SOLPX.sol;   /* a limit buy sizes off your limit price */ const v = ST.side === 'buy' ? (px > 0 ? h.q * f / px * 0.995 : 0) : h.sol * f; $('#stAmt').value = v > 0 ? String(Math.floor(v * 1e4) / 1e4) : ''; return stEst(); }
   const g = b.parentElement.id; if (g === 'stQ') { if (ST.q === b.dataset.v) return; ST.q = b.dataset.v; ST.jin = null; ST.bk = {}; ST.tops = null; cxStart(); ST.sales = []; ST.salesAt = 0; ST.at = 0; stPaint(); stPaintSales(); stPaintVol(); stLoop(); }
-  if (g === 'stSide') ST.side = b.dataset.v; if (g === 'stMode') ST.mode = b.dataset.v; if (g === 'stLt') ST.lt = b.dataset.v; stPaintForm(); stEst(); });
-document.addEventListener('input', (e) => { if (e.target && e.target.id === 'stAmt') stEst(); });
+  if (g === 'stSk') ST.sk = b.dataset.v; if (g === 'stSide') { if (ST.side !== b.dataset.v && $('#stStop')) { $('#stStop').value = ''; $('#stSl').value = ''; } ST.side = b.dataset.v; } if (g === 'stMode') ST.mode = b.dataset.v; if (g === 'stLt') ST.lt = b.dataset.v; stPaintForm(); stEst(); });
+document.addEventListener('input', (e) => { if (e.target && e.target.id === 'stAmt') stEst(); if (e.target && e.target.id === 'stStop') sstPaintForm(); if (e.target && e.target.id === 'xtStop' && typeof xtModeUI === 'function') xtModeUI(); });
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'eSoWal' && cur === 'earn') { solSel = e.target.value; return solEarnDraw(); } if (e.target && e.target.id === 'stLtSel' && cur === 'strade') { ST.lt = e.target.value; stPaintForm(); } });
 
 /* Earn: Jupiter Lend (mainnet). Rates come in basis points (389 = 3.89%). Deposit/withdraw instructions come from Jupiter's
@@ -17166,6 +17364,10 @@ const JL_SHOW = ['USDC', 'USDT', 'USDG', 'EURC', 'JupUSD'];
 let JLPOS = {};
 async function jlTokens() { if (JLT && Date.now() - JLT.at < 60000) return JLT; const r = await fetch(JL + '/earn/tokens'); if (!r.ok) throw new Error("Jupiter Lend isn't answering right now."); const j = await r.json(); j.at = Date.now(); return (JLT = j); }
 async function jlPositions(addr) { const r = await fetch(JL + '/earn/positions?users=' + addr); if (!r.ok) throw new Error("Jupiter Lend isn't answering right now."); return (JLPOS[addr] = await r.json()); }
+async function jlAtaIx(o, mint) {   /* open o's token account for this mint (idempotent: nothing happens if it's already there) */
+  let t22 = 0; try { const r = await solRpc('getAccountInfo', [mint, { encoding: 'base64', commitment: 'confirmed' }]); t22 = r && r.value && r.value.owner === SOL_PROG.tok22 ? 1 : 0; } catch (e) {}
+  return ixAtaOpen(o.addr, await solAta(o.addr, mint, t22), o.addr, mint, t22);
+}
 async function jlIx(kind, body) {
   const r = await fetch(`${JL}/earn/${kind}-instructions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error((j && (j.error || j.message)) || "Jupiter Lend couldn't build it.");
@@ -17240,9 +17442,11 @@ async function jlGo(kind, jm) {
       if (amt >= mx - 1e-9) units = BigInt(wt.raw);   /* Max: every last unit */
       FP = await solFeePlan(o, d, { mint: t.assetAddress, d: dec, t22: wt.t22, ata: wt.ata, sym }, units); fee = FP.tok;
       if (FP.ix) ixs.push(FP.ix);
+      ixs.push(await jlAtaIx(o, t.address));   /* v2.45d (Jeff hit Custom 3012 on his first USDC deposit): Jupiter's deposit expects your jl-token account to exist already ("recipient_token_account" not initialized). Opened here first; no-op when it exists. */
       ixs.push(...await jlIx('deposit', { asset: t.assetAddress, signer: o.addr, amount: String(units - fee) }));
     } else {
       const p = (JLPOS[solSel] || []).find((x) => (x.token && (x.token.address || x.token.id)) === jm);
+      ixs.push(await jlAtaIx(o, t.assetAddress));   /* the coin comes back to your plain token account: make sure it's open */
       if (amt >= mx - 1e-9 && p && +p.shares > 0) ixs.push(...await jlIx('redeem', { asset: t.assetAddress, signer: o.addr, shares: String(p.shares) }));   /* Max: all shares, nothing left behind */
       else ixs.push(...await jlIx('withdraw', { asset: t.assetAddress, signer: o.addr, amount: String(units) }));
     }
@@ -21047,7 +21251,7 @@ const hexOk = (h, n) => typeof h === 'string' && new RegExp(`^[0-9a-f]{${n}}$`).
 const stopSig = (kp, msg) => b64(kp.sign(new TextEncoder().encode(msg)));
 async function stopApi(path, body) {
   if (!S.stopUrl) throw new Error('Set your stop server in Settings → Stop orders.');
-  if (body && /^\/(arm|arm_own|list|xrp\/arm|xrp\/status)$/.test(path) && !('push' in body)) body = { ...body, push: pushRef() };   /* which alert id this phone's stops use (null = alerts off) */
+  if (body && /^\/(arm|arm_own|list|xrp\/arm|xrp\/status|solstop\/arm|solstop\/status)$/.test(path) && !('push' in body)) body = { ...body, push: pushRef() };   /* which alert id this phone's stops use (null = alerts off) */
   let r; for (let i = 0; ; i++) {   /* a read (GET) is tried 3 times: the first request after the phone or the tunnel was idle sometimes drops */
     try { r = await fetch(S.stopUrl.replace(/\/+$/, '') + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' }); break; }
     catch (e) { if (body || i >= 2) throw new Error("Can't reach your stop server. Check your connection and try again."); await sleep(1500); } }
@@ -21124,9 +21328,11 @@ async function stopList(addr) {
 }
 const p4 = (x) => (+x).toFixed(x < 1 ? 6 : 4);
 // how far past the stop it may fill: 0.5 / 1 / 2 %, Market (= up to STOP_MKT % so a flash crash can't sell for almost nothing), or Custom
-const STOP_MKT = 5, STOP_MKT_STABLE = 1;   // XLM moves a lot; EURC and other coins against a dollar coin barely do, so a market stop goes at most 1% past
-const stopMkt = () => (TP().b === 'XLM' ? STOP_MKT : STOP_MKT_STABLE);
-const limMode = () => (['0.5', '1', '2', 'mkt', 'custom'].includes(String(S.stopLim)) ? String(S.stopLim) : 'mkt');   // Market is the default
+/* v2.45c (Jeff: "it should be regardless of asset, anything on XLM blockchain will be defaulted to whatever number is here. Maybe we should
+   default all of them 1%"): one market-stop cap per blockchain, set in Settings → Stop orders (1 / 2 / 5%, default 1%) */
+const stopCap = (k) => { const v = +((S && S.stopCap) || {})[k]; return [1, 2, 5].includes(v) ? v : 1; };
+const stopMkt = () => stopCap('xlm');
+const limMode = () => (String(S.stopLim) === 'custom' ? 'custom' : 'mkt');   // Stop-market (default) or Stop-limit
 const limPct = () => (limMode() === 'mkt' ? stopMkt() : +limMode());
 function stopDefaults() {
   feedOpts();
@@ -21140,7 +21346,7 @@ function stopDefaults() {
   const st = +$('#tStop').value;
   if (mode !== 'custom' && st > 0) $('#tLim').value = (sell ? st * (1 - limPct() / 100) : st * (1 + limPct() / 100)).toFixed(6);
   const lim = +$('#tLim').value;
-  $('#tLimTxt').textContent = !(st > 0 && lim > 0) ? '' : mode === 'mkt' ? `Market: fills at the best price on the book, down to ${p4(lim)} (${stopMkt()}% ${sell ? 'below' : 'above'} the stop) as a safety floor`
+  $('#tLimTxt').innerHTML = !(st > 0 && lim > 0) ? '' : mode === 'mkt' ? `${sell ? 'Sells' : 'Buys'} at market, at most ${stopMkt()}% ${sell ? 'below' : 'above'} the stop (${p4(lim)}). <a href="#" data-go="set" style="font-weight:400;font-size:13px">Change in Settings</a>`
     : `Limit ${p4(lim)} · ${(Math.abs(lim / st - 1) * 100).toFixed(2)}% ${sell ? 'below' : 'above'} the stop`;
 }
 function stopEst(q, el) {
@@ -21251,7 +21457,7 @@ function stopEdit(id) {
   const w = STOPS.addr; homeAddr = w;
   { const b = x.base || 'XLM', q = x.quote || uKey(); if (TP().b !== b || TP().q !== q) { NS().tPair = { b, q }; saveS(); } }
   T.mode = 'stop'; T.side = x.side; T.replace = { id: x.id, xlm: +x.xlm, coin: x.coin || 'XLM', stop: +x.stop, side: x.side, w, guard: x.guard != null ? +x.guard : null };   // the replacement keeps the old stop's price guard (Settings stays as it is)
-  if (['0.5', '1', '2', 'mkt', 'custom'].includes(String(x.lim_mode))) S.stopLim = String(x.lim_mode); else S.stopLim = 'custom';
+  S.stopLim = String(x.lim_mode) === 'mkt' ? 'mkt' : 'custom';   /* an older 0.5 / 1 / 2% stop edits as a stop-limit at its own price */
   saveS();
   const fill = () => {
     $('#tAmt').value = String(+(+x.xlm).toFixed(7)); $('#tStop').value = String(+x.stop); T.stopTyped = true; T.stopSide = x.side;
@@ -21316,6 +21522,7 @@ async function stopStatus(h) {
 const stopGuard = () => { const g = S.stopGuard; return g === 0 || [1, 1.5, 3].includes(g) ? g : 1.5; };   // price guard %, 0 = off
 function drawStopSet() {
   $$('#setGuard button').forEach((b) => b.classList.toggle('on', +b.dataset.v === stopGuard()));
+  for (const k of ['xlm', 'xrp', 'sol']) $$('#setCap' + k[0].toUpperCase() + k.slice(1) + ' button').forEach((b) => b.classList.toggle('on', +b.dataset.v === stopCap(k)));
   $('#setStopUrl').value = S.stopUrl || '';
   if (!S.stopUrl) { $('#setStopSt').textContent = 'Off. Add your stop server to use stop orders.'; return; }
   $('#setStopSt').textContent = 'Checking…'; fetch(S.stopUrl + '/health').then((r) => r.json()).then((j) => servesNet(j) ? stopStatus(j) : ($('#setStopSt').innerHTML = `<span class="amb">Doesn't serve ${netWord()}.</span>`)).catch(() => { $('#setStopSt').innerHTML = '<span class="amb">Not answering right now.</span>'; });
@@ -21983,6 +22190,7 @@ document.addEventListener('click', async (e) => {
     if (seg === 'setSlip') { S.slip = +v; saveS(); return drawSet(); }
     if (seg === 'setFlat') { S.flatTo = v; saveS(); return drawSet(); }
     if (seg === 'setGuard') { S.stopGuard = +v; saveS(); return drawStopSet(); }
+    if (/^setCap(Xlm|Xrp|Sol)$/.test(seg)) { S.stopCap = { ...(S.stopCap || {}), [seg.slice(6).toLowerCase()]: +v }; saveS(); return drawStopSet(); }
     if (seg === 'setSwSlip') { S.swSlip = +v; saveS(); return drawSet(); }
     if (seg === 'setCol') { S.col = v; saveS(); applyCol(); return drawSet(); }
     if (seg === 'setNet') return setNet(v);
@@ -22066,7 +22274,7 @@ document.addEventListener('click', async (e) => {
         ${XL.length ? `<span class="lbl">XRP Ledger</span><div class="card" style="padding:0 14px;gap:0">${XL.map((w) => { const d = XRA[w.addr]; return row(w.addr, w.name, d && d.a ? '$' + fx(xrUsd(d)) : d && d.a === null ? 'not activated' : '', 'xrp'); }).join('')}</div>` : ''}
         ${SL.length ? `<span class="lbl">Solana</span><div class="card" style="padding:0 14px;gap:0">${SL.map((w) => { const d = SOLA[w.addr]; return row(w.addr, w.name, d ? '$' + fx(solUsd(d)) : '', 'sol'); }).join('')}</div>` : ''}<button class="b-out" data-act="closeSheet">Close</button>`);
     },
-    l2Trade: () => l2Trade(), tWalGo: () => { closeSheet(); if (t.dataset.k === 'sol') { solSel = t.dataset.addr; return cur === 'strade' ? drawSTrade() : go('strade'); } if (t.dataset.k === 'xrp') { xrSel = t.dataset.addr; return cur === 'xtrade' ? drawXTrade() : go('xtrade'); }
+    l2Trade: () => l2Trade(), sstCancel: () => sstCancelSheet(t.dataset.ss), tWalGo: () => { closeSheet(); if (t.dataset.k === 'sol') { solSel = t.dataset.addr; return cur === 'strade' ? drawSTrade() : go('strade'); } if (t.dataset.k === 'xrp') { xrSel = t.dataset.addr; return cur === 'xtrade' ? drawXTrade() : go('xtrade'); }
       homeAddr = t.dataset.addr; S.tradeLast = homeAddr; saveS(); return cur === 'trade' ? drawTrade() : go('trade'); },
     fundOpen: phGate(() => fundSheet()), fundReview: () => fundReview(),
     pinChange: () => pinChangeSheet(), pinChangeOk: () => pinChangeOk(),
