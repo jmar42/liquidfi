@@ -671,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45j · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45m · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15755,7 +15755,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45j';
+const APP_VER = 'v2.45m';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -15822,8 +15822,8 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx11') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx11', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx12') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx12', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
@@ -15835,7 +15835,19 @@ const SOL_VEN = { CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: 'Raydium CLMM', 
 /* v2.42v (Jeff: "What about adding our fee in the update details?") */
 const lfeeTxt = (f) => (!f || f.sol < 1e-9 ? 'none' : `${solAmt(f.sol)} SOL ($${f.usd.toFixed(f.usd < 0.1 ? 3 : 2)}) · ${f.pct.toFixed(2)}%`);
 const solVen = (m) => [...new Set((m.innerInstructions || []).flatMap((x) => x.instructions || []).map((x) => SOL_VEN[x.programId] || JLAB[x.programId]).filter((v) => v && v !== 'Jupiter'))].join(', ');
-function solTxSum(addr, t) { const R = solTxSum0(addr, t); try { const mm = solTxMemo(t); if (mm && R) { if (mm.startsWith(SPM_PRE)) R.pmemo = mm.slice(SPM_PRE.length); else R.memo = mm; } } catch (e) {} return R; }
+function solTxSum(addr, t) { const R = solTxSum0(addr, t); try { const mm = solTxMemo(t); if (mm && R) { if (mm.startsWith(SPM_PRE)) R.pmemo = mm.slice(SPM_PRE.length); else R.memo = mm; } } catch (e) {}
+  try { const N = solTxNonce(t); if (N && R) Object.assign(R, N); } catch (e) {} return R; }
+/* v2.45k (Jeff: "it should have details of the order. Sell at xyz stop xyzz open, cancelled, filled"): which stop step a transaction is.
+   'open' = its nonce account was made, 'fire' = a signed stop order ran (it starts by using the nonce), 'close' = the nonce was closed (cancel / cleanup) */
+function solTxNonce(t) {
+  const I = (((t || {}).transaction || {}).message || {}).instructions || [], P = (x) => (x && x.parsed) || {}, nn = [];
+  const first = P(I[0]); if (first.type === 'advanceNonce') return { nk: 'fire', nonce: (first.info || {}).nonceAccount, nonces: I.map(P).filter((p) => p.type === 'advanceNonce').map((p) => p.info.nonceAccount), jupx: I.some((x) => x.programId === JUP_PROG), mfx: I.some((x) => x.programId === MNF_PROG) };
+  for (const x of I) { const p = P(x); if (p.type === 'initializeNonce') nn.push(p.info.nonceAccount); }
+  if (nn.length) return { nk: 'open', nonce: nn[0], nonces: nn };
+  for (const x of I) { const p = P(x); if (p.type === 'withdrawFromNonce') nn.push(p.info.nonceAccount); }
+  if (nn.length) return { nk: 'close', nonce: nn[0], nonces: nn };
+  return null;
+}
 const solTxMemo = (t) => { const ins = [...((((t || {}).transaction || {}).message || {}).instructions || [])]; const m = ins.find((x) => x.programId === SOL_MEMO || x.program === 'spl-memo'); if (!m) return null; return typeof m.parsed === 'string' ? m.parsed : m.data ? (() => { try { return new TextDecoder('utf-8', { fatal: true }).decode(b58d(m.data)); } catch (e) { return null; } })() : null; };
 function solTxSum0(addr, t) {
   const m = t.meta || {}, keys = ((t.transaction || {}).message || {}).accountKeys || [], K = keys.map((k) => (typeof k === 'string' ? k : k.pubkey));
@@ -15886,8 +15898,9 @@ async function solRecent(addr) {
     if (solSel !== addr) return;
     const LL = [...(L || []), ...mfFillRows(addr)].sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
     const paint = () => { setTimeout(() => spmFill(el), 0); const STR = mfStory(L, addr), GR = solGroups(L, addr, STR), GH = {}; for (const g of Object.values(GR.G)) GH[g.last] = solGroupHtml(g, L, addr, STR);
+      const SG = sstGroups(L, addr), SH = {}; for (const g of Object.values(SG.G)) SH[g.sigs[0]] = sstGroupHtml(g, L, addr).html;   /* one line per stop (newest step shows it) */
       const gTxt = Object.values(GH).map((h) => h.head).join('|'), gF = new Set(Object.values(GR.G).flatMap((g) => (g.pf || []).map((f) => f.t)));
-      el.innerHTML = LL.length ? LL.map((s) => { if (GH[s.signature]) return GH[s.signature].html; if (GR.of[s.signature]) return '';
+      el.innerHTML = LL.length ? LL.map((s) => { if (SH[s.signature]) return SH[s.signature]; if (SG.of[s.signature]) return ''; if (GH[s.signature]) return GH[s.signature].html; if (GR.of[s.signature]) return '';
         if (s.fill && gF.has(s.fill.t)) return '';
         if (s.fill && gTxt.includes(`${s.fill.bid ? 'Bought' : 'Sold'} ${solAmt(s.fill.sol)} SOL at ${(+s.fill.px).toFixed(2)}`)) return '';
         if (s.fill) return `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order (seen ${esc(new Date(s.fill.t).toLocaleString())})</span></div></div></details>`; const x = SOLTX[s.signature + addr];
@@ -16442,7 +16455,10 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
     /* v2.43b (Jeff: "It doesn't show the fees for network?"): Your trades opens to the same details as Recent: order, fills, Liquidfi fee, network fees */
     const gDone = new Set(), rw2 = (k, v) => `<div><span style="white-space:nowrap">${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
     const plain = (s, x) => `<details class="recrow"><summary><span>${esc(x.txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd">${x.lfee ? rw2('Liquidfi fee', esc(lfeeTxt(x.lfee))) : ''}${x.fee ? rw2('Network fee', solAmt(x.fee) + ' SOL') : ''}${s.blockTime ? rw2('Time', esc(new Date(s.blockTime * 1000).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }))) : ''}<div><span></span><a class="b-out sm" href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`;
-    el.innerHTML = R.length ? R.map((s) => { const gid = s.signature && GR2.of[s.signature], g = gid && GR2.G[gid];
+    const SG2 = sstGroups(L, addr), sDone = new Set(), stopRows = Object.values(SG2.G).map((g) => ({ blockTime: (L.find((y) => y.signature === g.sigs[0]) || {}).blockTime || 0, stopG: g }));
+    R.push(...stopRows.filter((r) => !R.some((s) => SG2.of[s.signature]))); R.sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
+    el.innerHTML = R.length ? R.map((s) => { if (s.stopG) return sstGroupHtml(s.stopG, L, addr).html; if (s.signature && SG2.of[s.signature]) { const k = SG2.of[s.signature]; if (sDone.has(k)) return ''; sDone.add(k); return sstGroupHtml(SG2.G[k], L, addr).html; }
+      const gid = s.signature && GR2.of[s.signature], g = gid && GR2.G[gid];
       if (g) { if (gDone.has(gid)) return ''; gDone.add(gid); return solGroupHtml(g, L, addr, ST2).html; }
       if (!s.fill && SOLTX[s.signature + addr] && !ST2[s.signature]) return plain(s, SOLTX[s.signature + addr]);
       return ST2[s.signature] ? `<details class="recrow"><summary><span>${esc(ST2[s.signature].txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd">${(SOLTX[s.signature + addr] || {}).fee ? rw2('Network fee', solAmt(SOLTX[s.signature + addr].fee) + ' SOL') : ''}<a class="b-out sm" href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></details>` : s.fill ? `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order</span></div></div></details>` : `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
@@ -16703,7 +16719,8 @@ async function sstMfIxs(o, M, a, d) {
   ixs.push(ixMfBatch(o.addr, M.key, [], [{ atoms, m: P.m, e: P.e, bid: buy, t: a.kind === 'lim' ? 0 : 1 }]));   /* 0 = limit (crosses, rest rests), 1 = IOC */
   return ixs;
 }
-function sstSign(o, nonce, val, ixs, cu) { const msg = solCompile(o.addr, [ixNonceAdvance(nonce, o.addr), ixCuLimit(cu), ixCuPrice(100000), ...ixs], val); if (msg.length > 1167) throw new Error('too big'); return solSign(solKp(o), msg); }
+function sstSign(o, nonce, val, ixs, cu, other) {   /* other: the other version's nonce, advanced too, so if this one fills the other can never land (a failed landing keeps only its own nonce move) */
+  const msg = solCompile(o.addr, [ixNonceAdvance(nonce, o.addr), ...(other ? [ixNonceAdvance(other, o.addr)] : []), ixCuLimit(cu), ixCuPrice(100000), ...ixs], val); if (msg.length > 1167) throw new Error('too big'); return solSign(solKp(o), msg); }
 async function sstCu(o, ixs) { try { return Math.max(60000, await solSim(o, ixs)); } catch (e) { return 400000; } }
 
 function sstPaintForm() {   /* the Stop fields on Trade SOL */
@@ -16728,9 +16745,10 @@ async function sstReview(btn) {
   const px = cxRef().mid || SOLPX.sol; if (px && (side === 'sell' ? stop >= px : stop <= px)) return toast(side === 'sell' ? `A sell stop must be below the price now (${px.toFixed(2)}). For a higher price use a limit order.` : `A buy stop must be above the price now (${px.toFixed(2)}). For a lower price use a limit order.`, 8000);
   if (sstOf(o.addr).filter(sstLive).length >= 5) return toast('At most 5 SOL stops per wallet.');
   const days = [1, 7, 30, 90].includes(+($('#stDays') || {}).value) ? +$('#stDays').value : 30;
-  let h; try { h = await stopApi('/health'); } catch (e) { return toast(niceErr(e)); } if (!h || !h.solStops) return toast('Your stop server needs the update for SOL stops (stopd 3.1): run Update-Stops-On-Vultr.bat.', 8000);
+  let h; try { h = await stopApi('/health'); } catch (e) { return toast(niceErr(e)); } if (!h || !h.solStops || +h.version < 3.3) return toast('Your stop server needs the update for SOL stops (stopd 3.3): run Update-Stops-On-Vultr.bat.', 8000);
   let rent = 1447680; try { rent = +(await solRpc('getMinimumBalanceForRentExemption', [80])) || rent; } catch (e) {}
   const feeSol = side === 'sell' ? amt * SOL_FEE.bps / 1e4 : amt * lim * SOL_FEE.bps / 1e4 / (px || lim);
+  rent *= 2;   /* two nonce accounts: one per version */
   const needSol = rent / 1e9 + 0.0003 + feeSol + (side === 'sell' ? amt : 0), h2 = stHave();
   if (d.sol < needSol + SOL_KEEP) return toast(`Not enough SOL: needs about ${solAmt(needSol)} (${side === 'sell' ? solAmt(amt) + ' to sell, ' : ''}${solAmt(rent / 1e9)} held while it waits, refunded${feeSol ? ', ' + solAmt(feeSol) + ' fee' : ''}) plus ${SOL_KEEP} kept for fees.`, 8000);
   if (side === 'buy' && h2.q < amt * lim) return toast(`Not enough ${ST.q}: needs up to ${m2(amt * lim)} (have ${m2(h2.q)}).`);
@@ -16746,36 +16764,38 @@ async function sstReview(btn) {
     `Place ${side} stop`, () => sstArm(o, { side, kind, amt, stop, lim, worst: lim, q: ST.q, days, until, rent }), false, side === 'buy' ? 'b-grn' : 'b-red', 'Placing…', true);
 }
 async function sstArm(o, a) {
-  const me = o.addr, p = tPend(`Stop ${a.side} ${solAmt(a.amt)} SOL at ${a.stop.toFixed(2)}`, 'strade', me); let nonce = null;
+  const me = o.addr, p = tPend(`Stop ${a.side} ${solAmt(a.amt)} SOL at ${a.stop.toFixed(2)}`, 'strade', me); let nonce = null, nonce2 = null;
   MF_BUSY++;
   try {
-    const seed = SST_SEED + Math.random().toString(36).slice(2, 10); nonce = await sstNonceAddr(me, seed);
+    const seed = SST_SEED + Math.random().toString(36).slice(2, 10), seed2 = seed + 'm'; nonce = await sstNonceAddr(me, seed); nonce2 = await sstNonceAddr(me, seed2);
     let M = await mfLoad(a.q, true); const d0 = await solLoad(me, true);
-    tPendSet(p, 'Setting up…', 'mu', 'opening its nonce account' + (mfSeat(M, me) ? '' : ' and a Manifest seat'));
-    const setup = [ixNonceCreate(me, nonce, seed, a.rent), ixNonceInit(nonce, me), ...(mfSeat(M, me) ? [] : [ixMfClaim(me, M.key)])];
-    const r0 = await solSendIxs(o, setup); if (r0.state !== 'ok') { nonce = r0.state === 'failed' ? null : nonce; throw new Error(r0.state === 'failed' ? solTxErr(r0.err) : 'Setting up did not confirm.'); }
-    let N = null; for (let i = 0; i < 8 && !N; i++) { N = await sstNonceRead(nonce).catch(() => null); if (!N) await sleep(1500); }
-    if (!N || N.auth !== me) throw new Error("Couldn't read the new nonce account.");
+    tPendSet(p, 'Setting up…', 'mu', 'opening its two nonce accounts' + (mfSeat(M, me) ? '' : ' and a Manifest seat'));
+    const setup = [ixNonceCreate(me, nonce, seed, a.rent / 2), ixNonceInit(nonce, me), ixNonceCreate(me, nonce2, seed2, a.rent / 2), ixNonceInit(nonce2, me), ...(mfSeat(M, me) ? [] : [ixMfClaim(me, M.key)])];
+    const r0 = await solSendIxs(o, setup); if (r0.state !== 'ok') { if (r0.state === 'failed') nonce = nonce2 = null; throw new Error(r0.state === 'failed' ? solTxErr(r0.err) : 'Setting up did not confirm.'); }
+    let N = null, N2 = null; for (let i = 0; i < 8 && !(N && N2); i++) { N = N || await sstNonceRead(nonce).catch(() => null); N2 = N2 || await sstNonceRead(nonce2).catch(() => null); if (!(N && N2)) await sleep(1500); }
+    if (!N || N.auth !== me || !N2 || N2.auth !== me) throw new Error("Couldn't read the new nonce accounts.");
     tPendSet(p, 'Signing…', 'mu', 'both versions are signed on this phone');
     const d = await solLoad(me, true), Q = stQ(); M = await mfLoad(a.q, true);
-    const fits = (ixs) => { try { sstSign(o, nonce, N.val, ixs, 400000); return true; } catch (e) { return false; } };
+    const fits = (ixs) => { try { sstSign(o, nonce, N.val, ixs, 400000, nonce2); return true; } catch (e) { return false; } };
     const J = await sstJupIxs(o, d, a, Q, fits).catch((e) => ({ err: e })), B = await sstMfIxs(o, M, a, d);
     const txs = [];
-    if (!J.err) { try { txs.push({ k: 'jup', b64: u8b64(sstSign(o, nonce, N.val, J.ixs, await sstCu(o, J.ixs))) }); } catch (e) { J.err = e; } }
-    txs.push({ k: 'mf', b64: u8b64(sstSign(o, nonce, N.val, B, await sstCu(o, B))) });
+    if (!J.err) { try { txs.push({ k: 'jup', b64: u8b64(sstSign(o, nonce, N.val, J.ixs, await sstCu(o, J.ixs), nonce2)) }); } catch (e) { J.err = e; } }
+    txs.push({ k: 'mf', b64: u8b64(sstSign(o, nonce2, N2.val, B, await sstCu(o, B), nonce)) });   /* Manifest on its own nonce: alive if the Jupiter version lands but fails */
     tPendSet(p, 'Sending to your stop server…', 'mu', J.err ? 'Jupiter had no route right now: Manifest only' : '');
-    const j = await stopApi('/solstop/arm', { net: 'mainnet', wallet: me, side: a.side, q: a.q, kind: a.kind, amount: a.amt, stop: a.stop, limit: a.lim, end_at: Math.floor(a.until / 1000), nonce, txs });
-    sstAll().push({ id: j.id, token: j.token, addr: me, side: a.side, q: a.amt, quote: a.q, stop: a.stop, lim: a.lim, kind: a.kind, nonce, seed, st: 'armed', at: Date.now(), until: a.until, jup: !J.err }); saveS();
-    nonce = null; sstPaint();
+    const j = await stopApi('/solstop/arm', { net: 'mainnet', wallet: me, side: a.side, q: a.q, kind: a.kind, amount: a.amt, stop: a.stop, limit: a.lim, end_at: Math.floor(a.until / 1000), nonce, nonce2, txs });
+    sstAll().push({ id: j.id, token: j.token, addr: me, side: a.side, q: a.amt, quote: a.q, stop: a.stop, lim: a.lim, kind: a.kind, nonce, nonce2, seed, st: 'armed', at: Date.now(), until: a.until, jup: !J.err }); saveS();
+    nonce = nonce2 = null; sstPaint();
     tPendSet(p, '✓ Stop armed', 'grn', `${a.side === 'sell' ? 'sells' : 'buys'} if SOL-USD ${a.side === 'sell' ? 'falls' : 'rises'} to ${a.stop.toFixed(2)} · ends ${xstEnds(a.until)}${J.err ? ' · Manifest only (no Jupiter route now)' : ''}`, true);
   } catch (e) {
-    tPendSet(p, 'Not placed', 'red', (e && e.message ? e.message : String(e)) + (nonce ? ' Closing its nonce account…' : ''), true);
-    if (nonce) sstClose(o, nonce).then((ok) => { if (ok) toast('Closed the stop\'s nonce account: its SOL is back.'); }).catch(() => {});
+    tPendSet(p, 'Not placed', 'red', (e && e.message ? e.message : String(e)) + (nonce ? ' Closing its nonce accounts…' : ''), true);
+    if (nonce) sstClose(o, nonce, nonce2).then((ok) => { if (ok) toast('Closed the stop\'s nonce accounts: its SOL is back.'); }).catch(() => {});
   } finally { MF_BUSY--; }
 }
-async function sstClose(o, nonce) {   /* close a nonce account → its signed orders can never apply; the SOL comes back. true if closed (or already gone) */
-  const N = await sstNonceRead(nonce).catch(() => undefined); if (N === null) return true; if (!N || N.auth !== o.addr) return false;
-  const r = await solSendIxs(o, [ixNonceWithdraw(nonce, o.addr, o.addr, N.lam)]); return r.state === 'ok';
+async function sstClose(o, nonce, nonce2) {   /* close the stop's nonce account(s) → its signed orders can never apply; the SOL comes back. true if all closed (or already gone) */
+  const ixs = [];
+  for (const n of [nonce, nonce2].filter(Boolean)) { const N = await sstNonceRead(n).catch(() => undefined); if (N === null) continue; if (!N || N.auth !== o.addr) return false; ixs.push(ixNonceWithdraw(n, o.addr, o.addr, N.lam)); }
+  if (!ixs.length) return true;
+  const r = await solSendIxs(o, ixs); return r.state === 'ok';
 }
 let SST_AT = 0;
 async function sstSync(addr, force) {
@@ -16792,32 +16812,56 @@ async function sstSync(addr, force) {
 async function sstCleanup(addr) {   /* ended stops: close their nonce accounts (refund) */
   const o = solOwn(addr); if (!o) return;
   for (const x of sstOf(addr)) { if (x.closed || sstLive(x) || !x.nonce || Date.now() - (x.closeTry || 0) < 300000) continue;
-    x.closeTry = Date.now(); try { if (await sstClose(o, x.nonce)) { x.closed = true; saveS(); } } catch (e) {} }
+    x.closeTry = Date.now(); try { if (await sstClose(o, x.nonce, x.nonce2)) { x.closed = true; saveS(); } } catch (e) {} }
 }
 async function sstPaint() {
   const el = $('#sstCards'); if (!el) return; const addr = solSel; await sstSync(addr); if (cur !== 'strade' || solSel !== addr) return;
-  const L = sstOf(addr).filter((x) => sstLive(x) || Date.now() - (x.endAt || 0) < 86400000);
+  const L = sstOf(addr).filter((x) => sstLive(x) || (!x.hid && Date.now() - (x.endAt || 0) < 86400000));   /* ended cards: shown a day, or until Clear (still in Your trades) */
   el.innerHTML = L.map((x) => { const live = sstLive(x);
     const t = x.st === 'armed' ? `waiting · ends ${xstEnds(x.until)}` : x.st === 'sending' ? 'triggered · sending' : x.st === 'filled' ? '✓ filled' + (x.via === 'mf' ? ' on Manifest' : ' through Jupiter') : x.st === 'placed' ? (x.kind === 'lim' ? 'triggered · limit order on Manifest' : 'triggered · sent to Manifest') : x.st === 'expired' ? 'ended · time ran out' : x.st === 'cancelled' ? 'cancelled' : 'did not fill' + (x.note ? ' · ' + x.note : '');
-    return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${x.side === 'sell' ? 't-sell' : 't-buy'}">STOP</span> <b class="mono">${x.side === 'sell' ? 'Sell' : 'Buy'} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}</b><div class="mono mu" style="font-size:13px">${x.kind === 'mkt' ? 'stop-market' : 'stop-limit ' + (+x.lim).toFixed(2)} ${esc(x.quote)} · <span class="${live ? 'amb' : x.st === 'filled' ? 'grn' : ''}">${esc(t)}</span></div></div>${live && x.st === 'armed' ? `<button class="b-redout sm" data-act="sstCancel" data-ss="${esc(x.id)}">Cancel</button>` : ''}</div>`; }).join('');
+    return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${x.side === 'sell' ? 't-sell' : 't-buy'}">STOP</span> <b class="mono">${x.side === 'sell' ? 'Sell' : 'Buy'} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}</b><div class="mono mu" style="font-size:13px">${x.kind === 'mkt' ? 'stop-market' : 'stop-limit ' + (+x.lim).toFixed(2)} ${esc(x.quote)} · <span class="${live ? 'amb' : x.st === 'filled' ? 'grn' : ''}">${esc(t)}</span></div></div>${live && x.st === 'armed' ? `<button class="b-redout sm" data-act="sstCancel" data-ss="${esc(x.id)}">Cancel</button>` : !live ? `<button class="b-out sm" data-act="sstHide" data-ss="${esc(x.id)}" style="width:auto;padding:0 12px">Clear</button>` : ''}</div>`; }).join('');
   if (L.some((x) => !sstLive(x) && !x.closed)) sstCleanup(addr).catch(() => {});
+}
+const SST_WORD = { armed: 'waiting', sending: 'triggered · sending', filled: 'filled', placed: 'triggered · on Manifest', failed: 'did not fill', cancelled: 'cancelled', expired: 'ended (time ran out)' };
+function sstGroups(L, addr) {   /* { of: {sig: key}, G: {key: {x (your stop, if this phone placed it), sigs: [sig…] newest first}} } */
+  const of = {}, G = {}, keyOf = (n) => { const x = sstAll().find((y) => y.nonce === n || y.nonce2 === n); return x ? 's:' + x.id : 'n:' + n; };
+  for (const s of L || []) { const v = SOLTX[s.signature + addr]; if (!v || !v.nonce) continue; const k = keyOf(v.nonce); of[s.signature] = k;
+    (G[k] = G[k] || { x: sstAll().find((y) => 's:' + y.id === k) || null, sigs: [] }).sigs.push(s.signature); }
+  return { of, G };
+}
+function sstGroupHtml(g, L, addr) {
+  const x = g.x, rows = [], tm = (s) => (s && s.blockTime ? new Date(s.blockTime * 1000).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '');
+  const T = g.sigs.map((sig) => ({ s: L.find((y) => y.signature === sig) || {}, v: SOLTX[sig + addr] || {} })).sort((a, b) => (a.s.blockTime || 0) - (b.s.blockTime || 0));
+  let fee = 0, fired = null, closed = false;
+  const step = (lab, s) => `<div style="display:block;padding:4px 0"><span>${esc(lab)}</span><br><span class="mu mono" style="font-size:12.5px">${esc(tm(s))} · <a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">Solscan ↗</a></span></div>`;
+  for (const { s, v } of T) { fee += v.fee || 0;
+    if (v.nk === 'open') rows.push(step('Placed: stop order signed and armed on your stop server', s));
+    else if (v.nk === 'fire') { const bad = s.err || v.err; fired = { bad, mf: v.mfx };
+      rows.push(step(bad ? (v.jupx ? 'Triggered: Jupiter could not fill it (the price was past your limit)' : 'Triggered: Manifest order did not go through') : v.jupx ? `Triggered: ${String(v.txt || 'filled through Jupiter').replace(/^Swapped/, 'filled')}` : 'Triggered: your order went to Manifest', s)); }
+    else if (v.nk === 'close') { closed = true; rows.push(step(x && x.st === 'cancelled' ? 'Cancelled: its signed orders can no longer run · deposit returned' : 'Closed: deposit returned', s)); } }
+  const st = x ? x.st : fired ? (fired.bad ? 'failed' : fired.mf ? 'placed' : 'filled') : closed ? 'cancelled' : 'armed';
+  const head = x ? `Stop ${x.side} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)} · ${SST_WORD[st] || st}` : `Stop order · ${SST_WORD[st] || st}`;
+  const kv = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right">${v}</span></div>`;
+  const ord = x ? kv('Order', `${x.side === 'sell' ? 'Sell' : 'Buy'} ${solAmt(x.q)} SOL`) + kv('Stop', `${(+x.stop).toFixed(2)} ${esc(x.quote || 'USDC')}`) + kv(x.kind === 'lim' ? 'Limit' : 'Worst price', `${(+x.lim).toFixed(2)}${x.kind === 'lim' ? ' (stop-limit)' : ' (stop-market)'}`) + kv('Status', esc(SST_WORD[st] || st)) + (x.note && !sstLive(x) ? kv('Note', esc(x.note)) : '') : '';
+  const last = T[T.length - 1].s, iso = last.blockTime ? new Date(last.blockTime * 1000).toISOString() : '';
+  return { head, html: `<details class="recrow"><summary><span>${esc(head)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${ord}${rows.join('')}${kv('Network fees', solAmt(fee) + ' SOL')}</div></details>` };
 }
 function sstCancelSheet(id) {
   const x = sstAll().find((y) => y.id === id), o = x && solOwn(x.addr); if (!x || !o) return;
   confirmSheet('Cancel stop', `${x.side === 'sell' ? 'Sell' : 'Buy'} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}`, [
     { t: 'Tell your stop server not to send it', hl: 1 },
-    { t: 'Close its nonce account on Solana', s: 'so the signed orders can never apply · its SOL comes back · tiny network fee' }], 'Cancel stop', async () => {
+    { t: 'Close its nonce accounts on Solana', s: 'so the signed orders can never apply · its SOL comes back · tiny network fee' }], 'Cancel stop', async () => {
     const p = tPend(`Cancel stop ${x.side} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}`, 'strade', x.addr, true);
     try {
       let sv = null; try { sv = await stopApi('/solstop/cancel', { id: x.id, token: x.token }); } catch (e) {}
       const ss = sv && sv.stop && sv.stop.status;
       if (ss && !['armed', 'cancelled'].includes(ss)) { Object.assign(x, { st: ss, note: sv.stop.note || '' }); if (!sstLive(x)) x.endAt = x.endAt || Date.now(); saveS(); sstPaint();
         return tPendSet(p, 'Too late to cancel', 'amb', ss === 'sending' ? 'It already triggered: the order is going in now.' : `It already ${ss}.`, true); }
-      tPendSet(p, 'Cancelling…', 'mu', 'closing its nonce account');
-      const ok = await sstClose(o, x.nonce);
+      tPendSet(p, 'Cancelling…', 'mu', 'closing its nonce accounts');
+      const ok = await sstClose(o, x.nonce, x.nonce2);
       if (ok || ss === 'cancelled') { Object.assign(x, { st: 'cancelled', note: 'cancelled from the phone', endAt: Date.now(), closed: ok }); saveS(); sstPaint();
         return tPendSet(p, '✓ Cancelled', 'grn', ok ? "the signed orders can't apply any more · its SOL is back" : 'your stop server won\'t send it · its SOL comes back next time you open Trade SOL', true); }
-      tPendSet(p, 'Not cancelled yet', 'red', "Couldn't reach your stop server or close the nonce account. The stop may still fire. Try again in a minute.", true);
+      tPendSet(p, 'Not cancelled yet', 'red', "Couldn't reach your stop server or close the nonce accounts. The stop may still fire. Try again in a minute.", true);
     } catch (e) { tPendSet(p, 'Not cancelled', 'red', e && e.message ? e.message : String(e), true); }
   }, true, null, 'Cancelling…', true);
 }
@@ -22317,7 +22361,7 @@ document.addEventListener('click', async (e) => {
         ${XL.length ? `<span class="lbl">XRP Ledger</span><div class="card" style="padding:0 14px;gap:0">${XL.map((w) => { const d = XRA[w.addr]; return row(w.addr, w.name, d && d.a ? '$' + fx(xrUsd(d)) : d && d.a === null ? 'not activated' : '', 'xrp'); }).join('')}</div>` : ''}
         ${SL.length ? `<span class="lbl">Solana</span><div class="card" style="padding:0 14px;gap:0">${SL.map((w) => { const d = SOLA[w.addr]; return row(w.addr, w.name, d ? '$' + fx(solUsd(d)) : '', 'sol'); }).join('')}</div>` : ''}<button class="b-out" data-act="closeSheet">Close</button>`);
     },
-    l2Trade: () => l2Trade(), sstCancel: () => sstCancelSheet(t.dataset.ss), tWalGo: () => { closeSheet(); if (t.dataset.k === 'sol') { solSel = t.dataset.addr; return cur === 'strade' ? drawSTrade() : go('strade'); } if (t.dataset.k === 'xrp') { xrSel = t.dataset.addr; return cur === 'xtrade' ? drawXTrade() : go('xtrade'); }
+    l2Trade: () => l2Trade(), sstCancel: () => sstCancelSheet(t.dataset.ss), sstHide: () => { const x = sstAll().find((y) => y.id === t.dataset.ss); if (x && !sstLive(x)) { x.hid = 1; saveS(); sstPaint(); } }, tWalGo: () => { closeSheet(); if (t.dataset.k === 'sol') { solSel = t.dataset.addr; return cur === 'strade' ? drawSTrade() : go('strade'); } if (t.dataset.k === 'xrp') { xrSel = t.dataset.addr; return cur === 'xtrade' ? drawXTrade() : go('xtrade'); }
       homeAddr = t.dataset.addr; S.tradeLast = homeAddr; saveS(); return cur === 'trade' ? drawTrade() : go('trade'); },
     fundOpen: phGate(() => fundSheet()), fundReview: () => fundReview(),
     pinChange: () => pinChangeSheet(), pinChangeOk: () => pinChangeOk(),
