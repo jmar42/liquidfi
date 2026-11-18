@@ -644,8 +644,8 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMySol" style="display:none"><span class="lbl">Solana server <span class="tag">beta</span></span><div class="mu" style="font-size:13px">Your own Solana RPC (yours, or a Helius / Alchemy / QuickNode address with your key). Without one, Solana goes through the Liquidfi server.</div><label>Your server (https)<input id="setSsUrl" placeholder="https://solana-mainnet.g.alchemy.com/v2/…" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setSsOnly" style="width:auto"> Only my server (no Liquidfi backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="sol">Save</button><button class="b-out sm" data-act="myOff" data-k="sol">Use Liquidfi server</button></div><div class="mu" id="setSsSt" style="font-size:13px;line-height:1.5"></div></div>
-  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:13px">Your stop server watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:13px;line-height:1.5"></div><span style="margin-top:6px;font-weight:600">Market stops go at most this far past your stop</span><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>XLM</span><div class="seg" id="setCapXlm" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>XRP</span><div class="seg" id="setCapXrp" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>SOL</span><div class="seg" id="setCapSol" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:13px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:13px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:13px;line-height:1.5"></div></div>
-  <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:13px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses your stop server, which holds the Stripe / Coinbase keys (never this phone).</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:13px;line-height:1.5"></div></div>
+  <div class="card"><span class="lbl">Stop orders</span><div class="mu" style="font-size:13px">Liquidfi watches the price every second and sends your signed stop orders. It never gets your keys.</div><label>Stop server address (https)<input id="setStopUrl" placeholder="https://…/stops" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="stopCheck" id="stopSave">Save</button><div class="mu" id="setStopSt" style="font-size:13px;line-height:1.5"></div><span style="margin-top:6px;font-weight:600">Market stops go at most this far past your stop</span><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>XLM</span><div class="seg" id="setCapXlm" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>XRP</span><div class="seg" id="setCapXrp" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>SOL</span><div class="seg" id="setCapSol" style="min-width:150px"><button data-v="1">1%</button><button data-v="2">2%</button><button data-v="5">5%</button></div></div><span class="lbl" style="margin-top:6px">Price guard</span><div class="mu" style="font-size:13px">A stop never fills more than this much worse than the Coinbase, Kraken and Binance average. Protects you if someone empties Stellar's order book to grab stops. It waits instead.</div><div class="seg" id="setGuard"><button data-v="1">1%</button><button data-v="1.5">1.5%</button><button data-v="3">3%</button><button data-v="0">Off</button></div><span class="lbl" style="margin-top:6px">Stop clerks</span><div class="mu" style="font-size:13px">Each waiting stop has its own small clerk account (1.01 XLM from your wallet). Its XLM comes back when the stop fills, is cancelled or ends. New phone or something left over? This finds your clerks from your wallet keys and returns their XLM.</div><button class="b-out sm" data-act="helperRecover">Return clerk XLM</button><div class="mu" id="setHlpSt" style="font-size:13px;line-height:1.5"></div></div>
+  <div class="card"><span class="lbl">Buy (Stripe / Coinbase)</span><div class="mu" style="font-size:13px">Buy XLM or USDC (Stripe, no exchange account) or XRP (Coinbase account) and have it sent straight to your wallet. Uses the Liquidfi server, which holds the Stripe / Coinbase keys (never this phone).</div><button class="b-out sm" data-act="onrCheck">Check</button><div class="mu" id="setOnrSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setTax"><span class="lbl">Taxes</span><div class="mu" style="font-size:13px">Everything your wallets did in a year (trades, swaps, sends, receives, pools, fees) with dollar values at the time, in two files: one for tax software (Koinly format) and a broker-style statement of buys, sells and totals for you or your tax pro. Made on this phone from the public ledgers; Liquidfi never sees it. Not tax advice.</div>
     <label>Year<select id="taxYear"></select></label><div id="taxW" style="display:flex;flex-direction:column;gap:8px"></div>
     <button class="b-light" data-act="taxMake" id="taxGo">Make tax files</button><div class="mu" id="taxSt" style="font-size:14px"></div><div id="taxOut"></div>
@@ -671,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45m · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45n · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13636,7 +13636,7 @@ function niceErr(e) {
   const rc = e.j && e.j.extras && e.j.extras.result_codes;
   if (rc) { const all = [rc.transaction, ...(rc.operations || [])].filter((c) => c && c !== 'op_success' && c !== 'tx_failed'); return all.map((c) => CODES[c] || c).join(' ') || 'Stellar refused it.'; }
   const m = e.message || String(e);
-  if (/stop server is private/i.test(m)) return 'This wallet isn\'t on your stop server\'s allowed list yet. Add its address to allowed-wallets.txt and run set-allowlist.sh on the watcher box.';
+  if (/stop server is private/i.test(m)) return 'This wallet isn\'t on the stop server\'s allowed list yet. Add its address to allowed-wallets.txt and run set-allowlist.sh on the watcher box.';
   if (/XRP Ledger/i.test(m)) return m.replace(/ \((Failed to fetch|NetworkError[^)]*|Load failed)\)/i, '') + '. Check your connection and try again.';   // XRP errors say XRP, not Stellar
   return /Failed to fetch|NetworkError|Load failed/i.test(m) ? "Can't reach Stellar right now. Check your connection and try again." : m;
 }
@@ -15276,7 +15276,7 @@ async function xstCards(addr) {
     return `<div class="card" style="padding:12px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${x.side === 'sell' ? 't-sell' : 't-buy'}">STOP</span> <b class="mono">${x.side === 'sell' ? 'Sell' : 'Buy'} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}</b><div class="mono mu" style="font-size:13px">${x.kind === 'mkt' ? 'market stop' : 'stop-limit'} · worst ${(+x.lim).toFixed(4)} ${esc(x.tok)} · <span class="${live ? 'amb' : x.st === 'filled' ? 'grn' : ''}">${esc(stTxt)}</span></div>${x.note && !live && x.st !== 'expired' ? `<div class="mu" style="font-size:13px">${esc(x.note)}</div>` : ''}</div>${btn}</div>`; }).join('');
 }
 async function xtStopReview(o, C, q, buy) {
-  if (!S.stopUrl) return toast('Stops need your stop server: Settings → Stop orders.');
+  if (!S.stopUrl) return toast('Stop orders are off: turn them on in Settings → Stop orders.');
   const gb = $('#xtGo'), lbl = gb ? gb.textContent : ''; if (gb) { gb.disabled = true; gb.textContent = 'Checking…'; }   /* feedback right away: the checks below take a moment */
   try { return await xtStopReview2(o, C, q, buy); } finally { if (gb) { gb.disabled = false; gb.textContent = lbl; } }
 }
@@ -15288,7 +15288,7 @@ async function xtStopReview2(o, C, q, buy) {
   if (buy ? lim < st : lim > st) return toast(buy ? 'For a buy stop the worst price must be at or above the stop.' : 'For a sell stop the worst price must be at or below the stop.');
   if (Math.abs(lim / st - 1) > 0.5) return toast('The worst price is too far from the stop.');
   let drops, sv, h; try { [drops, sv, , h] = await Promise.all([xrFee(), xrServer(), xrLoad(o.w.classicAddress), hP.catch((e) => { throw new Error(niceErr(e)); })]); } catch (e) { return toast(e.message || String(e)); }
-  if (!h || !h.xrp || !h.xexp) return toast('Your stop server needs the update for XRP stops (version 1.9). Install it on the watcher box first.', 8000);
+  if (!h || !h.xrp || !h.xexp) return toast('The stop server needs the update for XRP stops (version 1.9). Install it on the watcher box first.', 8000);
   if (XT.q !== C.k || XT.mode !== 'stop') return toast('You changed the order. Review again.');
   const b = XT.bids[0], a = XT.asks[0], mid = b && a ? (b[0] + a[0]) / 2 : 0;
   if (mid && (buy ? st <= mid : st >= mid)) return toast(buy ? `A buy stop must be above the price now (${mid.toFixed(4)}). For a lower price use a limit order.` : `A sell stop must be below the price now (${mid.toFixed(4)}). For a higher price use a limit order.`, 8000);
@@ -15327,7 +15327,7 @@ async function xstArm(o, C, a) {
     const xd = String(Math.round(a.q * 1e6)), U = { currency: C.cur, issuer: C.iss, value: xtAmtStr(a.q * a.lim) };
     const ord = o.w.sign({ TransactionType: 'OfferCreate', Account: me, Sequence: 0, TicketSequence: tickets[0], Fee: '5000', LastLedgerSequence: lls, ...(a.side === 'sell' ? { TakerGets: xd, TakerPays: U, Flags: 0x00080000 } : { TakerPays: xd, TakerGets: U, Flags: 0 }) });   /* tfSell: sell exactly this XRP, take at least the worst price */
     const fee = a.lf ? o.w.sign({ TransactionType: 'Payment', Account: me, Destination: a.fTo, Amount: String(Math.round(a.lf * 1e6)), Sequence: 0, TicketSequence: tickets[1], Fee: '1000', LastLedgerSequence: lls + 5000, Flags: 0 }) : null;   /* the fee goes right after a fill: a few hours of room past the order's end */
-    tPendSet(p, 'Sending to your stop server…', 'mu', '');
+    tPendSet(p, 'Placing your stop…', 'mu', '');
     const armBody = { net: S.net, wallet: me, side: a.side, coin: C.tok, amount: a.q, stop: a.st, limit: a.lim, kind: a.kind, lls, end_at: Math.floor(until / 1000),
       order: { blob: ord.tx_blob, hash: ord.hash, ticket: tickets[0] }, ...(fee ? { fee: { blob: fee.tx_blob, hash: fee.hash, ticket: tickets[1], lls: lls + 5000 } } : {}) };
     let j; for (let i = 0; ; i++) { try { j = await stopApi('/xrp/arm', armBody); break; } catch (e) { if (i >= 3 || !/not on the ledger yet|reach the XRP Ledger/.test(e.message || '')) throw e; await sleep(4000); } }   /* a server a ledger behind may not see the new tickets yet */
@@ -15349,7 +15349,7 @@ async function xstUseTickets(o, tickets) {   /* spend tickets on harmless no-op 
 function xstCancelSheet(id) {
   const x = xstAll().find((y) => y.id === id), o = x && xrOwn(x.addr); if (!x || !o) return;
   confirmSheet('Cancel stop', `${x.side === 'sell' ? 'Sell' : 'Buy'} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}`, [
-    { t: 'Tell your stop server not to send it', hl: 1 },
+    { t: 'Stop it from being sent', hl: 1 },
     { t: `Use up its ${x.tickets.length} ticket${x.tickets.length > 1 ? 's' : ''} on the ledger`, s: `so the signed order can never apply · ${m2(x.tickets.length * (XRSV || { inc: 0.2 }).inc)} XRP comes back · tiny network fee` }], 'Cancel stop', async () => {
     const p = tPend(`Cancel stop ${x.side} ${m2(x.q)} XRP @ ${(+x.stop).toFixed(4)}`, 'xtrade', x.addr, true);
     try {
@@ -15365,10 +15365,10 @@ function xstCancelSheet(id) {
       U.mine = [...U1.mine, ...U.mine]; U.n += U1.n;
       if (ours || ss === 'cancelled') {
         Object.assign(x, { st: 'cancelled', note: 'cancelled from the phone', endAt: Date.now(), rel: true }); saveS();
-        return tPendSet(p, '✓ Cancelled', 'grn', ours ? `the signed order can't apply any more · ${m2(U.mine.length * (XRSV || { inc: 0.2 }).inc)} XRP is back` : 'your stop server won\'t send it · tap Release later to get the reserve back', true);
+        return tPendSet(p, '✓ Cancelled', 'grn', ours ? `the signed order can't apply any more · ${m2(U.mine.length * (XRSV || { inc: 0.2 }).inc)} XRP is back` : 'it won\'t be sent · tap Release later to get the reserve back', true);
       }
       if (U1.n && !ours) { XST_AT = 0; xstSync(x.addr, true).catch(() => {}); return tPendSet(p, 'It may have triggered', 'amb', "The order's ticket was already used: the stop probably fired. Check its status in a moment.", true); }
-      tPendSet(p, 'Not cancelled yet', 'red', "Couldn't reach your stop server or use up the order's ticket. The stop may still fire. Try again in a minute.", true);
+      tPendSet(p, 'Not cancelled yet', 'red', "Couldn't reach Liquidfi or use up the order's ticket. The stop may still fire. Try again in a minute.", true);
     } catch (e) { tPendSet(p, 'Not cancelled', 'red', e && e.message ? e.message : String(e), true); }
   }, true, null, 'Cancelling…', true);
 }
@@ -15755,7 +15755,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45m';
+const APP_VER = 'v2.45n';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16651,7 +16651,7 @@ function chInit() {
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && CH.k && cur === CH.k && CH.on) chLoad(false); });
 }
 /* v2.45a SOL stops (Jeff: "lets get started w/ the stops for SOL" · "if it's a limit then our normal limit method. If it's market then
-   jupiter. Make sure we dont charge twice. These orders are the 25bps"). Signed here, held by a durable nonce, sent by your stop server.
+   jupiter. Make sure we dont charge twice. These orders are the 25bps"). Signed here, held by a durable nonce, sent by the stop server.
    - A small nonce account (authority = this wallet, ~0.0015 SOL, refunded) keeps the signed orders valid until they're used or cancelled.
    - Two versions are signed on that ONE nonce, so at most one can ever land (the fee can never be charged twice):
        'jup' = a Jupiter swap at your limit (stop-limit) / the 2% cap (stop-market), Liquidfi's 0.25% fee inside it;
@@ -16745,7 +16745,7 @@ async function sstReview(btn) {
   const px = cxRef().mid || SOLPX.sol; if (px && (side === 'sell' ? stop >= px : stop <= px)) return toast(side === 'sell' ? `A sell stop must be below the price now (${px.toFixed(2)}). For a higher price use a limit order.` : `A buy stop must be above the price now (${px.toFixed(2)}). For a lower price use a limit order.`, 8000);
   if (sstOf(o.addr).filter(sstLive).length >= 5) return toast('At most 5 SOL stops per wallet.');
   const days = [1, 7, 30, 90].includes(+($('#stDays') || {}).value) ? +$('#stDays').value : 30;
-  let h; try { h = await stopApi('/health'); } catch (e) { return toast(niceErr(e)); } if (!h || !h.solStops || +h.version < 3.3) return toast('Your stop server needs the update for SOL stops (stopd 3.3): run Update-Stops-On-Vultr.bat.', 8000);
+  let h; try { h = await stopApi('/health'); } catch (e) { return toast(niceErr(e)); } if (!h || !h.solStops || +h.version < 3.3) return toast('The stop server needs the update for SOL stops (stopd 3.3): run Update-Stops-On-Vultr.bat.', 8000);
   let rent = 1447680; try { rent = +(await solRpc('getMinimumBalanceForRentExemption', [80])) || rent; } catch (e) {}
   const feeSol = side === 'sell' ? amt * SOL_FEE.bps / 1e4 : amt * lim * SOL_FEE.bps / 1e4 / (px || lim);
   rent *= 2;   /* two nonce accounts: one per version */
@@ -16760,7 +16760,7 @@ async function sstReview(btn) {
     { k: 'Liquidfi fee', v: `${SOL_FEE.bps / 100}%`, n: 'charged once, when it triggers (Jupiter or Manifest)' },
     { k: 'Ends', v: xstEnds(until), n: `${days} day${days > 1 ? 's' : ''}` },
     { k: 'Set aside', v: `${solAmt(rent / 1e9)} SOL`, n: 'back when it ends' },
-    { foot: `Keep the ${side === 'buy' ? ST.q : 'SOL'} in this wallet until then. Your stop server only sends what this phone signed; it never has your key.` }],
+    { foot: `Keep the ${side === 'buy' ? ST.q : 'SOL'} in this wallet until then. Liquidfi only sends what this phone signed; it never has your key.` }],
     `Place ${side} stop`, () => sstArm(o, { side, kind, amt, stop, lim, worst: lim, q: ST.q, days, until, rent }), false, side === 'buy' ? 'b-grn' : 'b-red', 'Placing…', true);
 }
 async function sstArm(o, a) {
@@ -16781,7 +16781,7 @@ async function sstArm(o, a) {
     const txs = [];
     if (!J.err) { try { txs.push({ k: 'jup', b64: u8b64(sstSign(o, nonce, N.val, J.ixs, await sstCu(o, J.ixs), nonce2)) }); } catch (e) { J.err = e; } }
     txs.push({ k: 'mf', b64: u8b64(sstSign(o, nonce2, N2.val, B, await sstCu(o, B), nonce)) });   /* Manifest on its own nonce: alive if the Jupiter version lands but fails */
-    tPendSet(p, 'Sending to your stop server…', 'mu', J.err ? 'Jupiter had no route right now: Manifest only' : '');
+    tPendSet(p, 'Placing your stop…', 'mu', J.err ? 'Jupiter had no route right now: Manifest only' : '');
     const j = await stopApi('/solstop/arm', { net: 'mainnet', wallet: me, side: a.side, q: a.q, kind: a.kind, amount: a.amt, stop: a.stop, limit: a.lim, end_at: Math.floor(a.until / 1000), nonce, nonce2, txs });
     sstAll().push({ id: j.id, token: j.token, addr: me, side: a.side, q: a.amt, quote: a.q, stop: a.stop, lim: a.lim, kind: a.kind, nonce, nonce2, seed, st: 'armed', at: Date.now(), until: a.until, jup: !J.err }); saveS();
     nonce = nonce2 = null; sstPaint();
@@ -16835,7 +16835,7 @@ function sstGroupHtml(g, L, addr) {
   let fee = 0, fired = null, closed = false;
   const step = (lab, s) => `<div style="display:block;padding:4px 0"><span>${esc(lab)}</span><br><span class="mu mono" style="font-size:12.5px">${esc(tm(s))} · <a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">Solscan ↗</a></span></div>`;
   for (const { s, v } of T) { fee += v.fee || 0;
-    if (v.nk === 'open') rows.push(step('Placed: stop order signed and armed on your stop server', s));
+    if (v.nk === 'open') rows.push(step('Placed: live stop order', s));
     else if (v.nk === 'fire') { const bad = s.err || v.err; fired = { bad, mf: v.mfx };
       rows.push(step(bad ? (v.jupx ? 'Triggered: Jupiter could not fill it (the price was past your limit)' : 'Triggered: Manifest order did not go through') : v.jupx ? `Triggered: ${String(v.txt || 'filled through Jupiter').replace(/^Swapped/, 'filled')}` : 'Triggered: your order went to Manifest', s)); }
     else if (v.nk === 'close') { closed = true; rows.push(step(x && x.st === 'cancelled' ? 'Cancelled: its signed orders can no longer run · deposit returned' : 'Closed: deposit returned', s)); } }
@@ -16849,7 +16849,7 @@ function sstGroupHtml(g, L, addr) {
 function sstCancelSheet(id) {
   const x = sstAll().find((y) => y.id === id), o = x && solOwn(x.addr); if (!x || !o) return;
   confirmSheet('Cancel stop', `${x.side === 'sell' ? 'Sell' : 'Buy'} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}`, [
-    { t: 'Tell your stop server not to send it', hl: 1 },
+    { t: 'Stop it from being sent', hl: 1 },
     { t: 'Close its nonce accounts on Solana', s: 'so the signed orders can never apply · its SOL comes back · tiny network fee' }], 'Cancel stop', async () => {
     const p = tPend(`Cancel stop ${x.side} ${solAmt(x.q)} SOL @ ${(+x.stop).toFixed(2)}`, 'strade', x.addr, true);
     try {
@@ -16860,8 +16860,8 @@ function sstCancelSheet(id) {
       tPendSet(p, 'Cancelling…', 'mu', 'closing its nonce accounts');
       const ok = await sstClose(o, x.nonce, x.nonce2);
       if (ok || ss === 'cancelled') { Object.assign(x, { st: 'cancelled', note: 'cancelled from the phone', endAt: Date.now(), closed: ok }); saveS(); sstPaint();
-        return tPendSet(p, '✓ Cancelled', 'grn', ok ? "the signed orders can't apply any more · its SOL is back" : 'your stop server won\'t send it · its SOL comes back next time you open Trade SOL', true); }
-      tPendSet(p, 'Not cancelled yet', 'red', "Couldn't reach your stop server or close the nonce accounts. The stop may still fire. Try again in a minute.", true);
+        return tPendSet(p, '✓ Cancelled', 'grn', ok ? "the signed orders can't apply any more · its SOL is back" : 'it won\'t be sent · its SOL comes back next time you open Trade SOL', true); }
+      tPendSet(p, 'Not cancelled yet', 'red', "Couldn't reach Liquidfi or close the nonce accounts. The stop may still fire. Try again in a minute.", true);
     } catch (e) { tPendSet(p, 'Not cancelled', 'red', e && e.message ? e.message : String(e), true); }
   }, true, null, 'Cancelling…', true);
 }
@@ -17901,7 +17901,7 @@ async function swapReview() {
 }
 
 /* ---------- Cross-chain swap XLM ⇄ XRP (NEAR Intents 1Click) ----------
-   The price comes from your stop server (it adds the Liquidfi partner key) or, if that can't answer, from 1Click directly;
+   The price comes from the stop server (it adds the Liquidfi partner key) or, if that can't answer, from 1Click directly;
    both charge the same 0.50% (0.25% to Liquidfi, 0.25% to NEAR), already inside the price shown. Before anything is sent the
    phone asks 1Click ITSELF about the deposit address and checks it pays your own wallet, refunds to the sending wallet, and
    the amount, coins and fee. Then your wallet sends the coin to that one-time address and 1Click delivers the other coin to
@@ -19328,7 +19328,7 @@ async function closeWallet() {
   const block = [];
   if (+a.num_sponsoring > 0) block.push('It pays the reserve for another account or entry (sponsoring). End that first.');
   if (a.balances.some((b) => b.asset_type === 'liquidity_pool_shares')) block.push('It is in a liquidity pool. Earn → Withdraw → All first.');
-  if (S.stopUrl) { try { const L = await stopList(addr); if (L.some((x) => stopLive(x))) block.push('It has stop orders on your stop server. Cancel them first (Open orders → Cancel all).'); } catch (e) {} }
+  if (S.stopUrl) { try { const L = await stopList(addr); if (L.some((x) => stopLive(x))) block.push('It has live stop orders. Cancel them first (Open orders → Cancel all).'); } catch (e) {} }
   for (const [h, r] of Object.entries(hlpReg())) if (r.w === addr) { try { if (await acct(h)) { block.push('One of its stop clerks still holds 1.01 XLM. Settings → Stop orders → Return clerk XLM first.'); break; } } catch (e) {} }
   if (block.length) return sheet(`<h2>Close ${esc(w.name)}</h2><div class="note amb">${block.map(esc).join('<br>')}</div><button class="b-out" data-act="closeSheet">OK</button>`);
   CLW.addr = addr; CLW.a = a; CLW.off = off;
@@ -20154,7 +20154,7 @@ async function homeCancelAll() {
   const st = STOPS.addr === addr ? STOPS.list.filter((x) => stopLive(x) && ['armed', 'triggered'].includes(x.status) && hexOk(x.id, 32)) : [];
   if (!off.length && !st.length) { toast('No open orders on this wallet.'); return homeOrders(ACC[addr]); }
   const items = [...off.map((o) => ({ t: 'Cancel order #' + o.id, s: offerTextShort(o) + ' @ ' + o.price })), ...st.map((x) => ({ t: `Cancel stop ${x.side} ${fx(+x.xlm || 0, 2)} XLM`, s: 'stop ' + p4(+x.stop || 0) }))];
-  confirmSheet(`Cancel all ${items.length} order(s)?`, `${esc(name)}${netTag()}<br>${off.length ? (off.length > 100 ? 'Orders: one transaction per 100' : 'Orders: one transaction · all or nothing') : ''}${off.length && st.length ? ' · ' : ''}${st.length ? 'stops: cancelled on your stop server' : ''}<br><span class="mu">If a bot trades from this wallet, pause it first or it will place new orders.</span>`, items, 'Hold to cancel all', async () => {
+  confirmSheet(`Cancel all ${items.length} order(s)?`, `${esc(name)}${netTag()}<br>${off.length ? (off.length > 100 ? 'Orders: one transaction per 100' : 'Orders: one transaction · all or nothing') : ''}${off.length && st.length ? ' · ' : ''}${st.length ? 'stops: cancelled' : ''}<br><span class="mu">If a bot trades from this wallet, pause it first or it will place new orders.</span>`, items, 'Hold to cancel all', async () => {
     const rows = []; let okAll = true;
     let now = off; try { now = await offersOf(addr); } catch (e) {}   // the orders as they are NOW: one that filled meanwhile would fail the whole transaction
     if (now.length) {
@@ -21326,7 +21326,7 @@ async function personalTx(kp, src, ops, okTitle, back, memo, what) {
   } catch (e) { showResult(false, 'Not sent', [`<div class="card red">${esc(niceErr(e))}</div>`], back); }
 }
 
-/* ---------- stop orders (held by your stop server on the watcher box) ----------
+/* ---------- stop orders (held by the stop server on the watcher box) ----------
    The phone signs the order now with the wallet key; the stop server only holds the signed order and sends it when the
    price hits. A "channel" account of the server pays the network fee and gives the sequence number, so the stop stays good
    while the wallet does other things. Cancel = the server burns that sequence number. */
@@ -21337,11 +21337,11 @@ const stopLive = (x) => ['armed', 'triggered', 'sending', 'checking', 'cancellin
 const hexOk = (h, n) => typeof h === 'string' && new RegExp(`^[0-9a-f]{${n}}$`).test(h);
 const stopSig = (kp, msg) => b64(kp.sign(new TextEncoder().encode(msg)));
 async function stopApi(path, body) {
-  if (!S.stopUrl) throw new Error('Set your stop server in Settings → Stop orders.');
+  if (!S.stopUrl) throw new Error('Stop orders are off: turn them on in Settings → Stop orders.');
   if (body && /^\/(arm|arm_own|list|xrp\/arm|xrp\/status|solstop\/arm|solstop\/status)$/.test(path) && !('push' in body)) body = { ...body, push: pushRef() };   /* which alert id this phone's stops use (null = alerts off) */
   let r; for (let i = 0; ; i++) {   /* a read (GET) is tried 3 times: the first request after the phone or the tunnel was idle sometimes drops */
     try { r = await fetch(S.stopUrl.replace(/\/+$/, '') + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { cache: 'no-store' }); break; }
-    catch (e) { if (body || i >= 2) throw new Error("Can't reach your stop server. Check your connection and try again."); await sleep(1500); } }
+    catch (e) { if (body || i >= 2) throw new Error("Can't reach Liquidfi. Check your connection and try again."); await sleep(1500); } }
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Stop server error ' + r.status);
   if (j && j.push_ok === false && body && body.push) pushResync();   /* the server lost this phone's alert address: send it again */
   return j;
@@ -21363,7 +21363,7 @@ const hlpReg = () => { const N = NS(); if (!N.hlp) N.hlp = {}; return N.hlp; }; 
 let STOPH = null, STOPH_AT = 0;
 async function stopHealth() {
   if (STOPH && Date.now() - STOPH_AT < 5 * 60e3) return STOPH;
-  const r = await fetch(S.stopUrl.replace(/\/+$/, '') + '/health').catch(() => { throw new Error("Can't reach your stop server."); });
+  const r = await fetch(S.stopUrl.replace(/\/+$/, '') + '/health').catch(() => { throw new Error("Can't reach Liquidfi."); });
   STOPH = await r.json(); STOPH_AT = Date.now(); return STOPH;
 }
 async function helperFree(kp, w) {   // the first helper index whose account doesn't exist and isn't in use
@@ -21399,7 +21399,7 @@ async function helperRecover() {
   try {
     for (const o of OWN()) {
       const kp = kpFor(o.addr); if (!kp) continue;
-      let list = []; if (S.stopUrl) list = await stopList(o.addr).catch(() => null); if (list === null) { if (el) el.innerHTML = '<span class="amb">Can\'t reach your stop server, so nothing was closed (a clerk might hold a live stop).</span>'; return; }
+      let list = []; if (S.stopUrl) list = await stopList(o.addr).catch(() => null); if (list === null) { if (el) el.innerHTML = '<span class="amb">Can\'t reach Liquidfi, so nothing was closed (a clerk might hold a live stop).</span>'; return; }
       const live = new Set(list.filter(stopLive).map((x) => x.helper).filter(Boolean));
       for (let k = 0; k < 40; k++) { const h = await helperKp(kp, k), a = h.publicKey(); if (live.has(a)) continue; const x = await acct(a); if (!x) continue; f++; try { if ((await helperClose(o.addr, h)) === 'closed') n++; } catch (e) {} }
     }
@@ -21438,8 +21438,8 @@ function stopDefaults() {
 }
 function stopEst(q, el) {
   const st = +$('#tStop').value || 0, lim = +$('#tLim').value || 0, sell = T.side === 'sell', m = stopMid(), nB = kName(TP().b), nQ = kName(TP().q);
-  $('#tStopNote').innerHTML = !S.stopUrl ? '<span class="amb">Set your stop server first: Settings → Stop orders.</span>'
-    : `${$('#tFeed').value === 'trades3' ? `When 3 trades of 1+ ${esc(nB)} happen on Stellar at <b>${st ? p4(st) : 'the stop'}</b> or ${sell ? 'lower' : 'higher'} (a jump over 0.5% past it must be confirmed by the last 100 ${esc(nB)} traded)` : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}`}, your stop server ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? esc(nB) : esc(nQ)} stays in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
+  $('#tStopNote').innerHTML = !S.stopUrl ? '<span class="amb">Stop orders are off: turn them on in Settings → Stop orders.</span>'
+    : `${$('#tFeed').value === 'trades3' ? `When 3 trades of 1+ ${esc(nB)} happen on Stellar at <b>${st ? p4(st) : 'the stop'}</b> or ${sell ? 'lower' : 'higher'} (a jump over 0.5% past it must be confirmed by the last 100 ${esc(nB)} traded)` : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}`}, Liquidfi ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? esc(nB) : esc(nQ)} stays in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
   if (!el) return;
   const fOn = !!feeTo(tradeAddr) && (FEEOK[feeTo(tradeAddr)] || { ok: 1 }).ok, f = fOn ? feeOf(sell ? q : q * st) : 0;
   const warn = st && m && (sell ? st >= m : st <= m) ? `<div><span class="amb">The price is ${p4(m)} now: a ${sell ? 'sell' : 'buy'} stop goes ${sell ? 'below' : 'above'} it.</span></div>` : '';
@@ -21479,8 +21479,8 @@ async function stopReview(q, a, kp) {
     try {
       const w = tradeAddr, ts = Date.now();
       const hl = await stopHealth().catch(() => ({}));
-      if (!hl.own) throw new Error('Update your stop server to v1.5 (own clerks): copy the new stopd.py to the watcher box and run install-stops.sh again.');
-      if ((feed === 'trades3' || !isX) && !hl.trades3) throw new Error('Update your stop server to v1.6 (stops on any coin, Stellar trades trigger): copy the new stopd.py to the watcher box and run install-stops.sh again.');
+      if (!hl.own) throw new Error('Update the stop server to v1.5 (own clerks): copy the new stopd.py to the watcher box and run install-stops.sh again.');
+      if ((feed === 'trades3' || !isX) && !hl.trades3) throw new Error('Update the stop server to v1.6 (stops on any coin, Stellar trades trigger): copy the new stopd.py to the watcher box and run install-stops.sh again.');
       // a) the wallet makes and funds its own helper
       tPendSet(pnd, 'Setting up…', 'mu', 'making its clerk account (1.01 XLM from this wallet, comes back)');
       const { h, k } = await helperFree(kp, w); hh = h; const ha = h.publicKey();
@@ -21504,7 +21504,7 @@ async function stopReview(q, a, kp) {
       const cb = new SDK.TransactionBuilder(new SDK.Account(ha, (s0 + BigInt(HELPER_COPIES)).toString()), { fee: String(HELPER_FEE), networkPassphrase: NET().pass, timebounds: { minTime: 0, maxTime: 0 }, minAccountSequence: s0.toString() });
       cb.addOperation(SDK.Operation.accountMerge({ source: ha, destination: w }));
       const ctx = cb.build(); ctx.sign(h);
-      tPendSet(pnd, 'Sent', 'mu', 'handing the signed order to your stop server');
+      tPendSet(pnd, 'Sent', 'mu', 'sending the signed order to Liquidfi');
       const ts2 = Date.now();
       const r = await stopApi('/arm_own', { net: S.net, wallet: w, helper: ha, ts: ts2, sig: stopSig(kp, `liquidfi-stops:armown:${S.net}:${w}:${ha}:${ts2}`), xdrs, cleanup: ctx.toXDR(), feed, stop: st, lim_mode: limMode(), guard: !stopExOK() ? 0 : RP && RP.guard != null ? RP.guard : stopGuard() });
       Object.assign(hlpReg()[ha], { sid: r.id, exp: end.getTime() }); saveS(); hh = null;
@@ -21520,7 +21520,7 @@ async function stopReview(q, a, kp) {
     } catch (e) {
       let why = niceErr(e);
       if (hh) { try { if ((await helperClose(tradeAddr, hh)) === 'closed') why += ' Its clerk was closed, so the 1.01 XLM is back.'; } catch (x) { why += ' Its clerk will be closed and the XLM returned next time you open Trade.'; } }
-      if (/not funded yet/i.test(why)) why += ' Your stop server needs about 10 XLM on ' + netWord() + ' for its clerk accounts. Settings → Stop orders → Check shows the address to send it to.';
+      if (/not funded yet/i.test(why)) why += ' The stop server needs about 10 XLM on ' + netWord() + ' for its clerk accounts. Settings → Stop orders → Check shows the address to send it to.';
       tPendSet(pnd, 'Failed', 'red', why + (RP ? ' Nothing was placed. Your old stop is still waiting.' : ' Nothing was placed.'), true);
     }
   }, false, sell ? 'b-pur' : 'b-grn', 'Placing…', true);
@@ -21581,7 +21581,7 @@ async function stopCancel(t) {
 const servesNet = (j) => Array.isArray(j.nets) ? j.nets.includes(S.net) : !!(j.nets && j.nets[S.net]);
 async function stopCheck() {
   const u = ($('#setStopUrl').value || '').trim().replace(/\/+$/, ''), el = $('#setStopSt');
-  if (!u) { S.stopUrl = ''; saveS(); el.textContent = 'Off. Stop orders are hidden until you add your stop server.'; return; }
+  if (!u) { S.stopUrl = ''; saveS(); el.textContent = 'Off. Stop orders are hidden until the stop server address is set.'; return; }
   if (!/^https:\/\//.test(u) && !/^http:\/\/(127\.0\.0\.1|localhost|192\.168\.)/.test(u)) { el.innerHTML = '<span class="red">Use an https address.</span>'; return; }
   el.textContent = 'Checking…';
   try {
@@ -21611,7 +21611,7 @@ function drawStopSet() {
   $$('#setGuard button').forEach((b) => b.classList.toggle('on', +b.dataset.v === stopGuard()));
   for (const k of ['xlm', 'xrp', 'sol']) $$('#setCap' + k[0].toUpperCase() + k.slice(1) + ' button').forEach((b) => b.classList.toggle('on', +b.dataset.v === stopCap(k)));
   $('#setStopUrl').value = S.stopUrl || '';
-  if (!S.stopUrl) { $('#setStopSt').textContent = 'Off. Add your stop server to use stop orders.'; return; }
+  if (!S.stopUrl) { $('#setStopSt').textContent = 'Off. Add the stop server address to use stop orders.'; return; }
   $('#setStopSt').textContent = 'Checking…'; fetch(S.stopUrl + '/health').then((r) => r.json()).then((j) => servesNet(j) ? stopStatus(j) : ($('#setStopSt').innerHTML = `<span class="amb">Doesn't serve ${netWord()}.</span>`)).catch(() => { $('#setStopSt').innerHTML = '<span class="amb">Not answering right now.</span>'; });
 }
 
@@ -21685,7 +21685,7 @@ async function onrCheck() {
 let ONRH = null, ONRH_AT = 0;   // stop server /health (which buy providers it has)
 async function onrHealth() {
   if (ONRH && Date.now() - ONRH_AT < 10 * 60e3) return ONRH;
-  const r = await fetch(S.stopUrl.replace(/\/+$/, '') + '/health').catch(() => { throw new Error("Can't reach your stop server."); });
+  const r = await fetch(S.stopUrl.replace(/\/+$/, '') + '/health').catch(() => { throw new Error("Can't reach Liquidfi."); });
   ONRH = await r.json(); ONRH_AT = Date.now(); return ONRH;
 }
 const PROV_NM = { stripe: 'Stripe', coinbase: 'Coinbase' };
@@ -21696,7 +21696,7 @@ async function onrBuySheet(chain, addr, opts = {}) {
   let h; try { h = await onrHealth(); } catch (e) { return sheet(`<h2>Buy</h2><div class="note amb">${esc(niceErr(e))}</div><button class="b-out" data-act="closeSheet">Close</button>`); }
   const sol = chain === 'solana';
   const provs = [...((chain === 'stellar' || (sol && h.stripeSol)) && h.stripe ? ['stripe'] : []), ...(h.onramp && !sol ? ['coinbase'] : [])];
-  if (!provs.length) return sheet(`<h2>Buy</h2><div class="note amb">${sol ? (h.stripe ? 'Buying SOL needs your stop server on v2.9 or newer. Run Update-Stops-On-Vultr.bat on the PC.' : 'Buying SOL needs the Stripe key on your stop server.') : chain === 'xrp' ? 'Buying XRP needs the Coinbase key on your stop server.' : 'No buy service is set up on your stop server yet (Stripe or Coinbase key).'}</div><button class="b-out" data-act="closeSheet">Close</button>`);
+  if (!provs.length) return sheet(`<h2>Buy</h2><div class="note amb">${sol ? (h.stripe ? 'Buying SOL needs the stop server on v2.9 or newer. Run Update-Stops-On-Vultr.bat on the PC.' : 'Buying SOL needs the Stripe key on the Liquidfi server.') : chain === 'xrp' ? 'Buying XRP needs the Coinbase key on the Liquidfi server.' : 'No buy service is set up on the Liquidfi server yet (Stripe or Coinbase key).'}</div><button class="b-out" data-act="closeSheet">Close</button>`);
   if (!provs.includes(ONR.prov)) ONR.prov = provs[0];
   ONR.embed = (chain === 'stellar' || sol) && !!h.stripeEmbed && !!h.stripeTicket;   // Liquidfi's own Stripe checkout page (server v2.5); Stripe's own page stays as the backup
   const P = PROV_NM[ONR.prov];
@@ -21778,7 +21778,7 @@ function onrGo(btn) {
 }
 
 /* Liquidfi's Stripe checkout (buy.liquidfi.com). Stripe's embedded onramp only runs as a full page (it refuses to run
-   inside a frame), so it opens in a new tab. Your stop server makes the session with this wallet's address locked in and
+   inside a frame), so it opens in a new tab. The stop server makes the session with this wallet's address locked in and
    hands back a one-time ticket (works once, for 3 minutes). It travels in the link's #part, which browsers never send to
    any server; that page trades it for the session and shows Stripe's checkout. Stripe's code never loads in this page. */
 const BUY_URL = 'https://buy.liquidfi.com/';
@@ -22632,7 +22632,7 @@ async function pushSubscription(key) {
   return sub || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: want });
 }
 async function pushOn() {
-  if (!S.stopUrl) throw new Error('Alerts come from your stop server: set it first in Settings → Stop orders.');
+  if (!S.stopUrl) throw new Error('Alerts need stop orders on: Settings → Stop orders.');
   if (!pushCan()) throw new Error(pushIOSHome() ? 'On iPhone, add Liquidfi to your Home Screen first (Share → Add to Home Screen), open it from there, then turn alerts on.' : "This browser can't show alerts. Try Chrome.");
   const blocked = new Error('Notifications are blocked for this site. Allow them in your browser\'s site settings, then try again.');
   let sub = null;
@@ -22641,11 +22641,11 @@ async function pushOn() {
     try { sub = await PUSHPRE.reg.pushManager.getSubscription(); if (sub) { const have = sub.options && sub.options.applicationServerKey ? new Uint8Array(sub.options.applicationServerKey) : null; if (!have || have.length !== want.length || have.some((v, i) => v !== want[i])) { await sub.unsubscribe(); sub = null; } }
       if (!sub) sub = await PUSHPRE.reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: want }); }
     catch (e) { if (/NotAllowed|denied|permission/i.test((e && (e.name + ' ' + e.message)) || '')) throw blocked; sub = null; }
-    if (sub) { const h = await stopApi('/health').catch(() => null); if (!h || !h.push) { PUSHPRE = null; try { await sub.unsubscribe(); } catch (e) {} throw new Error('Your stop server needs the update for alerts (version 2.0). Install it on the watcher box first.'); } }
+    if (sub) { const h = await stopApi('/health').catch(() => null); if (!h || !h.push) { PUSHPRE = null; try { await sub.unsubscribe(); } catch (e) {} throw new Error('The stop server needs the update for alerts (version 2.0). Install it on the watcher box first.'); } }
   }
   if (!sub) {
     const perm = await Notification.requestPermission(); if (perm !== 'granted') throw blocked;
-    const h = await stopApi('/health'); if (!h || !h.push) throw new Error('Your stop server needs the update for alerts (version 2.0). Install it on the watcher box first.');
+    const h = await stopApi('/health'); if (!h || !h.push) throw new Error('The stop server needs the update for alerts (version 2.0). Install it on the watcher box first.');
     const { key } = await stopApi('/push/key', {}); sub = await pushSubscription(key);
   }
   await pushIds(); await stopApi('/push/sub', { pid: S.push.pid, sec: S.push.sec, sub: sub.toJSON(), detail: !!S.push.detail });
@@ -22685,7 +22685,7 @@ function pushPaint() {
   const standalone = navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
   $('#setPushTip').style.display = P.on && !standalone && !pushIsIOS() ? '' : 'none';
   $('#setPushFills').style.display = P.on ? 'flex' : 'none';
-  $('#setPushW').innerHTML = P.on ? (P.fillsOk === false ? '<span class="amb" style="font-size:13px">Your stop server needs version 2.1 for fill alerts.</span>' : pushWallets().map((w) => `<label style="flex-direction:row;align-items:center;justify-content:space-between;gap:10px;font-size:15px;padding:6px 0"><span>${esc(w.n)} <span class="mu" style="font-size:12.5px">· ${w.c === 'xrp' ? 'XRP' : 'Stellar'}</span></span><input type="checkbox" data-pushw="${esc(w.a)}" ${w.on ? 'checked' : ''} style="width:22px;height:22px"></label>`).join('') + (pushWallets().filter((w) => w.on).length > 12 ? `<div class="amb" style="font-size:13px;padding-top:6px">${pushWallets().filter((w) => w.on).length} ticked: only the first 12 get alerts. Untick the bot wallets you don't need (they trade all day).</div>` : '')) : '';
+  $('#setPushW').innerHTML = P.on ? (P.fillsOk === false ? '<span class="amb" style="font-size:13px">The stop server needs version 2.1 for fill alerts.</span>' : pushWallets().map((w) => `<label style="flex-direction:row;align-items:center;justify-content:space-between;gap:10px;font-size:15px;padding:6px 0"><span>${esc(w.n)} <span class="mu" style="font-size:12.5px">· ${w.c === 'xrp' ? 'XRP' : 'Stellar'}</span></span><input type="checkbox" data-pushw="${esc(w.a)}" ${w.on ? 'checked' : ''} style="width:22px;height:22px"></label>`).join('') + (pushWallets().filter((w) => w.on).length > 12 ? `<div class="amb" style="font-size:13px;padding-top:6px">${pushWallets().filter((w) => w.on).length} ticked: only the first 12 get alerts. Untick the bot wallets you don't need (they trade all day).</div>` : '')) : '';
 }
 function pushOffer() {   /* once, after the first stop is placed: offer alerts (never asks again after a yes or no) */
   if (!S.stopUrl || (S.push && (S.push.on || S.push.asked)) || !(pushCan() || pushIOSHome())) return;
