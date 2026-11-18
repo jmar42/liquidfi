@@ -671,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45n · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45o · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15755,7 +15755,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45n';
+const APP_VER = 'v2.45o';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -19781,7 +19781,7 @@ async function tryUnlock(bio) {
     const p = pinBuf;   // the PIN as typed at this moment (keys pressed during the unlock don't change it)
     const v = await unseal(p, S.vault);
     K = unpackVault(v); PIN = p; unlocking = false;
-    S.fails = 0; S.lockUntil = 0; S.pinLen = PIN.length; saveS(); pinBuf = ''; bumpIdle(); startMarket(); go('bots'); setTimeout(vanSweep, 1500); setTimeout(vanResume, 300);   // Accounts is the home page
+    S.fails = 0; S.lockUntil = 0; S.pinLen = PIN.length; saveS(); pinBuf = ''; bumpIdle(); startMarket(); go('bots'); if (NOTE_GO) setTimeout(() => noteGo(NOTE_GO), 0); setTimeout(vanSweep, 1500); setTimeout(vanResume, 300);   // Accounts is the home page
     $('#lockMsg').textContent = 'Enter PIN';
   } catch (e) {
     unlocking = false;
@@ -22631,6 +22631,33 @@ async function pushSubscription(key) {
   if (sub && sub.options && sub.options.applicationServerKey) { const have = new Uint8Array(sub.options.applicationServerKey); if (have.length !== want.length || have.some((v, i) => v !== want[i])) { await sub.unsubscribe(); sub = null; } }
   return sub || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: want });
 }
+/* v2.45o (Jeff: "when I get a notification, I click on it and it just goes to the home page"): the alert's tag says what it's about.
+   sw.js passes it here (a message to the open page, or #n=<tag> on a fresh one). Locked → held until unlock.
+   sstop-<id> SOL stop → Trade SOL · xstop-<id> XRP stop → Trade XRP · stop-<id> Stellar stop → Activity
+   fill-<addr12> → that wallet's trades (Trade SOL, else Activity) · dep-<addr12> → that wallet's page */
+let NOTE_GO = null;
+function noteGo(tag) {
+  tag = String(tag || ''); if (!tag || tag === 'liquidfi' || tag === 'liquidfi-test') return;
+  if (!K) { NOTE_GO = tag; return; }
+  NOTE_GO = null; closeSheet();
+  const i = tag.indexOf('-'), kind = tag.slice(0, i), id = tag.slice(i + 1);
+  const act = (tab) => { ACT.tab = tab; go('act'); };
+  try {
+    if (kind === 'sstop') { const x = sstAll().find((y) => y.id === id); if (x) { solSel = x.addr; return go('strade'); } return act('filled'); }
+    if (kind === 'xstop') { const x = xstAll().find((y) => y.id === id); if (x) { xrSel = x.addr; return go('xtrade'); } return act('filled'); }
+    if (kind === 'stop') return act('filled');
+    if (kind === 'fill' || kind === 'dep') {
+      const so = solList().find((o) => o.addr.startsWith(id)); if (so) { solSel = so.addr; return go(kind === 'fill' ? 'strade' : 'sol'); }
+      if (kind === 'fill') return act('filled');
+      const xo = xrList().find((o) => o.addr.startsWith(id)); if (xo) { xrSel = xo.addr; return go('xrp'); }
+      const st = persAccts().find((o) => o.addr.startsWith(id)); if (st) { homeAddr = st.addr; return go('home'); }
+      return go('bots');
+    }
+  } catch (e) {}
+}
+function noteHash() { const m = /[#&]n=([^&]+)/.exec(location.hash || ''); if (!m) return; try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} noteGo(decodeURIComponent(m[1])); }
+try { if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.liquidfiGo) noteGo(e.data.liquidfiGo); }); } catch (e) {}
+setTimeout(noteHash, 0); window.addEventListener('hashchange', noteHash);
 async function pushOn() {
   if (!S.stopUrl) throw new Error('Alerts need stop orders on: Settings → Stop orders.');
   if (!pushCan()) throw new Error(pushIOSHome() ? 'On iPhone, add Liquidfi to your Home Screen first (Share → Add to Home Screen), open it from there, then turn alerts on.' : "This browser can't show alerts. Try Chrome.");
