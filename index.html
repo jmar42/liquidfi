@@ -226,6 +226,8 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 .foot{font-size:12.5px;color:var(--mu);margin:0 4px;line-height:1.5}
 .killbar{position:sticky;bottom:72px;z-index:3;background:var(--bg);margin:auto -18px 0;padding:10px 18px 4px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--bd)}
 #tLimMode button{font-size:14.5px;padding-left:2px;padding-right:2px;min-width:0}
+#s-xtrade.rvon > *:not(.top:first-child):not(#xtQ):not(#rvP){display:none !important}
+#xtQ button{font-size:14.5px;padding-left:2px;padding-right:2px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -413,7 +415,22 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <!-- TRADE XRP (XRP Ledger DEX) -->
 <section class="scr" id="s-xtrade">
   <div class="top"><div class="l"><button class="ico back" data-go="xrp" aria-label="Back">‹</button><h2>Trade XRP</h2></div><button class="b-out sm" id="xtFrom" data-act="tWalPick" style="font-size:14px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
-  <div class="seg" id="xtQ"><button class="on" data-v="rl">XRP / RLUSD</button><button data-v="uc">XRP / USDC</button></div>
+  <div class="seg" id="xtQ"><button class="on" data-v="rl">XRP / RLUSD</button><button data-v="uc">XRP / USDC</button><button data-v="rv">RLUSD / USDC</button></div>
+  <div id="rvP" style="display:none;flex-direction:column;gap:12px">
+    <div class="card"><div class="top"><span class="lbl">RLUSD / USDC · XRP Ledger DEX</span><span class="grn" style="font-size:12px;font-weight:700" id="rvUpd"></span></div>
+      <div id="rvBook" style="display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px"></div><div class="mu" id="rvMid" style="font-size:13px"></div></div>
+    <div class="seg" id="rvMode"><button class="on" data-v="swap">Swap</button><button data-v="lim">Limit order</button></div>
+    <div class="seg" id="rvSide"><button class="on" data-v="buy">Buy RLUSD</button><button data-v="sell">Sell RLUSD</button></div>
+    <label><span id="rvAmtL">Spend (USDC)</span><input id="rvAmt" inputmode="decimal" placeholder="0"></label>
+    <div class="g4"><button class="b-out sm" data-rvpct="25">25%</button><button class="b-out sm" data-rvpct="50">50%</button><button class="b-out sm" data-rvpct="75">75%</button><button class="b-out sm" data-rvpct="100">Max</button></div>
+    <div class="mu" id="rvHave" style="font-size:13px"></div>
+    <label id="rvPxW" style="display:none"><span>Limit price (USDC per RLUSD)</span><input id="rvPx" inputmode="decimal"></label>
+    <div class="card rows" id="rvEst" style="padding:4px 14px;font-size:15px"></div>
+    <button class="b-grn big" data-act="rvReview" id="rvGo">Review swap</button>
+    <div id="rvPend" style="display:none;flex-direction:column;gap:8px"></div>
+    <span class="lbl">Open orders · RLUSD / USDC</span>
+    <div id="rvOpen" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
   <div class="card"><div class="top"><span class="lbl" id="xtPairL">XRP / RLUSD · XRP Ledger DEX</span><span class="grn" style="font-size:12px;font-weight:700" id="xtUpd"></span></div><div class="book" id="xtBook"></div><div class="mu" id="xtSpread" style="font-size:13px"></div></div>
   <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="mu" style="font-size:12px">order book + AMM</span></div><div id="xtLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px"></div></div>
   <div class="seg" id="xtSide"><button class="on" data-v="buy">Buy XRP</button><button data-v="sell">Sell XRP</button></div>
@@ -671,7 +688,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45p · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45t · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14541,20 +14558,30 @@ function xrTxText(x, me) {
 }
 
 /* send */
+/* v2.45s (Jeff: "How do I send USDC or anything other than XRP? ... there should be balances of the other tokens"): the coins this
+   wallet can send: XRP, then every token line with a balance (RLUSD, USDC, others), with what's there. Pool shares (LP tokens) aren't sent here. */
+function xrSendCoins(d) {
+  const L = [{ k: 'XRP', tok: 'XRP', bal: xrSpend(d) }];
+  for (const l of (d && d.lines) || []) { const b = +l.balance; if (!(b > 0) || xrLpName(l)) continue; const c = xrCoinOf(l);
+    L.push({ k: l.currency + '.' + l.account, tok: c ? c.tok : xrCur(l.currency), cur: l.currency, iss: l.account, bal: b, who: c ? c.who || '' : short(l.account) }); }
+  return L;
+}
 function xrSendSheet(pre = {}) {   /* like Stellar Send: you can only send to a saved address you checked (name, address, destination tag) */
   const o = xrOwn(xrSel); if (!o) return; pending = null; const d = XRA[xrSel];
   const XB = xrBook(), pick = pre.pick != null && XB[pre.pick] ? String(pre.pick) : '';
-  sheet(`<h2>Send XRP</h2><div class="mu" style="font-size:14px">From ${esc(o.name)} · ${m2(xrSpend(d))} XRP available</div>
+  const CS = xrSendCoins(d), ck = CS.some((c) => c.k === pre.coin) ? pre.coin : 'XRP', C0 = CS.find((c) => c.k === ck);
+  sheet(`<h2 id="xrsH">Send ${esc(C0.tok)}</h2><div class="mu" style="font-size:14px">From ${esc(o.name)}</div>
+    <div class="card" style="padding:8px 14px;gap:0">${CS.map((c) => `<div style="display:flex;justify-content:space-between;padding:5px 0"><span>${esc(c.tok)}${c.k !== 'XRP' && c.who ? `<span class="mu" style="font-size:12px"> · ${esc(c.who)}</span>` : ''}</span><span class="mono">${c.k === 'XRP' ? m2(c.bal) + ' <span class="mu" style="font-size:12px">available</span>' : xq4(c.bal)}</span></div>`).join('')}</div>
+    <label>Coin<select id="xrsCoin">${CS.map((c) => `<option value="${esc(c.k)}"${c.k === ck ? ' selected' : ''}>${esc(c.tok)} · ${c.k === 'XRP' ? m2(c.bal) : xq4(c.bal)}</option>`).join('')}</select></label>
     <label>To<select id="xrsBook"><option value="">Choose…</option>${XB.map((x, i) => `<option value="${i}"${String(i) === pick ? ' selected' : ''}>${esc(x.name)} · ${esc(short(x.addr))}${x.tag !== '' && x.tag != null ? ' · tag ' + esc(x.tag) : ''}</option>`).join('')}<option value="new">+ New address</option></select></label>
     <div id="xrsNew" style="display:none;flex-direction:column;gap:10px">
       <label>Name for this address<input id="xrsName" placeholder="e.g. Coinbase" maxlength="30" autocomplete="off"></label>
       <div style="display:flex;flex-direction:column;gap:6px"><span class="mu" style="font-size:14px">Address (r…)</span><div class="scanrow"><input id="xrsTo" placeholder="r…" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"><button class="b-out" data-act="xrScan">Scan</button></div><div id="xrsScan"></div></div>
       <label>Destination tag (exchanges need it; leave empty for a personal wallet)<input id="xrsTag" inputmode="numeric" autocomplete="off"></label>
-      <label>Memo this address needs, optional<input id="xrsNMemo" autocomplete="off" maxlength="300"></label>
       <div id="xrsChk"></div>
       <button class="b-out" data-act="xrBookCheck" id="xrsChkBtn">Check and save address</button>
     </div>
-    <div id="xrsSendW" style="display:flex;flex-direction:column;gap:10px"><div class="g2" style="align-items:end"><label>Amount (XRP)<input id="xrsAmt" inputmode="decimal" placeholder="0" value="${esc(pre.amt || '')}"></label><button class="b-out" data-act="xrMax">Max</button></div>
+    <div id="xrsSendW" style="display:flex;flex-direction:column;gap:10px"><div class="g2" style="align-items:end"><label><span id="xrsAmtL">Amount (${esc(C0.tok)})</span><input id="xrsAmt" inputmode="decimal" placeholder="0" value="${esc(pre.amt || '')}"></label><button class="b-out" data-act="xrMax">Max</button></div>
     <label><span id="xrsMemoL">Memo (optional, public: anyone can see it on the ledger)</span><input id="xrsMemo" autocomplete="off" maxlength="300" value="${esc(pick !== '' ? XB[+pick].memo || '' : '')}"></label>
     <label style="flex-direction:row;align-items:center;gap:10px;font-size:15px"><input type="checkbox" id="xrsPriv" style="width:20px;height:20px"><span>Private memo <span class="mu" style="font-size:13px">only you and the receiver can read it, in Liquidfi</span></span></label>
     <div class="note"><span>Only saved, checked addresses can be sent to.</span></div>
@@ -14592,16 +14619,17 @@ function xrsShow() {
 }
 function xrsPrivPaint() { const on = ($('#xrsPriv') || {}).checked; if ($('#xrsMemoL')) $('#xrsMemoL').textContent = on ? 'Private memo (encrypted: only you and the receiver can read it)' : 'Memo (optional, public: anyone can see it on the ledger)'; }
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'xrsPriv') xrsPrivPaint(); });
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'xrsCoin') { const c = xrSendCoins(XRA[xrSel]).find((x) => x.k === e.target.value) || { tok: 'XRP' }; $('#xrsH').textContent = 'Send ' + c.tok; $('#xrsAmtL').textContent = `Amount (${c.tok})`; $('#xrsAmt').value = ''; } });
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'xrsBook') { XRCHK = null; if ($('#xrsChk')) $('#xrsChk').innerHTML = ''; xrsShow(); } });
-document.addEventListener('input', (e) => { if (e.target && ['xrsTo', 'xrsTag', 'xrsName', 'xrsNMemo'].includes(e.target.id) && XRCHK) { XRCHK = null; $('#xrsChk').innerHTML = ''; $('#xrsChkBtn').textContent = 'Check and save address'; } });   // changed after the check: check again
+document.addEventListener('input', (e) => { if (e.target && ['xrsTo', 'xrsTag', 'xrsName'].includes(e.target.id) && XRCHK) { XRCHK = null; $('#xrsChk').innerHTML = ''; $('#xrsChkBtn').textContent = 'Check and save address'; } });   // changed after the check: check again
 let XRCHK = null;   /* the address being checked: { name, addr, tag } */
 async function xrBookCheck() {
   if (XRCHK) {   /* step 2: last 4 typed → save it and go back to Send with it picked */
     if ((($('#xrsChk4') || {}).value || '').trim() !== XRCHK.addr.slice(-4)) return toast('Last 4 do not match.');
-    const amt = ($('#xrsAmt') || {}).value || '', i = xrBookSave(XRCHK.name, XRCHK.addr, XRCHK.tag, XRCHK.memo); XRCHK = null;
-    toast('Saved.'); return xrSendSheet({ pick: i, amt });
+    const amt = ($('#xrsAmt') || {}).value || '', coin = ($('#xrsCoin') || {}).value, i = xrBookSave(XRCHK.name, XRCHK.addr, XRCHK.tag, XRCHK.memo); XRCHK = null;
+    toast('Saved.'); return xrSendSheet({ pick: i, amt, coin });
   }
-  const name = ($('#xrsName').value || '').trim().slice(0, 30), addr = ($('#xrsTo').value || '').trim(), tag = ($('#xrsTag').value || '').trim(), nmemo = ($('#xrsNMemo').value || '').trim();
+  const name = ($('#xrsName').value || '').trim().slice(0, 30), addr = ($('#xrsTo').value || '').trim(), tag = ($('#xrsTag').value || '').trim(), nmemo = '';   /* v2.45s: no separate "memo this address needs": XRP Ledger exchanges go by the destination tag */
   if (!name) return toast('Give the address a name.');
   if (!xrpl.isValidClassicAddress(addr)) return toast('That is not an XRP Ledger address (r…).');
   if (tag && (!/^\d{1,10}$/.test(tag) || +tag > 4294967295)) return toast('A destination tag is a whole number.');
@@ -14630,6 +14658,7 @@ async function xrSendReview() {
   const bv = ($('#xrsBook') || {}).value, bk = xrBook()[+bv];
   if (!bk || bv === '' || bv === 'new') return toast('Choose a saved address.');
   const to = bk.addr, tagS = String(bk.tag ?? ''), amt = +$('#xrsAmt').value;
+  const C = xrSendCoins(d).find((x) => x.k === (($('#xrsCoin') || {}).value || 'XRP')) || { k: 'XRP', tok: 'XRP' }, isT = C.k !== 'XRP';
   if (!xrpl.isValidClassicAddress(to)) return toast('That is not an XRP Ledger address (r…).');
   if (to === o.w.classicAddress) return toast("That's this wallet's own address.");
   { const la = xrLookAlike(to); if (la) return toast(`⚠ This looks like ${short(la)} but the middle is different: a scam look-alike. Copy the address from the real source (exchange page or QR), never from your history.`, 9000); }
@@ -14639,12 +14668,30 @@ async function xrSendReview() {
   try { sv = await xrServer(); [dst, fee] = await Promise.all([xr('account_info', { account: to, ledger_index: 'validated' }), xr('fee'), xrLoad(xrSel)]); } catch (e) { return toast(e.message || String(e)); }
   const d2 = XRA[xrSel] || d;
   const drops = Math.min(1000, Math.max(12, Math.ceil(+((fee.drops || {}).open_ledger_fee || 12) * 1.2)));
+  let tok = null;   /* a token send: the receiver needs a trust line for it; the issuer may keep a transfer fee */
+  if (isT) {
+    const l = (d2.lines || []).find((x) => x.currency === C.cur && x.account === C.iss), have = l ? +l.balance : 0;
+    if (amt > have + 1e-12) return toast(`Not enough ${C.tok} (${xq4(have)} in this wallet).`);
+    if (drops / 1e6 > xrSpend(d2) + 1e-9) return toast('Not enough XRP for the network fee.');
+    if (dst.error === 'actNotFound') return toast(`That address isn't activated on the XRP Ledger, so it can't hold ${C.tok}. Send it XRP first.`);
+    let rate = 0;
+    if (to !== C.iss) {
+      const [dl, ia] = await Promise.all([xr('account_lines', { account: to, peer: C.iss, ledger_index: 'validated' }).catch(() => ({ lines: [] })), xr('account_info', { account: C.iss, ledger_index: 'validated' }).catch(() => ({}))]);
+      const tl = (dl.lines || []).find((x) => x.currency === C.cur);
+      if (!tl) return toast(`That address can't receive ${C.tok} yet: it has no ${C.tok} trust line. Ask them to add ${C.tok}, or send XRP.`, 8000);
+      if (+tl.limit_peer > 0 && +tl.balance + amt > +tl.limit_peer + 1e-9) return toast(`That address's ${C.tok} limit is too low for this amount.`);
+      rate = ia.account_data && +ia.account_data.TransferRate > 1e9 ? +ia.account_data.TransferRate / 1e9 - 1 : 0;
+    }
+    if (amt * (1 + rate) > have + 1e-12) return toast(`Not enough ${C.tok} to cover the ${C.tok} issuer's ${(rate * 100).toFixed(2)}% transfer fee.`);
+    tok = { currency: C.cur, issuer: C.iss, rate };
+  } else {
   if (amt + drops / 1e6 > xrSpend(d2) + 1e-9) return toast(`Not enough XRP (${m2(xrSpend(d2))} available after the ledger reserve).`);
   if (dst.error === 'actNotFound' && amt < sv.base) return toast(`That address isn't activated yet. Send at least ${m2(sv.base)} XRP to open it.`);
+  }
   if (dst.error && dst.error !== 'actNotFound') return toast(dst.error_message || dst.error);
   if (dst.account_data && (+dst.account_data.Flags & 0x00020000) && !tagS) return toast('That address needs a destination tag (exchanges do). Add it from the exchange.');
   if (dst.account_data && (+dst.account_data.Flags & 0x01000000)) return toast('That address only accepts payments from senders it approved (Deposit Authorization). The ledger would refuse it.');
-  if (dst.account_data && (+dst.account_data.Flags & 0x00080000) && !confirm('That address asks not to be sent XRP. Send anyway?')) return;
+  if (!isT && dst.account_data && (+dst.account_data.Flags & 0x00080000) && !confirm('That address asks not to be sent XRP. Send anyway?')) return;
   const memoS = (($('#xrsMemo') || {}).value || '').trim(), priv = !!($('#xrsPriv') || {}).checked; let memos = null;
   if (memoS && new TextEncoder().encode(memoS).length > 300) return toast('A memo fits 300 characters.');
   if (priv) {
@@ -14654,9 +14701,9 @@ async function xrSendReview() {
     if (!pk) return toast("A private memo needs the receiver to have sent at least one XRP Ledger transaction (that's how Liquidfi gets their key). Send it as a public memo instead.", 9000);
     try { memos = [{ Memo: { MemoType: strHex(XPM.TYPE), MemoData: XPM.bHex(await XPM.seal(memoS, pk, o.w.publicKey)) } }]; } catch (e) { return toast(e.message || String(e)); }
   } else if (memoS) memos = [{ Memo: { MemoType: strHex('text'), MemoFormat: strHex('text/plain'), MemoData: strHex(memoS) } }];
-  const items = [...await xrBusy(xrSel), { k: 'Send', v: `${m2(amt)} XRP`, hl: 1 }, { k: 'To', v: `${to.slice(0, 8)}…${to.slice(-6)}`, n: bk.name || (xrList().find((w) => w.addr === to) || {}).name || 'check the start and end' }, ...(tagS ? [{ k: 'Destination tag', v: tagS }] : []), ...(memoS ? [{ k: priv ? '🔒 Private memo' : 'Memo', v: memoS, n: priv ? `encrypted: only you and ${bk.name} can read it, in Liquidfi` : 'public' }] : []), { k: 'Network fee', v: `${m2(drops / 1e6)} XRP` },
+  const items = [...await xrBusy(xrSel), { k: 'Send', v: `${isT ? xq4(amt) : m2(amt)} ${esc(C.tok)}`, hl: 1 }, ...(tok && tok.rate ? [{ k: `${esc(C.tok)} issuer fee`, v: `${xq4(amt * tok.rate)} ${esc(C.tok)}`, n: `${(tok.rate * 100).toFixed(2)}% kept by the issuer` }] : []), { k: 'Network fee', v: `${(drops / 1e6).toFixed(6).replace(/0+$/, '')} XRP` }, { k: 'To', v: `${to.slice(0, 8)}…${to.slice(-6)}`, n: bk.name || (xrList().find((w) => w.addr === to) || {}).name || 'check the start and end' }, ...(tagS ? [{ k: 'Destination tag', v: tagS }] : []), ...(memoS ? [{ k: priv ? '🔒 Private memo' : 'Memo', v: memoS, n: priv ? `encrypted: only you and ${bk.name} can read it, in Liquidfi` : 'public' }] : []), { k: 'Network fee', v: `${m2(drops / 1e6)} XRP` },
     ...(dst.error === 'actNotFound' ? [{ foot: `This opens a new XRP Ledger address: ${m2(sv.base)} XRP of it stays there as the ledger's reserve.` }] : []), { foot: XR_BOT_NOTE }];
-  confirmSheet(`Send ${m2(amt)} XRP`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops, memos, bk.name), false, 'b-acc', 'Sending…', true);
+  confirmSheet(`Send ${isT ? xq4(amt) : m2(amt)} ${esc(C.tok)}`, `XRP Ledger${S.net === 'public' ? '' : ' Testnet'} · from ${esc(o.name)}`, items, 'Send', () => xrSendRun(o, to, tagS ? +tagS : null, amt, drops, memos, bk.name, tok && { ...tok, tok: C.tok }), false, 'b-acc', 'Sending…', true);
 }
 // sign + submit + wait until the outcome is CERTAIN. A payment is only "not sent" once the ledger has passed its
 // LastLedgerSequence without it. Timeouts, tef/ter/tel answers (e.g. tefPAST_SEQ from a second server that already has it)
@@ -14788,16 +14835,18 @@ async function xrBusy(addr) { return xrBusyItems(await xrBusyN(addr)); }
 const XR_BOT_NOTE = 'If a bot (like XRP Sweepr) trades from this wallet, pause it first so the two don\'t clash.';
 /* v2.40v: like a Stellar send, the sheet closes on the tap and the big banner at the top goes Sending… → ✓ Sent (or Not sent / Still
    pending with the reason). A send that did not go through also opens the full result screen with the link. */
-async function xrSendRun(o, to, tag, amt, drops, memos, toName) {
-  const me = o.w.classicAddress, nm = toName || short(to), p = tPend(`Send ${m2(amt)} XRP to ${nm}`, 'xsend', me);
+async function xrSendRun(o, to, tag, amt, drops, memos, toName, tok) {
+  const me = o.w.classicAddress, nm = toName || short(to), sym = tok ? tok.tok : 'XRP', amS = tok ? xq4(amt) : m2(amt), p = tPend(`Send ${amS} ${sym} to ${nm}`, 'xsend', me);
   try {
-    const tx = { TransactionType: 'Payment', Destination: to, Amount: String(Math.round(amt * 1e6)) };
+    const iou = (v) => ({ currency: tok.currency, issuer: tok.issuer, value: String(+(+v).toPrecision(15)) });
+    const tx = tok ? { TransactionType: 'Payment', Destination: to, Amount: iou(amt), ...(tok.rate ? { SendMax: iou(amt * (1 + tok.rate) * 1.000001) } : {}) }   /* exact amount arrives; a transfer fee comes out of SendMax */
+      : { TransactionType: 'Payment', Destination: to, Amount: String(Math.round(amt * 1e6)) };
     if (tag != null) tx.DestinationTag = tag;
     if (memos && memos.length) tx.Memos = memos;
     const r = await xrSubmit(o, tx, drops);
     if (r.state === 'ok') { tPendSet(p, '✓ Sent', 'grn', `confirmed · ledger ${+r.ledger || ''}${tag != null ? ' · tag ' + tag : ''}`, true); delete XRA[me]; if (cur === 'xrp' && xrSel === me) drawXrp(true); return; }
     tPendSet(p, r.state === 'pending' ? 'Still pending' : 'Not sent', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? "not confirmed yet: don't send it again" : r.code ? xrErr(r.code) : 'it never reached the ledger; nothing moved', true);
-    return xrOutcome(r, 'Sent', `${m2(amt)} XRP to ${esc(short(to))}${tag != null ? ' · tag ' + tag : ''}`, 'Not sent');
+    return xrOutcome(r, 'Sent', `${amS} ${esc(sym)} to ${esc(short(to))}${tag != null ? ' · tag ' + tag : ''}`, 'Not sent');
   } catch (e) { tPendSet(p, 'Not sent', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
 }
 function xrErr(code, msg) {
@@ -14904,6 +14953,8 @@ function xtPickQ(addr) {   /* last pair used on this wallet if it can hold that 
   XT.q = m && held.some((c) => c.k === m) ? m : held.length ? held[0].k : (m || 'rl');
 }
 function xtSetQ(k) {
+  if (k === 'rv') { if (XT.rv) return; XT.rv = true; return drawXTrade(); }   /* v2.45t: RLUSD / USDC has its own panel */
+  if (XT.rv) { XT.rv = false; if (XT.q === k) return drawXTrade(); }
   if (XT.q === k) return; XT.q = k; const N = NS(); N.xtq = { ...(N.xtq || {}), [xrSel]: k }; saveS();
   XT.bids = []; XT.asks = []; XT.at = 0; XT.sales = []; XT.salesAt = 0; XT.fails = 0; $('#xtPx').value = '';
   drawXTrade();
@@ -14978,6 +15029,8 @@ function xtWalk(side, qty) {   // RLUSD to buy qty XRP (asks) or received for se
 async function drawXTrade() {
   const o = xrOwn(xrSel); if (!o) return go('xrp');
   $('#xtFrom').textContent = o.name + ' ▾';
+  $('#s-xtrade').classList.toggle('rvon', !!XT.rv); $('#rvP').style.display = XT.rv ? 'flex' : 'none';
+  if (XT.rv) { $$('#xtQ button').forEach((b) => b.classList.toggle('on', b.dataset.v === 'rv')); return rvDraw(); }
   chShow('xtrade', 'XRP-USD');
   { const fa = xrFeeTo(xrSel); if (fa) xrFeeLive(fa).then(() => { if (cur === 'xtrade') xtEst(); }).catch(() => {}); }
   const C = xtC(); $$('#xtQ button').forEach((b) => b.classList.toggle('on', b.dataset.v === XT.q));
@@ -15530,6 +15583,148 @@ async function xtEditOk(seq) {
     catch (e) { showResult(false, 'Not edited', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], back); }
   }, false, i.sell ? 'b-pur' : 'b-grn', 'Editing…', true);
 }
+/* ---------- v2.45t: RLUSD / USDC on the XRP Ledger (Jeff: "why not both a swap or book trade for it?") ----------
+   Swap: one Payment from this wallet to itself, USDC → RLUSD or back. The ledger takes the best route at that moment: the
+   RLUSD/USDC order book, the RLUSD/USDC AMM pool, or through XRP (ripple_path_find picks the paths). You spend exactly the
+   amount you typed; you get at least the quote less 0.3% (DeliverMin), or nothing happens. Liquidfi fee 0.25%, paid in XRP after it
+   fills (the fee wallet holds XRP only), like XRP market orders.
+   Limit order: an OfferCreate on the RLUSD/USDC book at your price; it rests until filled or cancelled. Free, like XRP limit orders. */
+const RV = { side: 'buy', mode: 'swap', bids: [], asks: [], amm: null, at: 0, q: null, qKey: '', timer: 0 };
+const RV_SLIP = 0.003;
+const rvRL = () => ({ currency: RLUSD_CUR, issuer: rlusdIss() }), rvUC = () => ({ currency: USDC_HEX, issuer: XRP_USDC_ISS[S.net] });
+const rvBal = (c) => { const l = xrLineOf(XRA[xrSel], xrCoins().find((x) => x.k === c)); return l ? Math.max(0, +l.balance) : null; };   /* null = no trust line */
+const rvIou = (a, v) => ({ ...a, value: String(+(+v).toPrecision(15)) });
+const rv5 = (v) => (+v).toFixed(5);
+function rvDraw() {
+  $$('#rvMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === RV.mode)); rvForm(); rvPaint();
+  rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) { rvPaint(); rvEst(); } }).catch((e) => { if ($('#rvMid')) $('#rvMid').innerHTML = `<span class="amb">${esc(e.message || String(e))}</span>`; });
+  xrLoad(xrSel).then(() => { if (cur === 'xtrade' && XT.rv) rvForm(); }).catch(() => {});
+  rvLoadOpen(); xrpPrice().then(() => { if (cur === 'xtrade' && XT.rv) rvEst(); }).catch(() => {});
+  clearInterval(RV.timer); RV.timer = setInterval(() => { if (cur !== 'xtrade' || !XT.rv) { clearInterval(RV.timer); RV.timer = 0; return; } rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) rvPaint(); }).catch(() => {}); }, 8000);
+}
+async function rvLoad() {   /* asks: offers selling RLUSD for USDC; bids: offers buying RLUSD with USDC; plus the AMM pool */
+  const RL = rvRL(), UC = rvUC();
+  const [a, b, m] = await Promise.all([xr('book_offers', { taker_gets: RL, taker_pays: UC, limit: 20, ledger_index: 'validated' }), xr('book_offers', { taker_gets: UC, taker_pays: RL, limit: 20, ledger_index: 'validated' }), xr('amm_info', { asset: RL, asset2: UC, ledger_index: 'validated' }).catch(() => ({}))]);
+  const v = (x) => +(typeof x === 'object' ? x.value : x);
+  RV.asks = (a.offers || []).map((o) => [v(o.TakerPays) / v(o.TakerGets), v(o.taker_gets_funded || o.TakerGets)]).filter((x) => x[1] > 0.000001);
+  RV.bids = (b.offers || []).map((o) => [v(o.TakerGets) / v(o.TakerPays), v(o.taker_pays_funded || o.TakerPays)]).filter((x) => x[1] > 0.000001);
+  const am = m.amm; RV.amm = am ? (() => { const x = am.amount, y = am.amount2, rl = x.currency === RL.currency ? +x.value : +y.value, uc = x.currency === RL.currency ? +y.value : +x.value; return { px: uc / rl, rl, uc, fee: (+am.trading_fee || 0) / 100000 }; })() : null;
+  RV.at = Date.now();
+}
+function rvPaint() {
+  const el = $('#rvBook'); if (!el) return; const A = RV.asks.slice(0, 6).reverse(), B = RV.bids.slice(0, 6);
+  const row = (x, c) => `<span class="${c}" data-rvpx="${rv5(x[0])}" style="cursor:pointer">${rv5(x[0])}</span><span style="text-align:right">${fx(x[1], 2)}</span>`;
+  el.innerHTML = RV.at ? `<span class="mu" style="font-size:12px">Price (USDC)</span><span class="mu" style="font-size:12px;text-align:right">Size (RLUSD)</span>${A.map((x) => row(x, 'sell')).join('')}${B.map((x) => row(x, 'buy')).join('')}` : '<span class="mu">loading…</span>';
+  const ba = RV.bids[0], aa = RV.asks[0];
+  $('#rvMid').innerHTML = RV.at ? `${ba && aa ? `Spread ${((aa[0] - ba[0]) / aa[0] * 1e4).toFixed(1)} bps` : 'One side of the book is empty'}${RV.amm ? ` · AMM pool ${rv5(RV.amm.px)} (${fx(RV.amm.rl + RV.amm.uc, 0)} deep, ${(RV.amm.fee * 100).toFixed(2)}% pool fee)` : ''}` : '';
+  $('#rvUpd').textContent = RV.at ? '● live' : '';
+}
+function rvForm() {
+  const sw = RV.mode === 'swap', buy = RV.side === 'buy';
+  $$('#rvMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === RV.mode)); $$('#rvSide button').forEach((b) => b.classList.toggle('on', b.dataset.v === RV.side));
+  $('#rvAmtL').textContent = sw ? `Spend (${buy ? 'USDC' : 'RLUSD'})` : 'Amount (RLUSD)'; $('#rvPxW').style.display = sw ? 'none' : '';
+  if (!sw && !$('#rvPx').value) { const b = buy ? RV.bids[0] : RV.asks[0]; if (b) $('#rvPx').value = rv5(b[0]); }
+  $('#rvGo').textContent = sw ? 'Review swap' : `Review ${buy ? 'buy' : 'sell'} order`; $('#rvGo').className = 'big ' + (buy ? 'b-grn' : 'b-red');
+  const r = rvBal('rl'), u = rvBal('uc');
+  $('#rvHave').innerHTML = `Available: ${u == null ? '<span class="amb">no USDC line</span>' : fx(u, 2) + ' USDC'} · ${r == null ? '<span class="amb">no RLUSD line</span>' : fx(r, 2) + ' RLUSD'}`;
+  rvEst();
+}
+function rvPct(p) {
+  const sw = RV.mode === 'swap', buy = RV.side === 'buy', u = rvBal('uc') || 0, r = rvBal('rl') || 0, px = +$('#rvPx').value || (RV.asks[0] || [1])[0];
+  const v = sw ? (buy ? u : r) : (buy ? u / px : r);
+  $('#rvAmt').value = String(Math.floor(v * p / 100 * 1e6) / 1e6); rvEst();
+}
+let RVQT = 0;
+function rvEst() {
+  const el = $('#rvEst'); if (!el) return; const q = +$('#rvAmt').value || 0, buy = RV.side === 'buy';
+  if (!(q > 0)) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; return; }
+  if (RV.mode === 'lim') { const p = +$('#rvPx').value || 0; el.innerHTML = `<div><span class="mu">${buy ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p, 2)} USDC</span></div><div><span class="mu">Liquidfi fee</span><span class="mono">none on limit orders</span></div>`; return; }
+  el.innerHTML = '<div><span class="mu">Getting the best route…</span></div>'; clearTimeout(RVQT);
+  RVQT = setTimeout(async () => { try { const Q = await rvQuote(q, buy); if (+$('#rvAmt').value !== q || RV.side !== (buy ? 'buy' : 'sell')) return; rvEstPaint(Q); } catch (e) { el.innerHTML = `<div><span class="amb">${esc(e.message || String(e))}</span></div>`; } }, 350);
+}
+async function rvQuote(q, buy) {   /* spend exactly q of the source coin: what the ledger's best paths deliver */
+  const from = buy ? rvUC() : rvRL(), to = buy ? rvRL() : rvUC();
+  const r = await xr('ripple_path_find', { source_account: xrSel, destination_account: xrSel, destination_amount: { ...to, value: '-1' }, send_max: rvIou(from, q), ledger_index: 'validated' });
+  if (r.error) throw new Error(r.error_message || r.error);
+  const best = (r.alternatives || []).map((a) => ({ get: +a.destination_amount.value, paths: a.paths_computed || [] })).sort((x, y) => y.get - x.get)[0];
+  if (!best || !(best.get > 0)) throw new Error('No route for this swap right now.');
+  return RV.q = { q, buy, get: best.get, paths: best.paths, at: Date.now(), via: best.paths.some((p) => p.some((s) => s.currency === 'XRP')) ? 'book, pool and through XRP' : 'RLUSD/USDC book and pool' };
+}
+const rvFeeX = (usd) => (XRPX.px > 0 ? xrFeeOf(usd / XRPX.px) : 0);
+function rvEstPaint(Q) {
+  const el = $('#rvEst'); const fin = Q.buy ? 'RLUSD' : 'USDC', fe = xrFeeOn(xrSel) ? rvFeeX(Q.q) : 0;
+  el.innerHTML = `<div><span class="mu">You get about</span><span class="mono">${fx(Q.get, 4)} ${fin}</span></div><div><span class="mu">Rate</span><span class="mono">${rv5(Q.buy ? Q.q / Q.get : Q.get / Q.q)} USDC per RLUSD</span></div><div><span class="mu">At least (0.3% max slippage)</span><span class="mono">${fx(Q.get * (1 - RV_SLIP), 4)} ${fin}</span></div>${fe ? `<div><span class="mu">Liquidfi fee (${XR_FEE.bps / 100}%)</span><span class="mono">${xq4(fe)} XRP</span></div>` : ''}<div><span class="mu">Route</span><span class="mono" style="font-size:13px">${esc(Q.via)}</span></div>`;
+}
+async function rvReview() {
+  const o = xrOwn(xrSel); if (!o) return; const q = +$('#rvAmt').value || 0, buy = RV.side === 'buy', sw = RV.mode === 'swap';
+  if (!(q > 0)) return toast('Enter an amount.');
+  let d, sv, drops; try { [d, sv, drops] = await Promise.all([xrLoad(xrSel), xrServer(), xrFee()]); await xrpPrice(); } catch (e) { return toast(e.message || String(e)); }
+  const r = rvBal('rl'), u = rvBal('uc'), get = buy ? 'RLUSD' : 'USDC';
+  if ((buy ? r : u) == null) return toast(`Add ${get} to this wallet first (XRP wallet → Assets), so it can receive it.`, 7000);
+  if (sw) {
+    if (q > (buy ? u : r) + 1e-9) return toast(`Not enough ${buy ? 'USDC' : 'RLUSD'} (${fx(buy ? u : r, 2)}).`);
+    let Q; try { Q = await rvQuote(q, buy); } catch (e) { return toast(e.message || String(e)); }
+    const fee = xrFeeOn(xrSel) ? rvFeeX(q) : 0; if (xrFeeOn(xrSel) && !(XRPX.px > 0)) return toast("Couldn't price the fee in XRP. Try again in a moment.");
+    if (xrSpend(d) < fee + 2 * drops / 1e6) return toast(`Not enough XRP for the fee (${xq4(fee + 2 * drops / 1e6)} XRP).`);
+    const min = Q.get * (1 - RV_SLIP);
+    confirmSheet(`Swap ${fx(q, 2)} ${buy ? 'USDC' : 'RLUSD'} → ${get}`, `XRP Ledger · from ${esc(o.name)}`, [...await xrBusy(xrSel),
+      { k: 'You pay', v: `${fx(q, 4)} ${buy ? 'USDC' : 'RLUSD'}`, n: 'exactly this', hl: 1 }, { k: 'You get about', v: `${fx(Q.get, 4)} ${get}`, n: `at least ${fx(min, 4)} or nothing happens` },
+      { k: 'Rate', v: `${rv5(buy ? q / Q.get : Q.get / q)} USDC per RLUSD` }, { k: 'Route', v: Q.via, n: 'the ledger picks the best price' },
+      ...(fee ? [{ k: 'Liquidfi fee', v: `${xq4(fee)} XRP`, n: `${XR_FEE.bps / 100}% · only if it fills` }] : []), { k: 'Network fee', v: `${(drops / 1e6).toFixed(6).replace(/0+$/, '')} XRP` }, { foot: XR_BOT_NOTE }],
+      'Swap', () => rvSwapRun(o, q, buy, Q, min, fee, drops), false, buy ? 'b-grn' : 'b-red', 'Swapping…', true);
+    return;
+  }
+  const p = +$('#rvPx').value || 0; if (!(p > 0)) return toast('Enter a limit price.'); if (Math.abs(p - 1) > 0.1) return toast('That price is more than 10% from $1. Check it.');
+  const cost = q * p; if (buy ? cost > u + 1e-9 : q > r + 1e-9) return toast(`Not enough ${buy ? 'USDC' : 'RLUSD'}.`);
+  if (xrSpend(d) < sv.inc + drops / 1e6) return toast(`An open order holds ${m2(sv.inc)} XRP of reserve: not enough XRP.`);
+  confirmSheet(`${buy ? 'Buy' : 'Sell'} ${fx(q, 2)} RLUSD @ ${rv5(p)}`, `XRP Ledger · limit order · from ${esc(o.name)}`, [...await xrBusy(xrSel),
+    { k: buy ? 'Buy' : 'Sell', v: `${fx(q, 4)} RLUSD`, hl: 1 }, { k: 'Limit price', v: `${rv5(p)} USDC` }, { k: buy ? 'Cost' : 'Proceeds', v: `${fx(cost, 4)} USDC`, n: 'if all of it fills' },
+    { k: 'Liquidfi fee', v: 'None', n: 'limit orders are free' }, { k: 'Reserve', v: `${m2(sv.inc)} XRP`, n: 'held while it rests, back when it closes' }, { k: 'Network fee', v: `${(drops / 1e6).toFixed(6).replace(/0+$/, '')} XRP` }, { foot: XR_BOT_NOTE }],
+    `Place ${buy ? 'buy' : 'sell'} order`, () => rvLimRun(o, q, p, buy, drops), false, buy ? 'b-grn' : 'b-red', 'Placing…', true);
+}
+async function rvSwapRun(o, q, buy, Q, min, fee, drops) {
+  const me = o.w.classicAddress, from = buy ? rvUC() : rvRL(), to = buy ? rvRL() : rvUC(), g = buy ? 'RLUSD' : 'USDC', pd = tPend(`Swap ${fx(q, 2)} ${buy ? 'USDC' : 'RLUSD'} → ${g}`, 'xtrv', me);
+  try {
+    const tx = { TransactionType: 'Payment', Destination: me, Amount: rvIou(to, Q.get * 1.01), SendMax: rvIou(from, q), DeliverMin: rvIou(to, min), Flags: 0x00020000, ...(Q.paths.length ? { Paths: Q.paths } : {}) };
+    const r = await xrSubmit(o, tx, drops);
+    if (r.state !== 'ok') { tPendSet(pd, r.state === 'pending' ? 'Still pending' : 'Not swapped', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? "not confirmed yet: don't swap again" : r.code === 'tecPATH_PARTIAL' || r.code === 'tecPATH_DRY' ? 'the price moved past 0.3%: nothing changed hands' : xrErr(r.code), true); return; }
+    const dv = r.meta && r.meta.delivered_amount ? +(r.meta.delivered_amount.value || 0) : Q.get;
+    let fn = '';
+    if (fee) { try { const fa = xrFeeTo(me); if (fa && await xrFeeLive(fa)) { const f = await xrSubmit(o, { TransactionType: 'Payment', Destination: fa, Amount: String(Math.round(fee * 1e6)) }, drops); fn = f.state === 'ok' ? ` · fee ${xq4(fee)} XRP` : ' · fee not charged'; } } catch (e) { fn = ' · fee not charged'; } }
+    tPendSet(pd, '✓ Swapped', 'grn', `got ${fx(dv, 4)} ${g} for ${fx(q, 4)} ${buy ? 'USDC' : 'RLUSD'}${fn}`, true);
+    $('#rvAmt').value = ''; delete XRA[me]; if (cur === 'xtrade' && XT.rv) rvDraw();
+  } catch (e) { tPendSet(pd, 'Not swapped', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); }
+}
+async function rvLimRun(o, q, p, buy, drops) {
+  const me = o.w.classicAddress, pd = tPend(`${buy ? 'Buy' : 'Sell'} ${fx(q, 2)} RLUSD @ ${rv5(p)}`, 'xtrv', me);
+  try {
+    const R2 = rvIou(rvRL(), q), U2 = rvIou(rvUC(), q * p);
+    const r = await xrSubmit(o, buy ? { TransactionType: 'OfferCreate', TakerPays: R2, TakerGets: U2 } : { TransactionType: 'OfferCreate', TakerGets: R2, TakerPays: U2 }, drops);
+    if (r.state !== 'ok') { tPendSet(pd, r.state === 'pending' ? 'Still pending' : 'Not placed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? "not confirmed yet: don't place it again" : xrErr(r.code), true); return; }
+    tPendSet(pd, '✓ Order placed', 'grn', 'on the RLUSD / USDC book (what crossed filled right away)', true);
+    $('#rvAmt').value = ''; delete XRA[me]; if (cur === 'xtrade' && XT.rv) rvDraw();
+  } catch (e) { tPendSet(pd, 'Not placed', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); }
+}
+async function rvLoadOpen() {
+  const el = $('#rvOpen'); if (!el) return; const me = xrSel;
+  try {
+    const r = await xr('account_offers', { account: me, ledger_index: 'validated' }); if (cur !== 'xtrade' || xrSel !== me) return;
+    const RL = rvRL(), UC = rvUC(), is = (a, c) => a && typeof a === 'object' && a.currency === c.currency && a.issuer === c.issuer;
+    const L = (r.offers || []).filter((f) => (is(f.taker_gets, RL) && is(f.taker_pays, UC)) || (is(f.taker_gets, UC) && is(f.taker_pays, RL)));
+    el.innerHTML = L.length ? L.map((f) => { const sell = is(f.taker_gets, RL), qn = +(sell ? f.taker_gets : f.taker_pays).value, us = +(sell ? f.taker_pays : f.taker_gets).value;
+      return `<div class="card" style="padding:10px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${sell ? 't-sell' : 't-buy'}">${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(qn, 2)} RLUSD @ ${rv5(us / qn)}</b></div><button class="b-redout sm" data-rvcancel="${+f.seq}">Cancel</button></div>`; }).join('')
+      : '<div class="mu">No open RLUSD / USDC orders.</div>';
+  } catch (e) { el.innerHTML = `<div class="mu">${esc(e.message || String(e))}</div>`; }
+}
+async function rvCancel(t) {
+  const o = xrOwn(xrSel), seq = +t.dataset.rvcancel; if (!o || !seq || t.disabled) return;
+  if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = 'Tap again to cancel'; setTimeout(() => { if (t.isConnected && !t.disabled) { t.dataset.armed = ''; t.textContent = 'Cancel'; } }, 4000); return; }
+  t.disabled = true; t.textContent = 'Cancelling…';
+  try { const r = await xrSubmit(o, { TransactionType: 'OfferCancel', OfferSequence: seq }, await xrFee());
+    if (r.state === 'ok') { t.textContent = 'Cancelled'; setTimeout(rvLoadOpen, 800); } else { t.disabled = false; t.textContent = 'Cancel'; toast('Not cancelled: ' + xrErr(r.code)); }
+  } catch (e) { t.disabled = false; t.textContent = 'Cancel'; toast('Not cancelled: ' + (e.message || e)); }
+}
+document.addEventListener('input', (e) => { if (e.target && (e.target.id === 'rvAmt' || e.target.id === 'rvPx')) rvEst(); });
 async function xtCancel(t) {
   const o = xrOwn(xrSel), seq = +t.dataset.xcancel; if (!o || !seq || t.disabled) return;
   if (t.dataset.armed !== '1') { t.dataset.armed = '1'; t.textContent = 'Tap again to cancel'; setTimeout(() => { if (t.isConnected && !t.disabled) { t.dataset.armed = ''; t.textContent = 'Cancel'; } }, 4000); return; }   // a bot may own orders on this wallet too: two taps
@@ -15755,7 +15950,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45p';
+const APP_VER = 'v2.45t';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -20652,16 +20847,24 @@ async function actLoad(more) {
      shows each wallet as soon as it arrives instead of waiting for all of them; 50 lines on screen, Load more adds 50 */
   const L = allAccts(), N = more ? 50 : 30;
   const part = () => { ACT.part = true; if (cur === 'act' && !ACT.pt) ACT.pt = setTimeout(() => { ACT.pt = 0; if (cur === 'act') paintAct(); }, 150); };
+  if (!more) ACT.err = {}; ACT.err = ACT.err || {};
   const base0 = ACT.shownN || 0; if (!more) ACT.show = 50; else ACT.show = base0;   /* while reading more, keep the same lines on screen */
-  await Promise.all([...L.map(async (a) => {
+  const sl = async (a) => {
     if (more && !ACT.next[a.addr]) return;
-    try {
-      const j = await H(more ? ACT.next[a.addr].replace(/limit=\d+/, 'limit=' + N) : `/accounts/${a.addr}/trades?order=desc&limit=${N}`);
-      const rs = j._embedded.records; ACT.recs[a.addr] = (more ? ACT.recs[a.addr] || [] : []).concat(rs);
-      ACT.next[a.addr] = rs.length < N ? null : rel(j._links.next.href);
-    } catch (e) { if (!more) { ACT.recs[a.addr] = []; ACT.next[a.addr] = null; } }
+    for (let k = 0; k < 3; k++) {   /* v2.45r: Horizon answers 503 to bursts; retry twice (1.5 s, 3 s) before giving up on a wallet */
+      try {
+        const j = await H(more ? ACT.next[a.addr].replace(/limit=\d+/, 'limit=' + N) : `/accounts/${a.addr}/trades?order=desc&limit=${N}`);
+        const rs = j._embedded.records; ACT.recs[a.addr] = (more ? ACT.recs[a.addr] || [] : []).concat(rs);
+        ACT.next[a.addr] = rs.length < N ? null : rel(j._links.next.href); delete ACT.err[a.addr]; break;
+      } catch (e) {
+        if (e && e.status === 404) { if (!more) { ACT.recs[a.addr] = []; ACT.next[a.addr] = null; } break; }   /* not on the network yet: nothing to show */
+        if (k < 2) { await sleep(1500 * (k + 1)); continue; }
+        if (!more) { ACT.recs[a.addr] = []; ACT.next[a.addr] = null; } ACT.err[a.addr] = 1;
+      }
+    }
     part();
-  }), (async () => { for (const w of xrList()) await (async (w) => {   /* XRP wallets, one at a time (bursts trip the public servers' limit): their XRP ⇄ RLUSD / USDC trades */
+  };
+  const xl = async (w) => {   /* XRP wallets, one at a time (bursts trip the public servers' limit): their XRP ⇄ RLUSD / USDC trades */
     if (more && !ACT.xnext[w.addr]) return;
     try {
       let mk = more ? ACT.xnext[w.addr] : null, got = [], pg = 0;
@@ -20669,20 +20872,52 @@ async function actLoad(more) {
         const r = await xr('account_tx', { account: w.addr, limit: 100, ledger_index_min: -1, ledger_index_max: -1, ...(mk ? { marker: mk } : {}) });
         got = got.concat((r.transactions || []).map((x) => xrActRow(x, w.addr)).filter(Boolean)); mk = r.marker || null; pg++;
       } while (mk && got.length < 10 && pg < (more ? 3 : 2));
+      delete ACT.err[w.addr];
       ACT.xr[w.addr] = (more ? ACT.xr[w.addr] || [] : []).concat(got);
       ACT.xnext[w.addr] = mk;
-    } catch (e) { if (!more) { ACT.xr[w.addr] = []; ACT.xnext[w.addr] = null; } }
+    } catch (e) { if (!more) { ACT.xr[w.addr] = []; ACT.xnext[w.addr] = null; } ACT.err[w.addr] = 1; }
     part();
-  })(w); })()]);
+  };
+  /* v2.45q (Jeff: "it's primarily to load the notification faster"): a wallet picked by a notification (or the chip) loads FIRST, alone,
+     and shows right away; the other wallets load after it */
+  const XL = xrList(), pri = !more && ACT.fil !== 'all' ? ACT.fil : null, pa = pri && L.find((a) => a.addr === pri), pw = pri && !pa && XL.find((w) => w.addr === pri);
+  if (pa) await sl(pa); else if (pw) await xl(pw);
+  const rest = L.filter((a) => a !== pa), lane = async () => { while (rest.length) await sl(rest.shift()); };   /* 2 Stellar wallets at a time: a burst gets 503s */
+  await Promise.all([lane(), lane(), (async () => { for (const w of XL) if (w !== pw) await xl(w); })()]);
   ACT.at = Date.now(); ACT.net = S.net; ACT.busy = false; ACT.part = false; if (more) ACT.show = base0 + 50; $('#aMore').textContent = 'Load more';
   if (cur === 'act') paintAct();
 }
+/* v2.45q (Jeff: "Isn't it supposed to have the fee in there too? Network fee or Liquidfi fee? Or both or market center fee?"):
+   fees show when a line is opened (read then, so the list itself stays fast).
+   - Network fee: paid by whoever sent the transaction. A resting order filled by someone else's trade pays none at fill time.
+   - Liquidfi fee: the 0.25% payment to the fee wallet in the same transaction (Liquidfi trades only; bots pay none).
+   - Exchange fee: the Stellar order book charges none; an AMM pool keeps 0.3%, already in the price. */
+const ACTFEE = {};
+async function actFeeLoad(d) {
+  const el = d.querySelector('.actfee'); if (!el || el.dataset.done) return; el.dataset.done = 1;
+  const op = el.dataset.op, me = el.dataset.addr, pool = !!el.dataset.pool;
+  const row = (k, v, n) => `<div><span style="display:flex;flex-direction:column"><span>${k}</span>${n ? `<span class="mu" style="font-size:12px">${n}</span>` : ''}</span><span class="mono">${v}</span></div>`;
+  try {
+    let F = ACTFEE[op];
+    if (!F) {
+      const o = await H(`/operations/${op}?join=transactions`), tx = o.transaction || await H(`/transactions/${o.transaction_hash}`);
+      const mine = tx.source_account === me || tx.fee_account === me, lf = {};
+      if (mine) { const fw = (SWAP_FEE.to[S.net] || '').trim(); if (fw) { const ops = await H(`/transactions/${tx.hash}/operations?limit=50`);
+        for (const x of ops._embedded.records) if (x.to === fw && x.from === me && /^payment/.test(x.type)) { const a = x.asset_type === 'native' ? 'XLM' : x.asset_code; lf[a] = (lf[a] || 0) + +x.amount; } } }
+      F = ACTFEE[op] = { mine, net: mine ? (+tx.fee_charged || 0) / 1e7 : 0, lf };
+    }
+    const ff = (v) => (v >= 1 ? fx(v, 2) : String(+(+v).toPrecision(3))), lfs = Object.entries(F.lf).map(([a, v]) => `${ff(v)} ${esc(a)}`).join(' + ');
+    el.outerHTML = row('Network fee', F.mine ? `${ff(F.net)} XLM` : 'none', F.mine ? '' : 'your resting order was filled by another trader')
+      + row('Liquidfi fee', lfs || 'none') + row('Exchange fee', pool ? '0.3% (in the price)' : 'none', pool ? 'AMM pool' : 'Stellar order book');
+  } catch (e) { el.innerHTML = '<span>Fees</span><span class="mu">couldn\'t load</span>'; delete el.dataset.done; }
+}
+document.addEventListener('toggle', (e) => { const d = e.target; if (d && d.classList && d.classList.contains('actrow') && d.open) actFeeLoad(d); }, true);
 function xrActRow(x, me) {   /* one XRP Ledger transaction → an Activity line if it traded XRP against a dollar coin for this wallet */
   const t = x.tx || x.tx_json || {}, m = x.meta || {}; if ((m.TransactionResult || 'tesSUCCESS') !== 'tesSUCCESS') return null;
   const d = xrMyDelta(m, me, t); if (!xrTradeText(d)) return null;
   const buy = d.x > 0, qty = Math.abs(d.x), qamt = Math.abs(d.u), tm = x.close_time_iso ? Date.parse(x.close_time_iso) : ((+t.date || 0) + 946684800) * 1000;
   const f = { t: tm, side: buy ? 'BUY' : 'SELL', got: buy ? ['XRP', qty] : [d.tok, qamt], gave: buy ? [d.tok, qamt] : ['XRP', qty], pool: false, ix: 0 };
-  return { ...f, op: 'x' + (x.hash || t.hash), hash: x.hash || t.hash, asset: 'XRP', qty, quote: d.tok, qamt, n: 1, xrp: true, fills: [f] };
+  return { ...f, op: 'x' + (x.hash || t.hash), hash: x.hash || t.hash, asset: 'XRP', qty, quote: d.tok, qamt, n: 1, xrp: true, fills: [f], nfee: t.Account === me ? (+t.Fee || 0) / 1e6 : 0 };
 }
 function actTabShow() {
   const open = ACT.tab === 'open'; $('#aOpen').style.display = open ? 'flex' : 'none'; $('#aList').style.display = open ? 'none' : 'flex';
@@ -20707,10 +20942,10 @@ function paintAct() {
     for (const r of ACT.recs[a.addr] || []) {
       const f = fillFor(r, a.addr);
       if (g && g.op === f.op && g.side === f.side && g.asset === f.asset && g.quote === f.quote) { g.qty += f.qty; g.qamt += f.qamt; g.n++; g.pool = g.pool || f.pool; g.fills.push(f); continue; }
-      g = { ...f, acct: a.name, fills: [f] }; rows.push(g);
+      g = { ...f, acct: a.name, addr: a.addr, fills: [f] }; rows.push(g);
     }
   }
-  for (const w of XL) { if (ACT.fil !== 'all' && w.addr !== ACT.fil) continue; for (const r of ACT.xr[w.addr] || []) rows.push({ ...r, acct: w.name }); }
+  for (const w of XL) { if (ACT.fil !== 'all' && w.addr !== ACT.fil) continue; for (const r of ACT.xr[w.addr] || []) rows.push({ ...r, acct: w.name, addr: w.addr }); }
   // one operation that traded through more than one pair is a swap with steps (e.g. XLM → USDC → EURC): show it as one SWAP line
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i], same = rows.filter((x) => x !== r && x.acct === r.acct && x.op === r.op && !x.merged);
@@ -20725,7 +20960,9 @@ function paintAct() {
   rows.sort((x, y) => y.t - x.t);
   const shown = rows.slice(0, ACT.show || 50); ACT.extra = rows.length > shown.length; ACT.shownN = shown.length;
   if (!shown.length && ACT.busy) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
-  if (!shown.length) { $('#aList').innerHTML = '<div class="note">No buys or sells yet.</div>'; $('#aMore').style.display = 'none'; return; }
+  const bad = ACT.busy ? [] : [...L, ...XL].filter((a) => (ACT.err || {})[a.addr] && (ACT.fil === 'all' || a.addr === ACT.fil)).map((a) => a.name);
+  const badN = bad.length ? `<div class="note amb">Couldn't load ${esc(bad.join(', '))} (the network servers are busy). Tap ↻ to try again.</div>` : '';
+  if (!shown.length) { $('#aList').innerHTML = badN || '<div class="note">No buys or sells yet.</div>'; $('#aMore').style.display = 'none'; return; }
   const today = ptDay(Date.now(), { year: 'numeric', month: 'short', day: 'numeric' }), yday = ptDay(Date.now() - 86400000, { year: 'numeric', month: 'short', day: 'numeric' });
   let html = '', day = null, open = false;
   for (const r of shown) {
@@ -20735,12 +20972,14 @@ function paintAct() {
     const extra = [r.n > 1 ? r.n + ' fills' : '', r.pool ? 'pool' : ''].filter(Boolean).join(' · ');
     const steps = [];   // details: each step and where it filled (order book or AMM pool), in the order they happened
     for (const f of [...r.fills].sort((x, y) => x.t - y.t || x.ix - y.ix)) { const k = f.gave[0] + '→' + f.got[0] + (f.pool ? 'P' : 'B'), l = steps.find((x) => x.k === k); if (l) { l.g += f.gave[1]; l.o += f.got[1]; l.n++; } else steps.push({ k, a: f.gave[0], b: f.got[0], g: f.gave[1], o: f.got[1], pool: f.pool, n: 1 }); }
-    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>${r.xrp ? `<a href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a>` : `<a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>`}</div></div>`;
+    const feeRow = r.xrp ? `<div><span>Network fee</span><span class="mono">${r.nfee ? xq4(r.nfee) + ' XRP' : 'none'}</span></div>`
+      : `<div class="actfee" data-op="${esc(r.op)}" data-addr="${esc(r.addr || '')}" data-pool="${r.pool ? 1 : ''}"><span>Fees</span><span class="mu">loading…</span></div>`;
+    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}${feeRow}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>${r.xrp ? `<a href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a>` : `<a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>`}</div></div>`;
     const head = r.swap ? `${amtFmt(r.qamt)} ${esc(r.quote)} → ${amtFmt(r.qty)} ${esc(r.asset)}` : `${fx(r.qty, 2)} ${esc(r.asset)} @ ${px.toFixed(dp)}`;
     html += `<details class="actrow"><summary style="display:flex;align-items:center;gap:10px;padding:10px 0"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : r.side === 'SELL' ? '--sell' : '--blu'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:15px">${head}</span><span class="mu" style="font-size:13px">${esc(r.acct)}${r.swap ? ` · ${steps.length} steps` : ` · ${fx(r.qamt, 2)} ${esc(r.quote)}`}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:13px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></summary>${det}</details>`;
   }
   if (open) html += '</div>';
-  $('#aList').innerHTML = html;
+  $('#aList').innerHTML = badN + html;
   $('#aMore').style.display = ACT.tab !== 'open' && !ACT.busy && (ACT.extra || L.some((a) => ACT.next[a.addr]) || XL.some((w) => ACT.xnext[w.addr])) ? '' : 'none';
 }
 
@@ -21294,7 +21533,7 @@ function tPend(label, scr = 'trade', addr = tradeAddr, keepForm = false) {
   else if (scr === 'trade') { if ($('#tAmt')) $('#tAmt').value = ''; ['#tStop', '#tPx'].forEach((k) => { if ($(k)) $(k).value = ''; }); if (limMode() === 'custom' && $('#tLim')) $('#tLim').value = ''; T.stopTyped = T.pxTyped = false; if ($('#tDays')) $('#tDays').value = '1';   // stops default to 1 day
     T.mode = 'mkt'; T.side = 'buy';   // back to the normal order entry (Market · Buy), so it doesn't look like the order is still being entered
     if (cur === 'trade') drawTrade(); } else if (scr === 'xtrade') { if (!keepForm) xtFormReset(); } else if (scr === 'send' && $('#sAmt')) $('#sAmt').value = '';
-  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : scr === 'swap' ? '#wPend' : scr === 'xswap' ? '#xsPend' : scr === 'xtrade' ? '#xtPend' : scr === 'earn' ? '#ePend' : scr === 'earnx' ? '#eXPend' : '#tPend'); if (el && el.firstElementChild && (cur === scr || (scr === 'earnx' && cur === 'earn'))) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  tPendPaint(); const el = $(scr === 'send' ? '#sPend' : scr === 'swap' ? '#wPend' : scr === 'xswap' ? '#xsPend' : scr === 'xtrade' ? '#xtPend' : scr === 'xtrv' ? '#rvPend' : scr === 'earn' ? '#ePend' : scr === 'earnx' ? '#eXPend' : '#tPend'); if (el && el.firstElementChild && (cur === scr || (scr === 'earnx' && cur === 'earn') || (scr === 'xtrv' && cur === 'xtrade'))) el.firstElementChild.scrollIntoView({ block: 'center', behavior: 'smooth' });
   return p;
 }
 function tPendSet(p, st, cls, sub, done) {
@@ -21310,7 +21549,7 @@ function tPendPaint() {
   const el = $('#tPend'); if (!el) return; const now = Date.now();
   for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : p.scr === 'trade' ? 20000 : 180000)) TPEND.splice(i, 1); }   // Trade has its history list below; Send / Swap keep the result 3 min   // done ones fade into the normal history below
   const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:15px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:14px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.xs && xsStepsHtml(p.xs) ? xsStepsHtml(p.xs) : p.sub ? `<div class="mu" style="font-size:13px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
-  for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend'], ['xswap', '#xsPend'], ['earn', '#ePend'], ['earnx', '#eXPend'], ['xtrade', '#xtPend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k && (k !== 'xtrade' || p.addr === xrSel)); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
+  for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend'], ['xswap', '#xsPend'], ['earn', '#ePend'], ['earnx', '#eXPend'], ['xtrade', '#xtPend'], ['xtrv', '#rvPend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k && ((k !== 'xtrade' && k !== 'xtrv') || p.addr === xrSel)); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
   const L = TPEND.filter((p) => p.scr === 'trade' && p.addr === tradeAddr);
   el.style.display = L.length ? 'flex' : 'none';
   el.innerHTML = L.map((p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:15px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:14px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:13px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
@@ -22267,6 +22506,9 @@ document.addEventListener('click', async (e) => {
   if (t.dataset.xcancel) return xtCancel(t);
   if (t.dataset.xedit) return xtEditSheet(+t.dataset.xedit);
   if (t.dataset.xpct) return xtFillPct(+t.dataset.xpct);
+  if (t.dataset.rvpct) return rvPct(+t.dataset.rvpct);
+  if (t.dataset.rvcancel) return rvCancel(t);
+  if (t.dataset.rvpx) { $('#rvPx').value = t.dataset.rvpx; return rvEst(); }
   if (t.parentElement && t.parentElement.classList.contains('seg')) {
     const seg = t.parentElement.id, v = t.dataset.v;
     if (seg === 'tMode' && v === 'stop' && !stopPairOK()) return;
@@ -22275,6 +22517,7 @@ document.addEventListener('click', async (e) => {
     if (seg === 'tMode' || seg === 'tSide') return drawTrade();
     if (seg === 'eChain') { S.earnChain = v; saveS(); return drawEarn(); }
     if (seg === 'xtQ') return xtSetQ(v);
+    if (seg === 'rvMode' || seg === 'rvSide') { if (seg === 'rvMode') RV.mode = v; else { if (RV.side !== v) $('#rvPx').value = ''; RV.side = v; } $('#rvAmt').value = ''; return rvForm(); }
     if (seg === 'xtSk') { XT.sk = v; return xtModeUI(); }
     if (seg === 'xtSide' || seg === 'xtMode') { if (seg === 'xtSide' && XT.side !== v) { $('#xtPx').value = ''; $('#xtStop').value = ''; $('#xtSl').value = ''; } if (seg === 'xtSide') XT.side = v; else XT.mode = v; xtModeUI(); xtPaint(); return xtEst(); }
     if (seg === 'tLimMode') { S.stopLim = v; saveS(); if (v === 'custom' && !$('#tLim').value) stopDefaults(); stopDefaults(); return tradeEst(); }
@@ -22421,7 +22664,9 @@ document.addEventListener('click', async (e) => {
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
     onrGo: () => onrGo(t),
     xrScan: () => scanInline($('#xrsScan'), (r) => { $('#xrsTo').value = r.addr; $('#xrsTag').value = r.tag || ''; XRCHK = null; $('#xrsChk').innerHTML = ''; $('#xrsChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
-    xrMax: () => { const d = XRA[xrSel]; $('#xrsAmt').value = String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)); },
+    rvReview: () => rvReview(),
+    xrMax: () => { const d = XRA[xrSel], c = xrSendCoins(d).find((x) => x.k === (($('#xrsCoin') || {}).value || 'XRP')) || { k: 'XRP' };
+      $('#xrsAmt').value = c.k === 'XRP' ? String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)) : String(c.bal); },
     xrNewDone: () => { const a = t.dataset.addr, fresh = XRFRESH; XRFRESH = false; const done = () => { closeSheet(); xrSel = a; go('xrp'); };
       if (fresh || phNeedCheck()) return phQuiz(done, 'new'); done(); },
     pushYes: async () => { closeSheet(); try { await pushOn(); toast('✓ Stop alerts on. Turn them off any time in Settings.', 6000); } catch (er) { S.push = { ...(S.push || {}), asked: true }; saveS(); toast(er.message || String(er), 9000); } },
@@ -22655,7 +22900,7 @@ function noteGo(tag) {
     if (kind === 'stop') return act('filled');
     if (kind === 'fill' || kind === 'dep') {
       const so = solList().find((o) => o.addr.startsWith(id)); if (so) { solSel = so.addr; return go(kind === 'fill' ? 'strade' : 'sol'); }
-      if (kind === 'fill') return act('filled');
+      if (kind === 'fill') { const w = [...allAccts(), ...xrList()].find((o) => o.addr && o.addr.startsWith(id)); if (w) ACT.fil = w.addr; return act('filled'); }   /* just that wallet: it loads first */
       const xo = xrList().find((o) => o.addr.startsWith(id)); if (xo) { xrSel = xo.addr; return go('xrp'); }
       const st = persAccts().find((o) => o.addr.startsWith(id)); if (st) { homeAddr = st.addr; return go('home'); }
       return go('bots');
