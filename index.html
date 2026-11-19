@@ -671,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45o · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45p · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15755,7 +15755,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45o';
+const APP_VER = 'v2.45p';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -20601,7 +20601,7 @@ function paintPnl() {
 /* ---------- activity: recent fills on every account ---------- */
 // Horizon lists either asset of a pair as "base", so each fill is turned into what THIS account got and gave.
 // Checked on a real mainnet cover (path payment strict receive): the account is base, gives USDC, gets XLM = BUY.
-const ACT = { at: 0, net: null, fil: 'all', recs: {}, next: {}, xr: {}, xnext: {}, busy: false, tab: 'filled', open: null };
+const ACT = { at: 0, part: false, show: 50, net: null, fil: 'all', recs: {}, next: {}, xr: {}, xnext: {}, busy: false, tab: 'filled', open: null };
 /* ---------- Activity → Open orders: every wallet's waiting orders and stops in one place, grouped by wallet ---------- */
 const opPx = (v) => (v >= 1 ? (+v).toFixed(4) : (+v).toFixed(5));
 const QRANK = (n) => (n === 'USDC' || n === 'USD' ? 3 : ['PYUSD', 'USDT', 'RLUSD', 'yUSDC'].includes(n) ? 2 : n === 'EURC' ? 1 : 0);   /* the side prices are quoted in: dollars, then euros */
@@ -20648,27 +20648,33 @@ function fillFor(r, addr) {
 }
 async function actLoad(more) {
   if (ACT.busy) return; ACT.busy = true; $('#aMore').textContent = 'Loading…';
-  const L = allAccts();
+  /* v2.45o (Jeff: "limit how many it opens. It slows down"): first load reads 30 trades a wallet (XRP: up to 2 pages of 100) and
+     shows each wallet as soon as it arrives instead of waiting for all of them; 50 lines on screen, Load more adds 50 */
+  const L = allAccts(), N = more ? 50 : 30;
+  const part = () => { ACT.part = true; if (cur === 'act' && !ACT.pt) ACT.pt = setTimeout(() => { ACT.pt = 0; if (cur === 'act') paintAct(); }, 150); };
+  const base0 = ACT.shownN || 0; if (!more) ACT.show = 50; else ACT.show = base0;   /* while reading more, keep the same lines on screen */
   await Promise.all([...L.map(async (a) => {
     if (more && !ACT.next[a.addr]) return;
     try {
-      const j = await H(more ? ACT.next[a.addr] : `/accounts/${a.addr}/trades?order=desc&limit=100`);
+      const j = await H(more ? ACT.next[a.addr].replace(/limit=\d+/, 'limit=' + N) : `/accounts/${a.addr}/trades?order=desc&limit=${N}`);
       const rs = j._embedded.records; ACT.recs[a.addr] = (more ? ACT.recs[a.addr] || [] : []).concat(rs);
-      ACT.next[a.addr] = rs.length < 100 ? null : rel(j._links.next.href);
+      ACT.next[a.addr] = rs.length < N ? null : rel(j._links.next.href);
     } catch (e) { if (!more) { ACT.recs[a.addr] = []; ACT.next[a.addr] = null; } }
+    part();
   }), (async () => { for (const w of xrList()) await (async (w) => {   /* XRP wallets, one at a time (bursts trip the public servers' limit): their XRP ⇄ RLUSD / USDC trades */
     if (more && !ACT.xnext[w.addr]) return;
     try {
       let mk = more ? ACT.xnext[w.addr] : null, got = [], pg = 0;
       do {   /* a bot wallet's 200 newest can be all re-quotes: read on (up to 5 pages) until some trades show */
-        const r = await xr('account_tx', { account: w.addr, limit: 200, ledger_index_min: -1, ledger_index_max: -1, ...(mk ? { marker: mk } : {}) });
+        const r = await xr('account_tx', { account: w.addr, limit: 100, ledger_index_min: -1, ledger_index_max: -1, ...(mk ? { marker: mk } : {}) });
         got = got.concat((r.transactions || []).map((x) => xrActRow(x, w.addr)).filter(Boolean)); mk = r.marker || null; pg++;
-      } while (mk && got.length < 10 && pg < 5);
+      } while (mk && got.length < 10 && pg < (more ? 3 : 2));
       ACT.xr[w.addr] = (more ? ACT.xr[w.addr] || [] : []).concat(got);
       ACT.xnext[w.addr] = mk;
     } catch (e) { if (!more) { ACT.xr[w.addr] = []; ACT.xnext[w.addr] = null; } }
+    part();
   })(w); })()]);
-  ACT.at = Date.now(); ACT.net = S.net; ACT.busy = false; $('#aMore').textContent = 'Load more';
+  ACT.at = Date.now(); ACT.net = S.net; ACT.busy = false; ACT.part = false; if (more) ACT.show = base0 + 50; $('#aMore').textContent = 'Load more';
   if (cur === 'act') paintAct();
 }
 function xrActRow(x, me) {   /* one XRP Ledger transaction → an Activity line if it traded XRP against a dollar coin for this wallet */
@@ -20684,7 +20690,7 @@ function actTabShow() {
 }
 function drawAct() {
   if ($('#aTab')) { $$('#aTab button').forEach((b) => b.classList.toggle('on', b.dataset.v === ACT.tab)); setTimeout(actTabShow, 0); }
-  if (!ACT.at || ACT.net !== S.net || Date.now() - ACT.at > 60000) { ACT.recs = {}; ACT.next = {}; ACT.xr = {}; ACT.xnext = {}; paintAct(); actLoad(false); } else paintAct();
+  if (!ACT.at || ACT.net !== S.net || Date.now() - ACT.at > 60000) { ACT.at = 0; ACT.recs = {}; ACT.next = {}; ACT.xr = {}; ACT.xnext = {}; paintAct(); actLoad(false); } else paintAct();
 }
 function paintAct() {
   const L = allAccts();
@@ -20692,7 +20698,7 @@ function paintAct() {
   if (ACT.fil !== 'all' && !L.some((a) => a.addr === ACT.fil) && !XL.some((w) => w.addr === ACT.fil)) ACT.fil = 'all';
   $('#aFil').innerHTML = [['all', 'All'], ...L.map((a) => [a.addr, a.name]), ...XL.map((w) => [w.addr, w.name])].map(([k, n]) => `<button class="chip${k === ACT.fil ? ' on' : ''}" style="white-space:nowrap" data-afil="${k}">${esc(n)}</button>`).join('');
   $('#aUpd').innerHTML = `Buys and sells · ${ACT.at ? 'updated ' + new Date(ACT.at).toLocaleTimeString() + ' · ' : ''}${S.net === 'public' ? '' : '<span style="color:var(--amb);font-weight:700">TESTNET</span>'}`;
-  if (!ACT.at) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
+  if (!ACT.at && !ACT.part) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
   // group fills of one operation on one account into a single line
   const rows = [];
   for (const a of L) {
@@ -20717,7 +20723,8 @@ function paintAct() {
   }
   for (let i = rows.length - 1; i >= 0; i--) if (rows[i].merged) rows.splice(i, 1);
   rows.sort((x, y) => y.t - x.t);
-  const shown = rows.slice(0, 80);
+  const shown = rows.slice(0, ACT.show || 50); ACT.extra = rows.length > shown.length; ACT.shownN = shown.length;
+  if (!shown.length && ACT.busy) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
   if (!shown.length) { $('#aList').innerHTML = '<div class="note">No buys or sells yet.</div>'; $('#aMore').style.display = 'none'; return; }
   const today = ptDay(Date.now(), { year: 'numeric', month: 'short', day: 'numeric' }), yday = ptDay(Date.now() - 86400000, { year: 'numeric', month: 'short', day: 'numeric' });
   let html = '', day = null, open = false;
@@ -20734,7 +20741,7 @@ function paintAct() {
   }
   if (open) html += '</div>';
   $('#aList').innerHTML = html;
-  $('#aMore').style.display = ACT.tab !== 'open' && (L.some((a) => ACT.next[a.addr]) || XL.some((w) => ACT.xnext[w.addr])) ? '' : 'none';
+  $('#aMore').style.display = ACT.tab !== 'open' && !ACT.busy && (ACT.extra || L.some((a) => ACT.next[a.addr]) || XL.some((w) => ACT.xnext[w.addr])) ? '' : 'none';
 }
 
 /* ---------- kill plans ---------- */
@@ -22491,7 +22498,7 @@ document.addEventListener('click', async (e) => {
     actRefresh: () => { ACT.at = 0; if (ACT.tab === 'open') actOpenLoad(true); drawAct(); },
     actOpenAll: () => { ACT.openAll = { ...(ACT.openAll || {}), [t.dataset.addr]: true }; paintActOpen(); },
     actOpenGo: () => { if (t.dataset.k === 'xrp') { xrSel = t.dataset.addr; go(xrOwn(xrSel) ? 'xtrade' : 'xrp'); } else { homeAddr = t.dataset.addr; go(OWN().some((o) => o.addr === homeAddr) ? 'trade' : 'home'); } },
-    actMore: () => actLoad(true),
+    actMore: () => { if (ACT.extra) { ACT.show = (ACT.show || 50) + 50; return paintAct(); } actLoad(true); },   /* already loaded: just show 50 more */
     pnlRefresh: () => { pnlReset(); paintPnl(); loadPer(P.sel); },
     killAll: () => killFlow(allPlans(false), 'Cancel orders?', 'cancel orders', xrKillPlans()),
     xrCancelAll: () => xrCancelAll(),
