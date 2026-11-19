@@ -689,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45u · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45v · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14458,7 +14458,7 @@ function xrMyDelta(meta, me, tx) {   /* u = the dollar coin (RLUSD or Circle USD
   }
   if (tx && tx.Account === me && tx.Fee) x += +tx.Fee / 1e6;
   let tok = 'RLUSD', u = 0; for (const [t2, v] of Object.entries(U)) if (Math.abs(v) > Math.abs(u)) { u = v; tok = t2; }
-  return { x, u, tok };
+  return { x, u, tok, U };
 }
 const xq4 = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });   /* fills: enough decimals that parts add up */
 function xrTradeText(d) {   // null if this wasn't an XRP / dollar-coin trade
@@ -15756,11 +15756,43 @@ async function rvLoadOpen() {
   try {
     const r = await xr('account_offers', { account: me, ledger_index: 'validated' }); if (cur !== 'xtrade' || xrSel !== me) return;
     const RL = rvRL(), UC = rvUC(), is = (a, c) => a && typeof a === 'object' && a.currency === c.currency && a.issuer === c.issuer;
-    const L = (r.offers || []).filter((f) => (is(f.taker_gets, RL) && is(f.taker_pays, UC)) || (is(f.taker_gets, UC) && is(f.taker_pays, RL)));
+    const L = (r.offers || []).filter((f) => (is(f.taker_gets, RL) && is(f.taker_pays, UC)) || (is(f.taker_gets, UC) && is(f.taker_pays, RL))); RV.offers = L;
     el.innerHTML = L.length ? L.map((f) => { const sell = is(f.taker_gets, RL), qn = +(sell ? f.taker_gets : f.taker_pays).value, us = +(sell ? f.taker_pays : f.taker_gets).value;
-      return `<div class="card" style="padding:10px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${sell ? 't-sell' : 't-buy'}">${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(qn, 2)} RLUSD @ ${rv5(us / qn)}</b></div><button class="b-redout sm" data-rvcancel="${+f.seq}">Cancel</button></div>`; }).join('')
+      return `<div class="card" style="padding:10px 14px;flex-direction:row;justify-content:space-between;align-items:center;gap:8px"><div><span class="tag ${sell ? 't-sell' : 't-buy'}">${sell ? 'SELL' : 'BUY'}</span> <b class="mono">${fx(qn, 2)} RLUSD @ ${rv5(us / qn)}</b></div><div style="display:flex;gap:8px"><button class="b-out sm" data-rvedit="${+f.seq}">Edit</button><button class="b-redout sm" data-rvcancel="${+f.seq}">Cancel</button></div></div>`; }).join('')
       : '<div class="mu">No open RLUSD / USDC orders.</div>';
   } catch (e) { el.innerHTML = `<div class="mu">${esc(e.message || String(e))}</div>`; }
+}
+/* Edit: one OfferCreate with OfferSequence = the old order (it replaces it in one step), like XRP orders */
+const rvOfferInfo = (f) => { const sell = f.taker_gets && f.taker_gets.currency === RLUSD_CUR, q = +(sell ? f.taker_gets : f.taker_pays).value, us = +(sell ? f.taker_pays : f.taker_gets).value; return { sell, q, px: us / q }; };
+function rvEditSheet(seq) {
+  const f = (RV.offers || []).find((o) => +o.seq === seq); if (!f) return; const i = rvOfferInfo(f); pending = null;
+  sheet(`<h2>Edit ${i.sell ? 'sell' : 'buy'} order</h2><div class="mu" style="font-size:14px">Order #${seq} · now ${i.sell ? 'sell' : 'buy'} ${fx(i.q, 2)} RLUSD @ ${rv5(i.px)} USDC. The change replaces it in one step (it gets a new order number). What already filled stays filled.</div>
+    <label>Limit price (USDC per RLUSD)<input id="rvePx" inputmode="decimal" value="${rv5(i.px)}"></label>
+    <label>RLUSD to ${i.sell ? 'sell' : 'buy'}<input id="rveAmt" inputmode="decimal" value="${+i.q.toFixed(6)}"></label>
+    <div class="mu" id="rveNote" style="font-size:13.5px"></div>
+    <button class="${i.sell ? 'b-red' : 'b-grn'} big" data-act="rvEditOk" data-seq="${seq}">Review change</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  const upd = () => { const p = +$('#rvePx').value, q = +$('#rveAmt').value; $('#rveNote').textContent = p > 0 && q > 0 ? `${i.sell ? 'Gets' : 'Uses up to'} ${fx(p * q, 2)} USDC if it all fills` : ''; };
+  $('#rvePx').addEventListener('input', upd); $('#rveAmt').addEventListener('input', upd); upd();
+}
+async function rvEditOk(seq) {
+  const o = xrOwn(xrSel), f = (RV.offers || []).find((x) => +x.seq === seq); if (!o || !f) return; const i = rvOfferInfo(f);
+  const p = +$('#rvePx').value, q = +$('#rveAmt').value;
+  if (!(p > 0)) return toast('Enter a price.'); if (!(q > 0)) return toast('Enter an amount, or use Cancel to remove the order.'); if (Math.abs(p - 1) > 0.1) return toast('That price is more than 10% from $1. Check it.');
+  let drops; try { [drops] = await Promise.all([xrFee(), xrLoad(xrSel)]); } catch (e) { return toast(e.message || String(e)); }
+  const r = rvBal('rl') || 0, u = rvBal('uc') || 0;
+  if (i.sell ? q > r + 1e-9 : q * p > u + 1e-9) return toast(`Not enough ${i.sell ? 'RLUSD' : 'USDC'}.`);
+  const R2 = rvIou(rvRL(), q), U2 = rvIou(rvUC(), q * p);
+  const tx = i.sell ? { TransactionType: 'OfferCreate', TakerGets: R2, TakerPays: U2, OfferSequence: seq } : { TransactionType: 'OfferCreate', TakerPays: R2, TakerGets: U2, OfferSequence: seq };
+  confirmSheet(`Change order #${seq}`, `XRP Ledger DEX · ${esc(o.name)}`, [...await xrBusy(xrSel),
+    { t: `Was: ${i.sell ? 'Sell' : 'Buy'} ${fx(i.q, 2)} RLUSD @ ${rv5(i.px)}`, s: 'open now' },
+    { t: `New: ${i.sell ? 'Sell' : 'Buy'} ${fx(q, 2)} RLUSD @ ${rv5(p)}`, s: 'if the new price crosses the book, it fills right away', hl: 1 },
+    { t: `Network fee ${(drops / 1e6).toFixed(6).replace(/0+$/, '')} XRP`, s: XR_BOT_NOTE }], 'Send edit', async () => {
+    const pd = tPend(`Change order #${seq}: ${i.sell ? 'sell' : 'buy'} ${fx(q, 2)} RLUSD @ ${rv5(p)}`, 'xtrv', o.w.classicAddress);
+    try { const res = await xrSubmit(o, tx, drops);
+      if (res.state === 'ok') { tPendSet(pd, '✓ Order changed', 'grn', 'the old order is gone; the new one is on the book', true); rvLoadOpen(); }
+      else tPendSet(pd, res.state === 'pending' ? 'Still pending' : 'Not changed', res.state === 'pending' ? 'amb' : 'red', res.state === 'pending' ? "not confirmed yet: don't send it again" : xrErr(res.code), true);
+    } catch (e) { tPendSet(pd, 'Not changed', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); }
+  }, false, i.sell ? 'b-red' : 'b-grn', 'Sending…', true);
 }
 async function rvCancel(t) {
   const o = xrOwn(xrSel), seq = +t.dataset.rvcancel; if (!o || !seq || t.disabled) return;
@@ -15996,7 +16028,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45u';
+const APP_VER = 'v2.45v';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -18154,7 +18186,7 @@ const XS = {
   oc: '5880ad2b362620fadf759cbceb1cd5737ce8c6ed7fb8e9942881e6731f9247dd',   // 1Click's own fee account: the only other fee line a quote may have   // XLM → XRP stays off until a real Stellar deposit (its memo type) is checked: 1Click isn't quoting Stellar deposits now anyway
   coins: { SOL: { id: 'nep141:sol.omft.near', chain: 'sol', dp: 9 }, SUSDC: { id: 'nep141:sol-5ce3bf3a31af18be40ba30f721101b4341690186.omft.near', chain: 'sol', dp: 6, tok: 'USDC', mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' }, XRP: { id: 'nep141:xrp.omft.near', chain: 'xrp', dp: 6 }, XLM: { id: 'nep245:v2_1.omni.hot.tg:1100_111bzQBB5v7AhLyPMDwS8uJgQV24KaAPXtwyVWu2KXbbfQU6NXRCz', chain: 'stellar', dp: 7 } },
 };
-const XSW = { from: null, to: null, q: null, seq: 0, t: 0, poll: {}, busy: false, rseq: 0 };
+const XSW = { pay: null, from: null, to: null, q: null, seq: 0, t: 0, poll: {}, busy: false, rseq: 0 };
 const XS_MIN = { XRP: 2 };   // NEAR's XRP bridge takes at least 2 XRP (it says "try at least 2000000" in drops)
 const xsMin = (coin) => Math.max(XS_MIN[coin] || 0, coin === 'XRP' ? ((XRSV && XRSV.base) || 1) + 0.5 : 0);
 function xsErrText(e, fw, tw) {   // 1Click's words → plain words, amounts in coins (never drops or stroops)
@@ -18200,6 +18232,13 @@ async function xsSameQuote(fw, amt, seq) {   /* XRP → RLUSD / USDC on the XRP 
   $('#xsOut').textContent = m2(c); $('#xsOutUsd').textContent = '≈ $' + fx(c);
   xsInfo(`<div><span class="mu">Price</span><span class="mono">${(c / amt).toFixed(5)} ${tok} per XRP</span></div><div><span class="mu">Fills</span><span>now, or not at all</span></div>`);
 }
+async function xsTokQuote(fw, amt, seq) {   /* RLUSD ⇄ USDC: the same quote as Trade XRP → RLUSD / USDC → Swap (the ledger's best paths) */
+  xsInfo('<div><span class="mu">Getting the best price…</span></div>'); const buy = XSW.pay === 'uc';
+  let Q; try { xrSel = fw.addr; Q = await rvQuote(amt, buy); } catch (e) { if (seq === XSW.seq) { $('#xsOut').textContent = '–'; xsInfo(`<div><span class="amb">${esc(e.message || String(e))}</span></div>`); } return; }
+  if (seq !== XSW.seq || cur !== 'xswap') return;
+  $('#xsOut').textContent = m2(Q.get); $('#xsOutUsd').textContent = '≈ $' + fx(Q.get);
+  xsInfo(`<div><span class="mu">Rate</span><span class="mono">${rv5(buy ? amt / Q.get : Q.get / amt)} USDC per RLUSD</span></div><div><span class="mu">At least (0.3% max slippage)</span><span class="mono">${fx(Q.get * (1 - RV_SLIP), 4)}</span></div><div><span class="mu">Route</span><span class="mono" style="font-size:13px">${esc(Q.via)}</span></div>`);
+}
 async function drawXSwap() {
   netBadge($('#xsNet'));
   const L = xsWallets(), xw = L.filter((w) => w.chain === 'xrp'), st = L.filter((w) => w.chain === 'stellar'), nets = new Set(L.map((w) => w.chain));
@@ -18211,21 +18250,23 @@ async function drawXSwap() {
   const opt = (w) => `<option value="${esc(w.id)}">${xsNet(w)}${w.chain === 'sol' ? ' ' + w.coin : ''} · ${esc(w.name)} · ${short(w.addr)}</option>`;
   $('#xsFrom').innerHTML = L.map(opt).join(''); if (fw) $('#xsFrom').value = fw.id;
   const other = L.filter((w) => fw && w.chain !== fw.chain);
+  if (!fw || fw.chain !== 'xrp') XSW.pay = null;
+  if (XSW.pay) XSW.get = XSW.pay === 'rl' ? 'uc' : 'rl';   /* v2.45v (Jeff: "I cant swap USDC to RLUSD"): RLUSD ⇄ USDC on the XRP Ledger, same wallet */
   if (!fw || fw.chain !== 'xrp' || !xrCoins().some((c) => c.k === XSW.get)) XSW.get = 'x';   /* 'x' = across networks; 'rl' / 'uc' = an XRP Ledger dollar coin (same network) */
   const same = XSW.get !== 'x';
   if (!same && (!XSW.to || !other.some((w) => w.id === XSW.to))) XSW.to = (other[0] || {}).id || null;
   const tw = xsW(XSW.to);
   $('#xsTo').innerHTML = other.map(opt).join(''); if (XSW.to && !same) $('#xsTo').value = XSW.to;
   $('#xsToW').style.display = same ? 'none' : '';
-  $('#xsCoin').textContent = fw ? fw.coin : ''; $('#xsCoin2').textContent = fw ? (same ? xtCoin(XSW.get).tok : tw ? tw.coin : '') : '';
+  $('#xsCoin').textContent = fw ? (XSW.pay ? xtCoin(XSW.pay).tok : fw.coin) : ''; $('#xsCoin2').textContent = fw ? (same ? xtCoin(XSW.get).tok : tw ? tw.coin : '') : '';
   /* the coin pickers: one Swap screen for every route */
   const hasSol = L.some((w) => w.chain === 'sol');
-  $('#xsPayC').innerHTML = `<optgroup label="XRP Ledger"><option value="xrp">XRP</option></optgroup><optgroup label="Stellar"><option value="xlm">XLM</option><option value="stl">USDC, EURC…</option></optgroup>${hasSol ? '<optgroup label="Solana"><option value="sol">SOL</option><option value="susdc">USDC</option></optgroup>' : ''}`;
-  $('#xsPayC').value = !fw ? 'xlm' : fw.chain === 'xrp' ? 'xrp' : fw.chain === 'sol' ? (fw.ck === 'SOL' ? 'sol' : 'susdc') : 'xlm';
+  $('#xsPayC').innerHTML = `<optgroup label="XRP Ledger"><option value="xrp">XRP</option><option value="xp:rl">RLUSD</option><option value="xp:uc">USDC</option></optgroup><optgroup label="Stellar"><option value="xlm">XLM</option><option value="stl">USDC, EURC…</option></optgroup>${hasSol ? '<optgroup label="Solana"><option value="sol">SOL</option><option value="susdc">USDC</option></optgroup>' : ''}`;
+  $('#xsPayC').value = !fw ? 'xlm' : fw.chain === 'xrp' ? (XSW.pay ? 'xp:' + XSW.pay : 'xrp') : fw.chain === 'sol' ? (fw.ck === 'SOL' ? 'sol' : 'susdc') : 'xlm';
   const gk = (w) => 'x:' + w.ck;   /* across-network targets, one per coin */
   const tgts = [...new Map(other.map((w) => [w.ck, w])).values()];
   const grp = (net, list) => (list.length ? `<optgroup label="${net}">${list.join('')}</optgroup>` : '');
-  $('#xsGetC').innerHTML = grp('XRP Ledger', [...tgts.filter((w) => w.chain === 'xrp').map((w) => `<option value="${gk(w)}">XRP</option>`), ...(fw && fw.chain === 'xrp' ? xrCoins().map((c) => `<option value="${c.k}">${esc(c.tok)}</option>`) : [])])
+  $('#xsGetC').innerHTML = XSW.pay ? grp('XRP Ledger', [`<option value="${XSW.get}">${esc(xtCoin(XSW.get).tok)}</option>`]) : grp('XRP Ledger', [...tgts.filter((w) => w.chain === 'xrp').map((w) => `<option value="${gk(w)}">XRP</option>`), ...(fw && fw.chain === 'xrp' ? xrCoins().map((c) => `<option value="${c.k}">${esc(c.tok)}</option>`) : [])])
     + grp('Stellar', [...tgts.filter((w) => w.chain === 'stellar').map((w) => `<option value="${gk(w)}">XLM</option>`), ...(fw && fw.chain === 'stellar' ? ['<option value="stl">USDC, EURC…</option>'] : [])])
     + grp('Solana', tgts.filter((w) => w.chain === 'sol').map((w) => `<option value="${gk(w)}">${w.coin}</option>`));
   if ($('#xsNote')) $('#xsNote').style.display = same ? 'none' : '';
@@ -18234,7 +18275,9 @@ async function drawXSwap() {
   if (same) { $('#xsOff').innerHTML = ''; $('#xsGo').disabled = XSW.busy; }
   if (!off && fw && !same && !XS.from[fw.ck]) { $('#xsOff').innerHTML = `<div class="note amb">Swapping ${fw.coin} out of Stellar isn't available yet: NEAR Intents isn't taking Stellar deposits right now. Into Stellar works: pay with XRP or SOL.</div>`; $('#xsGo').disabled = true; }
   xsRecPaint(); tPendPaint(); xsResume();
-  if (fw && !off) { const av = await xsAvail(fw); if (cur !== 'xswap' || XSW.from !== fw.id) return; XSW.av = av;
+  if (fw && XSW.pay) { const d = await xrLoad(fw.addr).catch(() => null); if (cur !== 'xswap' || XSW.from !== fw.id) return; const l = xrLineOf(d, xtCoin(XSW.pay)); XSW.av = l ? Math.max(0, +l.balance) : 0;
+    $('#xsAvail').innerHTML = l ? `Available: <span class="mono">${m2(XSW.av)}</span> ${xtCoin(XSW.pay).tok}` : `<span class="amb">This wallet has no ${xtCoin(XSW.pay).tok}.</span>`; }
+  else if (fw && !off) { const av = await xsAvail(fw); if (cur !== 'xswap' || XSW.from !== fw.id) return; XSW.av = av;
     $('#xsAvail').innerHTML = av == null ? '<span class="amb">This wallet is not funded yet.</span>' : `Available: <span class="mono">${m2(av)}</span> ${fw.coin}${fw.chain === 'sol' ? (fw.ck === 'SOL' ? ' (after what stays for fees)' : '') : ' (after the reserve)'}`; }
   else $('#xsAvail').textContent = '';
   xsQuote();
@@ -18270,7 +18313,8 @@ function xsPaintOut() {
 function xsQuote() {
   clearTimeout(XSW.t); XSW.q = null; const seq = ++XSW.seq;
   if (XSW.get && XSW.get !== 'x') { const fw = xsW(XSW.from), amt = +$('#xsAmt').value; $('#xsOut').textContent = '–'; $('#xsOutUsd').textContent = '';
-    if (!fw || !(amt > 0)) return xsInfo(''); if (XSW.av != null && amt > XSW.av + 1e-9) return xsInfo(`<div><span class="red">More than this wallet has available (${m2(XSW.av)} XRP).</span></div>`);
+    if (!fw || !(amt > 0)) return xsInfo(''); if (XSW.av != null && amt > XSW.av + 1e-9) return xsInfo(`<div><span class="red">More than this wallet has available (${m2(XSW.av)} ${XSW.pay ? xtCoin(XSW.pay).tok : 'XRP'}).</span></div>`);
+    if (XSW.pay) { XSW.t = setTimeout(() => xsTokQuote(fw, amt, seq), 400); return; }
     XSW.t = setTimeout(() => xsSameQuote(fw, amt, seq), 400); return; }
   xsPaintOut();
   const fw = xsW(XSW.from), tw = xsW(XSW.to), amt = +$('#xsAmt').value;
@@ -18319,6 +18363,11 @@ async function xsVerify(b, q, dry) {
   return { ...q, minAmountOut: qq.minAmountOut, amountOut: qq.amountOut || q.amountOut, deadline: qr.deadline };
 }
 async function xsReview() {
+  if (XSW.pay) {   /* RLUSD ⇄ USDC: Trade XRP → RLUSD / USDC → Swap reviews and sends it */
+    const fw = xsW(XSW.from), amt = +$('#xsAmt').value; if (!fw) return; if (!(amt > 0)) return toast('Enter an amount.');
+    xrSel = fw.addr; XT.rv = true; RV.mode = 'swap'; RV.side = XSW.pay === 'uc' ? 'buy' : 'sell'; navHold = true; go('xtrade'); navHold = false;
+    $('#rvAmt').value = String(amt); rvForm(); return rvReview();
+  }
   if (XSW.get && XSW.get !== 'x') {   /* same network (XRP → RLUSD / USDC): it is an XRP Ledger market sell; its own review checks and confirms */
     const fw = xsW(XSW.from), amt = +$('#xsAmt').value; if (!fw) return; if (!(amt > 0)) return toast('Enter an amount.');
     xrSel = fw.addr; xtUseQ(XSW.get); XT.mode = 'mkt'; XT.side = 'sell'; navHold = true; go('xtrade'); navHold = false;
@@ -20960,7 +21009,14 @@ async function actFeeLoad(d) {
 document.addEventListener('toggle', (e) => { const d = e.target; if (d && d.classList && d.classList.contains('actrow') && d.open) actFeeLoad(d); }, true);
 function xrActRow(x, me) {   /* one XRP Ledger transaction → an Activity line if it traded XRP against a dollar coin for this wallet */
   const t = x.tx || x.tx_json || {}, m = x.meta || {}; if ((m.TransactionResult || 'tesSUCCESS') !== 'tesSUCCESS') return null;
-  const d = xrMyDelta(m, me, t); if (!xrTradeText(d)) return null;
+  const d = xrMyDelta(m, me, t);
+  { const r = (d.U || {}).RLUSD || 0, c = (d.U || {}).USDC || 0;   /* v2.45v: RLUSD ⇄ USDC fills (Jeff: Activity blank after his RLUSD/USDC order filled) */
+    if (Math.abs(r) > 1e-6 && Math.abs(c) > 1e-6 && Math.sign(r) !== Math.sign(c) && Math.abs(d.x) < 0.01) {
+      const buy = r > 0, tm = x.close_time_iso ? Date.parse(x.close_time_iso) : ((+t.date || 0) + 946684800) * 1000;
+      const f = { t: tm, side: buy ? 'BUY' : 'SELL', got: buy ? ['RLUSD', r] : ['USDC', c], gave: buy ? ['USDC', -c] : ['RLUSD', -r], pool: false, ix: 0 };
+      return { ...f, op: 'x' + (x.hash || t.hash), hash: x.hash || t.hash, asset: 'RLUSD', qty: Math.abs(r), quote: 'USDC', qamt: Math.abs(c), n: 1, xrp: true, fills: [f], nfee: t.Account === me ? (+t.Fee || 0) / 1e6 : 0 };
+    } }
+  if (!xrTradeText(d)) return null;
   const buy = d.x > 0, qty = Math.abs(d.x), qamt = Math.abs(d.u), tm = x.close_time_iso ? Date.parse(x.close_time_iso) : ((+t.date || 0) + 946684800) * 1000;
   const f = { t: tm, side: buy ? 'BUY' : 'SELL', got: buy ? ['XRP', qty] : [d.tok, qamt], gave: buy ? [d.tok, qamt] : ['XRP', qty], pool: false, ix: 0 };
   return { ...f, op: 'x' + (x.hash || t.hash), hash: x.hash || t.hash, asset: 'XRP', qty, quote: d.tok, qamt, n: 1, xrp: true, fills: [f], nfee: t.Account === me ? (+t.Fee || 0) / 1e6 : 0 };
@@ -20978,6 +21034,7 @@ function paintAct() {
   const XL = xrList().filter((w) => !L.some((a) => a.addr === w.addr));
   if (ACT.fil !== 'all' && !L.some((a) => a.addr === ACT.fil) && !XL.some((w) => w.addr === ACT.fil)) ACT.fil = 'all';
   $('#aFil').innerHTML = [['all', 'All'], ...L.map((a) => [a.addr, a.name]), ...XL.map((w) => [w.addr, w.name])].map(([k, n]) => `<button class="chip${k === ACT.fil ? ' on' : ''}" style="white-space:nowrap" data-afil="${k}">${esc(n)}</button>`).join('');
+  { const on = $('#aFil .chip.on'); if (on && on.scrollIntoView && ACT.fil !== 'all') try { on.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {} }   /* a wallet picked by a notification: its chip shows, so it's clear the list is filtered */
   $('#aUpd').innerHTML = `Buys and sells · ${ACT.at ? 'updated ' + new Date(ACT.at).toLocaleTimeString() + ' · ' : ''}${S.net === 'public' ? '' : '<span style="color:var(--amb);font-weight:700">TESTNET</span>'}`;
   if (!ACT.at && !ACT.part) { $('#aList').innerHTML = '<div class="note">Loading recent trades…</div>'; $('#aMore').style.display = 'none'; return; }
   // group fills of one operation on one account into a single line
@@ -21560,10 +21617,10 @@ async function fillPriceOf(hash, me) {
 /* Big "order sent" banner at the top of the screen (orders and swaps): Sending… → Order sent · confirming… → ✓ Filled /
    On the book, or Failed. Follows the same status as the row under the order form; tap to close; closes itself when done. */
 /* v2.40v (Jeff: "It has to be consistent on all the coins"): sends get the same big banner as orders and swaps, on Stellar, XRP and Solana */
-const OBN = { p: null, t: 0 }, OBN_SCR = ['trade', 'xtrade', 'swap', 'xswap', 'send', 'xsend', 'solsend', 'strade'];   /* v2.42x: Solana orders too */
+const OBN = { p: null, t: 0 }, OBN_SCR = ['trade', 'xtrade', 'xtrv', 'swap', 'xswap', 'send', 'xsend', 'solsend', 'strade'];   /* v2.42x: Solana orders too */
 function obnPaint() {
   const p = OBN.p, el = $('#obn'); if (!p || !el) return;
-  const what = p.scr === 'swap' || p.scr === 'xswap' ? 'swap' : 'order', bad = p.cls === 'red', warn = !p.busy && !bad && /amb/.test(p.cls || '');
+  const what = p.scr === 'swap' || p.scr === 'xswap' || (p.scr === 'xtrv' && /^Swap/.test(p.label)) ? 'swap' : 'order', bad = p.cls === 'red', warn = !p.busy && !bad && /amb/.test(p.cls || '');
   const title = p.busy ? (/^(Sending|Sent)/.test(p.st) ? 'Sending…' : String(p.st || ''))   /* two steps only: Sending… (yellow) → the result (Order placed / Filled, green) */ : String(p.st || '').replace(/^✓\s*/, '');
   el.className = 'on ' + (p.busy || warn ? '' : bad ? 'bad' : 'ok');
   el.innerHTML = `<div class="obi">${p.busy ? '<div class="obsp"></div>' : bad || warn ? '!' : '✓'}</div><div style="min-width:0"><b>${esc(title)}</b><div class="obs">${esc(p.label)}${p.sub ? ' · ' + esc(p.sub) : ''}</div></div>`;
@@ -22554,6 +22611,7 @@ document.addEventListener('click', async (e) => {
   if (t.dataset.xpct) return xtFillPct(+t.dataset.xpct);
   if (t.dataset.rvpct) return rvPct(+t.dataset.rvpct);
   if (t.dataset.rvcancel) return rvCancel(t);
+  if (t.dataset.rvedit) return rvEditSheet(+t.dataset.rvedit);
   if (t.dataset.rvpx) { $('#rvPx').value = t.dataset.rvpx; return rvEst(); }
   if (t.parentElement && t.parentElement.classList.contains('seg')) {
     const seg = t.parentElement.id, v = t.dataset.v;
@@ -22710,7 +22768,7 @@ document.addEventListener('click', async (e) => {
     onrUsd: () => { ONR.usd = +t.dataset.v; const a = $('#onrAmt'); if (a) { a.value = ''; a.placeholder = String(ONR.usd); } $$('#onrUsd button').forEach((b) => b.classList.toggle('on', b === t)); },
     onrGo: () => onrGo(t),
     xrScan: () => scanInline($('#xrsScan'), (r) => { $('#xrsTo').value = r.addr; $('#xrsTag').value = r.tag || ''; XRCHK = null; $('#xrsChk').innerHTML = ''; $('#xrsChkBtn').textContent = 'Check and save address'; toast('Address scanned: ' + short(r.addr)); }, parseXrpQR, 'an XRP Ledger address (r…)'),
-    rvReview: () => rvReview(),
+    rvReview: () => rvReview(), rvEditOk: () => rvEditOk(+t.dataset.seq),
     xrMax: () => { const d = XRA[xrSel], c = xrSendCoins(d).find((x) => x.k === (($('#xrsCoin') || {}).value || 'XRP')) || { k: 'XRP' };
       $('#xrsAmt').value = c.k === 'XRP' ? String(Math.max(0, Math.floor((xrSpend(d) - 0.001) * 1e6) / 1e6)) : String(c.bal); },
     xrNewDone: () => { const a = t.dataset.addr, fresh = XRFRESH; XRFRESH = false; const done = () => { closeSheet(); xrSel = a; go('xrp'); };
@@ -22853,13 +22911,13 @@ $('#wWal').addEventListener('change', () => { const v = $('#wWal').value; if (v.
 $('#xsAmt').addEventListener('input', xsQuote);
 $('#xsFrom').addEventListener('change', () => { ++XSW.rseq; XSW.from = $('#xsFrom').value; XSW.av = null; $('#xsAmt').value = ''; drawXSwap(); });   // To stays what you picked (drawXSwap only changes it if it no longer fits)
 $('#xsPayC').addEventListener('change', (e) => {
-  const v = e.target.value, L = xsWallets();
+  const v0 = e.target.value, L = xsWallets(), pay = v0.startsWith('xp:') ? v0.slice(3) : null, v = pay ? 'xrp' : v0;
   if (v === 'stl') return swapToStellar(uKey(), 'XLM');
   const w = v === 'xrp' ? (L.find((x) => x.chain === 'xrp' && x.addr === xrSel) || L.find((x) => x.chain === 'xrp'))
     : v === 'sol' || v === 'susdc' ? (L.find((x) => x.ck === (v === 'sol' ? 'SOL' : 'SUSDC') && x.addr === solSel) || L.find((x) => x.ck === (v === 'sol' ? 'SOL' : 'SUSDC')))
     : (L.find((x) => x.chain === 'stellar' && x.addr === homeAddr) || L.find((x) => x.chain === 'stellar'));
   if (!w) return toast(v === 'xrp' ? 'Add an XRP wallet first.' : v === 'sol' || v === 'susdc' ? 'Add a Solana wallet first.' : 'Add a Stellar wallet first.');
-  ++XSW.rseq; XSW.from = w.id; XSW.to = null; XSW.get = 'x'; XSW.av = null; $('#xsAmt').value = ''; drawXSwap();
+  ++XSW.rseq; XSW.from = w.id; XSW.to = null; XSW.get = 'x'; XSW.pay = pay; XSW.av = null; $('#xsAmt').value = ''; drawXSwap();
 });
 $('#xsGetC').addEventListener('change', (e) => {
   const v = e.target.value; if (v === 'stl') return swapToStellar('XLM', uKey());
