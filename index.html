@@ -418,12 +418,13 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="seg" id="xtQ"><button class="on" data-v="rl">XRP / RLUSD</button><button data-v="uc">XRP / USDC</button><button data-v="rv">RLUSD / USDC</button></div>
   <div id="rvP" style="display:none;flex-direction:column;gap:12px">
     <div class="card"><div class="top"><span class="lbl">RLUSD / USDC · XRP Ledger DEX</span><span class="grn" style="font-size:12px;font-weight:700" id="rvUpd"></span></div>
-      <div id="rvBook" style="display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px"></div><div class="mu" id="rvMid" style="font-size:13px"></div></div>
+      <div class="book" id="rvBook"></div><div class="mu" id="rvMid" style="font-size:13px"></div></div>
+    <div class="card"><div class="top"><span class="lbl">Last sales</span><span class="mu" style="font-size:12px">order book + AMM</span></div><div id="rvLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px"></div></div>
     <div class="seg" id="rvMode"><button class="on" data-v="swap">Swap</button><button data-v="lim">Limit order</button></div>
     <div class="seg" id="rvSide"><button class="on" data-v="buy">Buy RLUSD</button><button data-v="sell">Sell RLUSD</button></div>
     <label><span id="rvAmtL">Spend (USDC)</span><input id="rvAmt" inputmode="decimal" placeholder="0"></label>
     <div class="g4"><button class="b-out sm" data-rvpct="25">25%</button><button class="b-out sm" data-rvpct="50">50%</button><button class="b-out sm" data-rvpct="75">75%</button><button class="b-out sm" data-rvpct="100">Max</button></div>
-    <div class="mu" id="rvHave" style="font-size:13px"></div>
+    <div class="mu" id="rvHave" style="font-size:13px"></div><div class="qline" id="rvQuote"></div>
     <label id="rvPxW" style="display:none"><span>Limit price (USDC per RLUSD)</span><input id="rvPx" inputmode="decimal"></label>
     <div class="card rows" id="rvEst" style="padding:4px 14px;font-size:15px"></div>
     <button class="b-grn big" data-act="rvReview" id="rvGo">Review swap</button>
@@ -688,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45t · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45u · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15597,27 +15598,72 @@ const rvIou = (a, v) => ({ ...a, value: String(+(+v).toPrecision(15)) });
 const rv5 = (v) => (+v).toFixed(5);
 function rvDraw() {
   $$('#rvMode button').forEach((b) => b.classList.toggle('on', b.dataset.v === RV.mode)); rvForm(); rvPaint();
-  rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) { rvPaint(); rvEst(); } }).catch((e) => { if ($('#rvMid')) $('#rvMid').innerHTML = `<span class="amb">${esc(e.message || String(e))}</span>`; });
+  rvPaintSales();
+  rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) { rvPaint(); rvEst(); } return rvLoadSales(); }).then(() => { if (cur === 'xtrade' && XT.rv) rvPaintSales(); }).catch((e) => { if ($('#rvMid')) $('#rvMid').innerHTML = `<span class="amb">${esc(e.message || String(e))}</span>`; });
   xrLoad(xrSel).then(() => { if (cur === 'xtrade' && XT.rv) rvForm(); }).catch(() => {});
   rvLoadOpen(); xrpPrice().then(() => { if (cur === 'xtrade' && XT.rv) rvEst(); }).catch(() => {});
-  clearInterval(RV.timer); RV.timer = setInterval(() => { if (cur !== 'xtrade' || !XT.rv) { clearInterval(RV.timer); RV.timer = 0; return; } rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) rvPaint(); }).catch(() => {}); }, 8000);
+  clearInterval(RV.timer); RV.timer = setInterval(() => { if (cur !== 'xtrade' || !XT.rv) { clearInterval(RV.timer); RV.timer = 0; return; } RV.n = (RV.n || 0) + 1; rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) rvPaint(); return RV.n % 3 ? null : rvLoadSales().then(() => { if (cur === 'xtrade' && XT.rv) rvPaintSales(); }); }).catch(() => {}); }, 8000);
 }
 async function rvLoad() {   /* asks: offers selling RLUSD for USDC; bids: offers buying RLUSD with USDC; plus the AMM pool */
   const RL = rvRL(), UC = rvUC();
   const [a, b, m] = await Promise.all([xr('book_offers', { taker_gets: RL, taker_pays: UC, limit: 20, ledger_index: 'validated' }), xr('book_offers', { taker_gets: UC, taker_pays: RL, limit: 20, ledger_index: 'validated' }), xr('amm_info', { asset: RL, asset2: UC, ledger_index: 'validated' }).catch(() => ({}))]);
   const v = (x) => +(typeof x === 'object' ? x.value : x);
+  RV.makers = [...new Set([...(a.offers || []).slice(0, 6), ...(b.offers || []).slice(0, 6)].map((o) => o.Account).filter(Boolean))];
   RV.asks = (a.offers || []).map((o) => [v(o.TakerPays) / v(o.TakerGets), v(o.taker_gets_funded || o.TakerGets)]).filter((x) => x[1] > 0.000001);
   RV.bids = (b.offers || []).map((o) => [v(o.TakerGets) / v(o.TakerPays), v(o.taker_pays_funded || o.TakerPays)]).filter((x) => x[1] > 0.000001);
-  const am = m.amm; RV.amm = am ? (() => { const x = am.amount, y = am.amount2, rl = x.currency === RL.currency ? +x.value : +y.value, uc = x.currency === RL.currency ? +y.value : +x.value; return { px: uc / rl, rl, uc, fee: (+am.trading_fee || 0) / 100000 }; })() : null;
+  const am = m.amm; if (am && am.account) RV.ammAcct = am.account; RV.amm = am ? (() => { const x = am.amount, y = am.amount2, rl = x.currency === RL.currency ? +x.value : +y.value, uc = x.currency === RL.currency ? +y.value : +x.value; return { px: uc / rl, rl, uc, fee: (+am.trading_fee || 0) / 100000 }; })() : null;
   RV.at = Date.now();
 }
-function rvPaint() {
-  const el = $('#rvBook'); if (!el) return; const A = RV.asks.slice(0, 6).reverse(), B = RV.bids.slice(0, 6);
-  const row = (x, c) => `<span class="${c}" data-rvpx="${rv5(x[0])}" style="cursor:pointer">${rv5(x[0])}</span><span style="text-align:right">${fx(x[1], 2)}</span>`;
-  el.innerHTML = RV.at ? `<span class="mu" style="font-size:12px">Price (USDC)</span><span class="mu" style="font-size:12px;text-align:right">Size (RLUSD)</span>${A.map((x) => row(x, 'sell')).join('')}${B.map((x) => row(x, 'buy')).join('')}` : '<span class="mu">loading…</span>';
+function rvPaint() {   /* v2.45u (Jeff: "consistent with the others ... bids on the left and offers on the right"): same book as XRP / RLUSD */
+  const el = $('#rvBook'); if (!el) return;
+  const rows = [`<span class="mu s2" style="font-family:inherit;font-weight:600">Bids</span><span class="mu s2" style="text-align:right;font-weight:600">Asks</span>`];
+  for (let i = 0; i < 7; i++) { const b = RV.bids[i], a = RV.asks[i];
+    rows.push(`<span class="buy" ${b ? `data-rvpx="${rv5(b[0])}" style="cursor:pointer"` : ''}>${b ? rv5(b[0]) : ''}</span><span class="buy sz">${b ? szFmt(b[1]) : ''}</span><span class="sell ap" ${a ? `data-rvpx="${rv5(a[0])}" style="cursor:pointer"` : ''}>${a ? rv5(a[0]) : ''}</span><span class="sell sz">${a ? szFmt(a[1]) : ''}</span>`); }
+  el.innerHTML = RV.at ? rows.join('') : '<span class="mu s2">loading…</span>';
+  rvQuoteLine();
   const ba = RV.bids[0], aa = RV.asks[0];
-  $('#rvMid').innerHTML = RV.at ? `${ba && aa ? `Spread ${((aa[0] - ba[0]) / aa[0] * 1e4).toFixed(1)} bps` : 'One side of the book is empty'}${RV.amm ? ` · AMM pool ${rv5(RV.amm.px)} (${fx(RV.amm.rl + RV.amm.uc, 0)} deep, ${(RV.amm.fee * 100).toFixed(2)}% pool fee)` : ''}` : '';
-  $('#rvUpd').textContent = RV.at ? '● live' : '';
+  $('#rvMid').innerHTML = RV.at ? `${ba && aa ? `Mid ${rv5((aa[0] + ba[0]) / 2)} USDC · spread ${((aa[0] - ba[0]) / ((aa[0] + ba[0]) / 2) * 1e4).toFixed(1)} bps` : 'No orders on one side of the book right now.'}${RV.amm ? ` · AMM pool ${rv5(RV.amm.px)} (${fx(RV.amm.rl + RV.amm.uc, 0)} deep, ${(RV.amm.fee * 100).toFixed(2)}% pool fee)` : ''}` : '';
+  $('#rvUpd').textContent = RV.at ? 'live · ' + new Date(RV.at).toLocaleTimeString() : 'loading…';
+}
+/* Last sales: RLUSD/USDC fills. The ledger has no trades feed and both issuers are too busy to scan, so read the transactions of
+   the market makers at the top of this book (every book fill consumes one of their offers) and of the AMM pool (pool swaps).
+   Checked live Nov 19: 4 makers' last 100 transactions held ~230 RLUSD/USDC fills, the newest minutes old. */
+function rvSaleOf(t, ammAcct) {
+  const meta = t.meta || t.metaData, tx = t.tx || t.tx_json || t.transaction || {}; if (!meta || meta.TransactionResult !== 'tesSUCCESS' || !Array.isArray(meta.AffectedNodes)) return null;
+  const RL = rvRL(), UC = rvUC(), is = (a, c) => a && typeof a === 'object' && a.currency === c.currency && a.issuer === c.issuer;
+  const N = meta.AffectedNodes.map((n) => { const k = Object.keys(n)[0]; return { k, v: n[k] || {} }; });
+  let r = 0, u = 0, bought = 0, sold = 0;
+  for (const { k, v } of N) {
+    if (v.LedgerEntryType !== 'Offer' || (k !== 'ModifiedNode' && k !== 'DeletedNode')) continue;
+    const F = v.FinalFields || {}, P = v.PreviousFields || {}; if (P.TakerGets == null || P.TakerPays == null) continue;
+    if (is(F.TakerGets, RL) && is(F.TakerPays, UC)) { const dr = +P.TakerGets.value - +F.TakerGets.value, du = +P.TakerPays.value - +F.TakerPays.value; if (dr > 0 && du > 0) { r += dr; u += du; bought += dr; } }   // maker sold RLUSD → a buy
+    else if (is(F.TakerGets, UC) && is(F.TakerPays, RL)) { const dr = +P.TakerPays.value - +F.TakerPays.value, du = +P.TakerGets.value - +F.TakerGets.value; if (dr > 0 && du > 0) { r += dr; u += du; sold += dr; } }
+  }
+  if (ammAcct) {   /* pool swap: the pool's RLUSD and USDC move in opposite directions */
+    const held = (c) => { for (const { v } of N) { const F = v.FinalFields || {}, P = v.PreviousFields || {}; if (v.LedgerEntryType !== 'RippleState' || !F.Balance || !P.Balance || F.Balance.currency !== c.currency) continue;
+      const lo = F.LowLimit.issuer, hi = F.HighLimit.issuer; if (!((lo === ammAcct && hi === c.issuer) || (hi === ammAcct && lo === c.issuer))) continue;
+      return (lo === ammAcct ? 1 : -1) * (+F.Balance.value - +P.Balance.value); } return 0; };
+    const dR = held(RL), dU = held(UC);
+    if (dR && dU && Math.sign(dR) !== Math.sign(dU)) { r += Math.abs(dR); u += Math.abs(dU); if (dR < 0) bought += -dR; else sold += dR; }
+  }
+  if (!(r >= 0.000001) || !(u > 0)) return null;
+  const iso = t.close_time_iso || (tx.date != null ? new Date((tx.date + 946684800) * 1000).toISOString() : null);
+  return { t: iso ? Date.parse(iso) : 0, px: u / r, x: r, buy: bought >= sold, hash: t.hash || tx.hash };
+}
+async function rvLoadSales() {
+  const amm = RV.ammAcct, q = (acct) => xr('account_tx', { account: acct, limit: 100, ledger_index_min: -1, ledger_index_max: -1 }).catch(() => ({ transactions: [] }));
+  const accts = [...(RV.makers || []).slice(0, 4), ...(amm ? [amm] : [])], T = [];
+  for (let i = 0; i < accts.length; i += 2) { const R2 = await Promise.all(accts.slice(i, i + 2).map(q)); for (const r of R2) T.push(...(r.transactions || [])); }   /* 2 at a time: public servers limit bursts */
+  const seen = new Set(), L = [];
+  for (const t of T) { const s = rvSaleOf(t, amm); if (s && !seen.has(s.hash)) { seen.add(s.hash); L.push(s); } }
+  RV.sales = L.sort((x, y) => y.t - x.t).slice(0, 12); RV.salesAt = Date.now();
+}
+function rvQuoteLine() { const b = RV.bids[0], a = RV.asks[0], L0 = (RV.sales || [])[0]; qLine('#rvQuote', b && b[0], a && a[0], L0 && L0.px, L0 && L0.buy, rv5); }
+function rvPaintSales() {
+  rvQuoteLine(); const el = $('#rvLast'); if (!el) return; const S2 = RV.sales || [];
+  const H3 = (t, r) => `<span class="mu" style="font-family:inherit;font-size:12px;${r ? 'text-align:right' : ''}">${t}</span>`;
+  el.innerHTML = H3('Time (PT)') + H3('Price', 1) + H3('RLUSD', 1) + (S2.length ? S2.map((t) => `<span class="mu">${t.t ? new Date(t.t).toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour12: false }) : ''}</span><span class="${t.buy ? 'buy' : 'sell'}" style="text-align:right">${rv5(t.px)}</span><span style="text-align:right">${fx(t.x, 2)}</span>`).join('')
+    : `<span class="mu">${RV.salesAt ? 'No RLUSD/USDC trades in the latest activity.' : 'loading…'}</span><span></span><span></span>`);
 }
 function rvForm() {
   const sw = RV.mode === 'swap', buy = RV.side === 'buy';
@@ -15950,7 +15996,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45t';
+const APP_VER = 'v2.45u';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
