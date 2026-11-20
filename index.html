@@ -689,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45v · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45w · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -15602,7 +15602,7 @@ function rvDraw() {
   rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) { rvPaint(); rvEst(); } return rvLoadSales(); }).then(() => { if (cur === 'xtrade' && XT.rv) rvPaintSales(); }).catch((e) => { if ($('#rvMid')) $('#rvMid').innerHTML = `<span class="amb">${esc(e.message || String(e))}</span>`; });
   xrLoad(xrSel).then(() => { if (cur === 'xtrade' && XT.rv) rvForm(); }).catch(() => {});
   rvLoadOpen(); xrpPrice().then(() => { if (cur === 'xtrade' && XT.rv) rvEst(); }).catch(() => {});
-  clearInterval(RV.timer); RV.timer = setInterval(() => { if (cur !== 'xtrade' || !XT.rv) { clearInterval(RV.timer); RV.timer = 0; return; } RV.n = (RV.n || 0) + 1; rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) rvPaint(); return RV.n % 3 ? null : rvLoadSales().then(() => { if (cur === 'xtrade' && XT.rv) rvPaintSales(); }); }).catch(() => {}); }, 8000);
+  clearInterval(RV.timer); RV.timer = setInterval(() => { if (cur !== 'xtrade' || !XT.rv) { clearInterval(RV.timer); RV.timer = 0; return; } if (RV.busy) return; RV.n = (RV.n || 0) + 1; rvLoad().then(() => { if (cur === 'xtrade' && XT.rv) rvPaint(); return RV.n % 6 ? null : rvLoadSales().then(() => { if (cur === 'xtrade' && XT.rv) rvPaintSales(); }); }).catch(() => {}); }, 10000);
 }
 async function rvLoad() {   /* asks: offers selling RLUSD for USDC; bids: offers buying RLUSD with USDC; plus the AMM pool */
   const RL = rvRL(), UC = rvUC();
@@ -15651,8 +15651,8 @@ function rvSaleOf(t, ammAcct) {
   return { t: iso ? Date.parse(iso) : 0, px: u / r, x: r, buy: bought >= sold, hash: t.hash || tx.hash };
 }
 async function rvLoadSales() {
-  const amm = RV.ammAcct, q = (acct) => xr('account_tx', { account: acct, limit: 100, ledger_index_min: -1, ledger_index_max: -1 }).catch(() => ({ transactions: [] }));
-  const accts = [...(RV.makers || []).slice(0, 4), ...(amm ? [amm] : [])], T = [];
+  const amm = RV.ammAcct, q = (acct) => xr('account_tx', { account: acct, limit: 40, ledger_index_min: -1, ledger_index_max: -1 }).catch(() => ({ transactions: [] }));   /* v2.45w: lighter (the public servers share one quota per phone) */
+  const accts = [...(RV.makers || []).slice(0, 3), ...(amm ? [amm] : [])], T = [];
   for (let i = 0; i < accts.length; i += 2) { const R2 = await Promise.all(accts.slice(i, i + 2).map(q)); for (const r of R2) T.push(...(r.transactions || [])); }   /* 2 at a time: public servers limit bursts */
   const seen = new Set(), L = [];
   for (const t of T) { const s = rvSaleOf(t, amm); if (s && !seen.has(s.hash)) { seen.add(s.hash); L.push(s); } }
@@ -15678,7 +15678,9 @@ function rvForm() {
 function rvPct(p) {
   const sw = RV.mode === 'swap', buy = RV.side === 'buy', u = rvBal('uc') || 0, r = rvBal('rl') || 0, px = +$('#rvPx').value || (RV.asks[0] || [1])[0];
   const v = sw ? (buy ? u : r) : (buy ? u / px : r);
-  $('#rvAmt').value = String(Math.floor(v * p / 100 * 1e6) / 1e6); rvEst();
+  const a = Math.floor(v * p / 100 * 1e6) / 1e6;
+  if (a < 0.01) { $('#rvAmt').value = ''; rvEst(); return toast(`Not enough ${sw ? (buy ? 'USDC' : 'RLUSD') : (buy ? 'USDC' : 'RLUSD')} to trade (${fx(v, 4)}).${sw && buy && (rvBal('rl') || 0) >= 0.01 ? ' You hold RLUSD: tap Sell RLUSD to swap it back.' : ''}`, 6000); }
+  $('#rvAmt').value = String(a); rvEst();
 }
 let RVQT = 0;
 function rvEst() {
@@ -15686,7 +15688,7 @@ function rvEst() {
   if (!(q > 0)) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; return; }
   if (RV.mode === 'lim') { const p = +$('#rvPx').value || 0; el.innerHTML = `<div><span class="mu">${buy ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p, 2)} USDC</span></div><div><span class="mu">Liquidfi fee</span><span class="mono">none on limit orders</span></div>`; return; }
   el.innerHTML = '<div><span class="mu">Getting the best route…</span></div>'; clearTimeout(RVQT);
-  RVQT = setTimeout(async () => { try { const Q = await rvQuote(q, buy); if (+$('#rvAmt').value !== q || RV.side !== (buy ? 'buy' : 'sell')) return; rvEstPaint(Q); } catch (e) { el.innerHTML = `<div><span class="amb">${esc(e.message || String(e))}</span></div>`; } }, 350);
+  RVQT = setTimeout(async () => { try { const Q = await rvQuote(q, buy); if (+$('#rvAmt').value !== q || RV.side !== (buy ? 'buy' : 'sell')) return; rvEstPaint(Q); } catch (e) { el.innerHTML = `<div><span class="amb">${esc(/busy/i.test(e.message || '') ? 'XRP Ledger servers are busy. The quote will retry when you change the amount, or tap Review.' : e.message || String(e))}</span></div>`; } }, 350);
 }
 async function rvQuote(q, buy) {   /* spend exactly q of the source coin: what the ledger's best paths deliver */
   const from = buy ? rvUC() : rvRL(), to = buy ? rvRL() : rvUC();
@@ -15696,27 +15698,34 @@ async function rvQuote(q, buy) {   /* spend exactly q of the source coin: what t
   if (!best || !(best.get > 0)) throw new Error('No route for this swap right now.');
   return RV.q = { q, buy, get: best.get, paths: best.paths, at: Date.now(), via: best.paths.some((p) => p.some((s) => s.currency === 'XRP')) ? 'book, pool and through XRP' : 'RLUSD/USDC book and pool' };
 }
-const rvFeeX = (usd) => (XRPX.px > 0 ? xrFeeOf(usd / XRPX.px) : 0);
+const rvFeeX = (usd) => (XRPX.px > 0 ? xrFeeOf(usd / XRPX.px) : 0), rvFeeS = (v) => (v >= 0.01 ? xq4(v) : String(+v.toPrecision(2)));
 function rvEstPaint(Q) {
   const el = $('#rvEst'); const fin = Q.buy ? 'RLUSD' : 'USDC', fe = xrFeeOn(xrSel) ? rvFeeX(Q.q) : 0;
-  el.innerHTML = `<div><span class="mu">You get about</span><span class="mono">${fx(Q.get, 4)} ${fin}</span></div><div><span class="mu">Rate</span><span class="mono">${rv5(Q.buy ? Q.q / Q.get : Q.get / Q.q)} USDC per RLUSD</span></div><div><span class="mu">At least (0.3% max slippage)</span><span class="mono">${fx(Q.get * (1 - RV_SLIP), 4)} ${fin}</span></div>${fe ? `<div><span class="mu">Liquidfi fee (${XR_FEE.bps / 100}%)</span><span class="mono">${xq4(fe)} XRP</span></div>` : ''}<div><span class="mu">Route</span><span class="mono" style="font-size:13px">${esc(Q.via)}</span></div>`;
+  el.innerHTML = `<div><span class="mu">You get about</span><span class="mono">${fx(Q.get, 4)} ${fin}</span></div><div><span class="mu">Rate</span><span class="mono">${rv5(Q.buy ? Q.q / Q.get : Q.get / Q.q)} USDC per RLUSD</span></div><div><span class="mu">At least (0.3% max slippage)</span><span class="mono">${fx(Q.get * (1 - RV_SLIP), 4)} ${fin}</span></div>${fe ? `<div><span class="mu">Liquidfi fee (${XR_FEE.bps / 100}%)</span><span class="mono">${rvFeeS(fe)} XRP</span></div>` : ''}<div><span class="mu">Route</span><span class="mono" style="font-size:13px">${esc(Q.via)}</span></div>`;
 }
-async function rvReview() {
+async function rvReview() {   /* v2.45w (Jeff: "The button doesnt press. Then it says busy"): the button shows it's working; quotes are reused */
+  if (RV.busy) return; const g = $('#rvGo'), g0 = g ? g.textContent : '';
+  RV.busy = true; if (g) { g.disabled = true; g.textContent = 'Checking…'; }
+  try { await rvReview1(); } finally { RV.busy = false; if (g) { g.disabled = false; g.textContent = g0; } }
+}
+async function rvReview1() {
   const o = xrOwn(xrSel); if (!o) return; const q = +$('#rvAmt').value || 0, buy = RV.side === 'buy', sw = RV.mode === 'swap';
   if (!(q > 0)) return toast('Enter an amount.');
-  let d, sv, drops; try { [d, sv, drops] = await Promise.all([xrLoad(xrSel), xrServer(), xrFee()]); await xrpPrice(); } catch (e) { return toast(e.message || String(e)); }
+  if (q < 0.01) return toast('That is too small to trade (at least 0.01).');
+  let d, sv, drops; try { d = await xrLoad(xrSel); sv = await xrServer(); drops = await xrFee(); await xrpPrice().catch(() => 0); } catch (e) { return toast(e.message || String(e)); }
   const r = rvBal('rl'), u = rvBal('uc'), get = buy ? 'RLUSD' : 'USDC';
   if ((buy ? r : u) == null) return toast(`Add ${get} to this wallet first (XRP wallet → Assets), so it can receive it.`, 7000);
   if (sw) {
     if (q > (buy ? u : r) + 1e-9) return toast(`Not enough ${buy ? 'USDC' : 'RLUSD'} (${fx(buy ? u : r, 2)}).`);
-    let Q; try { Q = await rvQuote(q, buy); } catch (e) { return toast(e.message || String(e)); }
+    let Q = RV.q && RV.q.q === q && RV.q.buy === buy && Date.now() - RV.q.at < 20000 ? RV.q : null;   /* the quote on screen (DeliverMin still protects the price) */
+    if (!Q) { try { Q = await rvQuote(q, buy); } catch (e) { return toast(/busy/i.test(e.message || '') ? 'The XRP Ledger servers are busy. Wait a few seconds and tap Review again.' : (e.message || String(e))); } }
     const fee = xrFeeOn(xrSel) ? rvFeeX(q) : 0; if (xrFeeOn(xrSel) && !(XRPX.px > 0)) return toast("Couldn't price the fee in XRP. Try again in a moment.");
     if (xrSpend(d) < fee + 2 * drops / 1e6) return toast(`Not enough XRP for the fee (${xq4(fee + 2 * drops / 1e6)} XRP).`);
     const min = Q.get * (1 - RV_SLIP);
     confirmSheet(`Swap ${fx(q, 2)} ${buy ? 'USDC' : 'RLUSD'} → ${get}`, `XRP Ledger · from ${esc(o.name)}`, [...await xrBusy(xrSel),
       { k: 'You pay', v: `${fx(q, 4)} ${buy ? 'USDC' : 'RLUSD'}`, n: 'exactly this', hl: 1 }, { k: 'You get about', v: `${fx(Q.get, 4)} ${get}`, n: `at least ${fx(min, 4)} or nothing happens` },
       { k: 'Rate', v: `${rv5(buy ? q / Q.get : Q.get / q)} USDC per RLUSD` }, { k: 'Route', v: Q.via, n: 'the ledger picks the best price' },
-      ...(fee ? [{ k: 'Liquidfi fee', v: `${xq4(fee)} XRP`, n: `${XR_FEE.bps / 100}% · only if it fills` }] : []), { k: 'Network fee', v: `${(drops / 1e6).toFixed(6).replace(/0+$/, '')} XRP` }, { foot: XR_BOT_NOTE }],
+      ...(fee ? [{ k: 'Liquidfi fee', v: `${rvFeeS(fee)} XRP`, n: `${XR_FEE.bps / 100}% · only if it fills` }] : []), { k: 'Network fee', v: `${(drops / 1e6).toFixed(6).replace(/0+$/, '')} XRP` }, { foot: XR_BOT_NOTE }],
       'Swap', () => rvSwapRun(o, q, buy, Q, min, fee, drops), false, buy ? 'b-grn' : 'b-red', 'Swapping…', true);
     return;
   }
@@ -16028,7 +16037,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45v';
+const APP_VER = 'v2.45w';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
