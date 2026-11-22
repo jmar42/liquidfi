@@ -242,7 +242,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device · no server<br>v2.42l</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.45x</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -260,7 +260,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
     <button class="b-acc big" data-act="setup">Set up</button>
   </div>
   <ul class="feats">
-    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span><b>Your keys stay on this phone.</b> They are encrypted with your PIN. No server, no sign-up.</span></li>
+    <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span><b>Your keys stay on this phone.</b> They are encrypted with your PIN. No account, no sign-up.</span></li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span><b>Cancel All in one tap.</b> Cancel the open orders on every wallet on this phone at once. Buy XLM or USDC with a card, swap and trade on Stellar.</span></li>
     <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7.5 14h9"/></svg><span><b>Stellar and XRP Ledger.</b> Trade, swap and send on the real networks, with stop orders that work while your phone sleeps.</span></li>
   </ul>
@@ -516,7 +516,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="tbal" id="tBal"></div><div class="qline" id="tQuote"></div>
   <label><span id="tAmtL">Amount (XLM)</span><input id="tAmt" inputmode="decimal" placeholder="0"></label>
   <div class="g4"><button class="b-out sm" data-pct="25">25%</button><button class="b-out sm" data-pct="50">50%</button><button class="b-out sm" data-pct="75">75%</button><button class="b-out sm" data-pct="100">Max</button></div>
-  <div class="mu" id="tMktNote" style="font-size:13px;display:none">Fills now at the best price (book or AMM pools), within your slippage cap. Includes a 0.25% fee; limit orders have no fee.</div>
+  <div class="mu" id="tMktNote" style="font-size:13px;display:none">Fills now against the order book and AMM pools, within your slippage cap. Includes a 0.25% fee; limit orders have no fee.</div>
   <div class="note" id="tStopOff" style="display:none"><span>Stops work against USDC (or another dollar or euro coin), not against XLM. Switch the pair, for example to EURC/USDC or XLM/USDC.</span></div>
   <div class="note" id="tEditBar" style="display:none"></div>
   <div id="tStopW" style="display:none;flex-direction:column;gap:10px">
@@ -657,7 +657,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.42l</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.45x</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -689,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45w · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45x · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14145,8 +14145,37 @@ function portData() {
       tot += u || 0;
     }
   }
+  /* v2.45x (Jeff: "the balance seems off"): Portfolio added up Stellar wallets only, so it showed ~$1,480 less than the Accounts total.
+     XRP Ledger and Solana wallets now count too, valued the way Accounts values them. A dollar or euro coin joins the Stellar row of the
+     same name (USDC on three networks is one USDC line); XRP and SOL get rows of their own. */
+  const xadd = (code, cash, amt, usd, name, ord, watch) => {
+    if (!(amt > 0)) return;
+    const k = (cash && (Object.values(G).find((g) => g.code === code && g.cash) || {}).k) || (cash ? 'C:' : 'N:') + code;
+    const g = G[k] || (G[k] = { k, code, iss: '', amt: 0, usd: 0, ord: 0, nft: false, cash, none: false, by: [] });
+    g.amt += amt; g.usd += usd; g.ord += ord || 0; const b = g.by.find((x) => x.name === name); if (b) { b.amt += amt; b.usd += usd; } else g.by.push({ name, amt, usd, watch });
+    tot += usd;
+  };
+  if (S.net === 'public') {
+    for (const w of xrList()) {
+      if (!w.own && (S.pMode || 'all') !== 'all') continue;
+      const d = XRA[w.addr]; if (d === undefined) { pending = true; continue; } if (!d || !d.a) continue;
+      if (!XRPX.px) pending = true;
+      xadd('XRP', false, xrXrp(d), xrXrp(d) * (XRPX.px || 0), w.name, 0, !w.own);
+      for (const l of d.lines.filter(xrIsUsd)) { const v = Math.max(0, +l.balance); xadd(l.currency === USDC_HEX ? 'USDC' : xrCur(l.currency), true, v, v, w.name, 0, !w.own); }
+    }
+    for (const w of solList()) {
+      const d = SOLA[w.addr]; if (!d) { pending = true; continue; } if (!SOLPX.sol) pending = true;
+      xadd('SOL', false, d.sol, d.sol * (SOLPX.sol || 0), w.name);
+      for (const t of d.toks) { const m = solMints()[t.mint] || {}, j = JLT && JLT.find((x) => x.address === t.mint), c = t.c || (j && j.symbol); if (!c) continue;
+        xadd(c, !!(m.usd || m.eur), t.amt, solTokUsd(t), w.name); }
+      for (const x of (MFW[w.addr] || { items: [] }).items) {   // money sitting on Manifest (open orders and fills not yet moved to the wallet)
+        xadd('SOL', false, x.free.sol + x.held.sol, (x.free.sol + x.held.sol) * (SOLPX.sol || 0), w.name, x.held.sol);
+        xadd(x.q, true, x.free.q + x.held.q, x.free.q + x.held.q, w.name, x.held.q);
+      }
+    }
+  }
   const all = Object.values(G), dup = (c) => all.filter((g) => g.code === c).length > 1;
-  all.forEach((g) => { const fake = CASH.includes(g.code) && !g.cash; g.label = g.code + (fake ? ' · not verified' : g.code !== 'XLM' && !g.cash && dup(g.code) ? ' · ' + short(g.iss) : ''); g.by.sort((x, y) => y.usd - x.usd || y.amt - x.amt); });
+  all.forEach((g) => { const fake = CASH.includes(g.code) && !g.cash; g.label = g.code + (fake ? ' · not verified' : g.code !== 'XLM' && !g.cash && g.iss && dup(g.code) ? ' · ' + short(g.iss) : ''); g.by.sort((x, y) => y.usd - x.usd || y.amt - x.amt); });
   const main = all.filter((g) => !g.nft && (g.cash || g.code === 'XLM' || (!g.none && g.usd >= 0.01))).sort((x, y) => y.usd - x.usd);
   return { tot, pending, main, nfts: all.filter((g) => g.nft), other: all.filter((g) => !g.nft && !main.includes(g)) };
 }
@@ -14183,13 +14212,14 @@ function paintPort() {
   $('#oMore').innerHTML = (D.nfts.length ? `<span class="lbl">Collectibles · ${D.nfts.length}</span><div class="card" style="padding:4px 14px;gap:0">${D.nfts.map((g) => row(g, true)).join('')}</div>` : '')
     + (D.other.length ? `<details class="obal" style="margin-top:8px"><summary class="mu">Other tokens · ${D.other.length} <span style="font-size:13px">(no market or under 1¢)</span></summary><div class="card" style="padding:4px 14px;gap:0;margin-top:8px">${D.other.map((g) => row(g, true)).join('')}</div></details>` : '');
   const nw = portAccts().length;
-  $('#oFoot').textContent = `${nw} wallet${nw === 1 ? '' : 's'}${(S.pMode || 'all') === 'all' && watched().length ? ', watched ones included' : ''} · values in USD from the Stellar market${D.pending ? ' · updating…' : ''}`;
+  $('#oFoot').textContent = `${nw} wallet${nw === 1 ? '' : 's'}${(S.pMode || 'all') === 'all' && watched().length ? ', watched ones included' : ''} · Stellar, XRP Ledger and Solana · values in USD${D.pending ? ' · updating…' : ''}`;
 }
 async function drawPort() {
   paintPort();
   if (!P.res[P.sel] && !P.busy[P.sel]) loadPer(P.sel);
   const own = persAccts(), w = watched();
-  await Promise.all([...own.map((o) => refreshAcct(o.addr).then((a) => priceAssets(a)).catch(() => null)), ...w.map((b) => loadBot(b).then(() => priceAssets((BOT[b.addr] || {}).a)).catch(() => null))]);
+  await Promise.all([...own.map((o) => refreshAcct(o.addr).then((a) => priceAssets(a)).catch(() => null)), ...w.map((b) => loadBot(b).then(() => priceAssets((BOT[b.addr] || {}).a)).catch(() => null)),
+    loadXrpAll().catch(() => null), solPrices().catch(() => null), ...solList().map((x) => Promise.all([solLoad(x.addr).catch(() => null), mfWalletLoad(x.addr).catch(() => null)]))]);   /* v2.45x: XRP and Solana wallets too */
   paintPort();
 }
 
@@ -14389,10 +14419,10 @@ async function drawXrp(quiet) {
     // a bot re-quotes every few seconds: 3+ "Order placed / Order cancelled" in a row collapse into one line, so fills and payments stay visible
     const FG = xrGroupFills(T, addr);   /* fills of one order → one line */
     const R = []; for (const x of T) {
-      const L = FG.fills.has(x.hash) ? (FG.heads.get(x.hash) || []).map((g) => (g.own ? (g.fok ? 'Market: ' : 'Filled: ') : 'Order filled: ') + xrGroupText(g)) : [xrTxText(x, addr)];
-      for (const t of L) { const q = /^(Order placed|Order cancelled)/.test(t), last = R[R.length - 1]; if (q && last && last.q) { last.m.push({ x, t }); continue; } R.push({ q, m: [{ x, t }] }); } }
+      const L = FG.fills.has(x.hash) ? (FG.heads.get(x.hash) || []).map((g) => xrGroupText(g) + (g.own ? (g.fok ? ' · market order' : ' · filled') : ' · your order filled')) : [xrTxText(x, addr)];
+      for (const t of L) { const q = /^(Placed |Order cancelled)/.test(t), last = R[R.length - 1]; if (q && last && last.q) { last.m.push({ x, t }); continue; } R.push({ q, m: [{ x, t }] }); } }
     const rows = R.flatMap((g) => g.q && g.m.length >= 3 ? [{ x: g.m[0].x, t: `${g.m.length} orders placed / replaced (a bot re-quoting)` }] : g.m).slice(0, 16);   // runs of 1-2 stay as they are
-    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^Order filled|^Filled|^Market/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${esc(t)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>'; xpmFill($('#xrRec')).catch(() => {});
+    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^(Sold|Bought) /.test(t) && !/ · failed$/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${/ · failed$/.test(t) ? esc(t.replace(/ · failed$/, '')) + ' <span class="sell">failed</span>' : esc(t)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>'; xpmFill($('#xrRec')).catch(() => {});
   } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
 }
 /* A bot wallet re-quotes all day: the newest 60 transactions can be minutes of "order placed / cancelled" and no trade.
@@ -14464,7 +14494,7 @@ const xq4 = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maxi
 function xrTradeText(d) {   // null if this wasn't an XRP / dollar-coin trade
   if (!(Math.abs(d.x) > 1e-6 && Math.abs(d.u) > 1e-6) || Math.sign(d.x) === Math.sign(d.u)) return null;
   const px = Math.abs(d.u / d.x), tk = d.tok || 'RLUSD';
-  return d.x < 0 ? `sold ${xq4(-d.x)} XRP for ${xq4(d.u)} ${tk} @ ${px.toFixed(5)}` : `bought ${xq4(d.x)} XRP for ${xq4(-d.u)} ${tk} @ ${px.toFixed(5)}`;
+  return `${d.x < 0 ? 'Sold' : 'Bought'} ${xq4(Math.abs(d.x))} XRP at ${pxW(px)} ${tk}`;   /* v2.45x: the one trade wording */
 }
 /* ---------- Fills grouped by order ----------
    Every fill records which of my orders it took (my Offer node's Sequence in the metadata). My own OfferCreate that crossed
@@ -14515,9 +14545,9 @@ function xrGroupFills(T, me) {
   }
   return { list, heads, fills };
 }
-function xrGroupText(g) {   /* "sold 45 XRP for 59.22 RLUSD @ 1.31600 · 2 fills" / "sold 30 of 45 XRP … · 15 still open" */
+function xrGroupText(g) {   /* "Sold 45 XRP at 1.31600 RLUSD · 2 fills" / "Sold 30 of 45 XRP at … · 15 XRP still open" */
   const X = Math.abs(g.x), U = Math.abs(g.u), px = X > 0 ? U / X : 0, part = g.orig != null && g.orig - X > 1e-6;
-  return `${g.x < 0 ? 'sold' : 'bought'} ${xq4(X)}${part ? ' of ' + xq4(g.orig) : ''} XRP for ${xq4(U)} ${g.tok} @ ${px.toFixed(5)}${g.n > 1 ? ` · ${g.n} fills` : ''}${g.open && g.left > 1e-6 ? ` · ${xq4(g.left)} still open` : ''}`;
+  return `${g.x < 0 ? 'Sold' : 'Bought'} ${xq4(X)}${part ? ' of ' + xq4(g.orig) : ''} XRP at ${pxW(px)} ${g.tok}${g.n > 1 ? ` · ${g.n} fills` : ''}${g.open && g.left > 1e-6 ? ` · ${xq4(g.left)} XRP still open` : ''}`;
 }
 /* Toast for a fill that just arrived: read the wallet's history so the message covers the whole order, not one piece */
 async function xrFillToast(me, hash, meta, tx) {
@@ -14545,10 +14575,11 @@ function xrTxText(x, me) {
       return `⚠ Tiny ${xrAmt(amt)} from unknown ${t.Account.slice(0, 6)}…${t.Account.slice(-6)} · likely spam, never copy this address`;   // dust from a new address
     s = xsd ? `Swap ${xrAmt(amt)} → ${xsd.to.coin} · NEAR Intents` : xso ? `Received ${xrAmt(amt)} · swap from ${xso.from.coin}` : t.Account === me && t.Destination && t.Destination === XR_FEE.to[S.net] ? `Liquidfi fee ${xrAmt(amt)}` : t.Destination === me && t.Account !== me ? `Received ${xrAmt(amt)} from ${short(t.Account)}` : t.Account === me && t.Destination !== me ? `Sent ${xrAmt(amt)} to ${short(t.Destination)}${t.DestinationTag != null ? ' · tag ' + t.DestinationTag : ''}` : `Payment ${xrAmt(amt)}`;
   } else if (t.TransactionType === 'TrustSet') s = `Trust line ${xrCur((t.LimitAmount || {}).currency)}`;
-  else if (t.Account !== me) { const tr = ok && xrTradeText(xrMyDelta(x.meta, me, t)); s = tr ? `Order filled: ${tr}` : (t.TransactionType || 'Transaction'); }   // someone else's transaction that touched this wallet: usually a fill of my order
+  else if (t.Account !== me) { const tr = ok && xrTradeText(xrMyDelta(x.meta, me, t)); s = tr ? `${tr} · your order filled` : (t.TransactionType || 'Transaction'); }   // someone else's transaction that touched this wallet: usually a fill of my order
   else if (t.TransactionType === 'OfferCreate') { const tr = ok && xrTradeText(xrMyDelta(x.meta, me, t)), sell = typeof t.TakerGets === 'string';
     const rest = (x.meta.AffectedNodes || []).some((n) => n.CreatedNode && n.CreatedNode.LedgerEntryType === 'Offer' && (n.CreatedNode.NewFields || {}).Account === me);
-    s = tr ? (rest ? `Filled part: ${tr} · rest open` : (t.Flags & 0x00040000 ? 'Market: ' : 'Filled at once: ') + tr) : `Order placed: ${sell ? 'sell' : 'buy'} ${xrAmt(sell ? t.TakerGets : t.TakerPays)} for ${xrAmt(sell ? t.TakerPays : t.TakerGets)}`; }
+    const nm = (a) => (typeof a === 'string' ? 'XRP' : a && a.currency === USDC_HEX ? 'USDC' : xrCur((a || {}).currency));
+    s = tr ? `${tr} · ${rest ? 'part filled, rest open' : t.Flags & 0x00040000 ? 'market order' : 'filled at once'}` : `Placed ${ordW(nm(t.TakerGets), xrAmtV(t.TakerGets), nm(t.TakerPays), xrAmtV(t.TakerPays), (v) => xq4(v))}`; }
   else if (t.TransactionType === 'OfferCancel') s = 'Order cancelled';
   else if (t.TransactionType === 'AMMDeposit' || t.TransactionType === 'AMMWithdraw') { const dep = t.TransactionType === 'AMMDeposit', a2 = t.Asset2 || {}, tok = xrCur(a2.currency);
     let xd = 0, ud = 0; if (ok) { xd = xrMyDelta(x.meta, me, t).x; for (const n of x.meta.AffectedNodes || []) { const v = n[Object.keys(n)[0]] || {}, F = v.FinalFields || v.NewFields || {}, P = v.PreviousFields || {};
@@ -15687,7 +15718,7 @@ function rvEst() {
   const el = $('#rvEst'); if (!el) return; const q = +$('#rvAmt').value || 0, buy = RV.side === 'buy';
   if (!(q > 0)) { el.innerHTML = '<div><span class="mu">Enter an amount</span></div>'; return; }
   if (RV.mode === 'lim') { const p = +$('#rvPx').value || 0; el.innerHTML = `<div><span class="mu">${buy ? 'Cost' : 'Proceeds'} if filled</span><span class="mono">${fx(q * p, 2)} USDC</span></div><div><span class="mu">Liquidfi fee</span><span class="mono">none on limit orders</span></div>`; return; }
-  el.innerHTML = '<div><span class="mu">Getting the best route…</span></div>'; clearTimeout(RVQT);
+  el.innerHTML = '<div><span class="mu">Getting a quote…</span></div>'; clearTimeout(RVQT);
   RVQT = setTimeout(async () => { try { const Q = await rvQuote(q, buy); if (+$('#rvAmt').value !== q || RV.side !== (buy ? 'buy' : 'sell')) return; rvEstPaint(Q); } catch (e) { el.innerHTML = `<div><span class="amb">${esc(/busy/i.test(e.message || '') ? 'XRP Ledger servers are busy. The quote will retry when you change the amount, or tap Review.' : e.message || String(e))}</span></div>`; } }, 350);
 }
 async function rvQuote(q, buy) {   /* spend exactly q of the source coin: what the ledger's best paths deliver */
@@ -15724,7 +15755,7 @@ async function rvReview1() {
     const min = Q.get * (1 - RV_SLIP);
     confirmSheet(`Swap ${fx(q, 2)} ${buy ? 'USDC' : 'RLUSD'} → ${get}`, `XRP Ledger · from ${esc(o.name)}`, [...await xrBusy(xrSel),
       { k: 'You pay', v: `${fx(q, 4)} ${buy ? 'USDC' : 'RLUSD'}`, n: 'exactly this', hl: 1 }, { k: 'You get about', v: `${fx(Q.get, 4)} ${get}`, n: `at least ${fx(min, 4)} or nothing happens` },
-      { k: 'Rate', v: `${rv5(buy ? q / Q.get : Q.get / q)} USDC per RLUSD` }, { k: 'Route', v: Q.via, n: 'the ledger picks the best price' },
+      { k: 'Rate', v: `${rv5(buy ? q / Q.get : Q.get / q)} USDC per RLUSD` }, { k: 'Route', v: Q.via, n: 'the ledger picks the route' },
       ...(fee ? [{ k: 'Liquidfi fee', v: `${rvFeeS(fee)} XRP`, n: `${XR_FEE.bps / 100}% · only if it fills` }] : []), { k: 'Network fee', v: `${(drops / 1e6).toFixed(6).replace(/0+$/, '')} XRP` }, { foot: XR_BOT_NOTE }],
       'Swap', () => rvSwapRun(o, q, buy, Q, min, fee, drops), false, buy ? 'b-grn' : 'b-red', 'Swapping…', true);
     return;
@@ -16037,7 +16068,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45w';
+const APP_VER = 'v2.45x';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16104,8 +16135,8 @@ function solPollStart(addr) {
 }
 /* v2.40o (Jeff: "Wheres the details? Like xlm"): each Solana transaction read and put in words, like the Stellar list.
    A transaction never changes once final, so each one is read once and kept (memory + this phone's storage). */
-const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx12') || '{}'); } catch (e) { return {}; } })();
-function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx12', JSON.stringify(SOLTX)); } catch (e) {} }
+const SOLTX = (() => { try { return JSON.parse(localStorage.getItem('ksw_soltx13') || '{}'); } catch (e) { return {}; } })();
+function solTxSave() { try { const k = Object.keys(SOLTX); if (k.length > 400) for (const x of k.slice(0, k.length - 300)) delete SOLTX[x]; localStorage.setItem('ksw_soltx13', JSON.stringify(SOLTX)); } catch (e) {} }
 const solCoinNm = (mint) => { const m = solMints()[mint]; if (m) return m.c; const j = JLT && JLT.find((x) => x.address === mint); return j ? j.symbol : 'token ' + short(mint); };
 const solJl = (mint) => !!(JLT && JLT.find((x) => x.address === mint));
 const SOL_KNOWN = { '8d9FNC7AgKLTCPKNd3MMkLLXZYLmiYFYR3vfXMBNJVNx': 'Stripe (Zero Hash)' };   /* seen delivering Jeff's Stripe buy, Nov 14 2026 */
@@ -16152,7 +16183,8 @@ function solTxSum0(addr, t) {
     let od = '', odx = null; for (const x of (((t.transaction || {}).message || {}).instructions || []).filter((x) => x.programId === MNF_PROG)) { try { const d = b58d(x.data); if (d[0] !== 6) continue; let i = 1 + (d[1] ? 5 : 1); const nc = d[i] | (d[i + 1] << 8); i += 4; for (let c = 0; c < nc; c++) { i += 8; i += d[i] ? 5 : 1; }
       const no = d[i] | (d[i + 1] << 8); i += 4; if (no) { const dv = new DataView(d.buffer, d.byteOffset); const at = Number(dv.getBigUint64(i, true)), mm = dv.getUint32(i + 8, true), ee = dv.getInt8(i + 12), bd = d[i + 13];
         od = `${bd ? 'buy' : 'sell'} ${solAmt(at / 1e9)} SOL @ ${+(mm * 10 ** ee * 1000).toFixed(4)}`; odx = { bid: bd ? 1 : 0, sol: at / 1e9, px: mm * 10 ** ee * 1000 }; } } catch (e) {} }
-    txt = mfK.includes(2) || od ? `Manifest: ${od ? od + ' posted' : 'order placed'}${out.length && mfK.includes(2) ? ` · ${coins(out)} set aside for it` : ''}` : mfK.includes(3) ? `Manifest: moved to wallet${inn.length ? ` · ${coins(inn) || inn.map(f).join(' + ')}` : ''}${mfK.includes(6) ? ' (order cancelled)' : ''}` : mfK.includes(6) ? 'Manifest: order placed or cancelled' : 'Manifest: account set up';
+    const mq = [...out, ...inn].some((c) => c.c === 'USDT') ? 'USDT' : 'USDC';   /* v2.45x: "Placed sell order · 0.1 SOL at 72.0500 USDC · Manifest", like Stellar and XRP */
+    txt = mfK.includes(2) || od ? (odx ? `Placed ${odx.bid ? 'buy' : 'sell'} order · ${solAmt(odx.sol)} SOL at ${pxW(odx.px)} ${mq} · Manifest` : 'Placed an order · Manifest') + (out.length && mfK.includes(2) ? ` · ${coins(out)} set aside for it` : '') : mfK.includes(3) ? (mfK.includes(6) ? 'Order cancelled' : 'Moved from Manifest') + (inn.length ? ` · ${coins(inn) || inn.map(f).join(' + ')}${mfK.includes(6) ? ' back to wallet' : ''}` : '') + (mfK.includes(6) ? ' · Manifest' : '') : mfK.includes(6) ? 'Order placed or cancelled · Manifest' : 'Manifest account update';
     return { txt, fee: payer ? fee : 0, err: !!m.err, mf: { place: odx, moved: mfK.includes(3) ? inn.filter((c) => c.mint === 'SOL' || usdM0.includes(c.mint)).map((c) => ({ c: c.c, sol: c.mint === 'SOL', v: c.v })) : [] } };
   }
   /* v2.42g (Jeff: "It says Swap. It should say sold .1 at $72.xx"): a SOL ↔ dollar swap reads as a trade, at the price, with
@@ -16161,8 +16193,8 @@ function solTxSum0(addr, t) {
   if (payer && out.length && inn.length) { const so = out.find((c) => c.mint === 'SOL'), si = inn.find((c) => c.mint === 'SOL'), uo = out.find((c) => usdM.includes(c.mint)), ui = inn.find((c) => usdM.includes(c.mint));
     const fi = SOL_FEE.owner && SOL_FEE.owner !== addr ? K.indexOf(SOL_FEE.owner) : -1, feeSol = fi >= 0 ? Math.max(0, ((m.postBalances || [])[fi] - (m.preBalances || [])[fi]) / 1e9) : 0;   /* v2.42h: the fee wallet is one of Jeff's own wallets, still the fee */
     const ven = solVen(m), jup = K.includes('JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4') || (((t.transaction || {}).message || {}).instructions || []).some((x) => x.programId === 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4');
-    if (so && ui && Math.abs(so.v) - feeSol > 0) { const n = Math.abs(so.v) - feeSol; return { txt: `Sold ${solAmt(n)} SOL at ${(ui.v / n).toFixed(4)} ${ui.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err, lfee: jup ? { sol: feeSol, usd: feeSol * (ui.v / n), pct: ui.v ? feeSol * (ui.v / n) / ui.v * 100 : 0 } : null, ioc: jup ? { ok: true, bid: 0, sol: n, px: ui.v / n, ven } : null }; }
-    if (si && uo) { const n = si.v + feeSol; return { txt: `Bought ${solAmt(n)} SOL at ${(Math.abs(uo.v) / n).toFixed(4)} ${uo.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err, lfee: jup ? { sol: feeSol, usd: feeSol * (Math.abs(uo.v) / n), pct: uo.v ? feeSol * (Math.abs(uo.v) / n) / Math.abs(uo.v) * 100 : 0 } : null, ioc: jup ? { ok: true, bid: 1, sol: n, px: Math.abs(uo.v) / n, ven } : null }; } }
+    if (so && ui && Math.abs(so.v) - feeSol > 0) { const n = Math.abs(so.v) - feeSol; return { txt: `Sold ${solAmt(n)} SOL at ${pxW(ui.v / n)} ${ui.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err, lfee: jup ? { sol: feeSol, usd: feeSol * (ui.v / n), pct: ui.v ? feeSol * (ui.v / n) / ui.v * 100 : 0 } : null, ioc: jup ? { ok: true, bid: 0, sol: n, px: ui.v / n, ven } : null }; }
+    if (si && uo) { const n = si.v + feeSol; return { txt: `Bought ${solAmt(n)} SOL at ${pxW(Math.abs(uo.v) / n)} ${uo.c}${ven ? ' · ' + ven : ''}`, fee: fee, err: !!m.err, lfee: jup ? { sol: feeSol, usd: feeSol * (Math.abs(uo.v) / n), pct: uo.v ? feeSol * (Math.abs(uo.v) / n) / Math.abs(uo.v) * 100 : 0 } : null, ioc: jup ? { ok: true, bid: 1, sol: n, px: Math.abs(uo.v) / n, ven } : null }; } }
   if (!ch.length) txt = payer ? 'Account update' : 'No change to this wallet (someone else\'s transaction, often spam)';
   else if (out.length && inn.length && inn.some((c) => solJl(c.mint)) && !out.some((c) => solJl(c.mint))) txt = `Earn: put in ${out.filter((c) => c.mint !== 'SOL' || out.length === 1).map(f).join(', ')}`;
   else if (out.length && inn.length && out.some((c) => solJl(c.mint)) && !inn.some((c) => solJl(c.mint))) txt = `Earn: took out ${inn.filter((c) => c.mint !== 'SOL' || inn.length === 1).map(f).join(', ')}`;
@@ -16184,7 +16216,7 @@ async function solRecent(addr) {
       const gTxt = Object.values(GH).map((h) => h.head).join('|'), gF = new Set(Object.values(GR.G).flatMap((g) => (g.pf || []).map((f) => f.t)));
       el.innerHTML = LL.length ? LL.map((s) => { if (SH[s.signature]) return SH[s.signature]; if (SG.of[s.signature]) return ''; if (GH[s.signature]) return GH[s.signature].html; if (GR.of[s.signature]) return '';
         if (s.fill && gF.has(s.fill.t)) return '';
-        if (s.fill && gTxt.includes(`${s.fill.bid ? 'Bought' : 'Sold'} ${solAmt(s.fill.sol)} SOL at ${(+s.fill.px).toFixed(2)}`)) return '';
+        if (s.fill && gTxt.includes(`${s.fill.bid ? 'Bought' : 'Sold'} ${solAmt(s.fill.sol)} SOL at ${pxW(s.fill.px)}`)) return '';
         if (s.fill) return `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order (seen ${esc(new Date(s.fill.t).toLocaleString())})</span></div></div></details>`; const x = SOLTX[s.signature + addr];
       const iso = s.blockTime ? new Date(s.blockTime * 1000).toISOString() : '', rw = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
       return `<details class="recrow"><summary><span${/^No change/.test(x ? x.txt : '') ? ' class="mu"' : ''}>${x ? esc(STR[s.signature] ? STR[s.signature].txt : x.txt) : '<span class="mu">Reading…</span>'}${(s.err || (x && x.err)) && !/^Swap not filled/.test(x ? x.txt : '') ? ' <span class="sell">failed</span>' : ''}</span><span class="mu" style="font-size:13px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${x && x.memo ? rw('Memo', esc(x.memo)) : ''}${x && x.pmemo ? rw('🔒 Private memo', `<span class="spmemo" data-k="${esc(s.signature + addr)}" data-m="${esc(x.pmemo)}" data-me="${esc(addr)}">${xpmTxt(SPMC[s.signature + addr])}</span>`) : ''}${x && x.lfee ? rw('Liquidfi fee', esc(lfeeTxt(x.lfee))) : ''}${x && x.fee ? rw('Network fee', solAmt(x.fee) + ' SOL') : ''}${iso ? rw('Time', esc(new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))) : ''}${rw('Transaction', esc(short(s.signature)))}<div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">Nothing yet</span></div>'; };
@@ -16344,11 +16376,11 @@ function solSwapSheet(mode) {
   if (!F.find((c) => c.v === SWS.from)) SWS.from = F[0].v;
   const T = solTargets().filter((c) => c.v !== SWS.from); if (!T.find((c) => c.v === SWS.to)) SWS.to = (T.find((c) => c.c === (SWS.from === 'SOL' ? 'USDC' : 'SOL')) || T[0]).v;
   sheet(`<h2>${SWS.mode === 'trade' ? 'Trade on Solana' : 'Swap on Solana'}</h2>
-    ${SWS.mode === 'trade' ? '<div class="mu" style="font-size:13.5px">Trades now at the best market price on Solana (Jupiter). Limit and stop orders on Solana are coming next.</div>' : ''}
+    ${SWS.mode === 'trade' ? '<div class="mu" style="font-size:13.5px">Trades now at the market price on Solana, routed by Jupiter. Limit and stop orders on Solana are coming next.</div>' : ''}
     <label class="fld"><span>Pay with</span><select id="swF">${F.map((c) => `<option value="${esc(c.v)}"${c.v === SWS.from ? ' selected' : ''}>${esc(c.c)} · ${m2(c.a)} available</option>`).join('')}</select></label>
     <label class="fld"><span>Get</span><select id="swT">${T.map((c) => `<option value="${esc(c.v)}"${c.v === SWS.to ? ' selected' : ''}>${esc(c.c)}</option>`).join('')}</select></label>
     <label class="fld"><span>Amount</span><input id="swA" inputmode="decimal" placeholder="0.00"></label><button class="b-out sm" data-act="solSwMax" style="width:auto">Max</button>
-    <div class="mu" style="font-size:13.5px">Best price across Solana's exchanges (Jupiter). You get at least the amount shown or nothing trades.${SOL_FEE.owner ? ` Liquidfi fee ${(SOL_FEE.bps / 100).toFixed(2)}%, paid in SOL.` : ''}</div>
+    <div class="mu" style="font-size:13.5px">Routed across Solana's exchanges by Jupiter. You get at least the amount shown or nothing trades.${SOL_FEE.owner ? ` Liquidfi fee ${(SOL_FEE.bps / 100).toFixed(2)}%, paid in SOL.` : ''}</div>
     <button class="b-light big" data-act="solSwGo">Review</button>${SWS.mode !== 'trade' && xsOn() ? '<button class="b-out" data-act="solXs">To XRP or XLM (another network) →</button>' : ''}<button class="b-out" data-act="closeSheet">Cancel</button>`);
   $('#swF').onchange = () => { SWS.from = $('#swF').value; const a = $('#swA').value; solSwapSheet(SWS.mode); $('#swA').value = a; };
   $('#swT').onchange = () => { SWS.to = $('#swT').value; };
@@ -16370,7 +16402,7 @@ async function solSwapCore(F, T, amt, btn, btnTxt, title, opts = {}) {   /* shar
   const o = solOwn(solSel), d = SOLA[solSel]; if (!o || !d) return;
   if (!F) return toast("This wallet doesn't hold that coin yet."); if (!T) return; if (F.v === T.v) return toast('Pick two different coins.');
   if (!(amt > 0)) return toast('Enter an amount.'); if (amt > F.a + 1e-12) return toast(F.v === 'SOL' ? `At most ${m2(F.a)} SOL: ${SOL_KEEP} stays for fees.` : `You have ${m2(F.a)} ${F.c}.`);
-  if (btn) { btn.disabled = true; btn.textContent = 'Getting the best price…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Getting a quote…'; }
   const back = () => { if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = btnTxt || 'Review'; } };
   try {
     let units = BigInt(Math.round(amt * 10 ** F.d));
@@ -16683,9 +16715,9 @@ function stPaint() {
   el.innerHTML = rows.join('');
   const cxl = v === 'cbs' ? CX.at.cb : v === 'krk' ? CX.at.kr : Math.max(CX.at.cb, CX.at.kr);
   $('#stBkUpd').innerHTML = ['cex', 'cbs', 'krk'].includes(v) ? (cxl && Date.now() - cxl < 15000 ? '<span class="grn">● streaming</span>' : '<span class="mu">connecting…</span>') : m && m.at ? 'updated ' + new Date(Math.max(m.at || 0, ST.at || 0)).toLocaleTimeString() : '';
-  if (['cex', 'cbs', 'krk'].includes(v)) { $('#stSpread').textContent = (mid ? `Mid ${mid.toFixed(3)} · spread ${spr < 10 ? Math.max(0, spr).toFixed(1) : spr.toFixed(0)} bps. ` : '') + `CBS Coinbase · KRK Kraken (live order books, SOL/${ST.q === 'USDT' ? 'USDT' : 'USD'})${v === 'cex' ? ' · MNF Manifest (on-chain, every 15 s)' : ''}. Your order fills on Solana at the best price at that moment: type an amount to see it.`; return; }
+  if (['cex', 'cbs', 'krk'].includes(v)) { $('#stSpread').textContent = (mid ? `Mid ${mid.toFixed(3)} · spread ${spr < 10 ? Math.max(0, spr).toFixed(1) : spr.toFixed(0)} bps. ` : '') + `CBS Coinbase · KRK Kraken (live order books, SOL/${ST.q === 'USDT' ? 'USDT' : 'USD'})${v === 'cex' ? ' · MNF Manifest (on-chain, every 15 s)' : ''}. Your order fills on Solana at the market price at that moment: type an amount to see it.`; return; }
   $('#stSpread').textContent = (mid ? `Mid ${mid.toFixed(3)} · spread ${spr < 10 ? Math.max(0, spr).toFixed(1) : spr.toFixed(0)} bps. ` : '') + (all
-    ? 'MNF Manifest (real resting orders, exact) · JUP Jupiter best route · ZRO ZeroFi · BSN BisonFi · HMD HumidiFi · SLF SolFi · GON GoonFi · ORC Orca · RYC Raydium CLMM · RAY Raydium · MET Meteora · TSR Tessera · PHX Phoenix · OBK OpenBook. Venues other than MNF show their top of book: price for ~$100, and about how much fills there (~ estimate, ≥ at least).'
+    ? 'MNF Manifest (real resting orders, exact) · JUP Jupiter route · ZRO ZeroFi · BSN BisonFi · HMD HumidiFi · SLF SolFi · GON GoonFi · ORC Orca · RYC Raydium CLMM · RAY Raydium · MET Meteora · TSR Tessera · PHX Phoenix · OBK OpenBook. Venues other than MNF show their top of book: price for ~$100, and about how much fills there (~ estimate, ≥ at least).'
     : `Real resting limit orders on Manifest (${m.n} on the book; within 10% of the market).`);
 }
 function stQuote() {   /* best Solana bid / ask (the venues your order goes to), else Coinbase / Kraken; last = the newest print */
@@ -16732,7 +16764,7 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
     solTxSave(); const ST2 = mfStory(L, addr), GR2 = solGroups(L, addr, ST2), gF2 = new Set(Object.values(GR2.G).flatMap((g) => (g.pf || []).map((f) => f.t)));
     const hist = (L || []).filter((s) => ST2[s.signature] ? ST2[s.signature].trade : /^(Swapped|Sold|Bought)/.test((SOLTX[s.signature + addr] || {}).txt || ''));
     const seen = hist.map((s) => ST2[s.signature] && ST2[s.signature].txt).filter(Boolean).join('|');
-    const live = mfFillRows(addr).filter((r) => !gF2.has(r.fill.t) || !Object.values(GR2.G).some((g) => (g.pf || []).includes(r.fill) && g.sigs.some((sg) => (ST2[sg] || {}).trade))).filter((r) => !seen.includes(`${r.fill.bid ? 'Bought' : 'Sold'} ${solAmt(r.fill.sol)} SOL at ${(+r.fill.px).toFixed(2)}`));
+    const live = mfFillRows(addr).filter((r) => !gF2.has(r.fill.t) || !Object.values(GR2.G).some((g) => (g.pf || []).includes(r.fill) && g.sigs.some((sg) => (ST2[sg] || {}).trade))).filter((r) => !seen.includes(`${r.fill.bid ? 'Bought' : 'Sold'} ${solAmt(r.fill.sol)} SOL at ${pxW(r.fill.px)}`));
     const R = [...hist, ...live].sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
     /* v2.43b (Jeff: "It doesn't show the fees for network?"): Your trades opens to the same details as Recent: order, fills, Liquidfi fee, network fees */
     const gDone = new Set(), rw2 = (k, v) => `<div><span style="white-space:nowrap">${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
@@ -17597,19 +17629,19 @@ function mfStory(L, addr) {
   const out = {}, open = [];
   for (const s of [...(L || [])].filter((x) => !x.fill).sort((a, b) => (a.blockTime || 0) - (b.blockTime || 0))) {
     const x = SOLTX[s.signature + addr]; if (!x || !x.mf) continue; const P = x.mf.place;
-    if (P) { open.push({ ...P, sig: s.signature }); out[s.signature] = { txt: `Limit ${P.bid ? 'buy' : 'sell'} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} placed`, trade: false, place: P }; continue; }
+    if (P) { open.push({ ...P, sig: s.signature }); out[s.signature] = { txt: `Placed ${P.bid ? 'buy' : 'sell'} order · ${solAmt(P.sol)} SOL at ${pxW(P.px)} ${P.c || 'USDC'} · Manifest`, trade: false, place: P }; continue; }
     const fills = [], backs = [], w = [], parts = [];
     for (const c of x.mf.moved || []) {
       /* v2.42r: a fill may be short by a cancelled leftover worth under MF_TAIL dollars */
       let i = open.findIndex((o) => (c.sol ? o.bid && c.v <= o.sol + 0.0005 && o.sol - c.v <= Math.max(0.0005, o.sol * 0.002, MF_TAIL / o.px) : !o.bid && c.v <= o.sol * o.px + 0.02 && o.sol * o.px - c.v <= Math.max(0.02, o.sol * o.px * 0.003, MF_TAIL)));
       if (i >= 0) { const o = open.splice(i, 1)[0], n = c.sol ? c.v : c.v / o.px, nn = Math.abs(n - o.sol) <= Math.max(0.0005, o.sol * 0.002) ? o.sol : n;
-        fills.push(`${o.bid ? 'Bought' : 'Sold'} ${solAmt(nn)} SOL at ${o.px.toFixed(2)} ${c.sol ? 'USDC' : c.c} · Manifest`); w.push(o.sig); parts.push({ k: 'fill', o, c, n: nn }); continue; }
+        fills.push(`${o.bid ? 'Bought' : 'Sold'} ${solAmt(nn)} SOL at ${pxW(o.px)} ${c.sol ? 'USDC' : c.c} · Manifest`); w.push(o.sig); parts.push({ k: 'fill', o, c, n: nn }); continue; }
       i = open.findIndex((o) => (c.sol ? !o.bid && Math.abs(o.sol - c.v) <= Math.max(0.0005, o.sol * 0.002) : o.bid && Math.abs(o.sol * o.px - c.v) <= Math.max(0.02, o.sol * o.px * 0.003)));
-      if (i >= 0) { const o = open.splice(i, 1)[0]; backs.push(`Limit ${o.bid ? 'buy' : 'sell'} @ ${+o.px.toFixed(4)} cancelled · ${c.sol ? solAmt(c.v) + ' SOL' : m2(c.v) + ' ' + c.c} back`); w.push(o.sig); parts.push({ k: 'cx', o, c }); }
+      if (i >= 0) { const o = open.splice(i, 1)[0]; backs.push(`Order cancelled · ${o.bid ? 'buy' : 'sell'} at ${pxW(o.px)} USDC · ${c.sol ? solAmt(c.v) + ' SOL' : m2(c.v) + ' ' + c.c} back to wallet · Manifest`); w.push(o.sig); parts.push({ k: 'cx', o, c }); }
     }
     if (fills.length) out[s.signature] = { txt: fills.join('; '), trade: true, w, parts };
     else if (backs.length) out[s.signature] = { txt: backs.join('; '), trade: false, w, parts };
-    else if ((x.mf.moved || []).length) out[s.signature] = { txt: x.txt.replace(/^Manifest: moved to wallet/, 'Moved from Manifest').replace(/ \(order cancelled\)$/, ''), trade: false };
+    else if ((x.mf.moved || []).length) out[s.signature] = { txt: x.txt, trade: false };
   }
   return out;
 }
@@ -17642,9 +17674,9 @@ function solGroupHtml(g, L, addr, STR) {   /* v2.42t (Jeff: "why so many updates
   const tot = tr.reduce((a, b) => a + b.sol, 0), vens = [...new Set(tr.map((t) => t.ven))], onM = tr.filter((t) => t.ven === 'Manifest').reduce((a, b) => a + b.sol, 0);
   const avg = tot ? tr.reduce((a, b) => a + b.sol * b.px, 0) / tot : 0, same = tr.every((t) => Math.abs(t.px - avg) < 1e-6);
   const left = mf != null || cx ? 0 : Math.max(0, P.sol - onM);
-  const tail = left > 1e-9 && tot ? ` · ${solAmt(left)} resting @ ${+P.px.toFixed(4)}` : cx && tot ? ' · rest cancelled' : '';
-  const head = (tot ? `${Sd} ${solAmt(tot)} SOL at ${avg.toFixed(same && vens.length === 1 && vens[0] === 'Manifest' ? 2 : 4)}${same ? ' ' + (P.c || 'USDC') : ' avg'} · ${vens.join(' + ')}`
-    : cx ? `Limit ${sd} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} cancelled` : `Limit ${sd} ${solAmt(P.sol)} SOL @ ${+P.px.toFixed(4)} · resting on Manifest`) + tail;
+  const tail = left > 1e-9 && tot ? ` · ${solAmt(left)} SOL still open at ${pxW(P.px)}` : cx && tot ? ' · rest cancelled' : '';   /* v2.45x: the one trade wording */
+  const head = (tot ? `${Sd} ${solAmt(tot)} SOL at ${pxW(avg)} ${P.c || 'USDC'}${same ? '' : ' (average)'} · ${vens.join(' + ')}`
+    : cx ? `Order cancelled · ${sd} ${solAmt(P.sol)} SOL at ${pxW(P.px)} ${P.c || 'USDC'} · Manifest` : `Placed ${sd} order · ${solAmt(P.sol)} SOL at ${pxW(P.px)} ${P.c || 'USDC'} · Manifest`) + tail;
   const parts = (mf != null ? Math.max(1, pf.length) : pf.length) + tr.filter((t) => t.ven !== 'Manifest').length;
   const bt = (sig) => (L.find((y) => y.signature === sig) || {}).blockTime || 0, ls = bt(g.last), iso = ls ? new Date(ls * 1000).toISOString() : '';
   const rw = (k, v) => `<div><span style="white-space:nowrap">${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
@@ -17664,7 +17696,7 @@ function solGroupHtml(g, L, addr, STR) {   /* v2.42t (Jeff: "why so many updates
     + `<div><span></span><a class="b-out sm" href="${solTxLink(g.last)}" target="_blank" rel="noopener">View on Solscan ↗</a></div>`;
   return { head, html: `<details class="recrow"><summary><span>${esc(head)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${body}</div></details>` };
 }
-const mfFillTxt = (f) => `${f.bid ? 'Bought' : 'Sold'} ${solAmt(f.sol)} SOL at ${(+f.px).toFixed(f.px >= 1 ? 2 : 4)} ${f.q} · Manifest`;
+const mfFillTxt = (f) => `${f.bid ? 'Bought' : 'Sold'} ${solAmt(f.sol)} SOL at ${pxW(f.px)} ${f.q} · Manifest`;
 function mfCxMark(addr, q, seqs) { const T = mftOf(addr); for (const sq of seqs) T.cx[q + ':' + sq] = 1; mftSave(); }
 const mfFillRows = (addr) => (mftOf(addr).fills || []).map((f) => ({ fill: f, blockTime: Math.floor(f.t / 1000), signature: 'fill' + f.t }));
 const mfWalletUsd = (addr) => { const c = MFW[addr]; if (!c) return 0; return c.items.reduce((a, x) => a + (x.free.q + x.held.q) + (x.free.sol + x.held.sol) * (SOLPX.sol || 0), 0); };
@@ -18113,7 +18145,7 @@ function swapQuote() {
   SWP.q = null; swapPaintOut(); const seq = ++SWP.seq;
   if (!a) { $('#wInfo').innerHTML = ''; return; }
   if (!(amt > 0) || !to || from === to) { $('#wInfo').innerHTML = from === to && to ? '<div><span class="amb">Pick two different tokens.</span></div>' : ''; return; }
-  $('#wInfo').innerHTML = '<div><span class="mu">Getting the best price…</span></div>';
+  $('#wInfo').innerHTML = '<div><span class="mu">Getting a quote…</span></div>';
   SWP.t = setTimeout(async () => {
     try {
       const fTake = feeTo() ? await feeLive(feeTo()) : null, fTo = fTake ? feeTo() : null, fee = fTo ? Math.floor(amt * SWAP_FEE.bps / 10000 * 1e7) / 1e7 : 0, sw = +(amt - fee).toFixed(7);   // what is swapped = what you pay − fee
@@ -18232,7 +18264,7 @@ async function xsAvail(w) {
 const xtCoin = (k) => xrCoins().find((c) => c.k === k) || xrCoins()[0];
 function xtUseQ(k) { if (XT.q === k) return; XT.q = k; XT.bids = []; XT.asks = []; XT.at = 0; XT.sales = []; XT.salesAt = 0; XT.fails = 0; }   /* switch the XRP Ledger pair and drop the old pair's book (never price from it) */
 async function xsSameQuote(fw, amt, seq) {   /* XRP → RLUSD / USDC on the XRP Ledger: price from its order book (the market order checks it again) */
-  xtUseQ(XSW.get); xsInfo('<div><span class="mu">Getting the best price…</span></div>');
+  xtUseQ(XSW.get); xsInfo('<div><span class="mu">Getting a quote…</span></div>');
   let okB = true; try { await xtLoadBook(); } catch (e) { okB = false; }
   if (seq !== XSW.seq || cur !== 'xswap') return;
   if (!okB || !XT.at || Date.now() - XT.at > 60000 || XT.q !== XSW.get) { $('#xsOut').textContent = '–'; return xsInfo('<div><span class="amb">Couldn\'t load the XRP Ledger order book. Try again in a moment.</span></div>'); }
@@ -18242,7 +18274,7 @@ async function xsSameQuote(fw, amt, seq) {   /* XRP → RLUSD / USDC on the XRP 
   xsInfo(`<div><span class="mu">Price</span><span class="mono">${(c / amt).toFixed(5)} ${tok} per XRP</span></div><div><span class="mu">Fills</span><span>now, or not at all</span></div>`);
 }
 async function xsTokQuote(fw, amt, seq) {   /* RLUSD ⇄ USDC: the same quote as Trade XRP → RLUSD / USDC → Swap (the ledger's best paths) */
-  xsInfo('<div><span class="mu">Getting the best price…</span></div>'); const buy = XSW.pay === 'uc';
+  xsInfo('<div><span class="mu">Getting a quote…</span></div>'); const buy = XSW.pay === 'uc';
   let Q; try { xrSel = fw.addr; Q = await rvQuote(amt, buy); } catch (e) { if (seq === XSW.seq) { $('#xsOut').textContent = '–'; xsInfo(`<div><span class="amb">${esc(e.message || String(e))}</span></div>`); } return; }
   if (seq !== XSW.seq || cur !== 'xswap') return;
   $('#xsOut').textContent = m2(Q.get); $('#xsOutUsd').textContent = '≈ $' + fx(Q.get);
@@ -18331,7 +18363,7 @@ function xsQuote() {
   if (!(amt > 0)) return xsInfo('');
   if (XSW.av != null && amt > XSW.av + 1e-9) return xsInfo(`<div><span class="red">More than this wallet has available (${m2(XSW.av)} ${fw.coin}).</span></div>`);
   if (amt < xsMin(fw.ck)) return xsInfo(`<div><span class="amb">Swap at least ${xsMin(fw.ck)} ${fw.coin}. That's the smallest amount NEAR Intents will take.</span></div>`);
-  xsInfo('<div><span class="mu">Getting the best price…</span></div>');
+  xsInfo('<div><span class="mu">Getting a quote…</span></div>');
   XSW.t = setTimeout(async () => {
     try {
       const b = xsBody(fw, tw, amt, true), j = await xsAsk(b);
@@ -20357,9 +20389,19 @@ const effAsset = (t, c) => (t === 'native' ? 'XLM' : c);
 // "bought 0.004 EURC @ 1.106500" · "sold 100.00 XLM @ 0.182000" · "bought 1,000 AQUA @ 0.000600 XLM"
 const qAmt = (v) => (v >= 0.995 ? fx(v, 2) : v > 0 ? String(+v.toPrecision(3)) : '0');   // rounded, small fills keep 3 digits (0.0038)
 const qRank = (c) => (c === 'USDC' || c === 'USD' ? 4 : ['PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0);
+/* v2.45x (Jeff: "there's some inconsistencies… fix them all"): one way to write a trade on every screen and every network, the same as
+   the notifications: "Sold 500 XLM at 0.15200 USDC". Capital Bought / Sold, "at", the price coin always named, prices with 4 decimals
+   from 1 up and 5 under 1. What happened to the order goes after it: "· market order", "· your order filled", "· part filled, rest open". */
+function pxW(p) { p = +p; return !(p > 0) ? '–' : p >= 1 ? p.toFixed(4) : p.toFixed(5); }
+function tradeRank(c) { return c === 'USDC' || c === 'USD' ? 4 : ['PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0; }
+function tradeW(sa, sAmt, ba, bAmt, amtF) {   // gave sAmt of sa, got bAmt of ba → "Sold …" / "Bought …"; null when neither side prices the other
+  amtF = amtF || ((v) => fx(v)); const rs = tradeRank(sa), rb = tradeRank(ba); if (rs === rb) return null;
+  const sold = rb > rs, base = sold ? sa : ba, bq = sold ? sAmt : bAmt, q = sold ? ba : sa, qq = sold ? bAmt : sAmt;
+  if (!(bq > 0)) return null;
+  return `${sold ? 'Sold' : 'Bought'} ${amtF(bq)} ${base} at ${pxW(qq / bq)} ${q}`;
+}
 function fillText(sold, sa, bought, ba) {
-  const sellBase = qRank(ba) >= qRank(sa), base = sellBase ? sa : ba, q = sellBase ? ba : sa, amt = sellBase ? sold : bought, px = amt > 0 ? (sellBase ? bought : sold) / amt : 0;
-  return `${sellBase ? 'sold' : 'bought'} ${qAmt(amt)} ${base}${px ? ' @ ' + pxF(px) + (q === 'USDC' ? '' : ' ' + q) : ''}`;
+  return tradeW(sa, sold, ba, bought, qAmt) || `Traded ${qAmt(sold)} ${sa} for ${qAmt(bought)} ${ba}`;
 }
 async function homeRecent(addr) {
   // Recent = what this wallet did (its own operations, payments in) + its orders that FILLED (trade effects, grouped per operation).
@@ -20391,7 +20433,7 @@ async function homeRecent(addr) {
   const rows = [...ops.filter((o) => !isDust(o) && !feeTx.has(o.id)).map((o) => ({ t: o.created_at, o })), ...[...G.values()].map((g) => ({ t: g.t, g }))].sort((x, y) => Date.parse(y.t) - Date.parse(x.t)).slice(0, 10);
   const was = new Set([...document.querySelectorAll('#hRec details[open]')].map((d) => d.dataset.tx || d.dataset.op));   // rows you opened stay open
   $('#hRec').innerHTML = rows.length ? rows.map((r) => r.o ? `<details class="recrow" data-tx="${esc(r.o.transaction_hash)}"><summary><span${/^⚠/.test(opText(r.o, addr)) ? ' class="amb"' : ''}><span class="optx">${esc(opText(r.o, addr))}</span>${memoLine(r.o, addr)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(r.o.created_at))}</span></summary>${opDetail(r.o, addr)}</details>`
-    : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc((r.g.mine ? 'Filled at once: ' : 'Order filled: ') + fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
+    : `<details class="recrow" data-loaded="1" data-op="${esc(r.g.opId)}"><summary><span class="grn">${esc(fillText(r.g.sold, r.g.sa, r.g.bought, r.g.ba) + (r.g.mine ? ' · filled at once' : ' · your order filled'))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(r.g.t))}</span></summary><div class="recd"><div><span>${r.g.mine ? 'Your order crossed the book' : 'Another trader took your order'}</span><span class="mono">op ${esc(r.g.opId)}</span></div></div></details>`).join('')
     : '<div><span class="mu">Nothing yet</span></div>';
   pmFill($('#hRec')).catch(() => {});
   if (was.size) document.querySelectorAll('#hRec details').forEach((d) => { if (was.has(d.dataset.tx || d.dataset.op)) { d.dataset.loaded = d.dataset.loaded || ''; d.open = true; } });
@@ -20492,16 +20534,12 @@ async function homeOrders(a, quiet) {
 }
 function ago(t) { const s = (Date.now() - Date.parse(t)) / 1000; return s < 90 ? Math.round(s) + 's' : s < 5400 ? Math.round(s / 60) + 'm' : s < 129600 ? Math.round(s / 3600) + 'h' : Math.round(s / 86400) + 'd'; }
 // a trade with yourself (market order or stop) in trader words: "Filled · bought 10.00 XLM @ 0.170000". XLM / the non-dollar token is the base.
-function fillWords(sa, sAmt, ba, bAmt, pre = 'Filled', short4 = false) {
-  // Priced the way markets quote it: in dollars when a dollar coin is involved (XLM @ 0.1700 USDC), then euros, then XLM.
-  const rank = (c) => (c === 'USDC' || c === 'USD' ? 4 : ['PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0);
-  let side, base, bq, q, qq;
-  if (rank(sa) > rank(ba)) { side = 'bought'; base = ba; bq = bAmt; q = sa; qq = sAmt; }
-  else if (rank(ba) > rank(sa)) { side = 'sold'; base = sa; bq = sAmt; q = ba; qq = bAmt; }
-  else return null;
-  if (!(bq > 0)) return null;
-  const px = qq / bq;   // trade fills keep book precision (0.169407); swaps read like a quote (0.1694)
-  return `${pre ? pre + ' · ' + side : side[0].toUpperCase() + side.slice(1)} ${fx(bq)} ${base} @ ${short4 ? (px >= 0.01 ? px.toFixed(4) : px.toPrecision(4)) : pxF(px)}${q === 'USDC' ? '' : ' ' + q}`;
+function ordW(sa, sAmt, ba, bAmt, amtF) {   // an order that gives sAmt of sa for bAmt of ba → "sell order · 500 XLM at 0.15200 USDC"
+  amtF = amtF || ((v) => amtFmt(v)); const t = tradeW(sa, sAmt, ba, bAmt, amtF); if (!t) return `order · ${amtF(sAmt)} ${sa} for ${amtF(bAmt)} ${ba}`;
+  return t.replace(/^Sold /, 'sell order · ').replace(/^Bought /, 'buy order · ');
+}
+function fillWords(sa, sAmt, ba, bAmt) {   // v2.45x: the one trade wording (was "Filled · bought 10 XLM @ 0.170000")
+  return tradeW(sa, sAmt, ba, bAmt, (v) => fx(v));
 }
 /* Address poisoning: right after you pay or create an address, scam bots send dust (e.g. 0.0001 XLM) from a LOOK-ALIKE address
    (same first 4 and last 4 characters) hoping you'll copy it from your history later. Known = your wallets, saved addresses,
@@ -20530,7 +20568,11 @@ function opText(o, me) {
       if (o.to === me && lookAlike(o.from)) { const m6 = (x) => x.slice(0, 6) + '…' + x.slice(-6); return `⚠ Scam dust: ${m6(o.from)} imitates ${m6(lookAlike(o.from))} · never send to it`; }
       if (o.to === me && o.from !== me && +o.amount < 0.01 && !KNOWNADDR.has(o.from)) return `⚠ Tiny ${+o.amount} ${an(o.asset_type, o.asset_code)} from unknown ${o.from.slice(0, 6)}…${o.from.slice(-6)} · likely spam, never copy this address`;   // dust from a new address: the usual poisoning setup return (o.to === me ? 'Received ' : 'Sent ') + fx(o.amount) + ' ' + an(o.asset_type, o.asset_code) + (o.to === me ? ' from ' + short(o.from) : ' to ' + short(o.to));
     case 'path_payment_strict_send': case 'path_payment_strict_receive': if (o.to === SWAP_FEE.to[S.net] && o.from === me) return `Liquidfi fee ${amtFmt(+o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)}`; if (o.to === me && o.from !== me) return `Received ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} from ${short(o.from)}`; if (o.to !== me) return o.source_amount == null || !o.source_asset_type || o.source_asset_type === o.asset_type && o.source_asset_code === o.asset_code ? `Sent ${amtFmt(+o.amount)} ${an(o.asset_type, o.asset_code)} to ${short(o.to)}` : `Sent ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)} to ${short(o.to)}`;   /* v2.40o: no more "NaN undefined" */ return fillWords(an(o.source_asset_type, o.source_asset_code), +o.source_amount, an(o.asset_type, o.asset_code), +o.amount) || `Swapped ${fx(o.source_amount)} ${an(o.source_asset_type, o.source_asset_code)} → ${fx(o.amount)} ${an(o.asset_type, o.asset_code)}`;
-    case 'manage_sell_offer': case 'manage_buy_offer': { if (+o.amount === 0) return 'Cancelled an order'; const buy = o.type === 'manage_buy_offer', a = buy ? an(o.buying_asset_type, o.buying_asset_code) : an(o.selling_asset_type, o.selling_asset_code); return `${+o.offer_id ? 'Changed' : 'Placed'} ${buy ? 'buy' : 'sell'} order · ${amtFmt(+o.amount)} ${a} @ ${(+o.price).toFixed(6)}`; }
+    case 'manage_sell_offer': case 'manage_buy_offer': { if (+o.amount === 0) return 'Order cancelled';
+      /* v2.45x: "Placed sell order · 500 XLM at 0.15200 USDC", the same as XRP and Solana. Horizon: a sell offer's amount is what it sells and
+         its price is bought per sold; a buy offer's amount is what it buys and its price is sold per bought. */
+      const bo = o.type === 'manage_buy_offer', sa = an(o.selling_asset_type, o.selling_asset_code), ba = an(o.buying_asset_type, o.buying_asset_code);
+      return `${+o.offer_id ? 'Changed' : 'Placed'} ${ordW(sa, bo ? +o.amount * +o.price : +o.amount, ba, bo ? +o.amount : +o.amount * +o.price)}`; }
     case 'change_trust': if (o.asset_type === 'liquidity_pool_shares') return `${+o.limit === 0 ? 'Left' : 'Joined'} ${poolNm(o.liquidity_pool_id)}`; return (+o.limit === 0 ? 'Removed ' : 'Added ') + 'trustline ' + o.asset_code;
     case 'liquidity_pool_deposit': return `Added ${resTxt(o.reserves_deposited)} to ${poolNm(o.liquidity_pool_id)}`;
     case 'liquidity_pool_withdraw': return `Withdrew ${resTxt(o.reserves_received)} from ${poolNm(o.liquidity_pool_id)}`;
@@ -20900,7 +20942,7 @@ function paintPnl() {
 /* ---------- activity: recent fills on every account ---------- */
 // Horizon lists either asset of a pair as "base", so each fill is turned into what THIS account got and gave.
 // Checked on a real mainnet cover (path payment strict receive): the account is base, gives USDC, gets XLM = BUY.
-const ACT = { at: 0, part: false, show: 50, net: null, fil: 'all', recs: {}, next: {}, xr: {}, xnext: {}, busy: false, tab: 'filled', open: null };
+const ACT = { at: 0, part: false, show: 50, net: null, fil: 'all', recs: {}, next: {}, xr: {}, xnext: {}, sr: {}, busy: false, tab: 'filled', open: null };
 /* ---------- Activity → Open orders: every wallet's waiting orders and stops in one place, grouped by wallet ---------- */
 const opPx = (v) => (v >= 1 ? (+v).toFixed(4) : (+v).toFixed(5));
 const QRANK = (n) => (n === 'USDC' || n === 'USD' ? 3 : ['PYUSD', 'USDT', 'RLUSD', 'yUSDC'].includes(n) ? 2 : n === 'EURC' ? 1 : 0);   /* the side prices are quoted in: dollars, then euros */
@@ -20982,12 +21024,21 @@ async function actLoad(more) {
     } catch (e) { if (!more) { ACT.xr[w.addr] = []; ACT.xnext[w.addr] = null; } ACT.err[w.addr] = 1; }
     part();
   };
+  const so = async (w) => {   /* v2.45x (Jeff: "fix them all"): Solana trades in Activity too: swaps and stops through Jupiter, and resting Manifest fills */
+    if (more) return;
+    try {
+      const L = (await solRpc('getSignaturesForAddress', [w.addr, { limit: 25, commitment: 'confirmed' }])) || [];
+      for (const s of L.filter((s) => !s.err && !SOLTX[s.signature + w.addr]).slice(0, 12)) { const t = await solRpc('getTransaction', [s.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }]).catch(() => null); if (t) SOLTX[s.signature + w.addr] = solTxSum(w.addr, t); }
+      solTxSave(); ACT.sr[w.addr] = solActRows(w.addr, L); delete ACT.err[w.addr];
+    } catch (e) { ACT.sr[w.addr] = []; ACT.err[w.addr] = 1; }
+    part();
+  };
   /* v2.45q (Jeff: "it's primarily to load the notification faster"): a wallet picked by a notification (or the chip) loads FIRST, alone,
      and shows right away; the other wallets load after it */
-  const XL = xrList(), pri = !more && ACT.fil !== 'all' ? ACT.fil : null, pa = pri && L.find((a) => a.addr === pri), pw = pri && !pa && XL.find((w) => w.addr === pri);
-  if (pa) await sl(pa); else if (pw) await xl(pw);
+  const XL = xrList(), SL = solList(), pri = !more && ACT.fil !== 'all' ? ACT.fil : null, pa = pri && L.find((a) => a.addr === pri), pw = pri && !pa && XL.find((w) => w.addr === pri), ps = pri && !pa && !pw && SL.find((w) => w.addr === pri);
+  if (pa) await sl(pa); else if (pw) await xl(pw); else if (ps) await so(ps);
   const rest = L.filter((a) => a !== pa), lane = async () => { while (rest.length) await sl(rest.shift()); };   /* 2 Stellar wallets at a time: a burst gets 503s */
-  await Promise.all([lane(), lane(), (async () => { for (const w of XL) if (w !== pw) await xl(w); })()]);
+  await Promise.all([lane(), lane(), (async () => { for (const w of XL) if (w !== pw) await xl(w); })(), (async () => { for (const w of SL) if (w !== ps) await so(w); })()]);
   ACT.at = Date.now(); ACT.net = S.net; ACT.busy = false; ACT.part = false; if (more) ACT.show = base0 + 50; $('#aMore').textContent = 'Load more';
   if (cur === 'act') paintAct();
 }
@@ -21016,6 +21067,14 @@ async function actFeeLoad(d) {
   } catch (e) { el.innerHTML = '<span>Fees</span><span class="mu">couldn\'t load</span>'; delete el.dataset.done; }
 }
 document.addEventListener('toggle', (e) => { const d = e.target; if (d && d.classList && d.classList.contains('actrow') && d.open) actFeeLoad(d); }, true);
+function solActRows(addr, L) {   /* v2.45x: a Solana wallet's trades → Activity lines (same shape as the Stellar and XRP ones) */
+  const out = [], line = (t, buy, sol, px, q, ven, op, hash, nfee) => { const qa = sol * px, f = { t, side: buy ? 'BUY' : 'SELL', got: buy ? ['SOL', sol] : [q, qa], gave: buy ? [q, qa] : ['SOL', sol], pool: false, ix: 0 };
+    out.push({ ...f, op, hash, asset: 'SOL', qty: sol, quote: q, qamt: qa, n: 1, sol: true, ven, fills: [f], nfee }); };
+  for (const s of L || []) { const x = SOLTX[s.signature + addr]; if (!x || x.err || !x.ioc || !x.ioc.ok || !(x.ioc.sol > 0) || !(x.ioc.px > 0)) continue;
+    const m = /SOL at [\d.]+ (\w+)/.exec(x.txt || ''); line((s.blockTime || 0) * 1000, !!x.ioc.bid, x.ioc.sol, x.ioc.px, m ? m[1] : 'USDC', x.ioc.ven || '', 's' + s.signature, s.signature, x.fee || 0); }
+  for (const f of (typeof mftOf === 'function' ? mftOf(addr).fills : []) || []) if (f.sol > 0 && f.px > 0) line(f.t, !!f.bid, f.sol, f.px, f.q || 'USDC', 'Manifest', 'm' + f.t, '', 0);
+  return out;
+}
 function xrActRow(x, me) {   /* one XRP Ledger transaction → an Activity line if it traded XRP against a dollar coin for this wallet */
   const t = x.tx || x.tx_json || {}, m = x.meta || {}; if ((m.TransactionResult || 'tesSUCCESS') !== 'tesSUCCESS') return null;
   const d = xrMyDelta(m, me, t);
@@ -21036,11 +21095,11 @@ function actTabShow() {
 }
 function drawAct() {
   if ($('#aTab')) { $$('#aTab button').forEach((b) => b.classList.toggle('on', b.dataset.v === ACT.tab)); setTimeout(actTabShow, 0); }
-  if (!ACT.at || ACT.net !== S.net || Date.now() - ACT.at > 60000) { ACT.at = 0; ACT.recs = {}; ACT.next = {}; ACT.xr = {}; ACT.xnext = {}; paintAct(); actLoad(false); } else paintAct();
+  if (!ACT.at || ACT.net !== S.net || Date.now() - ACT.at > 60000) { ACT.at = 0; ACT.recs = {}; ACT.next = {}; ACT.xr = {}; ACT.xnext = {}; ACT.sr = {}; paintAct(); actLoad(false); } else paintAct();
 }
 function paintAct() {
   const L = allAccts();
-  const XL = xrList().filter((w) => !L.some((a) => a.addr === w.addr));
+  const XL = [...xrList().filter((w) => !L.some((a) => a.addr === w.addr)), ...solList().map((w) => ({ ...w, sol: true }))];   /* v2.45x: Solana wallets too */
   if (ACT.fil !== 'all' && !L.some((a) => a.addr === ACT.fil) && !XL.some((w) => w.addr === ACT.fil)) ACT.fil = 'all';
   $('#aFil').innerHTML = [['all', 'All'], ...L.map((a) => [a.addr, a.name]), ...XL.map((w) => [w.addr, w.name])].map(([k, n]) => `<button class="chip${k === ACT.fil ? ' on' : ''}" style="white-space:nowrap" data-afil="${k}">${esc(n)}</button>`).join('');
   { const on = $('#aFil .chip.on'); if (on && on.scrollIntoView && ACT.fil !== 'all') try { on.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {} }   /* a wallet picked by a notification: its chip shows, so it's clear the list is filtered */
@@ -21057,7 +21116,7 @@ function paintAct() {
       g = { ...f, acct: a.name, addr: a.addr, fills: [f] }; rows.push(g);
     }
   }
-  for (const w of XL) { if (ACT.fil !== 'all' && w.addr !== ACT.fil) continue; for (const r of ACT.xr[w.addr] || []) rows.push({ ...r, acct: w.name, addr: w.addr }); }
+  for (const w of XL) { if (ACT.fil !== 'all' && w.addr !== ACT.fil) continue; for (const r of (w.sol ? ACT.sr : ACT.xr)[w.addr] || []) rows.push({ ...r, acct: w.name, addr: w.addr }); }
   // one operation that traded through more than one pair is a swap with steps (e.g. XLM → USDC → EURC): show it as one SWAP line
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i], same = rows.filter((x) => x !== r && x.acct === r.acct && x.op === r.op && !x.merged);
@@ -21084,10 +21143,10 @@ function paintAct() {
     const extra = [r.n > 1 ? r.n + ' fills' : '', r.pool ? 'pool' : ''].filter(Boolean).join(' · ');
     const steps = [];   // details: each step and where it filled (order book or AMM pool), in the order they happened
     for (const f of [...r.fills].sort((x, y) => x.t - y.t || x.ix - y.ix)) { const k = f.gave[0] + '→' + f.got[0] + (f.pool ? 'P' : 'B'), l = steps.find((x) => x.k === k); if (l) { l.g += f.gave[1]; l.o += f.got[1]; l.n++; } else steps.push({ k, a: f.gave[0], b: f.got[0], g: f.gave[1], o: f.got[1], pool: f.pool, n: 1 }); }
-    const feeRow = r.xrp ? `<div><span>Network fee</span><span class="mono">${r.nfee ? xq4(r.nfee) + ' XRP' : 'none'}</span></div>`
+    const feeRow = r.sol ? `<div><span>Network fee</span><span class="mono">${r.nfee ? solAmt(r.nfee) + ' SOL' : 'none'}</span></div>` : r.xrp ? `<div><span>Network fee</span><span class="mono">${r.nfee ? xq4(r.nfee) + ' XRP' : 'none'}</span></div>`
       : `<div class="actfee" data-op="${esc(r.op)}" data-addr="${esc(r.addr || '')}" data-pool="${r.pool ? 1 : ''}"><span>Fees</span><span class="mu">loading…</span></div>`;
-    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}${feeRow}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>${r.xrp ? `<a href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a>` : `<a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>`}</div></div>`;
-    const head = r.swap ? `${amtFmt(r.qamt)} ${esc(r.quote)} → ${amtFmt(r.qty)} ${esc(r.asset)}` : `${fx(r.qty, 2)} ${esc(r.asset)} @ ${px.toFixed(dp)}`;
+    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${r.sol ? esc(r.ven || 'Solana') : x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}${feeRow}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>${r.xrp ? `<a href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a>` : `<a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>`}</div></div>`;
+    const head = r.swap ? `${amtFmt(r.qamt)} ${esc(r.quote)} → ${amtFmt(r.qty)} ${esc(r.asset)} at ${pxW(px)} ${esc(r.quote)}` : `${r.sol ? solAmt(r.qty) : fx(r.qty, 2)} ${esc(r.asset)} at ${pxW(px)} ${esc(r.quote)}${r.ven ? ' · ' + esc(r.ven) : ''}`;   /* v2.45x: the price coin named, like every other screen */
     html += `<details class="actrow"><summary style="display:flex;align-items:center;gap:10px;padding:10px 0"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : r.side === 'SELL' ? '--sell' : '--blu'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:15px">${head}</span><span class="mu" style="font-size:13px">${esc(r.acct)}${r.swap ? ` · ${steps.length} steps` : ` · ${fx(r.qamt, 2)} ${esc(r.quote)}`}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:13px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></summary>${det}</details>`;
   }
   if (open) html += '</div>';
@@ -21797,7 +21856,7 @@ function stopDefaults() {
 function stopEst(q, el) {
   const st = +$('#tStop').value || 0, lim = +$('#tLim').value || 0, sell = T.side === 'sell', m = stopMid(), nB = kName(TP().b), nQ = kName(TP().q);
   $('#tStopNote').innerHTML = !S.stopUrl ? '<span class="amb">Stop orders are off: turn them on in Settings → Stop orders.</span>'
-    : `${$('#tFeed').value === 'trades3' ? `When 3 trades of 1+ ${esc(nB)} happen on Stellar at <b>${st ? p4(st) : 'the stop'}</b> or ${sell ? 'lower' : 'higher'} (a jump over 0.5% past it must be confirmed by the last 100 ${esc(nB)} traded)` : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}`}, Liquidfi ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at the best price on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? esc(nB) : esc(nQ)} stays in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
+    : `${$('#tFeed').value === 'trades3' ? `When 3 trades of 1+ ${esc(nB)} happen on Stellar at <b>${st ? p4(st) : 'the stop'}</b> or ${sell ? 'lower' : 'higher'} (a jump over 0.5% past it must be confirmed by the last 100 ${esc(nB)} traded)` : `${sell ? 'When the price falls to' : 'When the price rises to'} <b>${st ? p4(st) : 'the stop'}</b> on ${esc(FEEDN[$('#tFeed').value])}`}, Liquidfi ${sell ? 'sells' : 'buys'} ${limMode() === 'mkt' ? `at market on the book, no ${sell ? 'lower' : 'higher'} than <b>${lim ? p4(lim) : '–'}</b>` : `at <b>${lim ? p4(lim) : 'your limit'}</b> or better, or not at all`}. Your ${sell ? esc(nB) : esc(nQ)} stays in your wallet until then. Includes the ${SWAP_FEE.bps / 100}% fee if it fills.`;
   if (!el) return;
   const fOn = !!feeTo(tradeAddr) && (FEEOK[feeTo(tradeAddr)] || { ok: 1 }).ok, f = fOn ? feeOf(sell ? q : q * st) : 0;
   const warn = st && m && (sell ? st >= m : st <= m) ? `<div><span class="amb">The price is ${p4(m)} now: a ${sell ? 'sell' : 'buy'} stop goes ${sell ? 'below' : 'above'} it.</span></div>` : '';

@@ -1,31 +1,69 @@
 # Liquidfi
 
-Liquidfi is a phone web wallet for Stellar trading bots, in one self-contained HTML file. It runs entirely in the browser and talks straight to Stellar's Horizon servers. There is no backend of its own.
+Liquidfi is a self-custody phone web wallet for Stellar, the XRP Ledger and Solana, in one self-contained HTML file. It runs in the browser. Your keys are made on your phone and never leave it.
 
-**Open it:** the `index.html` in this repository, served by GitHub Pages.
+The app reads balances and sends transactions through each network's servers: Stellar Horizon, XRP Ledger servers and Solana RPC. A small Liquidfi server runs the features a phone can't run by itself: stop orders, notifications, and relaying Solana requests. It never holds wallet keys.
+
+**Open it:** the `index.html` in this repository, served by GitHub Pages. Add it to your home screen to use it like an app.
 
 ## What it does
 
-- **P/L:** value change of your trading accounts for Today, Yesterday, This week, Last week, This month, Last month and 6 months. Each account also shows a quote line for the asset it trades (last, change, % change). Only Today loads on open; other periods load when tapped.
-- **Accounts:** Personal wallets and trading accounts in one list. Trade XLM/USDC (limit or market), send to saved addresses, receive by QR, add trustlines.
-- **Kill switch:** Cancel all orders, or Flatten (cancel and close open trades at market), on every trading account, from your phone, when the PC that runs the bots is off.
-- **Activity:** recent buys and sells across all accounts.
-- **Wallets:** create a wallet from a 24-word recovery phrase (BIP39, Stellar SEP-5, the same as LOBSTR, Freighter and Stellar Laboratory) or import a secret key or phrase. The phrase and each secret key can be shown or copied after re-entering the PIN.
-- **Server choice:** Settings → Server. Stellar (SDF) is the default; LOBSTR's public Horizon (Mainnet) or any custom Horizon address can be picked instead. A custom server is checked before it is saved (it must use https, allow browser access (CORS), be on the selected network and be up to date). If the chosen server is down or rate-limited, Liquidfi falls back automatically: your choice → LOBSTR → SDF.
+- **Markets:** a watchlist of symbols with bid, ask and last from the Stellar DEX, Coinbase, Kraken and Binance.US. Tap a symbol for the order book and last sales across markets, and for charts.
+- **Accounts and Portfolio:** every wallet on every network in one list, with the total in USD and a breakdown by coin. P/L for Today, Yesterday, This week, Last week and longer.
+- **Trade:**
+  - limit and market orders on Stellar (XLM/USDC and other pairs), the XRP Ledger (XRP against RLUSD or USDC, and RLUSD/USDC) and Solana (SOL against USDC or USDT, through Jupiter and Manifest);
+  - open orders can be edited or cancelled.
+- **Stop orders:** on all three networks.
+  - You sign the order on your phone ahead of time.
+  - The Liquidfi server watches the price and sends the signed order when the stop is hit.
+  - A worst-price cap (and on Stellar, a price guard against the exchanges) keeps a stop from filling far from the market.
+- **Swap:** in one step on a network. Across networks it goes through NEAR Intents; the app shows the route and the minimum you get before you confirm.
+- **Send and receive:**
+  - QR codes and saved, checked addresses;
+  - memos, with an optional private memo that only you and the receiver can read;
+  - XRP Ledger tokens as well as XRP.
+- **Earn:** Stellar AMM pools, and lending on Solana through Jupiter Lend.
+- **Activity:** buys and sells across all your wallets, with each fill, the venue and the fees.
+- **Notifications:** for stop orders, for order fills on the wallets you choose, and when money arrives. Tapping one opens its details.
+- **Kill switch:** Cancel all orders, or Flatten (cancel and close open trades at market), on every trading account at once, from your phone, when the PC that runs your bots is off.
+- **Wallets:**
+  - Create a wallet from a 24-word recovery phrase (BIP39; Stellar SEP-5, the same as LOBSTR, Freighter and Stellar Laboratory), or import a secret key or phrase.
+  - One phrase backs up your Stellar, XRP Ledger and Solana wallets.
+  - The phrase and each key can be shown or copied after you re-enter your PIN.
+- **Buy with a card:** checkout runs on a separate page (buy.liquidfi.com) with the payment provider. Card and identity details go to the provider, not to Liquidfi.
+
+## Fees
+
+- **Network fees** go to the network.
+- **Market orders and swaps:** Liquidfi charges 0.25%, shown before you confirm.
+- **Limit orders:** no Liquidfi fee.
+- **Third-party providers** (card checkout, NEAR Intents) set their own fees.
+
+## Servers
+
+- **Stellar:** Horizon from the Stellar Development Foundation by default; LOBSTR's Horizon, or any Horizon address you enter, in Settings → Server. If a server is down or rate-limited, the app falls back automatically: your choice → LOBSTR → SDF.
+- **XRP Ledger:** public XRP Ledger servers (xrplcluster.com, s1/s2.ripple.com), or your own server in Settings → XRP Ledger server.
+- **Solana:** through the Liquidfi server by default, or your own Solana RPC (yours, or a Helius, Alchemy or QuickNode address) in Settings → Solana server.
+
+Public servers see your IP address and the wallet addresses you look up. Running your own server keeps that private.
 
 ## Security model
 
-- **Keys stay on your device.** Keys are created or imported on the phone and sealed with your PIN (PBKDF2-SHA256, 600,000 rounds, AES-GCM) in the browser's storage. They are never sent anywhere.
-- **Bots use an emergency signer, not their own keys.** The phone makes an emergency key. From the PC you add it to each bot account as a signer with weight 1, the master key at weight 2, and thresholds 1/1/2. The phone can then trade and cancel on those accounts, but it can't change their signers. Lose the phone? Remove that signer from the PC.
-- **Nothing personal is built in.** This file contains no account addresses. You add your own accounts in Settings, and they are saved on your device only.
-- Starts on **Testnet**. Switching to Mainnet requires typing `MAINNET`.
-- Auto-locks after 2 minutes. Wrong PINs back off. Every action that sends a transaction is hold-to-confirm.
+- **Keys stay on your device.** They are created or imported on the phone and sealed with your PIN (PBKDF2-SHA256, 600,000 rounds, AES-GCM) in the browser's storage. They are never sent anywhere, including to the Liquidfi server.
+- **Stop orders hold no keys.** The phone signs the stop order in advance. The server keeps only that signed order and sends it when the stop is hit. It can't sign anything else, and you can cancel from the phone.
+- **Bots use an emergency signer, not their own keys.** The phone makes an emergency key. From the PC you add it to each bot account as a signer with weight 1, with the master key at weight 2 and thresholds 1/1/2. The phone can then trade and cancel on those accounts, but it can't change their signers. If you lose the phone, remove that signer from the PC.
+- **Nothing personal is built in.** The file contains no personal account addresses; the only addresses in the code are Liquidfi's fee wallets. You add your own wallets, and they are saved on your device only.
+- **No third-party scripts in the wallet page.** Card checkout runs on its own page.
+- **Locking:**
+  - The app auto-locks after 2 minutes idle.
+  - After 3 wrong PINs, each further try has to wait longer. Fingerprint unlock is optional.
+  - Every action that sends a transaction is hold-to-confirm.
 
 Whoever controls the hosted file controls the code your phone runs. Protect the GitHub account with 2-factor login, and check the version on the unlock screen.
 
 ## Build
 
-`src/app.html` is the source. The Stellar SDK and a QR library are inlined at build time:
+`src/app.html` is the source. The Stellar SDK, xrpl.js and the QR libraries are inlined at build time:
 
 ```
 cd src
@@ -35,8 +73,13 @@ node build.js        # writes killswitch.html
 
 Copy the result to `index.html` at the root of the repository.
 
-Dependencies: `@stellar/stellar-sdk` 17.2.1 and `qrcode-generator` 2.0.4.
+Dependencies:
+
+- `@stellar/stellar-sdk` 17.2.1
+- `xrpl` 4.4.3
+- `qrcode-generator` 2.0.4
+- `jsqr` 1.4.0
 
 ## Disclaimer
 
-Experimental software. Use at your own risk. Try everything on Testnet first (Settings → Create practice bots). Nothing here is financial advice.
+Liquidfi is self-custody software. It is not a bank, broker, exchange, custodian or investment adviser, and nothing here is financial advice. Crypto assets are volatile and can lose all their value. Use at your own risk, and start with small amounts.
