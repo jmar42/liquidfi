@@ -36,6 +36,7 @@ Some optional features, like stop orders and notifications, use Liquidfi's serve
 
 - **Network fees** go to the network.
 - **0.25% Liquidfi fee, shown before you confirm:** swaps, market orders, stop orders, Solana limit sweeps (the part of a limit order that fills right away) and Solana lending deposits (Earn).
+- **0.50% Liquidfi fee:** swaps between networks (through NEAR Intents), included in the price shown before you confirm.
 - **No Liquidfi fee:** limit orders resting on the book, Stellar and XRP Ledger pools (Earn), and sending.
 - **Third-party providers** (card checkout, NEAR Intents) set their own fees.
 
