@@ -242,7 +242,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.45y</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.45z</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -657,7 +657,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.45y</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.45z</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -689,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45y · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45z · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14876,7 +14876,7 @@ async function xrSendRun(o, to, tag, amt, drops, memos, toName, tok) {
     if (tag != null) tx.DestinationTag = tag;
     if (memos && memos.length) tx.Memos = memos;
     const r = await xrSubmit(o, tx, drops);
-    if (r.state === 'ok') { tPendSet(p, '✓ Sent', 'grn', `confirmed · ledger ${+r.ledger || ''}${tag != null ? ' · tag ' + tag : ''}`, true); delete XRA[me]; if (cur === 'xrp' && xrSel === me) drawXrp(true); return; }
+    if (r.state === 'ok') { tpTx(p, 'xrp', r.hash); tPendSet(p, '✓ Sent', 'grn', `confirmed · ledger ${+r.ledger || ''}${tag != null ? ' · tag ' + tag : ''}`, true); delete XRA[me]; if (cur === 'xrp' && xrSel === me) drawXrp(true); return; }
     tPendSet(p, r.state === 'pending' ? 'Still pending' : 'Not sent', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? "not confirmed yet: don't send it again" : r.code ? xrErr(r.code) : 'it never reached the ledger; nothing moved', true);
     return xrOutcome(r, 'Sent', `${amS} ${esc(sym)} to ${esc(short(to))}${tag != null ? ' · tag ' + tag : ''}`, 'Not sent');
   } catch (e) { tPendSet(p, 'Not sent', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); showResult(false, 'Not sent', [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
@@ -15212,7 +15212,7 @@ function xtFormReset() {
 }
 /* An XRP order's ledger result → the status row and banner (no result screen) */
 function xtOrderDone(p, r, o, lim, drops) {
-  const me = o.w.classicAddress;
+  const me = o.w.classicAddress; if (r.state !== 'expired') tpTx(p, 'xrp', r.hash);
   if (r.state === 'ok') {
     const tr = xrTradeText(xrMyDelta(r.meta || {}, me, { Account: me, Fee: String(drops) }));
     let rest = null, id = null; for (const n of ((r.meta || {}).AffectedNodes || [])) { const v = n.CreatedNode; if (v && v.LedgerEntryType === 'Offer' && (v.NewFields || {}).Account === me) { rest = xrXrpSide(v.NewFields); id = v.NewFields.Sequence; } }
@@ -15777,7 +15777,7 @@ async function rvSwapRun(o, q, buy, Q, min, fee, drops) {
     const dv = r.meta && r.meta.delivered_amount ? +(r.meta.delivered_amount.value || 0) : Q.get;
     let fn = '';
     if (fee) { try { const fa = xrFeeTo(me); if (fa && await xrFeeLive(fa)) { const f = await xrSubmit(o, { TransactionType: 'Payment', Destination: fa, Amount: String(Math.round(fee * 1e6)) }, drops); fn = f.state === 'ok' ? ` · fee ${xq4(fee)} XRP` : ' · fee not charged'; } } catch (e) { fn = ' · fee not charged'; } }
-    tPendSet(pd, '✓ Swapped', 'grn', `got ${fx(dv, 4)} ${g} for ${fx(q, 4)} ${buy ? 'USDC' : 'RLUSD'}${fn}`, true);
+    tpTx(pd, 'xrp', r.hash); tPendSet(pd, '✓ Swapped', 'grn', `got ${fx(dv, 4)} ${g} for ${fx(q, 4)} ${buy ? 'USDC' : 'RLUSD'}${fn}`, true);
     $('#rvAmt').value = ''; delete XRA[me]; if (cur === 'xtrade' && XT.rv) rvDraw();
   } catch (e) { tPendSet(pd, 'Not swapped', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); }
 }
@@ -15787,7 +15787,7 @@ async function rvLimRun(o, q, p, buy, drops) {
     const R2 = rvIou(rvRL(), q), U2 = rvIou(rvUC(), q * p);
     const r = await xrSubmit(o, buy ? { TransactionType: 'OfferCreate', TakerPays: R2, TakerGets: U2 } : { TransactionType: 'OfferCreate', TakerGets: R2, TakerPays: U2 }, drops);
     if (r.state !== 'ok') { tPendSet(pd, r.state === 'pending' ? 'Still pending' : 'Not placed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? "not confirmed yet: don't place it again" : xrErr(r.code), true); return; }
-    tPendSet(pd, '✓ Order placed', 'grn', 'on the RLUSD / USDC book (what crossed filled right away)', true);
+    tpTx(pd, 'xrp', r.hash); tPendSet(pd, '✓ Order placed', 'grn', 'on the RLUSD / USDC book (what crossed filled right away)', true);
     $('#rvAmt').value = ''; delete XRA[me]; if (cur === 'xtrade' && XT.rv) rvDraw();
   } catch (e) { tPendSet(pd, 'Not placed', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was sent.', true); }
 }
@@ -16068,7 +16068,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45y';
+const APP_VER = 'v2.45z';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16328,7 +16328,7 @@ async function solSendGo() {
   confirmSheet('Send ' + items[0].v.replace(/^Send /, ''), `Solana${solNet() === 'devnet' ? ' Devnet' : ''} · from ${esc(o.name)}`, items, 'Send', async () => {   /* v2.40v: same as Stellar / XRP sends: sheet closes, big banner Sending… → ✓ Sent */
     const what = items[0].v, p = tPend(`Send ${what} to ${bk.name}`, 'solsend', o.addr);
     try { const r = await solSendIxs(o, ixs, null);
-      if (r.state === 'ok') { tPendSet(p, '✓ Sent', 'grn', 'confirmed on Solana', true); delete SOLA[o.addr]; if (cur === 'sol' && solSel === o.addr) drawSol(); return; }
+      if (r.state === 'ok') { tpTx(p, 'sol', r.sig); tPendSet(p, '✓ Sent', 'grn', 'confirmed on Solana', true); delete SOLA[o.addr]; if (cur === 'sol' && solSel === o.addr) drawSol(); return; }
       tPendSet(p, r.state === 'pending' ? 'Not confirmed yet' : 'Not sent', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'check the wallet in a minute before trying again' : r.state === 'expired' ? 'it expired before Solana took it; nothing moved' : solTxErr(r.err), true);
       solResult(r, 'Send');
     } catch (e) { tPendSet(p, 'Not sent', 'red', e.message || String(e), true); toast(e.message || String(e), 6000); } }, false, 'b-acc', 'Sending…', true);
@@ -18209,7 +18209,7 @@ async function swapReview() {
       const got = swapResult(r), g = got != null ? got : q.out;
       // Same words and price direction as trades: "Bought 4.72 XLM @ 0.1691" beside ✓ Swapped (price always in USDC per XLM, like the market)
       pnd.label = (got != null && fillWords(from, q.sw, to, got, '', true)) || `${m2(q.amt)} ${from} → ${got != null ? '' : '≈ '}${m2(g)} ${to}`;
-      tPendSet(pnd, '✓ Swapped', 'grn', `${q.fee ? `fee ${m2(q.fee.amt)} ${from} · ` : ''}ledger ${r.ledger}`, true);
+      tpTx(pnd, 'xlm', r.hash); tPendSet(pnd, '✓ Swapped', 'grn', `${q.fee ? `fee ${m2(q.fee.amt)} ${from} · ` : ''}ledger ${r.ledger}`, true);
     } catch (e) { tPendSet(pnd, 'Failed', 'red', niceErr(e) + ' Nothing was swapped.', true); }
   }, false, 'b-acc', 'Swapping…', true);
 }
@@ -19148,7 +19148,7 @@ function earnAddGo() {
   ], 'Add', async () => {
     const pnd = tPend(`Add ${m2(o)} ${kName(p.a)} + ${m2(u)} ${kName(p.b)}`, 'earn', addr);
     try { const tx = await buildTx(addr, ops); tx.sign(kpFor(addr)); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(tx);
-      pnd.label = `Added to ${p.name} · $${fx(2 * u)}`; c.at = 0; tPendSet(pnd, '✓ Added', 'grn', `ledger ${r.ledger}`, true);
+      pnd.label = `${p.name} pool · $${fx(2 * u)}`; c.at = 0; tpTx(pnd, 'xlm', r.hash); tPendSet(pnd, '✓ Added', 'grn', `ledger ${r.ledger}`, true);   /* v2.45z: "Added" once (was "Added to … ✓ Added") */
     } catch (e) { tPendSet(pnd, 'Failed', 'red', niceErr(e) + ' Nothing was added.', true); }
   }, false, 'b-acc', 'Adding…', true);
 }
@@ -19174,7 +19174,7 @@ function earnOutGo(pid, pct) {
   ], 'Withdraw', async () => {
     const pnd = tPend(`Withdraw ${all ? 'all' : pct + '%'} from ${p.name}`, 'earn', addr);
     try { const tx = await buildTx(addr, ops); tx.sign(kpFor(addr)); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(tx);
-      pnd.label = `Withdrew ${m2(ga)} ${kName(p.a)} + ${m2(gb)} ${kName(p.b)}`; c.at = 0; tPendSet(pnd, '✓ Withdrawn', 'grn', `ledger ${r.ledger}`, true);
+      pnd.label = `${p.name} pool · ${m2(ga)} ${kName(p.a)} + ${m2(gb)} ${kName(p.b)}`; c.at = 0; tpTx(pnd, 'xlm', r.hash); tPendSet(pnd, '✓ Withdrawn', 'grn', `ledger ${r.ledger}`, true);
     } catch (e) { tPendSet(pnd, 'Failed', 'red', niceErr(e) + ' Nothing was withdrawn.', true); }
   }, false, 'b-acc', 'Withdrawing…', true);
 }
@@ -19211,7 +19211,7 @@ async function xrEarnAddGo() {
   ], 'Add', async () => {
     const pnd = tPend(`Add ${m2(x)} XRP + ${m2(u)} ${p.tok}`, 'earnx', o.w.classicAddress);
     try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, tx, drops);
-      if (r.state === 'ok') { pnd.label = `Added to ${p.name} · $${fx(2 * u)}`; A.at = 0; tPendSet(pnd, '✓ Added', 'grn', `ledger ${r.ledger || ''}`, true); }
+      if (r.state === 'ok') { pnd.label = `${p.name} pool · $${fx(2 * u)}`; A.at = 0; tpTx(pnd, 'xrp', r.hash); tPendSet(pnd, '✓ Added', 'grn', `ledger ${r.ledger || ''}`, true); }
       else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet. Check this pool again in a minute before trying again.' : xrErr(r.code) + ' Nothing was added.', true);
     } catch (e) { tPendSet(pnd, 'Failed', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was added.', true); }
   }, false, 'b-acc', 'Adding…', true);
@@ -19221,7 +19221,7 @@ function xrTokAdd(k) {   // let this XRP wallet hold the pool's dollar coin (Tru
   confirmSheet(`Add ${p.tok} to this wallet`, `XRP Ledger · ${esc(o.name)}`, [{ t: `Hold ${p.tok} in this wallet`, s: `issuer ${p.a2.issuer} (${p.who})`, hl: 1 }, { t: 'Reserve', s: `${m2((XRSV || { inc: 0.2 }).inc)} XRP set aside while you hold it` }], `Add ${p.tok}`, async () => {
     const pnd = tPend(`Add ${p.tok} to ${o.name}`, 'earnx', o.w.classicAddress);
     try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { ...p.a2, value: '1000000000' }, Flags: 0x00020000 }, drops);   // tfSetNoRipple
-      if (r.state === 'ok') tPendSet(pnd, '✓ Added', 'grn', `this wallet can now receive ${p.tok} on the XRP Ledger`, true);
+      if (r.state === 'ok') { tpTx(pnd, 'xrp', r.hash); tPendSet(pnd, '✓ Added', 'grn', `this wallet can now receive ${p.tok} on the XRP Ledger`, true); }
       else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet.' : xrErr(r.code), true);
     } catch (e) { tPendSet(pnd, 'Failed', 'red', e && e.message ? e.message : String(e), true); }
   }, false, 'b-acc', 'Adding…', true);
@@ -19242,7 +19242,7 @@ function xrEarnOutGo(k, pct) {
   ], 'Withdraw', async () => {
     const pnd = tPend(`Withdraw ${all ? 'all' : pct + '%'} from ${p.name}`, 'earnx', o.w.classicAddress);
     try { const drops = await xrFee(); tPendSet(pnd, 'Sent…', 'mu', 'waiting for the ledger'); const r = await xrSubmit(o, tx, drops);
-      if (r.state === 'ok') { pnd.label = `Withdrew ${m2(gx)} XRP + ${m2(gu)} ${p.tok}`; A.at = 0; tPendSet(pnd, '✓ Withdrawn', 'grn', `ledger ${r.ledger || ''}`, true); }
+      if (r.state === 'ok') { pnd.label = `${p.name} pool · ${m2(gx)} XRP + ${m2(gu)} ${p.tok}`; A.at = 0; tpTx(pnd, 'xrp', r.hash); tPendSet(pnd, '✓ Withdrawn', 'grn', `ledger ${r.ledger || ''}`, true); }
       else tPendSet(pnd, r.state === 'pending' ? 'Pending' : 'Failed', r.state === 'pending' ? 'amb' : 'red', r.state === 'pending' ? 'Not confirmed yet. Check this pool again in a minute before trying again.' : xrErr(r.code) + ' Nothing was withdrawn.', true);
     } catch (e) { tPendSet(pnd, 'Failed', 'red', (e && e.message ? e.message : String(e)) + ' Nothing was withdrawn.', true); }
   }, false, 'b-acc', 'Withdrawing…', true);
@@ -19362,8 +19362,11 @@ const fxd = (v) => { const a = Math.abs(v); return a >= 1 ? fx(a) : a >= 0.01 ? 
 const pctd = (v) => { const a = Math.abs(v); return (a >= 0.01 || a === 0 ? a.toFixed(2) : a.toFixed(4)); };
 function plLine(now, E, holdNow) {   // "Put in $X · taken out $Y · P/L +$Z (+n%) · vs just holding +$W"
   if (!E || !(E.in > 0)) return '';
-  const pl = now + E.out - E.in, vs = now - holdNow, c = (v) => (v >= 0 ? 'grn' : 'red'), sg = (v) => (v >= 0 ? '+' : '−') + '$' + fxd(v);
-  return `<div class="mu" style="font-size:13.5px">Put in $${fx(E.in)}${E.out > 0 ? ` · taken out $${fx(E.out)}` : ''} · P/L <b class="${c(pl)}">${sg(pl)} (${pl >= 0 ? '+' : '−'}${pctd(pl / E.in * 100)}%)</b> · vs just holding <span class="${c(vs)}">${sg(vs)}</span></div>`;
+  /* v2.45z (Jeff's screenshot: "P/L −$0.000000 (−0.0000%)" in red right after adding): under half a millionth of a dollar is no change,
+     shown as a plain $0.00 (0.00%), not a red loss */
+  const z = (v) => Math.abs(v) < 5e-7, pl0 = now + E.out - E.in, vs0 = now - holdNow, pl = z(pl0) ? 0 : pl0, vs = z(vs0) ? 0 : vs0;
+  const c = (v) => (v > 0 ? 'grn' : v < 0 ? 'red' : 'mu'), sg = (v) => (v === 0 ? '$0.00' : (v > 0 ? '+' : '−') + '$' + fxd(v));
+  return `<div class="mu" style="font-size:13.5px">Put in $${fx(E.in)}${E.out > 0 ? ` · taken out $${fx(E.out)}` : ''} · P/L <b class="${c(pl)}">${sg(pl)} (${pl === 0 ? '0.00' : (pl > 0 ? '+' : '−') + pctd(pl / E.in * 100)}%)</b> · vs just holding <span class="${c(vs)}">${sg(vs)}</span></div>`;
 }
 
 /* ---------- Taxes: a file of everything the wallets did in one year, with dollar values ----------
@@ -21705,6 +21708,11 @@ function obnPaint() {
   clearTimeout(OBN.t); if (!p.busy) OBN.t = setTimeout(obnHide, bad || warn ? 12000 : 5000);
 }
 function obnHide() { clearTimeout(OBN.t); const el = $('#obn'); if (el) el.className = ''; OBN.p = null; }
+/* v2.45z (Jeff: "it shows more transparency so the user can see where it went"): a receipt card links to its transaction on the
+   network's explorer; tapping the card (or its "View on …" line) opens it */
+function tpTx(p, net, h) { if (!p || !h) return; p.link = net === 'xrp' ? `${XRP_EXPL[S.net]}/transactions/${h}` : net === 'sol' ? solTxLink(h) : `${NET().expert}/tx/${h}`; p.linkNm = net === 'xrp' ? 'the XRP Ledger explorer' : net === 'sol' ? 'Solscan' : 'Stellar Expert'; }
+const tpLinkHtml = (p) => (p.link && !p.busy ? `<a href="${esc(p.link)}" target="_blank" rel="noopener" style="font-size:13px;align-self:flex-start">View on ${esc(p.linkNm)} ↗</a>` : '');
+document.addEventListener('click', (e) => { const c = e.target.closest && e.target.closest('[data-tplink]'); if (!c || e.target.closest('a, button')) return; try { window.open(c.dataset.tplink, '_blank', 'noopener'); } catch (x) {} });
 function tPend(label, scr = 'trade', addr = tradeAddr, keepForm = false) {
   if ((scr === 'earn' || scr === 'earnx') && cur === 'earn') { const v = scr === 'earnx' ? 'xr' : 'st'; if (EARN_VIEW !== v) { closeSheet(); earnOpenView(v); } }   /* its receipt shows on that chain's page */
   const p = { id: ++tPendN, label, st: 'Sending…', cls: 'amb', busy: 1, addr, scr, t: Date.now() };
@@ -21729,11 +21737,11 @@ function tPendSet(p, st, cls, sub, done) {
 function tPendPaint() {
   const el = $('#tPend'); if (!el) return; const now = Date.now();
   for (let i = TPEND.length - 1; i >= 0; i--) { const p = TPEND[i]; if (p.t2 && now - p.t2 > (p.cls === 'red' ? 600000 : p.scr === 'trade' ? 20000 : 180000)) TPEND.splice(i, 1); }   // Trade has its history list below; Send / Swap keep the result 3 min   // done ones fade into the normal history below
-  const row = (p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:15px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:14px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.xs && xsStepsHtml(p.xs) ? xsStepsHtml(p.xs) : p.sub ? `<div class="mu" style="font-size:13px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
+  const row = (p) => `<div class="card"${p.link && !p.busy ? ` data-tplink="${esc(p.link)}"` : ''} style="padding:10px 14px;gap:4px${p.link && !p.busy ? ';cursor:pointer' : ''}${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:15px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:14px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.xs && xsStepsHtml(p.xs) ? xsStepsHtml(p.xs) : p.sub ? `<div class="mu" style="font-size:13px">${esc(p.sub)}</div>` : ''}${tpLinkHtml(p)}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`;
   for (const [k, id] of [['send', '#sPend'], ['swap', '#wPend'], ['xswap', '#xsPend'], ['earn', '#ePend'], ['earnx', '#eXPend'], ['xtrade', '#xtPend'], ['xtrv', '#rvPend']]) { const e2 = $(id); if (e2) { const S2 = TPEND.filter((p) => p.scr === k && ((k !== 'xtrade' && k !== 'xtrv') || p.addr === xrSel)); e2.style.display = S2.length ? 'flex' : 'none'; e2.innerHTML = S2.map(row).join(''); } }
   const L = TPEND.filter((p) => p.scr === 'trade' && p.addr === tradeAddr);
   el.style.display = L.length ? 'flex' : 'none';
-  el.innerHTML = L.map((p) => `<div class="card" style="padding:10px 14px;gap:4px${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:15px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:14px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:13px">${esc(p.sub)}</div>` : ''}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
+  el.innerHTML = L.map((p) => `<div class="card"${p.link && !p.busy ? ` data-tplink="${esc(p.link)}"` : ''} style="padding:10px 14px;gap:4px${p.link && !p.busy ? ';cursor:pointer' : ''}${p.cls === 'red' ? ';border-color:var(--red)' : ''}"><div class="r" style="gap:10px"><b style="font-size:15px">${esc(p.label)}</b><span class="${p.cls}${p.busy ? ' tpl' : ''}" style="font-size:14px;font-weight:700;white-space:nowrap">${esc(p.st)}</span></div>${p.sub ? `<div class="mu" style="font-size:13px">${esc(p.sub)}</div>` : ''}${tpLinkHtml(p)}${p.cls === 'red' ? `<button class="b-out sm" data-act="tPendX" data-i="${p.id}" style="align-self:flex-start;min-height:28px">Dismiss</button>` : ''}</div>`).join('');
 }
 setInterval(() => { if ((cur === 'trade' || cur === 'xtrade' || cur === 'send' || cur === 'swap' || cur === 'xswap' || cur === 'earn') && TPEND.length) tPendPaint(); }, 5000);
 async function personalTx(kp, src, ops, okTitle, back, memo, what) {
@@ -21741,7 +21749,7 @@ async function personalTx(kp, src, ops, okTitle, back, memo, what) {
     const p = tPend((what || okTitle).replace(/^Bought /, 'Buy ').replace(/^Sold /, 'Sell ').replace(/ · fee .*$/, ''));
     try { const t = await buildTx(src, ops, memo); t.sign(kp); tPendSet(p, 'Sent', 'mu'); const r = await submit(t);
       p.label = (what || okTitle).replace(/ · fee .*$/, '');
-      tPendSet(p, '✓ Filled', 'grn', what && / · fee /.test(what) ? what.replace(/^.* · fee /, 'fee ') + ' · ledger ' + r.ledger : 'ledger ' + r.ledger, true);
+      tpTx(p, 'xlm', r.hash); tPendSet(p, '✓ Filled', 'grn', what && / · fee /.test(what) ? what.replace(/^.* · fee /, 'fee ') + ' · ledger ' + r.ledger : 'ledger ' + r.ledger, true);
       fillPriceOf(r.hash, src).then((fp) => { if (fp) { p.label = fp; tPendPaint(); } }); }   // then the real fill: "Filled · bought 10.00 XLM @ 0.169407"
     catch (e) { tPendSet(p, 'Failed', 'red', niceErr(e) + ' Nothing traded.', true); }
     return;
@@ -22300,7 +22308,7 @@ async function orderTx(kp, src, op, side, title, orig) {
   const nB0 = kName(TP().b), q0 = orig || 0;
   const p = tPend(title === 'Edited' ? `Change ${side} order` : `Limit ${side} ${q0 ? fx(q0, 2) + ' ' + nB0 : ''}`.trim());
   try {
-    const t = await buildTx(src, [op]); t.sign(kp); tPendSet(p, 'Sent', 'mu'); const r = await submit(t);
+    const t = await buildTx(src, [op]); t.sign(kp); tPendSet(p, 'Sent', 'mu'); const r = await submit(t); tpTx(p, 'xlm', r.hash);
     const f = fillSummary(r, side), rows = [];
     if (f) {
       if (f.id && orig) { const st = ordStore(); st[f.id] = { orig, side, at: Date.now() }; saveS(); }
@@ -22443,7 +22451,7 @@ async function sendReview() {
 async function sendTx(kp, from, ops, memo, what, mtxt) {
   const p = tPend(what, 'send', from);
   try { const t = await buildTx(from, ops, memo); t.sign(kp); tPendSet(p, 'Sent…', 'mu', 'waiting for the ledger'); const r = await submit(t);
-    tPendSet(p, '✓ Sent', 'grn', 'confirmed · ledger ' + r.ledger + (mtxt ? ' · ' + mtxt : ''), true); }
+    tpTx(p, 'xlm', r.hash); tPendSet(p, '✓ Sent', 'grn', 'confirmed · ledger ' + r.ledger + (mtxt ? ' · ' + mtxt : ''), true); }
   catch (e) { tPendSet(p, 'Failed', 'red', niceErr(e) + ' Nothing was sent.', true); }
 }
 
