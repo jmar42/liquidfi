@@ -242,7 +242,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.45x</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.45y</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -657,7 +657,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.45x</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.45y</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -689,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.45x · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.45y · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14422,7 +14422,7 @@ async function drawXrp(quiet) {
       const L = FG.fills.has(x.hash) ? (FG.heads.get(x.hash) || []).map((g) => xrGroupText(g) + (g.own ? (g.fok ? ' · market order' : ' · filled') : ' · your order filled')) : [xrTxText(x, addr)];
       for (const t of L) { const q = /^(Placed |Order cancelled)/.test(t), last = R[R.length - 1]; if (q && last && last.q) { last.m.push({ x, t }); continue; } R.push({ q, m: [{ x, t }] }); } }
     const rows = R.flatMap((g) => g.q && g.m.length >= 3 ? [{ x: g.m[0].x, t: `${g.m.length} orders placed / replaced (a bot re-quoting)` }] : g.m).slice(0, 16);   // runs of 1-2 stay as they are
-    $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^(Sold|Bought) /.test(t) && !/ · failed$/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${/ · failed$/.test(t) ? esc(t.replace(/ · failed$/, '')) + ' <span class="sell">failed</span>' : esc(t)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>'; xpmFill($('#xrRec')).catch(() => {});
+    keepOpen($('#xrRec'), () => { $('#xrRec').innerHTML = rows.length ? rows.map(({ x, t }) => `<details class="recrow"><summary><span${/^(Sold|Bought) /.test(t) && !/ · failed$/.test(t) ? ' class="grn"' : /^⚠/.test(t) ? ' class="amb"' : ''}>${/ · failed$/.test(t) ? esc(t.replace(/ · failed$/, '')) + ' <span class="sell">failed</span>' : esc(t)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${x.iso ? esc(ago(x.iso)) : ''}</span></summary>${xrDetail(x, addr)}</details>`).join('') : '<div><span class="mu">Nothing yet</span></div>'; }); xpmFill($('#xrRec')).catch(() => {});
   } catch (e) { $('#xrRec').innerHTML = `<div><span class="mu">${esc(e.message || String(e))}</span></div>`; }
 }
 /* A bot wallet re-quotes all day: the newest 60 transactions can be minutes of "order placed / cancelled" and no trade.
@@ -16068,7 +16068,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.45x';
+const APP_VER = 'v2.45y';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16220,13 +16220,13 @@ async function solRecent(addr) {
         if (s.fill) return `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order (seen ${esc(new Date(s.fill.t).toLocaleString())})</span></div></div></details>`; const x = SOLTX[s.signature + addr];
       const iso = s.blockTime ? new Date(s.blockTime * 1000).toISOString() : '', rw = (k, v) => `<div><span>${k}</span><span class="mono" style="text-align:right;overflow-wrap:anywhere">${v}</span></div>`;
       return `<details class="recrow"><summary><span${/^No change/.test(x ? x.txt : '') ? ' class="mu"' : ''}>${x ? esc(STR[s.signature] ? STR[s.signature].txt : x.txt) : '<span class="mu">Reading…</span>'}${(s.err || (x && x.err)) && !/^Swap not filled/.test(x ? x.txt : '') ? ' <span class="sell">failed</span>' : ''}</span><span class="mu" style="font-size:13px;white-space:nowrap">${iso ? esc(ago(iso)) : ''}</span></summary><div class="recd">${x && x.memo ? rw('Memo', esc(x.memo)) : ''}${x && x.pmemo ? rw('🔒 Private memo', `<span class="spmemo" data-k="${esc(s.signature + addr)}" data-m="${esc(x.pmemo)}" data-me="${esc(addr)}">${xpmTxt(SPMC[s.signature + addr])}</span>`) : ''}${x && x.lfee ? rw('Liquidfi fee', esc(lfeeTxt(x.lfee))) : ''}${x && x.fee ? rw('Network fee', solAmt(x.fee) + ' SOL') : ''}${iso ? rw('Time', esc(new Date(iso).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }))) : ''}${rw('Transaction', esc(short(s.signature)))}<div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">Nothing yet</span></div>'; };
-    paint();
+    keepOpen(el, paint);
     const need = (L || []).filter((s) => !SOLTX[s.signature + addr]);
     if (need.length && !JLT) await jlTokens().catch(() => null);
     for (let j = 0; j < need.length; j += 3) {   // 3 at a time: gentle on the server
       await Promise.all(need.slice(j, j + 3).map((s) => solRpc('getTransaction', [s.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'confirmed' }])
         .then((t) => { if (t) SOLTX[s.signature + addr] = solTxSum(addr, t); }).catch(() => {})));
-      if (solSel !== addr) return; paint();
+      if (solSel !== addr) return; keepOpen(el, paint);
     }
     if (need.length) solTxSave();
   } catch (e) { el.innerHTML = `<div class="mu" style="padding:8px 0">${esc(e.message || e)}</div>`; }
@@ -16771,11 +16771,11 @@ async function stFills() {   // this wallet's recent swaps, from the same reader
     const plain = (s, x) => `<details class="recrow"><summary><span>${esc(x.txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd">${x.lfee ? rw2('Liquidfi fee', esc(lfeeTxt(x.lfee))) : ''}${x.fee ? rw2('Network fee', solAmt(x.fee) + ' SOL') : ''}${s.blockTime ? rw2('Time', esc(new Date(s.blockTime * 1000).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }))) : ''}<div><span></span><a class="b-out sm" href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`;
     const SG2 = sstGroups(L, addr), sDone = new Set(), stopRows = Object.values(SG2.G).map((g) => ({ blockTime: (L.find((y) => y.signature === g.sigs[0]) || {}).blockTime || 0, stopG: g }));
     R.push(...stopRows.filter((r) => !R.some((s) => SG2.of[s.signature]))); R.sort((a, b) => (b.blockTime || 0) - (a.blockTime || 0));
-    el.innerHTML = R.length ? R.map((s) => { if (s.stopG) return sstGroupHtml(s.stopG, L, addr).html; if (s.signature && SG2.of[s.signature]) { const k = SG2.of[s.signature]; if (sDone.has(k)) return ''; sDone.add(k); return sstGroupHtml(SG2.G[k], L, addr).html; }
+    keepOpen(el, () => { el.innerHTML = R.length ? R.map((s) => { if (s.stopG) return sstGroupHtml(s.stopG, L, addr).html; if (s.signature && SG2.of[s.signature]) { const k = SG2.of[s.signature]; if (sDone.has(k)) return ''; sDone.add(k); return sstGroupHtml(SG2.G[k], L, addr).html; }
       const gid = s.signature && GR2.of[s.signature], g = gid && GR2.G[gid];
       if (g) { if (gDone.has(gid)) return ''; gDone.add(gid); return solGroupHtml(g, L, addr, ST2).html; }
       if (!s.fill && SOLTX[s.signature + addr] && !ST2[s.signature]) return plain(s, SOLTX[s.signature + addr]);
-      return ST2[s.signature] ? `<details class="recrow"><summary><span>${esc(ST2[s.signature].txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd">${(SOLTX[s.signature + addr] || {}).fee ? rw2('Network fee', solAmt(SOLTX[s.signature + addr].fee) + ' SOL') : ''}<a class="b-out sm" href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></details>` : s.fill ? `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order</span></div></div></details>` : `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>';
+      return ST2[s.signature] ? `<details class="recrow"><summary><span>${esc(ST2[s.signature].txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd">${(SOLTX[s.signature + addr] || {}).fee ? rw2('Network fee', solAmt(SOLTX[s.signature + addr].fee) + ' SOL') : ''}<a class="b-out sm" href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></details>` : s.fill ? `<details class="recrow"><summary><span>${esc(mfFillTxt(s.fill))}</span><span class="mu" style="font-size:13px;white-space:nowrap">${esc(ago(new Date(s.fill.t).toISOString()))}</span></summary><div class="recd"><div><span>Filled</span><span class="mono">your resting Manifest order</span></div></div></details>` : `<details class="recrow"><summary><span>${esc(SOLTX[s.signature + addr].txt)}</span><span class="mu" style="font-size:13px;white-space:nowrap">${s.blockTime ? esc(ago(new Date(s.blockTime * 1000).toISOString())) : ''}</span></summary><div class="recd"><div><span></span><a href="${solTxLink(s.signature)}" target="_blank" rel="noopener">View on Solscan ↗</a></div></div></details>`; }).join('') : '<div><span class="mu">No trades from this wallet yet.</span></div>'; });
   } catch (e) { el.innerHTML = `<div><span class="mu">${esc(e.message || e)}</span></div>`; }
 }
 function stLoop() {   // v2.41d: Manifest every 15 s; the 24 h volume card every 5 min. Coinbase / Kraken stream on their own.
@@ -20392,6 +20392,12 @@ const qRank = (c) => (c === 'USDC' || c === 'USD' ? 4 : ['PYUSD', 'USDT', 'RLUSD
 /* v2.45x (Jeff: "there's some inconsistencies… fix them all"): one way to write a trade on every screen and every network, the same as
    the notifications: "Sold 500 XLM at 0.15200 USDC". Capital Bought / Sold, "at", the price coin always named, prices with 4 decimals
    from 1 up and 5 under 1. What happened to the order goes after it: "· market order", "· your order filled", "· part filled, rest open". */
+/* v2.45y: repaint a list without closing the lines someone opened (keyed by data-k, else the line's own text) */
+function keepOpen(el, paint) {
+  if (!el) return paint(); const k = (d) => d.dataset.k || ((d.querySelector('summary > span') || {}).textContent || '').trim();
+  const was = new Set([...el.querySelectorAll('details[open]')].map(k)); paint();
+  if (was.size) el.querySelectorAll('details').forEach((d) => { if (!d.open && was.has(k(d))) d.open = true; });
+}
 function pxW(p) { p = +p; return !(p > 0) ? '–' : p >= 1 ? p.toFixed(4) : p.toFixed(5); }
 function tradeRank(c) { return c === 'USDC' || c === 'USD' ? 4 : ['PYUSD', 'USDT', 'RLUSD'].includes(c) ? 3 : c === 'EURC' ? 2 : c === 'XLM' ? 1 : 0; }
 function tradeW(sa, sAmt, ba, bAmt, amtF) {   // gave sAmt of sa, got bAmt of ba → "Sold …" / "Bought …"; null when neither side prices the other
@@ -21145,12 +21151,16 @@ function paintAct() {
     for (const f of [...r.fills].sort((x, y) => x.t - y.t || x.ix - y.ix)) { const k = f.gave[0] + '→' + f.got[0] + (f.pool ? 'P' : 'B'), l = steps.find((x) => x.k === k); if (l) { l.g += f.gave[1]; l.o += f.got[1]; l.n++; } else steps.push({ k, a: f.gave[0], b: f.got[0], g: f.gave[1], o: f.got[1], pool: f.pool, n: 1 }); }
     const feeRow = r.sol ? `<div><span>Network fee</span><span class="mono">${r.nfee ? solAmt(r.nfee) + ' SOL' : 'none'}</span></div>` : r.xrp ? `<div><span>Network fee</span><span class="mono">${r.nfee ? xq4(r.nfee) + ' XRP' : 'none'}</span></div>`
       : `<div class="actfee" data-op="${esc(r.op)}" data-addr="${esc(r.addr || '')}" data-pool="${r.pool ? 1 : ''}"><span>Fees</span><span class="mu">loading…</span></div>`;
-    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${r.sol ? esc(r.ven || 'Solana') : x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}${feeRow}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>${r.xrp ? `<a href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a>` : `<a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>`}</div></div>`;
+    const det = `<div class="actd">${steps.map((x) => `<div><span style="display:flex;flex-direction:column"><span>${esc(x.a)} → ${esc(x.b)}</span><b style="color:var(--tx);font-weight:600">${r.sol ? esc(r.ven || 'Solana') : x.pool ? 'AMM pool' : 'Order book'}${x.n > 1 ? `<span class="mu" style="font-weight:400"> · ${x.n} fills</span>` : ''}</b></span><span class="mono">${amtFmt(x.g)} → ${amtFmt(x.o)}</span></div>`).join('')}${feeRow}<div><span>${new Date(r.t).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>${r.sol ? (r.hash ? `<a href="https://solscan.io/tx/${esc(r.hash)}" target="_blank" rel="noopener">View on Solscan ↗</a>` : '<span class="mu">your resting Manifest order</span>') : r.xrp ? `<a href="${XRP_EXPL[S.net]}/transactions/${esc(r.hash)}" target="_blank" rel="noopener">View on the XRP Ledger explorer ↗</a>` : `<a href="${NET().expert}/op/${esc(r.op)}" target="_blank" rel="noopener">View on Stellar Expert ↗</a>`}</div></div>`;
     const head = r.swap ? `${amtFmt(r.qamt)} ${esc(r.quote)} → ${amtFmt(r.qty)} ${esc(r.asset)} at ${pxW(px)} ${esc(r.quote)}` : `${r.sol ? solAmt(r.qty) : fx(r.qty, 2)} ${esc(r.asset)} at ${pxW(px)} ${esc(r.quote)}${r.ven ? ' · ' + esc(r.ven) : ''}`;   /* v2.45x: the price coin named, like every other screen */
-    html += `<details class="actrow"><summary style="display:flex;align-items:center;gap:10px;padding:10px 0"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : r.side === 'SELL' ? '--sell' : '--blu'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:15px">${head}</span><span class="mu" style="font-size:13px">${esc(r.acct)}${r.swap ? ` · ${steps.length} steps` : ` · ${fx(r.qamt, 2)} ${esc(r.quote)}`}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:13px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></summary>${det}</details>`;
+    html += `<details class="actrow" data-k="${esc([r.addr, r.op, r.side, r.asset, r.quote].join('|'))}"><summary style="display:flex;align-items:center;gap:10px;padding:10px 0"><span class="tag" style="width:44px;text-align:center;color:#0B0E13;background:var(${r.side === 'BUY' ? '--buy' : r.side === 'SELL' ? '--sell' : '--blu'})">${r.side}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="mono" style="font-weight:600;font-size:15px">${head}</span><span class="mu" style="font-size:13px">${esc(r.acct)}${r.swap ? ` · ${steps.length} steps` : ` · ${fx(r.qamt, 2)} ${esc(r.quote)}`}${extra ? ' · ' + extra : ''}</span></div><span class="mu" style="font-size:13px;white-space:nowrap">${new Date(r.t).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' })}</span></summary>${det}</details>`;
   }
   if (open) html += '</div>';
+  /* v2.45y (Jeff: "I open it then it quickly closes"): the list repaints as each wallet finishes loading (and on refresh), which closed
+     an opened line. Lines that were open stay open (their details load again from the cache). */
+  const was = new Set([...document.querySelectorAll('#aList details.actrow[open]')].map((d) => d.dataset.k));
   $('#aList').innerHTML = badN + html;
+  if (was.size) document.querySelectorAll('#aList details.actrow').forEach((d) => { if (was.has(d.dataset.k)) d.open = true; });
   $('#aMore').style.display = ACT.tab !== 'open' && !ACT.busy && (ACT.extra || L.some((a) => ACT.next[a.addr]) || XL.some((w) => ACT.xnext[w.addr])) ? '' : 'none';
 }
 

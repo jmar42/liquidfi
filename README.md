@@ -2,7 +2,7 @@
 
 Liquidfi is a self-custody phone web wallet for Stellar, the XRP Ledger and Solana, in one self-contained HTML file. It runs in the browser. Your keys are made on your phone and never leave it.
 
-The app reads balances and sends transactions through each network's servers: Stellar Horizon, XRP Ledger servers and Solana RPC. A small Liquidfi server runs the features a phone can't run by itself: stop orders, notifications, and relaying Solana requests. It never holds wallet keys.
+Some optional features, like stop orders and notifications, use Liquidfi's server.
 
 **Open it:** the `index.html` in this repository, served by GitHub Pages. Add it to your home screen to use it like an app.
 
@@ -25,7 +25,7 @@ The app reads balances and sends transactions through each network's servers: St
 - **Earn:** Stellar AMM pools, and lending on Solana through Jupiter Lend.
 - **Activity:** buys and sells across all your wallets, with each fill, the venue and the fees.
 - **Notifications:** for stop orders, for order fills on the wallets you choose, and when money arrives. Tapping one opens its details.
-- **Kill switch:** Cancel all orders, or Flatten (cancel and close open trades at market), on every trading account at once, from your phone, when the PC that runs your bots is off.
+- **Cancel all:** cancel every open order on your Stellar wallets in one tap. Trading wallets can also close their open trades at market.
 - **Wallets:**
   - Create a wallet from a 24-word recovery phrase (BIP39; Stellar SEP-5, the same as LOBSTR, Freighter and Stellar Laboratory), or import a secret key or phrase.
   - One phrase backs up your Stellar, XRP Ledger and Solana wallets.
@@ -51,15 +51,12 @@ Public servers see your IP address and the wallet addresses you look up. Running
 
 - **Keys stay on your device.** They are created or imported on the phone and sealed with your PIN (PBKDF2-SHA256, 600,000 rounds, AES-GCM) in the browser's storage. They are never sent anywhere, including to the Liquidfi server.
 - **Stop orders hold no keys.** The phone signs the stop order in advance. The server keeps only that signed order and sends it when the stop is hit. It can't sign anything else, and you can cancel from the phone.
-- **Bots use an emergency signer, not their own keys.** The phone makes an emergency key. From the PC you add it to each bot account as a signer with weight 1, with the master key at weight 2 and thresholds 1/1/2. The phone can then trade and cancel on those accounts, but it can't change their signers. If you lose the phone, remove that signer from the PC.
 - **Nothing personal is built in.** The file contains no personal account addresses; the only addresses in the code are Liquidfi's fee wallets. You add your own wallets, and they are saved on your device only.
 - **No third-party scripts in the wallet page.** Card checkout runs on its own page.
 - **Locking:**
   - The app auto-locks after 2 minutes idle.
   - After 3 wrong PINs, each further try has to wait longer. Fingerprint unlock is optional.
   - Every action that sends a transaction is hold-to-confirm.
-
-Whoever controls the hosted file controls the code your phone runs. Protect the GitHub account with 2-factor login, and check the version on the unlock screen.
 
 ## Build
 
