@@ -242,7 +242,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.46e</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.46h</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -387,7 +387,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" style="gap:4px"><span class="mu" style="font-size:14px">Total value (USD est.)</span><span class="mono" style="font-size:31px;font-weight:600;color:var(--blu)" id="soTot">–</span></div>
   <div id="soActs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px"></div>
   <div id="soFund"></div>
-  <span class="lbl">Balances</span>
+  <div class="top" style="align-items:baseline"><span class="lbl">Balances</span><button class="b-out sm" data-act="solAssets" style="width:auto;min-height:30px;padding:0 12px">Assets ›</button></div>
   <div class="card rows" id="soBal" style="padding:4px 14px"></div>
   <span class="lbl">Recent</span>
   <div class="card" id="soRec" style="padding:4px 14px;font-size:15px"></div>
@@ -657,7 +657,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.46e</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.46h</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -689,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.46e · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.46h · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14969,7 +14969,88 @@ async function xrAssetsSheet() {
   const other = d.lines.filter((l) => !xrCoinOf(l));
   sheet(`<h2>Assets</h2><div class="mu" style="font-size:14px">Coins this XRP wallet can hold. Each one sets aside ${inc} XRP of reserve, which comes back when you remove it at 0 balance.</div>${known}
     ${other.length ? `<span class="lbl">Other trust lines</span>${other.map((l) => row(esc(xrLpName(l) || xrCur(l.currency)), `${esc(short(String(l.account)))} · balance ${m2(+l.balance)}`, act(l))).join('')}<div class="mu" style="font-size:13px">Not issued by Ripple or Circle. Remove the ones you don't use to get their reserve back.</div>` : ''}
+    <span class="lbl">Other token</span><div class="g2"><label>Code<input id="xaCode" autocomplete="off"></label><label>Issuer (r…)<input id="xaIss" autocomplete="off" spellcheck="false"></label></div>
+    <button class="b-out" data-act="xrAddCheck">Check issuer</button><div id="xaRes"></div>
     <button class="b-out" data-act="closeSheet">Done</button>`);
+}
+
+/* ---------- v2.46h Add your own coins on Solana and the XRP Ledger, like Stellar's Assets (Jeff: "we need to be consistent") ----------
+   Solana: paste the coin's token address (mint). Jupiter must know it (that's what swaps it). Unverified coins need a tick:
+   anyone can make a coin with any name, and fakes of real coins are common. A coin that looks like a tokenized stock gets the
+   same US check as the built-in ones. XRP Ledger: code + issuer, then a trust line (as for RLUSD / USDC). */
+const solAdded = () => { const N = NS(); if (!N.solAdd || typeof N.solAdd !== 'object') N.solAdd = {}; return N.solAdd; };
+const SOLADD = { q: null };
+function solAssetsSheet() {
+  const A = solAdded(), B = SOL_MINTS[solNet()];
+  const row = (mint, m, mine) => `<div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:10px 14px"><div style="min-width:0"><b>${esc(m.c)}</b>${m.stock ? `<span class="mu" style="font-size:12.5px"> · ${esc(m.stock)}</span>` : ''}<div class="mono mu" style="font-size:12.5px">${esc(short(mint))}${mine ? (m.ver ? ' · verified by Jupiter' : ' · not verified') : ''}</div></div>${mine ? `<button class="b-out sm" style="width:auto;padding:0 12px" data-act="solAddDel" data-mint="${esc(mint)}">Remove</button>` : '<span class="tag t-grn">built in</span>'}</div>`;
+  sheet(`<h2>Assets</h2><div class="mu" style="font-size:14px">Coins this app shows, prices and swaps on Solana. Add another one by its token address (mint). Solana needs no trust line: a coin account opens the first time you get it (about 0.002 SOL, refundable).</div>
+    <label class="fld"><span>Token address (mint)</span><input id="saMint" autocomplete="off" spellcheck="false" placeholder="Paste the mint"></label>
+    <button class="b-out" data-act="solAddCheck">Check coin</button><div id="saRes"></div>
+    ${Object.keys(A).length ? `<span class="lbl">Added by you</span>${Object.entries(A).map(([k, m]) => row(k, m, 1)).join('')}` : ''}
+    <span class="lbl">Built in</span>${Object.entries(B).map(([k, m]) => row(k, m, 0)).join('')}
+    <button class="b-out" data-act="closeSheet">Done</button>`);
+}
+const solStockLike = (x) => /xStock|Ondo Tokeni[sz]ed|tokeni[sz]ed (stock|equity)|Backed/i.test(x.name || '') || (x.tags || []).some((t) => /stock|equit/i.test(t));
+async function solAddCheck() {
+  const mint = ($('#saMint').value || '').trim(), res = $('#saRes'); SOLADD.q = null;
+  if (!solAddrOk(mint)) return (res.innerHTML = '<div class="note amb">That isn\'t a Solana token address.</div>');
+  if (SOL_MINTS[solNet()][mint]) return (res.innerHTML = '<div class="note">That coin is already built in.</div>');
+  if (solAdded()[mint]) return (res.innerHTML = '<div class="note">You already added that coin.</div>');
+  if (solNet() !== 'mainnet') return (res.innerHTML = '<div class="note amb">Adding coins works on Solana Mainnet.</div>');
+  res.innerHTML = '<div class="note">Checking…</div>';
+  let x = null; try { const r = await fetch('https://lite-api.jup.ag/tokens/v2/search?query=' + mint); const j = await r.json(); x = Array.isArray(j) ? j.find((t) => t.id === mint) : null; } catch (e) {}
+  if (!$('#saRes')) return;
+  if (!x) return (res.innerHTML = '<div class="note amb">Jupiter doesn\'t know this coin, so Liquidfi can\'t price or swap it. Not added.</div>');
+  const sym = String(x.symbol || '').slice(0, 12).replace(/[^\w.$-]/g, '') || short(mint), stock = solStockLike(x) ? String(x.name || sym).replace(/\s*xStock$/i, '').slice(0, 30) : null;
+  const clash = Object.values({ ...SOL_MINTS[solNet()], ...solAdded() }).some((m) => m.c.toLowerCase() === sym.toLowerCase());
+  SOLADD.q = { mint, c: sym, d: +x.decimals || 0, t22: String(x.tokenProgram || '').startsWith('Tokenz') ? 1 : 0, nm: String(x.name || '').slice(0, 40), ver: x.isVerified === true ? 1 : 0, ...(stock ? { stock } : {}) };
+  res.innerHTML = `<div class="card" style="gap:6px"><div class="r"><b>${esc(sym)}</b><span class="${SOLADD.q.ver ? 'grn' : 'red'}" style="font-weight:700">${SOLADD.q.ver ? '✓ verified by Jupiter' : 'not verified'}</span></div>
+    <div class="mu" style="font-size:13.5px">${esc(SOLADD.q.nm)} · ${esc(short(mint))} · trading liquidity about $${fx(+x.liquidity || 0, 0)}</div>
+    ${clash ? `<div class="red" style="font-size:13.5px">Another coin is already called ${esc(sym)}. Fakes copy real names: check the address with the coin's own website.</div>` : ''}
+    ${stock ? '<div class="amb" style="font-size:13.5px">Looks like a tokenized stock: not offered to US persons, same as the built-in stocks.</div>' : ''}
+    ${SOLADD.q.ver ? '' : `<div class="red" style="font-size:13.5px">Jupiter hasn't verified this coin. Anyone can make a coin with any name, and many are scams that can't be sold.</div><label style="display:flex;flex-direction:row;gap:10px;align-items:flex-start;font-size:14px"><input type="checkbox" id="saOk" style="margin-top:3px;width:22px;height:22px;min-height:0;flex:none;padding:0"> <span>I checked the address myself and accept the risk.</span></label>`}
+    <button class="b-light" data-act="solAddGo">Add ${esc(sym)}</button></div>`;
+}
+function solAddGo() {
+  const q = SOLADD.q; if (!q) return; if (!q.ver && !($('#saOk') && $('#saOk').checked)) return toast('Tick the box first.');
+  const { mint, ...m } = q; solAdded()[mint] = m; saveS(); SOLADD.q = null; toast(`✓ ${m.c} added. It shows in this wallet and in Swap.`);
+  if (solSel) delete SOLA[solSel]; solAssetsSheet(); if (cur === 'sol') drawSol();
+}
+function solAddDel(mint) {
+  const m = solAdded()[mint]; if (!m) return; const held = Object.values(SOLA).some((d) => d && d.toks && d.toks.some((t) => t.mint === mint && t.amt > 0));
+  if (held) return toast(`A wallet still holds ${m.c}. Sell or send it first, then remove it.`, 6000);
+  delete solAdded()[mint]; saveS(); toast(`${m.c} removed from your list.`); solAssetsSheet(); if (cur === 'sol') drawSol();
+}
+/* XRP Ledger: another token by code + issuer (a trust line). Not issued by Ripple or Circle: shown, sent and received; swapping it is not offered yet. */
+const xrCurHex = (code) => { const c = String(code || '').trim(); if (/^[A-Za-z0-9?!@#$%^&*<>(){}[\]|]{3}$/.test(c) && c.toUpperCase() !== 'XRP') return c; if (c.length >= 4 && c.length <= 20 && /^[\x20-\x7e]+$/.test(c)) return Array.from(new TextEncoder().encode(c)).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase().padEnd(40, '0'); if (/^[0-9A-Fa-f]{40}$/.test(c)) return c.toUpperCase(); return null; };
+async function xrAddCheck() {
+  const code = ($('#xaCode').value || '').trim(), iss = ($('#xaIss').value || '').trim(), res = $('#xaRes'), cur2 = xrCurHex(code);
+  if (!cur2) return (res.innerHTML = '<div class="note amb">Enter the token\'s code (3 letters, or up to 20 characters; not XRP).</div>');
+  if (!xrpl.isValidClassicAddress(iss)) return (res.innerHTML = '<div class="note amb">The issuer must be an XRP Ledger address (r…).</div>');
+  if (iss === xrSel) return (res.innerHTML = '<div class="note amb">That\'s this wallet.</div>');
+  const B = xrCoins().find((c) => c.cur === cur2 && c.iss === iss); if (B) { res.innerHTML = ''; return xrTrustReview(B.k); }
+  res.innerHTML = '<div class="note">Checking the issuer…</div>';
+  let a = null; try { a = (await xr('account_info', { account: iss, ledger_index: 'validated' })).account_data; } catch (e) {}
+  if (!$('#xaRes')) return; if (!a) return (res.innerHTML = '<div class="note amb">That issuer address isn\'t active on the XRP Ledger.</div>');
+  const dom = a.Domain ? (() => { try { return new TextDecoder().decode(new Uint8Array(a.Domain.match(/../g).map((h) => parseInt(h, 16)))); } catch (e) { return ''; } })() : '';
+  const name = xrCur(cur2);
+  res.innerHTML = `<div class="card" style="gap:6px"><div class="r"><b>${esc(name)}</b><span class="mu">${esc(short(iss))}</span></div>
+    <div class="mu" style="font-size:13.5px">${dom ? 'Issuer\'s website: <b>' + esc(dom) + '</b>' : 'The issuer hasn\'t set a website.'}</div>
+    <div class="red" style="font-size:13.5px">Not issued by Ripple or Circle. Anyone can issue a token with any name on the XRP Ledger. Check the issuer address with the token's own website.</div>
+    <button class="b-light" data-act="xrAddGo" data-xc="${esc(cur2)}" data-xi="${esc(iss)}" data-xn="${esc(name)}">Add ${esc(name)}</button></div>`;
+}
+async function xrAddGo(ccy, iss, name) {
+  const o = xrOwn(xrSel); if (!o || !ccy || !iss) return; let d, sv, drops;
+  try { d = await xrLoad(xrSel); sv = await xrServer(); drops = await xrFee(); } catch (e) { return toast(e.message || String(e)); }
+  if (!d || !d.a) return toast('This wallet is not activated yet.'); if (d.lines.some((l) => l.account === iss && l.currency === ccy && xrLineOurs(l, d))) return toast(`${name} is already added.`);
+  if (xrSpend(d) < sv.inc + drops / 1e6) return toast(`Needs ${m2(sv.inc)} XRP free for the reserve (${m2(xrSpend(d))} available).`);
+  const BZ = await xrBusy(xrSel);
+  confirmSheet(`Add ${name}`, `XRP Ledger · ${esc(o.name)}`, [...BZ, { t: `Hold ${name} in this wallet`, s: `issuer ${iss} · not issued by Ripple or Circle`, hl: 1 },
+    { t: `Reserve +${m2(sv.inc)} XRP`, s: 'the ledger holds it while the trust line is open; you get it back if you remove the line at 0 balance' }, { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], `Add ${name}`, async () => {
+    try { const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: ccy, issuer: iss, value: '1000000000' }, Flags: 0x00020000 }, drops); if (r.state === 'ok') delete XRA[xrSel];
+      xrOutcome(r, `${name} added`, `${esc(o.name)} can now hold ${esc(name)} · reserve +${m2(sv.inc)} XRP`, `${name} not added`, 'xrp'); }
+    catch (e) { showResult(false, `${name} not added`, [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
+  }, false, 'b-acc', 'Adding…', true);
 }
 
 /* ---------- Trade XRP on the XRP Ledger DEX (XRP / RLUSD) ----------
@@ -15864,7 +15945,9 @@ const SOL_MINTS = {   /* the coins Liquidfi names; anything else shows as an unk
   mainnet: { EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: { c: 'USDC', d: 6, usd: 1 }, Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: { c: 'USDT', d: 6, usd: 1 },
     '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo': { c: 'PYUSD', d: 6, usd: 1, t22: 1 }, '2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH': { c: 'USDG', d: 6, usd: 1, t22: 1 },
     HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr: { c: 'EURC', d: 6, eur: 1 }, JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD: { c: 'JupUSD', d: 6, usd: 1 },
-    J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn: { c: 'JitoSOL', d: 9, lst: 1 } },
+    J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn: { c: 'JitoSOL', d: 9, lst: 1 },
+    /* v2.46g tokenized stocks (xStocks by Backed; Jupiter-verified mints, the Xs… ones; copycats with the same names are common, never match by name) */
+    XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W: { c: 'SPYx', d: 8, t22: 1, stock: 'S&P 500' }, Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ: { c: 'QQQx', d: 8, t22: 1, stock: 'Nasdaq 100' }, Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh: { c: 'NVDAx', d: 8, t22: 1, stock: 'NVIDIA' }, XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB: { c: 'TSLAx', d: 8, t22: 1, stock: 'Tesla' }, XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp: { c: 'AAPLx', d: 8, t22: 1, stock: 'Apple' }, XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX: { c: 'MSFTx', d: 8, t22: 1, stock: 'Microsoft' }, XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN: { c: 'GOOGLx', d: 8, t22: 1, stock: 'Alphabet' }, Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg: { c: 'AMZNx', d: 8, t22: 1, stock: 'Amazon' }, Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu: { c: 'METAx', d: 8, t22: 1, stock: 'Meta' }, Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu: { c: 'COINx', d: 8, t22: 1, stock: 'Coinbase' }, XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ: { c: 'MSTRx', d: 8, t22: 1, stock: 'Strategy' }, XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1: { c: 'CRCLx', d: 8, t22: 1, stock: 'Circle' }, XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg: { c: 'HOODx', d: 8, t22: 1, stock: 'Robinhood' }, Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re: { c: 'GLDx', d: 8, t22: 1, stock: 'Gold ETF' }, XsYzw7XHj8K2WHeoeNQVyevMmzjzXfcJ8tQ4FmdN1DL: { c: 'ANTx', d: 8, t22: 1, stock: 'Anthropic' } },
   devnet: { '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU': { c: 'USDC', d: 6, usd: 1 } } };
 const SOL_FEE = { owner: '9YjhsXcR1eNcvNuzezGn6bGsDB2iMn93a4ixuhSKHoDL', bps: 25, van: 0.02 };   /* v2.40p: Jeff's fee wallet ("send them there") */
    /* v2.40k: vanity fee 0.02 SOL (Jeff: "1/50ths of 1 SOL"), paid to owner; Devnet / no owner set: free */
@@ -15872,9 +15955,9 @@ const solVanFee = () => (solNet() === 'mainnet' && SOL_FEE.owner && SOL_FEE.van 
 const SOL_RENT = { sys: 890880, tok: 2039280 };   /* lamports a plain wallet / a token account must hold (refundable) */
 const SOL_KEEP = 0.003;   /* SOL kept back for fees + a token account or two */
 const SOLA = {};          /* addr → { sol, toks: [{ mint, amt, d, c, ata, t22 }], at } */
-let solSel = null, SOLPX = { sol: 0, eur: 0, at: 0 }, JLT = null;
+let solSel = null, SOLPX = { sol: 0, eur: 0, at: 0 }, JLT = null, SOLSTK = {};   /* SOLSTK: stock token mint → USD (Jupiter price) */
 const solNet = () => (S.net === 'public' ? 'mainnet' : 'devnet');
-const solMints = () => SOL_MINTS[solNet()];
+const solMints = () => { const A = S && S.nets && NS().solAdd; return A && Object.keys(A).length && solNet() === 'mainnet' ? { ...SOL_MINTS.mainnet, ...A } : SOL_MINTS[solNet()]; };   /* v2.46h: plus coins you added */
 const solList = () => (K && K.sol || [])   /* v2.40m (Jeff: "just do regular"): Solana is on for everyone, no dev switch */
   .map((o) => ({ name: o.name, addr: o.addr }));
 const solOwn = (addr) => (K && K.sol || []).find((o) => o.addr === addr);
@@ -15980,7 +16063,8 @@ async function solRpc(method, params = []) {
 async function solPrices() {
   if (Date.now() - SOLPX.at < 60000) return SOLPX;
   const p = async (pair) => { try { const j = await (await fetch(`https://api.coinbase.com/v2/prices/${pair}/spot`)).json(); return +j.data.amount || 0; } catch (e) { return 0; } };
-  const [sol, eur] = await Promise.all([p('SOL-USD'), p('EURC-USD')]); SOLPX = { sol: sol || SOLPX.sol, eur: eur || SOLPX.eur || 1.1, at: Date.now() }; return SOLPX;
+  const MMa = { ...SOL_MINTS.mainnet, ...(NS().solAdd || {}) }, stk = Object.keys(MMa).filter((k) => MMa[k].stock || (NS().solAdd || {})[k]);
+  const [sol, eur] = await Promise.all([p('SOL-USD'), p('EURC-USD'), fetch('https://lite-api.jup.ag/price/v3?ids=' + stk.join(',')).then((r) => r.json()).then((j) => { for (const k of stk) if (j && j[k] && +j[k].usdPrice > 0) SOLSTK[k] = +j[k].usdPrice; }).catch(() => {})]); SOLPX = { sol: sol || SOLPX.sol, eur: eur || SOLPX.eur || 1.1, at: Date.now() }; return SOLPX;
 }
 async function solLoad(addr, force) {
   const c = SOLA[addr]; if (c && !force && Date.now() - c.at < 15000) return c;
@@ -15991,7 +16075,7 @@ async function solLoad(addr, force) {
   { const o = solOwn(addr); if (o && o.vp && bal && bal.value > 0) { delete o.vp; delete o.vt; resealVault().catch(() => {}); } }
   return (SOLA[addr] = { sol: (bal && bal.value || 0) / 1e9, lam: bal && bal.value || 0, toks, at: Date.now() });
 }
-const solTokUsd = (t) => { const m = solMints()[t.mint]; if (!m) { const j = JLT && JLT.find((x) => x.address === t.mint); return j ? t.amt * (+j.convertToAssets / 10 ** j.decimals) * (+(j.asset || {}).price || 0) : 0; } return t.amt * (m.usd ? 1 : m.eur ? SOLPX.eur : m.lst ? SOLPX.sol * 1.25 : 0); };
+const solTokUsd = (t) => { const m = solMints()[t.mint]; if (!m) { const j = JLT && JLT.find((x) => x.address === t.mint); return j ? t.amt * (+j.convertToAssets / 10 ** j.decimals) * (+(j.asset || {}).price || 0) : 0; } return t.amt * (m.usd ? 1 : m.eur ? SOLPX.eur : m.lst ? SOLPX.sol * 1.25 : m.stock || (NS().solAdd || {})[t.mint] ? SOLSTK[t.mint] || 0 : 0); };
 const solUsd = (d) => !d ? 0 : d.sol * SOLPX.sol + d.toks.reduce((t, x) => t + solTokUsd(x), 0);
 
 /* sign, check, send, and wait until it is final or certainly dead */
@@ -16068,7 +16152,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.46e';
+const APP_VER = 'v2.46h';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16339,7 +16423,7 @@ async function solSendGo() {
    leave this wallet under SOL_KEEP does it come out of the coin itself (when the fee wallet holds that coin), else no fee. */
 async function solTokUsd1(mint) {
   if (mint === WSOL) return (await solPrices()).sol || 0;
-  const m = solMints()[mint]; if (m && m.usd) return 1; if (m && m.eur && SOLPX.eur) return SOLPX.eur;
+  const m = solMints()[mint]; if (m && m.usd) return 1; if (m && m.eur && SOLPX.eur) return SOLPX.eur; if (m && m.stock && SOLSTK[mint]) return SOLSTK[mint];
   const j = JLT && JLT.find((x) => x.address === mint || x.assetAddress === mint); if (j && j.asset && +j.asset.price && j.assetAddress === mint) return +j.asset.price;
   try { const r = await fetch('https://lite-api.jup.ag/price/v3?ids=' + mint); const x = (await r.json())[mint]; return x && +x.usdPrice || 0; } catch (e) { return 0; }
 }
@@ -18337,6 +18421,18 @@ function usWal() {   // every wallet with a key on this phone
   return [...st, ...xr, ...so];
 }
 const usSolUsdc = () => XS.coins.SUSDC.mint;
+const usStk = (k) => { const m = SOL_MINTS.mainnet[k] || (NS().solAdd || {})[k]; return m && m.stock ? m.stock : null; };   /* v2.46g: a tokenized stock's name, or null */
+const US_TZ = /^(America\/(New_York|Detroit|Chicago|Denver|Phoenix|Los_Angeles|Anchorage|Juneau|Sitka|Metlakatla|Yakutat|Nome|Adak|Boise|Menominee|Puerto_Rico|Indiana\/.*|Kentucky\/.*|North_Dakota\/.*)|Pacific\/(Honolulu|Guam|Saipan|Pago_Pago)|US\/.*)$/;
+function usStockGate() {   /* tokenized stocks are not offered to US persons (xStocks' own terms): a phone set to a US time zone is refused, others confirm once */
+  let tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  if (US_TZ.test(tz)) { toast('Tokenized stocks aren\'t offered in the United States or to US persons.', 7000); return false; }
+  if (S.nonUS) return true;
+  sheet(`<h2>Tokenized stocks</h2><div class="mu" style="font-size:14.5px;line-height:1.45">These are xStocks: tokens on Solana issued by Backed that track the price of a share or ETF. They are not the shares themselves and give no shareholder rights. They are <b>not offered in the United States or to US persons</b>, or where local law doesn't allow them.</div>
+    <label style="display:flex;flex-direction:row;gap:10px;align-items:flex-start;font-size:14.5px"><input type="checkbox" id="nonUsOk" style="margin-top:3px;width:22px;height:22px;min-height:0;flex:none;padding:0"> <span>I'm not a US person, I'm not in the United States, and tokenized stocks are allowed where I live.</span></label>
+    <button class="b-light big" data-act="nonUsGo">Confirm</button><button class="b-out" data-act="closeSheet">Cancel</button>`);
+  return false;
+}
+const usIss = (c, k) => (c === 'st' && k !== 'XLM' && !isTrusted(kName(k), k.split(':')[1]) ? ` (token · ${short(k.split(':')[1])})` : '');   /* v2.46f: a Stellar token named XRP or SOL is not the real coin: say so */
 function usCoinName(c, k) { if (c === 'st') return kName(k); if (c === 'xr') return k === 'XRP' ? 'XRP' : xtCoin(k).tok; if (k === 'SOL') return 'SOL'; const m = solMints()[k]; return m ? m.c : short(k); }
 function usPayCoins(w) {   // → [{ k, a (available or null) }]
   if (w.c === 'st') { const A = ACC[w.a]; if (!A) return [{ k: 'XLM', a: null }];
@@ -18350,10 +18446,10 @@ const usXsId = (c, a, k) => (c === 'st' ? (k === 'XLM' ? a : null) : c === 'xr' 
 function usGets(p) {   // → [{ v, txt, off }] grouped by network
   const W = usWal(), out = { st: [], xr: [], so: [] }, pw = W.find((w) => w.c === p.c && w.a === p.a) || {};
   if (p.c === 'st') { const A = ACC[p.a], held = A ? A.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares' && !isNFT(b)).map(akey) : [];
-    for (const k of [...new Set([...swapKnown(), ...held])]) if (k !== p.k) out.st.push({ v: `st|${p.a}|${k}`, txt: `${kName(k)}${k !== 'XLM' && !isTrusted(kName(k), k.split(':')[1]) ? ' · ' + short(k.split(':')[1]) : ''} · ${pw.n}` }); }
-  if (p.c === 'xr') { if (p.k === 'XRP') xrCoins().forEach((c) => out.xr.push({ v: `xr|${p.a}|${c.k}`, txt: `${c.tok} · ${pw.n}` }));
-    else { const o = xrCoins().find((c) => c.k !== p.k); out.xr.push({ v: `xr|${p.a}|${o.k}`, txt: `${o.tok} · ${pw.n}` }); out.xr.push({ v: `xr|${p.a}|XRP`, txt: `XRP · ${pw.n} · use Trade XRP → Buy`, off: 1 }); } }
-  if (p.c === 'so') for (const t of solTargets()) if (t.v !== p.k) out.so.push({ v: `so|${p.a}|${t.v}`, txt: `${t.c} · ${pw.n}` });
+    for (const k of [...new Set([...swapKnown(), ...held])]) if (k !== p.k) out.st.push({ v: `st|${p.a}|${k}`, txt: `${kName(k)}${usIss('st', k)} · ${pw.n} (Stellar)` }); }
+  if (p.c === 'xr') { if (p.k === 'XRP') xrCoins().forEach((c) => out.xr.push({ v: `xr|${p.a}|${c.k}`, txt: `${c.tok} · ${pw.n} (XRP Ledger)` }));
+    else { const o = xrCoins().find((c) => c.k !== p.k); out.xr.push({ v: `xr|${p.a}|${o.k}`, txt: `${o.tok} · ${pw.n} (XRP Ledger)` }); out.xr.push({ v: `xr|${p.a}|XRP`, txt: `XRP · ${pw.n} (XRP Ledger) · use Trade XRP → Buy`, off: 1 }); } }
+  if (p.c === 'so') for (const t of solTargets()) if (t.v !== p.k) (usStk(t.v) ? (out.stk = out.stk || []) : out.so).push({ v: `so|${p.a}|${t.v}`, txt: usStk(t.v) ? `${t.c} · ${usStk(t.v)} · ${pw.n}` : `${t.c} · ${pw.n} (Solana)` });
   const fid = usXsId(p.c, p.a, p.k), fw = fid && xsW(fid), can = xsOn() && fw && XS.from[fw.ck];
   const why = !xsOn() ? 'main network only' : !fid ? `pay with ${p.c === 'st' ? 'XLM' : p.c === 'xr' ? 'XRP' : 'SOL or USDC'} to swap here` : !XS.from[(fw || {}).ck] ? 'not from Stellar yet' : '';
   for (const w of W) { if (w.c === p.c) continue;
@@ -18364,7 +18460,7 @@ function usGets(p) {   // → [{ v, txt, off }] grouped by network
 function usRoute(p, g) {
   if (!p || !g) return null;
   if (p.c !== g.c) return { x: 1, name: `${usNet(p.c)} → ${usNet(g.c)} · NEAR Intents`, fee: `${(XS.bps / 100).toFixed(2)}% · in the price`, time: 'about 1–3 minutes' };
-  if (p.c === 'st') return { name: 'Stellar DEX', fee: feeTo(p.a) ? `${SWAP_FEE.bps / 100}% · ${'in ' + kName(p.k)}` : 'none', time: 'a few seconds' };
+  if (p.c === 'st') return { name: 'Stellar DEX', fee: feeTo(p.a) ? `${SWAP_FEE.bps / 100}% · in ${kName(p.k)}${p.k === 'XLM' ? '' : ' on Stellar'}` : 'none', time: 'a few seconds' };
   if (p.c === 'xr') return { name: 'XRP Ledger DEX', fee: xrFeeTo(p.a) ? `${XR_FEE.bps / 100}%` : 'none', time: 'a few seconds' };
   return { name: 'Solana · Jupiter', fee: SOL_FEE.owner && SOL_FEE.owner !== p.a ? `${(SOL_FEE.bps / 100).toFixed(2)}% · paid in SOL` : 'none', time: 'a few seconds' };
 }
@@ -18381,29 +18477,30 @@ function uSwap(c, a) {   /* open Swap on this wallet */
 }
 function usPaint(amtKeep) {
   const W = usWal(), P = []; for (const c of ['st', 'xr', 'so']) { const L = W.filter((w) => w.c === c); if (!L.length) continue;
-    P.push(`<optgroup label="${usNet(c)}">${L.flatMap((w) => usPayCoins(w).map((x) => `<option value="${esc(`${w.c}|${w.a}|${x.k}`)}">${esc(usCoinName(w.c, x.k))} · ${esc(w.n)}${x.a != null ? ` · ${m2(x.a)} available` : ''}</option>`)).join('')}</optgroup>`); }
+    P.push(`<optgroup label="${usNet(c)}">${L.flatMap((w) => usPayCoins(w).map((x) => `<option value="${esc(`${w.c}|${w.a}|${x.k}`)}">${esc(usCoinName(w.c, x.k) + usIss(w.c, x.k))} · ${esc(w.n)}${w.n.includes(usNet(w.c).split(' ')[0]) ? '' : ` (${usNet(w.c)})`}${x.a != null ? ` · ${m2(x.a)} available` : ''}</option>`)).join('')}</optgroup>`); }
   const vals = W.flatMap((w) => usPayCoins(w).map((x) => `${w.c}|${w.a}|${x.k}`));
   if (!vals.includes(US.pay)) { const p0 = usSplit(US.pay || vals[0]); US.pay = vals.find((v) => usSplit(v).a === p0.a) || vals[0]; }
   const p = usSplit(US.pay), G = usGets(p), gv = Object.values(G).flat();
   if (!gv.some((x) => x.v === US.get && !x.off)) { const first = (p.c === 'st' ? G.st.find((x) => kName(usSplit(x.v).k) === (p.k === 'XLM' ? 'USDC' : 'XLM')) : p.c === 'so' ? G.so.find((x) => usSplit(x.v).k === (p.k === 'SOL' ? usSolUsdc() : 'SOL')) : null) || gv.find((x) => !x.off && usSplit(x.v).c === p.c) || gv.find((x) => !x.off); US.get = first ? first.v : null; }
-  const og = (c) => (G[c].length ? `<optgroup label="${usNet(c)}">${G[c].map((x) => `<option value="${esc(x.v)}"${x.off ? ' disabled' : ''}>${esc(x.txt)}</option>`).join('')}</optgroup>` : '');
+  const og = (c) => (G[c] && G[c].length ? `<optgroup label="${c === 'stk' ? 'Stocks on Solana · outside the US only' : usNet(c)}">${G[c].map((x) => `<option value="${esc(x.v)}"${x.off ? ' disabled' : ''}>${esc(x.txt)}</option>`).join('')}</optgroup>` : '');
   sheet(`<h2>Swap</h2>
     <label class="fld"><span>Pay with</span><select id="uPay">${P.join('')}</select></label>
     <div style="display:flex;justify-content:center;margin:-6px 0"><button class="b-out sm" data-act="uFlip" aria-label="Swap direction" style="width:auto;padding:4px 18px;font-size:18px">⇅</button></div>
-    <label class="fld"><span>Get</span><select id="uGet">${[og(p.c), ...['st', 'xr', 'so'].filter((c) => c !== p.c).map(og)].join('')}</select></label>
+    <label class="fld"><span>Get</span><select id="uGet">${[og(p.c), ...(p.c === 'so' ? [og('stk')] : []), ...['st', 'xr', 'so'].filter((c) => c !== p.c).map(og)].join('')}</select></label>
     <label class="fld"><span>Amount</span><input id="uAmt" inputmode="decimal" placeholder="0.00" autocomplete="off"></label><button class="b-out sm" data-act="uMax" style="width:auto">Max</button>
     <div class="card csum" id="uSum"></div>
     <button class="b-light big" data-act="uGo" id="uGo">Review</button>${xsRecs().length ? '<button class="b-out" data-act="uHist">Swaps between networks · history</button>' : ''}<button class="b-out" data-act="closeSheet">Cancel</button>`);
-  $('#uPay').value = US.pay; if (US.get) $('#uGet').value = US.get; $('#uAmt').value = amtKeep || '';
+  $('#uPay').value = US.pay; if (US.get) $('#uGet').value = US.get; $('#uAmt').value = amtKeep || US.amt || ''; US.amt = '';
   $('#uPay').onchange = () => { US.pay = $('#uPay').value; US.get = null; usPaint(''); };
   $('#uGet').onchange = () => { US.get = $('#uGet').value; usPaint($('#uAmt').value); };
   $('#uAmt').oninput = usQuote; usQuote();
 }
 function usAvail() { const p = usSplit(US.pay), w = usWal().find((x) => x.c === p.c && x.a === p.a); const c = w && usPayCoins(w).find((x) => x.k === p.k); return c ? c.a : null; }
 function usSum(R, q, note) {
-  const g = US.get && usSplit(US.get), tn = g ? usCoinName(g.c, g.k) : '';
+  const g = US.get && usSplit(US.get), tn = g ? usCoinName(g.c, g.k) : '', m2 = (v) => (g && usStk(g.k) ? fx(v, 4) : amtFmt(v));   /* stock tokens: 4 decimals (0.0203 TSLAx) */
   $('#uSum').innerHTML = R ? [['Route', esc(R.name)], ['You get about', q && q.out != null ? `${m2(q.out)} ${esc(tn)}` : '–'], ['At least', q && q.min != null ? `${m2(q.min)} ${esc(tn)}` : '–'], ['Liquidfi fee', esc(R.fee)], ['Time', R.time]].map(([k, v]) => `<div><span class="mu">${k}</span><span>${v}</span></div>`).join('')
-    + (note ? `<div><span class="${note.cls || 'amb'}" style="text-align:left">${esc(note.t)}</span></div>` : '') : '<div><span class="mu">Pick what to get.</span></div>';
+    + (note ? `<div><span class="${note.cls || 'amb'}" style="text-align:left">${esc(note.t)}</span></div>` : '')
+    + (g && usStk(g.k) ? `<div><span class="mu" style="text-align:left;font-size:12.5px">${esc(tn)} is an xStock (Backed): a token tracking ${esc(usStk(g.k))}, not the share. Not offered to US persons. Trades 24/7; the price can move away from the market when it's closed.</span></div>` : '') : '<div><span class="mu">Pick what to get.</span></div>';
 }
 function usQuote() {
   clearTimeout(US.t); US.q = null; const seq = ++US.seq; if (!$('#uSum')) return;
@@ -18446,6 +18543,7 @@ function usFlip() {
 async function usGo(btn) {
   const p = usSplit(US.pay), g = US.get ? usSplit(US.get) : null, R = usRoute(p, g), amtS = String($('#uAmt').value).replace(/,/g, ''), amt = +amtS;
   if (!R) return toast('Pick what to get.'); if (!(amt > 0)) return toast('Enter an amount.');
+  if (usStk(g.k) && !usStockGate()) { US.amt = amtS; return; }
   const av = usAvail(); if (av != null && amt > av + 1e-9) return toast(`This wallet has ${m2(av)} ${usCoinName(p.c, p.k)} available.`, 6000);
   if (R.x) {   /* two networks: NEAR Intents' own review (asks NEAR Intents about the deposit address and checks it pays your wallet) */
     ++XSW.rseq; XSW.from = usXsId(p.c, p.a, p.k); XSW.to = usXsId(g.c, g.a, g.k); XSW.get = 'x'; XSW.pay = null; XSW.av = null; $('#xsAmt').value = amtS;
@@ -22920,7 +23018,7 @@ document.addEventListener('click', async (e) => {
     accRcv: phGate(() => { if (!allAccts().length) return toast('Add a wallet first.'); rcvWant = OWN().some((o) => o.addr === homeAddr) ? homeAddr : firstWallet(); go('receive'); }),
     accBuy: phGate(() => onrPickSheet()),
     onrPick: phGate(() => onrBuySheet(t.dataset.chain, t.dataset.addr)),
-    accSwap: () => uSwap('st', homeAddr), uFlip: () => usFlip(), uMax: () => usMax(), uGo: () => usGo(t), uHist: () => { closeSheet(); XSW.get = 'x'; go('xswap'); },
+    accSwap: () => uSwap('st', homeAddr), uFlip: () => usFlip(), uMax: () => usMax(), uGo: () => usGo(t), nonUsGo: () => { if (!$('#nonUsOk') || !$('#nonUsOk').checked) return toast('Tick the box to confirm.'); S.nonUS = Date.now(); saveS(); closeSheet(); setTimeout(() => usPaint(US.amt || ''), 50); }, solAssets: () => solAssetsSheet(), solAddCheck: () => solAddCheck(), solAddGo: () => solAddGo(), solAddDel: () => solAddDel(t.dataset.mint), xrAddCheck: () => xrAddCheck(), xrAddGo: () => xrAddGo(t.dataset.xc, t.dataset.xi, t.dataset.xn), uHist: () => { closeSheet(); XSW.get = 'x'; go('xswap'); },
     xsOpen: () => { if (cur === 'xrp') return uSwap('xr', xrSel); XSW.get = 'x'; XSW.from = cur === 'xrp' ? xrSel : (XS.from.XLM ? homeAddr : null); XSW.to = cur === 'xrp' || XS.from.XLM ? null : homeAddr; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
     xsMax: () => { if (XSW.av > 0) { const w = xsW(XSW.from), same = XSW.get && XSW.get !== 'x';
       const v = same ? Math.floor(((XSW.av - 0.0001) / (1 + XR_FEE.bps / 10000)) * 1e6) / 1e6 : (() => { const dp = w ? XS.coins[w.ck].dp : 6; return Math.floor(XSW.av * 10 ** dp + 1e-6) / 10 ** dp; })();   /* a market sell adds its fee on top · v2.42w: rounds down, never up */
