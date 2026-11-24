@@ -255,7 +255,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.47d</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.48d</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -349,14 +349,14 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <!-- P/L (first screen after unlock) -->
 <!-- MARKETS (home): XLM on Stellar next to the big exchanges, RealTick style -->
 <section class="scr" id="s-mkt">
-  <div class="top"><div><h1>Markets</h1><span class="mu" style="font-size:13px" id="mUpd">Live</span></div><div style="display:flex;gap:6px"><button class="ico" data-go="set" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div></div>
+  <div class="top"><div><h1>Markets</h1><span class="mu" style="font-size:13px" id="mUpd">Live</span></div><div style="display:flex;gap:6px"><button class="ico" data-act="pxSheet" aria-label="Price alerts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button class="ico" data-go="set" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button></div></div>
   <div class="card" style="padding:4px 12px 6px"><div id="mGrid"></div></div>
   <p class="foot">Tap a symbol for its order book and last sales on every market. Press and hold a symbol to move it up or down.</p>
 </section>
 
 <!-- LEVEL 2: book depth and last sales by venue -->
 <section class="scr" id="s-l2">
-  <div class="top"><div class="l"><button class="ico back" data-go="mkt" aria-label="Back to Markets">‹</button><div><h1 id="lSym">XLM</h1><span class="mu" style="font-size:13px" id="lUpd"></span></div></div><button class="b-out sm" data-act="rmSym" style="min-height:36px;font-size:14px;padding:0 12px">Remove</button></div>
+  <div class="top"><div class="l"><button class="ico back" data-go="mkt" aria-label="Back to Markets">‹</button><div><h1 id="lSym">XLM</h1><span class="mu" style="font-size:13px" id="lUpd"></span></div></div><div style="display:flex;gap:6px;align-items:center"><button class="ico" data-act="pxSheet" data-c="l2" aria-label="Price alert" style="width:38px;height:38px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button class="b-out sm" data-act="rmSym" style="min-height:36px;font-size:14px;padding:0 12px">Remove</button></div></div>
   <button class="b-grn" data-act="l2Trade" id="lTrade" style="display:none;min-height:40px;font-size:15px">Trade</button>
   <div id="lVen" style="display:flex;gap:6px;overflow-x:auto;margin:0 -18px;padding:2px 18px;scrollbar-width:none"></div>
   <div id="lTop" class="g3"></div>
@@ -428,7 +428,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- TRADE XRP (XRP Ledger DEX) -->
 <section class="scr" id="s-xtrade">
-  <div class="top"><div class="l"><button class="ico back" data-go="xrp" aria-label="Back">‹</button><h2>Trade XRP</h2></div><button class="b-out sm" id="xtFrom" data-act="tWalPick" style="font-size:14px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
+  <div class="top"><div class="l"><button class="ico back" data-go="xrp" aria-label="Back">‹</button><h2>Trade XRP</h2><button class="ico" data-act="pxSheet" data-c="XRP" aria-label="Price alert" style="width:38px;height:38px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button></div><button class="b-out sm" id="xtFrom" data-act="tWalPick" style="font-size:14px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
   <div class="seg" id="xtQ"><button class="on" data-v="rl">XRP / RLUSD</button><button data-v="uc">XRP / USDC</button><button data-v="rv">RLUSD / USDC</button></div>
   <div id="rvP" style="display:none;flex-direction:column;gap:12px">
     <div class="card"><div class="top"><span class="lbl">RLUSD / USDC · XRP Ledger DEX</span><span class="grn" style="font-size:12px;font-weight:700" id="rvUpd"></span></div>
@@ -473,7 +473,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- TRADE ON SOLANA (v2.40t): book = Jupiter's best price at several sizes; last sales = the biggest pool for the pair -->
 <section class="scr" id="s-strade">
-  <div class="top"><div class="l"><button class="ico back" data-go="sol" aria-label="Back">‹</button><h2>Trade SOL</h2></div><button class="b-out sm" id="stFrom" data-act="tWalPick" style="font-size:14px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
+  <div class="top"><div class="l"><button class="ico back" data-go="sol" aria-label="Back">‹</button><h2>Trade SOL</h2><button class="ico" data-act="pxSheet" data-c="SOL" aria-label="Price alert" style="width:38px;height:38px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button></div><button class="b-out sm" id="stFrom" data-act="tWalPick" style="font-size:14px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
   <div class="seg" id="stQ"><button class="on" data-v="USDC">SOL / USDC</button><button data-v="USDT">SOL / USDT</button></div>
   <div class="card"><div class="top"><span class="lbl" id="stPairL">Order book · SOL / USDC</span><span class="mu" style="font-size:12px" id="stBkUpd"></span></div>
     <div class="seg" id="stBk"><button class="on" data-v="cex">ALL</button><button data-v="cbs">CBS</button><button data-v="krk">KRK</button><button data-v="mf">MNF</button></div>
@@ -522,7 +522,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- TRADE -->
 <section class="scr" id="s-trade">
-  <div class="top" style="min-height:40px"><div class="l" style="gap:6px"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><button class="b-out sm" id="tPair" data-act="tPairPick" style="font-weight:700;font-size:16px;padding:6px 12px">XLM/USDC ▾</button></div><button class="b-out sm" id="tFrom" data-act="tWalPick" style="font-size:14px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
+  <div class="top" style="min-height:40px"><div class="l" style="gap:6px"><button class="ico back" data-act="scrBack" aria-label="Back">‹</button><button class="b-out sm" id="tPair" data-act="tPairPick" style="font-weight:700;font-size:16px;padding:6px 12px">XLM/USDC ▾</button><button class="ico" data-act="pxSheet" data-c="trade" aria-label="Price alert" style="width:38px;height:38px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button></div><button class="b-out sm" id="tFrom" data-act="tWalPick" style="font-size:14px;padding:6px 12px;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></button></div>
   <div class="card" style="padding:10px 14px"><div class="book" id="tBook"></div></div>
   <div class="card" style="padding:10px 14px;gap:6px"><div class="top"><span class="lbl" style="font-size:12px">Last sales</span><span class="grn" style="font-size:12px;font-weight:700">streaming</span></div><div id="tLast" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px"></div></div>
   <div class="trow"><div class="seg tsm" id="tSide"><button class="on" data-v="buy" id="tSideB">Buy</button><button data-v="sell" id="tSideS">Sell</button></div>
@@ -671,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.47d</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.48d</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -695,7 +695,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setPush"><span class="lbl">Alerts</span><div class="top"><span>Notifications for stops, order fills and money received</span><input type="checkbox" id="setPushOn" style="width:28px;min-height:28px"></div>
     <div class="top" id="setPushDetW"><span>Show amounts in alerts</span><input type="checkbox" id="setPushDet" style="width:28px;min-height:28px"></div>
     <div class="mu" id="setPushSt" style="font-size:13px"></div>
-    <div id="setPushFills" style="display:none;flex-direction:column;gap:6px"><span class="mu" style="font-size:13.5px">Order fills and money received in</span><div id="setPushW" style="display:flex;flex-direction:column"></div><div class="mu" style="font-size:12.5px">Bot wallets trade all day: they start off. Tiny "dust" payments (under 0.01) never alert. Needs stop server 2.8 for money received.</div></div>
+    <div id="setPushFills" style="display:none;flex-direction:column;gap:6px"><span class="mu" style="font-size:13.5px">Order fills and money received in</span><div id="setPushW" style="display:flex;flex-direction:column"></div><div class="mu" style="font-size:12.5px">Bot wallets trade all day: they start off. Tiny "dust" payments (under 0.01) never alert. Needs stop server 2.8 for money received.</div><button class="b-out" data-act="pxSheet" id="setPxBtn" style="margin-top:6px">Price alerts ›</button></div>
     <div class="amb" id="setPushTip" style="display:none;font-size:13px">Tip: install Liquidfi (Chrome ⋮ → Add to home screen → Install) so alerts come from Liquidfi, not Chrome. If Chrome says "possible spam", tap Always allow.</div>
     <button class="b-out sm" data-act="pushTest" id="setPushTest" style="display:none">Send a test alert</button></div>
   <div class="card" id="setBook"><span class="lbl">Address book</span><div class="mu" style="font-size:13.5px">Addresses you can send to. To change an address, tag or memo, add it again from Send (it gets checked).</div><div id="setBookL" style="display:flex;flex-direction:column;gap:6px"></div></div>
@@ -703,7 +703,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.47d · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.48d · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -16176,7 +16176,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.47d';
+const APP_VER = 'v2.48d';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -23085,7 +23085,7 @@ document.addEventListener('click', async (e) => {
     accRcv: phGate(() => { if (!allAccts().length) return toast('Add a wallet first.'); rcvWant = OWN().some((o) => o.addr === homeAddr) ? homeAddr : firstWallet(); go('receive'); }),
     accBuy: phGate(() => onrPickSheet()),
     onrPick: phGate(() => onrBuySheet(t.dataset.chain, t.dataset.addr)),
-    accSwap: () => uSwap('st', homeAddr), uFlip: () => usFlip(), uMax: () => usMax(), uGo: () => usGo(t), nonUsGo: () => { if (!$('#nonUsOk') || !$('#nonUsOk').checked) return toast('Tick the box to confirm.'); S.nonUS = Date.now(); saveS(); closeSheet(); setTimeout(() => usPaint(US.amt || ''), 50); }, solAssets: () => solAssetsSheet(), solAddCheck: () => solAddCheck(), solAddGo: () => solAddGo(), solAddDel: () => solAddDel(t.dataset.mint), xrAddCheck: () => xrAddCheck(), xrAddGo: () => xrAddGo(t.dataset.xc, t.dataset.xi, t.dataset.xn), wPnl: () => wPnlSheet(t.dataset.addr || homeAddr), uHist: () => { closeSheet(); XSW.get = 'x'; go('xswap'); },
+    accSwap: () => uSwap('st', homeAddr), uFlip: () => usFlip(), uMax: () => usMax(), uGo: () => usGo(t), nonUsGo: () => { if (!$('#nonUsOk') || !$('#nonUsOk').checked) return toast('Tick the box to confirm.'); S.nonUS = Date.now(); saveS(); closeSheet(); setTimeout(() => usPaint(US.amt || ''), 50); }, solAssets: () => solAssetsSheet(), solAddCheck: () => solAddCheck(), solAddGo: () => solAddGo(), solAddDel: () => solAddDel(t.dataset.mint), xrAddCheck: () => xrAddCheck(), xrAddGo: () => xrAddGo(t.dataset.xc, t.dataset.xi, t.dataset.xn), wPnl: () => wPnlSheet(t.dataset.addr || homeAddr), pxSheet: () => { const c = t.dataset.c; pxSheet(c === 'l2' ? (L2.sym || {}).b : c === 'trade' ? kName(TP().b) : c); }, pxAdd: () => pxAdd(), pxDel: () => pxDel(t.dataset.id), pxPct: () => pxPct(t.dataset.v), uHist: () => { closeSheet(); XSW.get = 'x'; go('xswap'); },
     xsOpen: () => { if (cur === 'xrp') return uSwap('xr', xrSel); XSW.get = 'x'; XSW.from = cur === 'xrp' ? xrSel : (XS.from.XLM ? homeAddr : null); XSW.to = cur === 'xrp' || XS.from.XLM ? null : homeAddr; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
     xsMax: () => { if (XSW.av > 0) { const w = xsW(XSW.from), same = XSW.get && XSW.get !== 'x';
       const v = same ? Math.floor(((XSW.av - 0.0001) / (1 + XR_FEE.bps / 10000)) * 1e6) / 1e6 : (() => { const dp = w ? XS.coins[w.ck].dp : 6; return Math.floor(XSW.av * 10 ** dp + 1e-6) / 10 ** dp; })();   /* a market sell adds its fee on top · v2.42w: rounds down, never up */
@@ -23408,6 +23408,8 @@ function noteGo(tag) {
   tag = String(tag || ''); if (!tag || tag === 'liquidfi' || tag === 'liquidfi-test') return;
   if (!K) { NOTE_GO = tag; return; }
   NOTE_GO = null; closeSheet();
+  if (tag === 'pxoff') { const P = pxCfg(); P.on = false; saveS(); pxSync().catch(() => {}); go('mkt'); return toast('Big-move alerts off. Turn them back on with the bell in Markets.', 7000); }
+  if (tag.startsWith('px-')) { const c = tag.slice(3), w = watch().find((x) => x.b === c); if (w) { L2.sym = w; L2.ven = 'all'; return go('l2'); } go('mkt'); return setTimeout(() => pxSheet(c), 300); }   /* v2.48a: a price alert opens that coin */
   const i = tag.indexOf('-'), kind = tag.slice(0, i), id = tag.slice(i + 1);
   const act = (tab) => { ACT.tab = tab; go('act'); };
   try {
@@ -23469,8 +23471,78 @@ async function pushWatchSync() {   /* tell the stop server which wallets to watc
   try { try { await stopApi('/push/watch', { pid: S.push.pid, sec: S.push.sec, wallets: W }); }
     catch (e) { if (!/Bad wallet/i.test(e.message || '') || !W.some((w) => w.c === 'sol')) throw e; W = W.filter((w) => w.c !== 'sol'); await stopApi('/push/watch', { pid: S.push.pid, sec: S.push.sec, wallets: W }); }   /* server older than 3.0: Stellar / XRP alerts keep working */
     S.push.fillsOk = true; } catch (e) { S.push.fillsOk = !/not found|404/.test(e.message || '') ? S.push.fillsOk : false; if (/not on/i.test(e.message || '')) setTimeout(() => pushResync(), 100); }
-  saveS(); return S.push.fillsOk;
+  saveS(); pxSync().catch(() => {}); return S.push.fillsOk;
 }
+/* ---------- v2.48a price alerts (Jeff: "alerts if there's a move over 5%… default it on and the user can turn it off") ----------
+   On by default once this phone has notifications on: a 5% (or 10%) move in 24h for the coins you hold, at most 3 a day,
+   once per coin and direction a day. Price targets you set ("XLM above $0.15") fire once. Liquidfi's server checks prices
+   every minute (Coinbase) and only learns which coins you chose, never your wallets. Wording states facts only. */
+const PXS = { hist: [], px: {}, bad: [], at: 0, ok: null };
+const pxCfg = () => { S.push = S.push || {}; const P = S.push.px = S.push.px || {}; if (P.on == null) P.on = true; if (![5, 10].includes(P.pct)) P.pct = 5; if (!Array.isArray(P.tg)) P.tg = []; return P; };
+function pxHeld() {   /* coins you hold (the networks' own coins: the dollar coins don't move) */
+  const C = [];
+  if (OWN().length) C.push('XLM');
+  if (xrList().some((w) => w.own)) C.push('XRP');
+  if (solList().length) C.push('SOL');
+  return C;
+}
+/* v2.48c (Jeff: "what if they don't have any alerts set? We need to be able to send them alerts on other assets"): big moves also
+   cover the market's main coins and your Markets watchlist, on by default. Order = priority under the 3-a-day cap: held first. */
+const PX_MKT = ['XLM', 'XRP', 'SOL'];   /* v2.48d (Jeff: "we only want assets traded on Stellar, Ripple, and Solana") */
+const pxWatchC = () => watch().map((w) => w.b).filter((b) => PX_MKT.includes(b));
+const pxMoveCoins = (held) => { const P = pxCfg(); return [...new Set([...held, ...pxWatchC(), ...(P.mkt === false ? [] : PX_MKT)])].slice(0, 20); };
+const pxCoinsAll = () => PX_MKT.slice();
+async function pxSync() {
+  const P = pxCfg(); if (!S.push.on || !S.stopUrl || !S.push.pid) return false;
+  /* still locked (no wallets readable yet): keep the coins from last time, never send an empty list that would switch them off */
+  let held = P.held || []; if (K) { held = pxHeld(); if (JSON.stringify(held) !== JSON.stringify(P.held)) { P.held = held; saveS(); } }
+  try { const j = await stopApi('/push/prices', { pid: S.push.pid, sec: S.push.sec, on: !!P.on, pct: P.pct, coins: pxMoveCoins(held), targets: P.tg.map((t) => ({ id: t.id, c: t.c, dir: t.dir, p: t.p })) });
+    PXS.hist = j.hist || []; PXS.px = j.px || {}; PXS.bad = j.bad || []; PXS.at = Date.now(); PXS.ok = true;
+    if (Array.isArray(j.tg)) { const keep = new Set(j.tg), before = P.tg.length; P.tg = P.tg.filter((t) => keep.has(t.id)); if (P.tg.length !== before) saveS(); }   /* targets that already fired are gone */
+    return true;
+  } catch (e) { PXS.ok = /not found|404/.test(e.message || '') ? false : PXS.ok; return false; }
+}
+const pxFmt = (v) => { v = +v; if (v >= 10) return '$' + fx(v, 2); let x = v >= 1 ? v.toFixed(4) : String(+v.toPrecision(4)); if (!x.includes('.')) x += '.00'; x = x.replace(/(\.\d\d\d*?)0+$/, '$1'); if (x.split('.')[1].length < 2) x += '0'; return '$' + x; };
+const pxAgo = (t) => { const m = Math.round((Date.now() / 1000 - t) / 60); return m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+async function pxSheet(coin) {
+  const P = pxCfg(), on = S.push && S.push.on;
+  if (!on) {
+    return sheet(`<h2>Price alerts</h2><div class="mu" style="font-size:14.5px">Get a notification when a coin you hold moves 5% in a day, or when a price you pick is reached. Turn on notifications for this phone first.</div>
+      <button class="b-light big" data-act="pushYes">Turn on notifications</button><button class="b-out" data-act="closeSheet">Not now</button>`);
+  }
+  const C = pxCoinsAll(), c0 = coin && C.includes(coin) ? coin : C[0], held = pxHeld();
+  const tgRow = (t) => { const n = PXS.px[t.c]; return `<div><span>${esc(t.c)} ${t.dir} ${pxFmt(t.p)}${n ? `<small class="mu" style="display:block;font-size:12px">now ${pxFmt(n.last)}</small>` : ''}</span><button class="b-out sm" style="width:auto;min-height:30px;padding:0 10px" data-act="pxDel" data-id="${esc(t.id)}">Remove</button></div>`; };
+  const badT = P.tg.filter((t) => PXS.bad.includes(t.c)).map((t) => t.c);
+  sheet(`<h2>Price alerts</h2>
+    ${PXS.ok === false ? '<div class="note amb">The Liquidfi server needs an update (3.7) before price alerts can send. Your settings are saved.</div>' : ''}
+    ${badT.length ? `<div class="note amb">No Coinbase price for ${esc([...new Set(badT)].join(', '))}, so ${badT.length > 1 ? 'those alerts' : 'that alert'} can't fire. Remove ${badT.length > 1 ? 'them' : 'it'} or pick another coin.</div>` : ''}
+    <div class="card" style="gap:10px"><label style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px"><span><b>Big moves</b><span class="mu" style="display:block;font-size:13px">${esc(pxMoveCoins(held).join(', '))} · coins you hold first · at most 3 a day</span></span><input type="checkbox" id="pxOn" ${P.on ? 'checked' : ''} style="width:22px;height:22px;min-height:0;flex:none;padding:0"></label>
+      <label style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px"><span><b>Market movers</b><span class="mu" style="display:block;font-size:13px">${PX_MKT.join(', ')}, even if you don't hold them</span></span><input type="checkbox" id="pxMkt" ${P.mkt === false ? '' : 'checked'} style="width:22px;height:22px;min-height:0;flex:none;padding:0"></label>
+      <div style="display:flex;gap:8px">${[5, 10].map((v) => `<button class="chip${P.pct === v ? ' on' : ''}" data-act="pxPct" data-v="${v}" style="min-height:36px">${v}% in 24h</button>`).join('')}</div></div>
+    <span class="lbl">Price targets</span>
+    ${P.tg.length ? `<div class="card csum">${P.tg.map(tgRow).join('')}</div>` : '<div class="mu" style="font-size:13.5px">None yet. Each one alerts once, then turns off.</div>'}
+    <div class="g2"><label>Coin<select id="pxC">${C.map((c) => `<option${c === c0 ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label><label>When it goes<select id="pxD"><option value="above">above</option><option value="below">below</option></select></label></div>
+    <label class="fld"><span id="pxNow">Price in US dollars</span><input id="pxP" inputmode="decimal" placeholder="0.00" autocomplete="off"></label>
+    <button class="b-light" data-act="pxAdd">Add price alert</button>
+    ${PXS.hist.length ? `<span class="lbl">Recent alerts</span><div class="card csum">${PXS.hist.slice().reverse().slice(0, 8).map((h) => `<div><span>${esc(h.title)}<small class="mu" style="display:block;font-size:12px">${esc(h.body)}</small></span><span class="mu" style="font-size:12.5px">${pxAgo(h.t)}</span></div>`).join('')}</div>` : ''}
+    <div class="mu" style="font-size:12.5px">Prices from Coinbase, checked every minute. Alerts only state the price; they aren't advice to buy or sell.</div>
+    <button class="b-out" data-act="closeSheet">Done</button>`);
+  const now = () => { const n = PXS.px[$('#pxC').value]; $('#pxNow').textContent = n ? `Price in US dollars · now ${pxFmt(n.last)}` : 'Price in US dollars'; };
+  $('#pxC').onchange = now; now();
+  $('#pxP').oninput = () => { const n = PXS.px[$('#pxC').value], v = +$('#pxP').value; if (n && v > 0) $('#pxD').value = v >= n.last ? 'above' : 'below'; };
+  $('#pxMkt').onchange = async () => { P.mkt = $('#pxMkt').checked; saveS(); await pxSync(); pxSheet(); };
+  $('#pxOn').onchange = async () => { P.on = $('#pxOn').checked; saveS(); toast(P.on ? 'Big-move alerts on.' : 'Big-move alerts off. Price targets still work.'); await pxSync(); };
+  if (Date.now() - PXS.at > 60000) pxSync().then(() => { if ($('#pxNow')) now(); });
+}
+async function pxAdd() {
+  const P = pxCfg(), c = $('#pxC').value, dir = $('#pxD').value, p = +String($('#pxP').value).replace(/[$,\s]/g, '');
+  if (!(p > 0)) return toast('Enter a price.'); if (P.tg.length >= 20) return toast('At most 20 price alerts.');
+  const n = PXS.px[c]; if (n && ((dir === 'above' && n.last >= p) || (dir === 'below' && n.last <= p))) return toast(`${c} is already ${dir} ${pxFmt(p)} (now ${pxFmt(n.last)}).`, 6000);
+  P.tg.push({ id: Math.random().toString(36).slice(2, 10), c, dir, p, at: Date.now() }); saveS();
+  const ok = await pxSync(); toast(!ok ? 'Saved. It starts once the server is reachable (needs stop server 3.7).' : PXS.bad.includes(c) ? `There's no Coinbase price for ${c}, so this alert can't fire.` : `✓ You'll get an alert when ${c} goes ${dir} ${pxFmt(p)}.`, 6000); pxSheet(c);
+}
+async function pxDel(id) { const P = pxCfg(); P.tg = P.tg.filter((t) => t.id !== id); saveS(); await pxSync(); pxSheet(); }
+async function pxPct(v) { const P = pxCfg(); P.pct = +v; saveS(); await pxSync(); pxSheet(); }
 function pushPaint() {
   const P = S.push || {}; if (!$('#setPushOn')) return;
   $('#setPushOn').checked = !!P.on; $('#setPushDet').checked = !!P.detail; $('#setPushDetW').style.display = P.on ? '' : 'none'; $('#setPushTest').style.display = P.on ? '' : 'none';
