@@ -242,7 +242,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.46h</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.46i</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -657,7 +657,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.46h</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.46i</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -689,7 +689,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.46h · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.46i · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -14396,7 +14396,9 @@ async function drawXrp(quiet) {
     $('#xrFund').innerHTML = (vcOf(xrSel) ? `<div class="note amb">🔒 ${esc(vcMsg(vcOf(xrSel)))}</div>` : '');
     const sv = XRSV || { base: 1, inc: 0.2 }, res = sv.base + sv.inc * (+d.a.OwnerCount || 0);
     $('#xrBal').innerHTML = `<div><div><b>XRP</b><div class="mu" style="font-size:13px">${m2(xrSpend(d))} available · ${m2(res)} reserved by the ledger</div></div><div style="text-align:right"><div class="mono">${m2(xrXrp(d))}</div><div class="mu mono" style="font-size:13px">${XRPX.px ? '$' + fx(xrXrp(d) * XRPX.px) : ''}</div></div></div>`
-      + d.lines.map((l) => { const c = xrCoinOf(l); return `<div><div><b>${esc(c ? c.tok : xrLpName(l) || xrCur(l.currency))}</b><div class="mu mono" style="font-size:13px">${c ? esc(c.who) + ' · ' : ''}${esc(short(String(l.account)))}</div></div><div style="text-align:right"><div class="mono">${m2(+l.balance)}</div><div class="mu mono" style="font-size:13px">${xrIsUsd(l) ? '$' + fx(+l.balance) : ''}</div></div></div>`; }).join('');
+      + (() => { const ln = (l) => { const c = xrCoinOf(l); return `<div><div><b>${esc(c ? c.tok : xrLpName(l) || xrCur(l.currency))}</b><div class="mu mono" style="font-size:13px">${c ? esc(c.who) + ' · ' : ''}${esc(short(String(l.account)))}</div></div><div style="text-align:right"><div class="mono">${m2(+l.balance)}</div><div class="mu mono" style="font-size:13px">${xrIsUsd(l) ? '$' + fx(+l.balance) : ''}</div></div></div>`; };
+        const ok = d.lines.filter(xrApproved), junk = d.lines.filter((l) => !xrApproved(l));   /* v2.46i: tokens not on Liquidfi's list (or verified by you) stay folded away */
+        return ok.map(ln).join('') + (junk.length ? `<details class="obal"><summary class="mu">Other tokens · ${junk.length} <span style="font-size:13px">(not on Liquidfi's list)</span></summary>${junk.map(ln).join('')}</details>` : ''); })();
   };
   paint();
   const trustBtn = () => { const d = XRA[addr], miss = own && d && d.a ? xrCoins().filter((c) => !xrLineOf(d, c)) : [];
@@ -14978,12 +14980,14 @@ async function xrAssetsSheet() {
    Solana: paste the coin's token address (mint). Jupiter must know it (that's what swaps it). Unverified coins need a tick:
    anyone can make a coin with any name, and fakes of real coins are common. A coin that looks like a tokenized stock gets the
    same US check as the built-in ones. XRP Ledger: code + issuer, then a trust line (as for RLUSD / USDC). */
+const xrAddList = () => { const N = NS(); if (!Array.isArray(N.xrAdd)) N.xrAdd = []; return N.xrAdd; };   /* verified XRP tokens you added */
+const xrApproved = (l) => !!xrCoinOf(l) || xrAddList().some((x) => x.cur === l.currency && x.iss === l.account) || !!xrLpName(l);
 const solAdded = () => { const N = NS(); if (!N.solAdd || typeof N.solAdd !== 'object') N.solAdd = {}; return N.solAdd; };
 const SOLADD = { q: null };
 function solAssetsSheet() {
   const A = solAdded(), B = SOL_MINTS[solNet()];
   const row = (mint, m, mine) => `<div class="card" style="flex-direction:row;justify-content:space-between;align-items:center;padding:10px 14px"><div style="min-width:0"><b>${esc(m.c)}</b>${m.stock ? `<span class="mu" style="font-size:12.5px"> · ${esc(m.stock)}</span>` : ''}<div class="mono mu" style="font-size:12.5px">${esc(short(mint))}${mine ? (m.ver ? ' · verified by Jupiter' : ' · not verified') : ''}</div></div>${mine ? `<button class="b-out sm" style="width:auto;padding:0 12px" data-act="solAddDel" data-mint="${esc(mint)}">Remove</button>` : '<span class="tag t-grn">built in</span>'}</div>`;
-  sheet(`<h2>Assets</h2><div class="mu" style="font-size:14px">Coins this app shows, prices and swaps on Solana. Add another one by its token address (mint). Solana needs no trust line: a coin account opens the first time you get it (about 0.002 SOL, refundable).</div>
+  sheet(`<h2>Assets</h2><div class="mu" style="font-size:14px">Coins this app shows, prices and swaps on Solana. Add another one by its token address (mint): only coins verified by Jupiter. Solana needs no trust line: a coin account opens the first time you get it (about 0.002 SOL, refundable).</div>
     <label class="fld"><span>Token address (mint)</span><input id="saMint" autocomplete="off" spellcheck="false" placeholder="Paste the mint"></label>
     <button class="b-out" data-act="solAddCheck">Check coin</button><div id="saRes"></div>
     ${Object.keys(A).length ? `<span class="lbl">Added by you</span>${Object.entries(A).map(([k, m]) => row(k, m, 1)).join('')}` : ''}
@@ -15001,6 +15005,7 @@ async function solAddCheck() {
   let x = null; try { const r = await fetch('https://lite-api.jup.ag/tokens/v2/search?query=' + mint); const j = await r.json(); x = Array.isArray(j) ? j.find((t) => t.id === mint) : null; } catch (e) {}
   if (!$('#saRes')) return;
   if (!x) return (res.innerHTML = '<div class="note amb">Jupiter doesn\'t know this coin, so Liquidfi can\'t price or swap it. Not added.</div>');
+  if (x.isVerified !== true) return (res.innerHTML = `<div class="note amb">${esc(String(x.symbol || 'This coin'))} isn't verified by Jupiter, so it can't be added. Unverified coins are often fakes of real ones.</div>`);
   const sym = String(x.symbol || '').slice(0, 12).replace(/[^\w.$-]/g, '') || short(mint), stock = solStockLike(x) ? String(x.name || sym).replace(/\s*xStock$/i, '').slice(0, 30) : null;
   const clash = Object.values({ ...SOL_MINTS[solNet()], ...solAdded() }).some((m) => m.c.toLowerCase() === sym.toLowerCase());
   SOLADD.q = { mint, c: sym, d: +x.decimals || 0, t22: String(x.tokenProgram || '').startsWith('Tokenz') ? 1 : 0, nm: String(x.name || '').slice(0, 40), ver: x.isVerified === true ? 1 : 0, ...(stock ? { stock } : {}) };
@@ -15008,11 +15013,10 @@ async function solAddCheck() {
     <div class="mu" style="font-size:13.5px">${esc(SOLADD.q.nm)} · ${esc(short(mint))} · trading liquidity about $${fx(+x.liquidity || 0, 0)}</div>
     ${clash ? `<div class="red" style="font-size:13.5px">Another coin is already called ${esc(sym)}. Fakes copy real names: check the address with the coin's own website.</div>` : ''}
     ${stock ? '<div class="amb" style="font-size:13.5px">Looks like a tokenized stock: not offered to US persons, same as the built-in stocks.</div>' : ''}
-    ${SOLADD.q.ver ? '' : `<div class="red" style="font-size:13.5px">Jupiter hasn't verified this coin. Anyone can make a coin with any name, and many are scams that can't be sold.</div><label style="display:flex;flex-direction:row;gap:10px;align-items:flex-start;font-size:14px"><input type="checkbox" id="saOk" style="margin-top:3px;width:22px;height:22px;min-height:0;flex:none;padding:0"> <span>I checked the address myself and accept the risk.</span></label>`}
     <button class="b-light" data-act="solAddGo">Add ${esc(sym)}</button></div>`;
 }
 function solAddGo() {
-  const q = SOLADD.q; if (!q) return; if (!q.ver && !($('#saOk') && $('#saOk').checked)) return toast('Tick the box first.');
+  const q = SOLADD.q; if (!q || !q.ver) return;
   const { mint, ...m } = q; solAdded()[mint] = m; saveS(); SOLADD.q = null; toast(`✓ ${m.c} added. It shows in this wallet and in Swap.`);
   if (solSel) delete SOLA[solSel]; solAssetsSheet(); if (cur === 'sol') drawSol();
 }
@@ -15034,9 +15038,13 @@ async function xrAddCheck() {
   if (!$('#xaRes')) return; if (!a) return (res.innerHTML = '<div class="note amb">That issuer address isn\'t active on the XRP Ledger.</div>');
   const dom = a.Domain ? (() => { try { return new TextDecoder().decode(new Uint8Array(a.Domain.match(/../g).map((h) => parseInt(h, 16)))); } catch (e) { return ''; } })() : '';
   const name = xrCur(cur2);
-  res.innerHTML = `<div class="card" style="gap:6px"><div class="r"><b>${esc(name)}</b><span class="mu">${esc(short(iss))}</span></div>
-    <div class="mu" style="font-size:13.5px">${dom ? 'Issuer\'s website: <b>' + esc(dom) + '</b>' : 'The issuer hasn\'t set a website.'}</div>
-    <div class="red" style="font-size:13.5px">Not issued by Ripple or Circle. Anyone can issue a token with any name on the XRP Ledger. Check the issuer address with the token's own website.</div>
+  /* v2.46i: the issuer's own website must list this token (XRP Ledger's xrp-ledger.toml), or it can't be added */
+  let ok = false; if (dom && /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(dom)) { try { const t = await (await fetch(`https://${dom}/.well-known/xrp-ledger.toml`)).text();
+    ok = t.split(/\[\[(?:TOKENS|CURRENCIES)\]\]/).slice(1).some((b) => b.includes(iss) && (b.toUpperCase().includes('"' + name.toUpperCase() + '"') || b.toUpperCase().includes('"' + cur2 + '"'))); } catch (e) {} }
+  if (!$('#xaRes')) return;
+  if (!ok) return (res.innerHTML = `<div class="note amb">${esc(name)} can't be added: ${dom ? esc(dom) + ' doesn\'t list this token from this issuer' : 'the issuer has no website'}. Only tokens their issuer lists on its own website (xrp-ledger.toml) can be added.</div>`);
+  res.innerHTML = `<div class="card" style="gap:6px"><div class="r"><b>${esc(name)}</b><span class="grn" style="font-weight:700">✓ verified · ${esc(dom)}</span></div>
+    <div class="mu" style="font-size:13.5px">${esc(short(iss))} · not issued by Ripple or Circle</div>
     <button class="b-light" data-act="xrAddGo" data-xc="${esc(cur2)}" data-xi="${esc(iss)}" data-xn="${esc(name)}">Add ${esc(name)}</button></div>`;
 }
 async function xrAddGo(ccy, iss, name) {
@@ -15047,7 +15055,7 @@ async function xrAddGo(ccy, iss, name) {
   const BZ = await xrBusy(xrSel);
   confirmSheet(`Add ${name}`, `XRP Ledger · ${esc(o.name)}`, [...BZ, { t: `Hold ${name} in this wallet`, s: `issuer ${iss} · not issued by Ripple or Circle`, hl: 1 },
     { t: `Reserve +${m2(sv.inc)} XRP`, s: 'the ledger holds it while the trust line is open; you get it back if you remove the line at 0 balance' }, { t: `Network fee ${m2(drops / 1e6)} XRP`, s: XR_BOT_NOTE }], `Add ${name}`, async () => {
-    try { const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: ccy, issuer: iss, value: '1000000000' }, Flags: 0x00020000 }, drops); if (r.state === 'ok') delete XRA[xrSel];
+    try { const r = await xrSubmit(o, { TransactionType: 'TrustSet', LimitAmount: { currency: ccy, issuer: iss, value: '1000000000' }, Flags: 0x00020000 }, drops); if (r.state === 'ok') { delete XRA[xrSel]; const A = xrAddList(); if (!A.some((x) => x.cur === ccy && x.iss === iss)) { A.push({ cur: ccy, iss, tok: name }); saveS(); } }
       xrOutcome(r, `${name} added`, `${esc(o.name)} can now hold ${esc(name)} · reserve +${m2(sv.inc)} XRP`, `${name} not added`, 'xrp'); }
     catch (e) { showResult(false, `${name} not added`, [`<div class="card red">${esc(e && e.message ? e.message : String(e))} Nothing was signed and sent.</div>`], 'xrp'); }
   }, false, 'b-acc', 'Adding…', true);
@@ -16137,7 +16145,9 @@ async function drawSol() {
     if (!d) return;
     const rows = [{ c: 'SOL', a: d.sol, u: d.sol * SOLPX.sol }, ...d.toks.filter((t) => t.amt > 0 || t.c).map((t) => ({ c: t.c || (JLT && (JLT.find((j) => j.address === t.mint) || {}).symbol) || 'Unknown token', a: t.amt, u: solTokUsd(t), n: t.c ? '' : (JLT && JLT.find((j) => j.address === t.mint)) ? '' : t.mint, jl: !!(JLT && JLT.find((j) => j.address === t.mint)) }))];
     const sub = (r) => r.c === 'SOL' ? `${m2(Math.min(r.a, SOL_KEEP))} kept for fees` : r.n ? short(r.n) : r.jl ? 'Earn · Jupiter Lend · withdraw any time' : 'Solana';
-    $('#soBal').innerHTML = rows.map((r) => `<div><div><div style="font-weight:600">${esc(r.c)}</div><div class="mu" style="font-size:13px">${esc(sub(r))}</div></div><div style="text-align:right"><div class="mono" style="font-weight:600">${m2(r.a)}</div>${r.u ? `<div class="mu" style="font-size:13px">$${fx(r.u)}</div>` : ''}</div></div>`).join('');
+    const rw = (r) => `<div><div><div style="font-weight:600">${esc(r.c)}</div><div class="mu" style="font-size:13px">${esc(sub(r))}</div></div><div style="text-align:right"><div class="mono" style="font-weight:600">${m2(r.a)}</div>${r.u ? `<div class="mu" style="font-size:13px">$${fx(r.u)}</div>` : ''}</div></div>`;
+    const known = rows.filter((r) => !r.n), junk = rows.filter((r) => r.n);   /* v2.46i: coins not on Liquidfi's list (airdropped spam is common on Solana) stay folded away, with no value */
+    $('#soBal').innerHTML = known.map(rw).join('') + (junk.length ? `<details class="obal"><summary class="mu">Other tokens · ${junk.length} <span style="font-size:13px">(not on Liquidfi's list)</span></summary>${junk.map((r) => rw({ ...r, u: 0 })).join('')}</details>` : '');
     { const MI = (MFW[w.addr] || { items: [] }).items; if (MI.length) $('#soBal').insertAdjacentHTML('beforeend', MI.map((x) => { const f = [x.free.q >= 0.01 ? m2(x.free.q) + ' ' + x.q : '', x.free.sol >= 0.000001 ? solAmt(x.free.sol) + ' SOL' : ''].filter(Boolean).join(' + '), h = [x.held.q >= 0.01 ? m2(x.held.q) + ' ' + x.q : '', x.held.sol >= 0.000001 ? solAmt(x.held.sol) + ' SOL' : ''].filter(Boolean).join(' + ');
       return `<div><div><div style="font-weight:600">On Manifest · SOL/${x.q}</div><div class="mu" style="font-size:13px">${f ? 'filled, not in the wallet yet: ' + f : ''}${f && h && x.orders ? ' · ' : ''}${h && x.orders ? `in ${x.orders} open order${x.orders > 1 ? 's' : ''}: ${h}` : ''}</div></div><div style="text-align:right">${f ? `<button class="b-acc sm" data-act="mfWalletMove" data-q="${x.q}">Move to wallet</button>` : `<button class="b-out sm" data-act="mfOpenOrders" data-q="${x.q}">Your orders →</button>`}</div></div>`; }).join('')); }
     $('#soFund').innerHTML = (vcOf(w.addr) ? `<div class="note amb">🔒 ${esc(vcMsg(vcOf(w.addr)))}</div>` : '') + (d.lam === 0 ? `<div class="note amb">Empty. Send it a little SOL first (about 0.01 SOL, ~$${fx(0.01 * (SOLPX.sol || 75))}): Solana needs SOL for fees and a small refundable deposit for each coin it holds.</div>` : d.sol < SOL_KEEP ? `<div class="note amb">Low on SOL. Keep at least ${SOL_KEEP} SOL for network fees and coin deposits.</div>` : '');
@@ -16152,7 +16162,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.46h';
+const APP_VER = 'v2.46i';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -22755,8 +22765,8 @@ async function trCheck() {
       verdict = ok ? `Verified: ${dom} lists ${code} from this issuer` : `${dom} does not list ${code} from this issuer · likely fake`;
     } else verdict = 'Issuer has no home domain · likely fake';
   } catch (e) { verdict = 'Could not reach the issuer\'s website to verify (' + e.message + '). Treat as unverified.'; }
-  out.innerHTML = `<div class="card ${ok ? '' : 'danger'}"><b>${esc(code)}</b> <span class="mono mu" style="font-size:13px">${short(iss)}</span><span class="${ok ? 'grn' : 'red'}" style="font-size:14px">${esc(verdict)}</span><button class="${ok ? 'b-light' : 'b-out'} sm" data-act="trAddCustom">${ok ? 'Add' : 'Add anyway'}</button></div>`;
-  window._custom = { code, issuer: iss, who: dom || 'unverified' };
+  out.innerHTML = `<div class="card ${ok ? '' : 'danger'}"><b>${esc(code)}</b> <span class="mono mu" style="font-size:13px">${short(iss)}</span><span class="${ok ? 'grn' : 'red'}" style="font-size:14px">${esc(verdict)}</span><button class="${ok ? 'b-light' : 'b-out'} sm" ${ok ? '<button class="b-light sm" data-act="trAddCustom">Add</button>' : '<span class="mu" style="font-size:13.5px">Not added: only tokens their issuer lists on its own website can be added.</span>'}</div>`;
+  window._custom = ok ? { code, issuer: iss, who: dom || 'verified' } : null;   /* v2.46i: pre-approved or issuer-verified only (Jeff: "so the user doesn't see a bunch of garbage or accidentally send money to fake asset") */
 }
 
 /* ---------- settings ---------- */
@@ -23202,7 +23212,7 @@ document.addEventListener('click', async (e) => {
     flatOne: () => { const b = tradeAccts()[botSel]; killFlow(planFlat(b).then((p) => [p]), `Cancel ${b.name} orders and close positions into ${flatCode()}?`, 'cancel + close'); },
     resultBack: () => go(resultBack),
     tradeReview, sendReview, saveAddr, saveAddrOk, xrBookCheck, bookRenOk, bookDelOk, trCheck,
-    trAddCustom: () => { const c = window._custom; if (!c) return; if (!NS().extraKnown.some((k) => k.code === c.code && k.issuer === c.issuer)) { NS().extraKnown.push(c); saveS(); } trustOp(c, false); },
+    trAddCustom: () => { const c = window._custom; if (!c) return toast('Only verified tokens can be added.'); if (!NS().extraKnown.some((k) => k.code === c.code && k.issuer === c.issuer)) { NS().extraKnown.push(c); saveS(); } trustOp(c, false); },
     copyAddr: () => copy($('#rAddr').textContent), copyEm: () => copy(K.em.publicKey()),
     shareAddr: () => { const a = $('#rAddr').textContent; if (navigator.share) navigator.share({ text: a }).catch(() => {}); else copy(a); },
     checkSig, sandbox,
