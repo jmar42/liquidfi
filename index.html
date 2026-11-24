@@ -82,7 +82,7 @@ label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--mu);
 .epill{background:var(--grn);color:#06140D;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;white-space:nowrap}
 .wic{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;font-size:13px;font-weight:800;color:#0B0E13;vertical-align:middle;margin-right:10px;position:relative;top:-2px}
 .wic.st{background:#E9EDF2}.wic.xr{background:#C3CAD5}.wic.so{background:linear-gradient(135deg,#9945FF,#14F195);color:#fff}
-#s-bots .list:empty{display:none!important}#bPnl .mono{font-family:'IBM Plex Sans',system-ui,sans-serif!important;font-weight:700}
+#s-bots .list:empty{display:none!important}#hTot,#xrTot,#soTot{font-family:'IBM Plex Sans',system-ui,sans-serif!important;font-size:34px!important;font-weight:700!important;color:var(--tx)!important;letter-spacing:-.02em}#xrActs.hacts,#soActs.hacts,#hActs.hacts{margin-top:2px}#bPnl .mono{font-family:'IBM Plex Sans',system-ui,sans-serif!important;font-weight:700}
 #bTotV{font-family:'IBM Plex Sans',system-ui,sans-serif!important;font-size:40px!important;font-weight:700!important;color:var(--tx)!important;letter-spacing:-.02em!important}
 
 .tothero{display:flex;flex-direction:column;gap:2px;padding:6px 4px 4px}.tothero .r{display:flex;justify-content:space-between;align-items:center}#bTotV{font-size:37px;font-weight:600;color:var(--blu);letter-spacing:-.01em}
@@ -255,7 +255,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.47c</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.47d</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -291,7 +291,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 <section class="scr" id="s-home">
   <div class="top"><div class="l"><button class="ico back" data-go="bots" aria-label="Back to accounts">‹</button><button class="b-out" data-act="pickAcct" id="hAcct" style="min-height:44px">Personal ▾</button></div><span class="netb" id="hNet"></span></div>
   <div class="card" style="gap:4px"><span class="mu" style="font-size:14px">Total value (USD est.)</span><span class="mono" style="font-size:31px;font-weight:600;color:var(--blu)" id="hTot">–</span><span class="mu" style="font-size:13px" id="hPx"></span><button class="hpl" id="hPnl" data-act="wPnl" style="display:none"></button></div>
-  <div class="hide-unf" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px"><button class="b-light" data-act="homeBuy" style="font-size:13.5px;padding:0 4px">Buy</button><button class="b-out" data-act="homeSwap" style="font-size:13.5px;padding:0 4px">Swap</button><button class="b-out" data-go="trade" style="font-size:13.5px;padding:0 4px">Trade</button><button class="b-out" data-go="send" style="font-size:13.5px;padding:0 4px">Send</button><button class="b-out" data-act="rcvHome" style="font-size:13.5px;padding:0 4px">Receive</button></div>
+  <div class="hide-unf" id="hActs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px"><button class="b-light" data-act="homeBuy" style="font-size:13.5px;padding:0 4px">Buy</button><button class="b-out" data-act="homeSwap" style="font-size:13.5px;padding:0 4px">Swap</button><button class="b-out" data-go="trade" style="font-size:13.5px;padding:0 4px">Trade</button><button class="b-out" data-go="send" style="font-size:13.5px;padding:0 4px">Send</button><button class="b-out" data-act="rcvHome" style="font-size:13.5px;padding:0 4px">Receive</button></div>
   <div id="hFund"></div>
   <div class="top hide-unf" style="align-items:baseline"><span class="lbl">Balances</span><button class="b-out sm" data-go="trust" style="width:auto;min-height:30px;padding:0 12px">Assets ›</button></div>
   <div class="card rows hide-unf" id="hBal" style="padding:4px 14px"></div>
@@ -671,7 +671,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.47c</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.47d</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -703,7 +703,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.47c · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.47d · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -16176,7 +16176,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.47c';
+const APP_VER = 'v2.47d';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -17837,7 +17837,7 @@ document.addEventListener('change', (e) => { if (e.target && e.target.id === 'eS
 const JL = 'https://api.jup.ag/lend/v1';
 const JL_SHOW = ['USDC', 'USDT', 'USDG', 'EURC', 'JupUSD'];
 let JLPOS = {};
-async function jlTokens() { if (JLT && Date.now() - JLT.at < 60000) return JLT; const r = await fetch(JL + '/earn/tokens'); if (!r.ok) throw new Error("Jupiter Lend isn't answering right now."); const j = await r.json(); j.at = Date.now(); return (JLT = j); }
+async function jlTokens() { if (JLT && Date.now() - JLT.at < 60000) return JLT; const r = await fetch(JL + '/earn/tokens'); if (!r.ok) throw new Error("Jupiter Lend isn't answering right now."); const j = await r.json(); if (!Array.isArray(j)) throw new Error("Jupiter Lend isn't answering right now."); j.at = Date.now(); return (JLT = j); }
 async function jlPositions(addr) { const r = await fetch(JL + '/earn/positions?users=' + addr); if (!r.ok) throw new Error("Jupiter Lend isn't answering right now."); return (JLPOS[addr] = await r.json()); }
 async function jlAtaIx(o, mint) {   /* open o's token account for this mint (idempotent: nothing happens if it's already there) */
   let t22 = 0; try { const r = await solRpc('getAccountInfo', [mint, { encoding: 'base64', commitment: 'confirmed' }]); t22 = r && r.value && r.value.owner === SOL_PROG.tok22 ? 1 : 0; } catch (e) {}
@@ -18445,6 +18445,7 @@ function usWal() {   // every wallet with a key on this phone
   return [...st, ...xr, ...so];
 }
 const usSolUsdc = () => XS.coins.SUSDC.mint;
+const usWN = (n, c) => (String(n).toLowerCase().includes(usNet(c).split(' ')[0].toLowerCase()) ? n : `${n} (${usNet(c)})`);
 const usStk = (k) => { const m = SOL_MINTS.mainnet[k] || (NS().solAdd || {})[k]; return m && m.stock ? m.stock : null; };   /* v2.46g: a tokenized stock's name, or null */
 const US_TZ = /^(America\/(New_York|Detroit|Chicago|Denver|Phoenix|Los_Angeles|Anchorage|Juneau|Sitka|Metlakatla|Yakutat|Nome|Adak|Boise|Menominee|Puerto_Rico|Indiana\/.*|Kentucky\/.*|North_Dakota\/.*)|Pacific\/(Honolulu|Guam|Saipan|Pago_Pago)|US\/.*)$/;
 function usStockGate() {   /* tokenized stocks are not offered to US persons (xStocks' own terms): a phone set to a US time zone is refused, others confirm once */
@@ -18470,15 +18471,15 @@ const usXsId = (c, a, k) => (c === 'st' ? (k === 'XLM' ? a : null) : c === 'xr' 
 function usGets(p) {   // → [{ v, txt, off }] grouped by network
   const W = usWal(), out = { st: [], xr: [], so: [] }, pw = W.find((w) => w.c === p.c && w.a === p.a) || {};
   if (p.c === 'st') { const A = ACC[p.a], held = A ? A.balances.filter((b) => b.asset_type !== 'liquidity_pool_shares' && !isNFT(b)).map(akey) : [];
-    for (const k of [...new Set([...swapKnown(), ...held])]) if (k !== p.k) out.st.push({ v: `st|${p.a}|${k}`, txt: `${kName(k)}${usIss('st', k)} · ${pw.n} (Stellar)` }); }
-  if (p.c === 'xr') { if (p.k === 'XRP') xrCoins().forEach((c) => out.xr.push({ v: `xr|${p.a}|${c.k}`, txt: `${c.tok} · ${pw.n} (XRP Ledger)` }));
-    else { const o = xrCoins().find((c) => c.k !== p.k); out.xr.push({ v: `xr|${p.a}|${o.k}`, txt: `${o.tok} · ${pw.n} (XRP Ledger)` }); out.xr.push({ v: `xr|${p.a}|XRP`, txt: `XRP · ${pw.n} (XRP Ledger) · use Trade XRP → Buy`, off: 1 }); } }
-  if (p.c === 'so') for (const t of solTargets()) if (t.v !== p.k) (usStk(t.v) ? (out.stk = out.stk || []) : out.so).push({ v: `so|${p.a}|${t.v}`, txt: usStk(t.v) ? `${t.c} · ${usStk(t.v)} · ${pw.n}` : `${t.c} · ${pw.n} (Solana)` });
+    for (const k of [...new Set([...swapKnown(), ...held])]) if (k !== p.k) out.st.push({ v: `st|${p.a}|${k}`, txt: `${kName(k)}${usIss('st', k)} · ${usWN(pw.n, 'st')}` }); }
+  if (p.c === 'xr') { if (p.k === 'XRP') xrCoins().forEach((c) => out.xr.push({ v: `xr|${p.a}|${c.k}`, txt: `${c.tok} · ${usWN(pw.n, 'xr')}` }));
+    else { const o = xrCoins().find((c) => c.k !== p.k); out.xr.push({ v: `xr|${p.a}|${o.k}`, txt: `${o.tok} · ${usWN(pw.n, 'xr')}` }); out.xr.push({ v: `xr|${p.a}|XRP`, txt: `XRP · ${usWN(pw.n, 'xr')} · use Trade XRP → Buy`, off: 1 }); } }
+  if (p.c === 'so') for (const t of solTargets()) if (t.v !== p.k) (usStk(t.v) ? (out.stk = out.stk || []) : out.so).push({ v: `so|${p.a}|${t.v}`, txt: usStk(t.v) ? `${t.c} · ${usStk(t.v)} · ${pw.n}` : `${t.c} · ${usWN(pw.n, 'so')}` });
   const fid = usXsId(p.c, p.a, p.k), fw = fid && xsW(fid), can = xsOn() && fw && XS.from[fw.ck];
   const why = !xsOn() ? 'main network only' : !fid ? `pay with ${p.c === 'st' ? 'XLM' : p.c === 'xr' ? 'XRP' : 'SOL or USDC'} to swap here` : !XS.from[(fw || {}).ck] ? 'not from Stellar yet' : '';
   for (const w of W) { if (w.c === p.c) continue;
     const ks = w.c === 'st' ? ['XLM'] : w.c === 'xr' ? ['XRP'] : ['SOL', usSolUsdc()];
-    for (const k of ks) out[w.c].push({ v: `${w.c}|${w.a}|${k}`, txt: `${usCoinName(w.c, k)} · ${w.n} (${usNet(w.c)})${can ? '' : ' · ' + why}`, off: can ? 0 : 1 }); }
+    for (const k of ks) out[w.c].push({ v: `${w.c}|${w.a}|${k}`, txt: `${usCoinName(w.c, k)} · ${usWN(w.n, w.c)}${can ? '' : ' · ' + why}`, off: can ? 0 : 1 }); }
   return out;
 }
 function usRoute(p, g) {
@@ -19093,7 +19094,7 @@ async function drawEarn() {
     });
     $('#eXList').innerHTML = group(xitems, 'xr');
     { const SL = solNet() === 'mainnet' ? +EARNSOL.tot || 0 : 0, T = { v: TS.v + TX.v + SL, pl: TS.pl + TX.pl, has: TS.has || TX.has }, el = $('#eTotAll'), wait = !settled && (TS.wait || TX.wait || (earnAddr && ACC[earnAddr] === undefined) || (earnXr && XRA[earnXr] === undefined)), stuck = settled && (TS.wait || TX.wait);
-      el.innerHTML = `<div class="r" style="align-items:baseline;gap:10px;flex-wrap:wrap"><span class="mu" style="font-size:14px">${SL > 0.005 ? 'Earning' : 'In pools'}</span><b class="mono" style="font-size:25px">$${fxv(T.v)}</b>${T.has ? `<span class="mono ${T.pl >= 0 ? 'grn' : 'red'}" style="font-size:15px">${T.pl >= 0 ? '+' : '−'}$${fxd(T.pl)} P/L</span>` : ''}<span class="mu" style="margin-left:auto;font-size:19px">›</span></div>`
+      el.innerHTML = `<div class="r" style="align-items:baseline;gap:10px;flex-wrap:wrap"><span class="mu" style="font-size:14px">${SL > 0.005 ? 'Earning' : 'In pools'}</span><b class="mono" style="font-size:25px">$${T.v >= 0.01 ? fxv(T.v) : '0.00'}</b>${T.has ? `<span class="mono ${T.pl >= 0 ? 'grn' : 'red'}" style="font-size:15px">${T.pl >= 0 ? '+' : '−'}$${fxd(T.pl)} P/L</span>` : ''}<span class="mu" style="margin-left:auto;font-size:19px">›</span></div>`
         + `<div class="mu" style="font-size:13.5px">${T.v > 0 ? [TS.v > 0 ? `Stellar $${fxv(TS.v)}` : '', TX.v > 0 ? `XRP Ledger $${fxv(TX.v)}` : '', SL > 0.005 ? `Solana lending $${fxv(SL)}` : ''].filter(Boolean).join(' · ') + ' · tap for details' + (wait ? ' · loading…' : stuck ? ' · some pools didn\'t load, tap ↻' : '') : wait ? 'Loading your pools…' : stuck ? 'Couldn\'t load your pools right now. Tap ↻ to try again.' : 'Nothing in pools yet. Pick a chain below to start earning.'}</div>`;
       const n = (it) => it.filter((x) => x.held).length, sub = (it, v, dflt) => (n(it) ? `You're in ${n(it)} pool${n(it) === 1 ? '' : 's'}${v > 0 ? ' · $' + fxv(v) : ''}` : dflt);
       $('#eSubSt').textContent = sub(items, TS.wait ? 0 : TS.v, 'XLM, EURC and PYUSD with USDC'); $('#eSubXr').textContent = sub(xitems, TX.wait ? 0 : TX.v, 'XRP with RLUSD or USDC'); }
@@ -22812,6 +22813,18 @@ async function trCheck() {
   out.innerHTML = `<div class="card ${ok ? '' : 'danger'}"><b>${esc(code)}</b> <span class="mono mu" style="font-size:13px">${short(iss)}</span><span class="${ok ? 'grn' : 'red'}" style="font-size:14px">${esc(verdict)}</span><button class="${ok ? 'b-light' : 'b-out'} sm" ${ok ? '<button class="b-light sm" data-act="trAddCustom">Add</button>' : '<span class="mu" style="font-size:13.5px">Not added: only tokens their issuer lists on its own website can be added.</span>'}</div>`;
   window._custom = ok ? { code, issuer: iss, who: dom || 'verified' } : null;   /* v2.46i: pre-approved or issuer-verified only (Jeff: "so the user doesn't see a bunch of garbage or accidentally send money to fake asset") */
 }
+
+
+/* v2.47d: wallet pages use the same icon tiles as Home (Trade first and blue) */
+const TILE_SV = { Trade: '<path d="M7 4v16M7 4 3 8M7 4l4 4"/><path d="M17 20V4M17 20l-4-4M17 20l4-4"/>', Swap: '<path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/>', Send: '<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>', Receive: '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>', Buy: '<path d="M12 5v14M5 12h14"/>' };
+function tileify(c) {
+  if (!c) return; c.classList.add('hacts'); const B = [...c.querySelectorAll(':scope > button')];
+  for (const b of B) { if (b.classList.contains('hact')) continue; const t = b.textContent.trim(); if (!TILE_SV[t]) continue;
+    b.className = 'hact' + (t === 'Trade' ? ' pri' : ''); b.removeAttribute('style'); b.innerHTML = `<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${TILE_SV[t]}</svg></i>${t}`; }
+  const order = ['Trade', 'Swap', 'Send', 'Receive', 'Buy'], H = B.filter((b) => b.classList.contains('hact')), S2 = H.slice().sort((x, y) => order.indexOf(x.textContent.trim()) - order.indexOf(y.textContent.trim()));
+  if (S2.some((b, i) => b !== H[i])) S2.forEach((b) => c.appendChild(b));   /* only when out of order (each move is a change the watcher sees) */
+}
+for (const id of ['#hActs', '#xrActs', '#soActs']) { const c = document.querySelector(id); if (c) { tileify(c); new MutationObserver(() => tileify(c)).observe(c, { childList: true }); } }
 
 /* ---------- settings ---------- */
 function bookList() { return [...(NS().saved || []).map((x, i) => ({ k: 'st', i, x })), ...xrBook().map((x, i) => ({ k: 'xr', i, x })), ...solBook().map((x, i) => ({ k: 'so', i, x }))]; }
