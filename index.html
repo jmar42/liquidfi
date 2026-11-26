@@ -257,7 +257,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="pin" id="pinDots"></div>
   <div class="pad" id="pad"></div>
   <button class="b-out sm" data-act="resetAsk" style="border:none;color:var(--mu);font-size:14px;min-height:36px">Forgot PIN? Erase and start over</button>
-  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.48j</p>
+  <p class="mu" style="font-size:13px;text-align:center;margin-top:auto;line-height:1.6">Keys are encrypted on this device and never leave it<br>v2.48l</p>
 </section>
 
 <section class="scr" id="s-setup">
@@ -361,6 +361,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="top"><div class="l"><button class="ico back" data-go="mkt" aria-label="Back to Markets">‹</button><div><h1 id="lSym">XLM</h1><span class="mu" style="font-size:13px" id="lUpd"></span></div></div><div style="display:flex;gap:6px;align-items:center"><button class="ico" data-act="pxSheet" data-c="l2" aria-label="Price alert" style="width:38px;height:38px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button><button class="b-out sm" data-act="rmSym" style="min-height:36px;font-size:14px;padding:0 12px">Remove</button></div></div>
   <button class="b-grn" data-act="l2Trade" id="lTrade" style="display:none;min-height:40px;font-size:15px">Trade</button>
   <div id="lVen" style="display:flex;gap:6px;overflow-x:auto;margin:0 -18px;padding:2px 18px;scrollbar-width:none"></div>
+  <div id="lPx" style="display:none;flex-direction:column;gap:8px"></div>
   <div id="lTop" class="g3"></div>
   <span class="lbl">Book depth</span>
   <div class="card" style="padding:8px 10px"><div id="lBook"></div></div>
@@ -673,7 +674,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
 
 <!-- SETTINGS -->
 <section class="scr" id="s-set">
-  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.48j</span></div>
+  <div class="top"><div class="l"><button class="ico back" data-act="setBack" aria-label="Back">‹</button><h1>Settings</h1></div><span class="mu mono" style="font-size:14px">v2.48l</span></div>
   <div class="card" id="setNetCard" style="display:none"><span class="lbl">Network</span><div class="seg" id="setNet"><button data-v="testnet">Testnet</button><button data-v="public">Mainnet</button></div></div>
   <div class="card"><span class="lbl">Server<span id="setHzNet"></span></span><div class="seg" id="setHz"><button data-v="sdf">Stellar</button><button data-v="lobstr">LOBSTR</button><button data-v="custom">Custom</button></div><div id="setHzC" style="display:none;flex-direction:column;gap:8px"><label>Horizon address (https)<input id="setHzUrl" placeholder="https://horizon.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><button class="b-out sm" data-act="hzCheck" id="hzSave">Save</button></div><div class="mu" id="setHzSt" style="font-size:13px;line-height:1.5"></div></div>
   <div class="card" id="setMyXr"><span class="lbl">XRP Ledger server<span id="setXsNet"></span></span><div class="mu" style="font-size:13px">For privacy: run your own XRP Ledger server and the app reads balances, books and sends through it instead of the public servers (they see your IP address and wallet addresses).</div><label>Your server (https)<input id="setXsUrl" placeholder="https://xrpl.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" inputmode="url"></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="setXsOnly" style="width:auto"> Only my server (no public backup)</label><div class="g2"><button class="b-out sm" data-act="myCheck" data-k="xr">Save</button><button class="b-out sm" data-act="myOff" data-k="xr">Use public servers</button></div><div class="mu" id="setXsSt" style="font-size:13px;line-height:1.5"></div></div>
@@ -705,7 +706,7 @@ nav button.on{color:var(--tx)}nav button.on svg{color:var(--blu)}
   <div class="card" id="setSec"><span class="lbl">Unlock</span><div class="top"><span>Fingerprint / Face ID</span><input type="checkbox" id="setBio" style="width:28px;min-height:28px"></div><div class="mu" id="setBioSt" style="font-size:13px"></div><div class="top" style="margin-top:8px"><span>PIN · <span id="setPinLen"></span> digits</span><button class="b-out sm" data-act="pinChange" style="width:auto;padding:0 16px">Change PIN</button></div></div>
   <div class="card"><button class="b-out sm" data-act="lock">Lock now</button></div>
   <div class="card"><span class="lbl">Start over</span><div class="mu" style="font-size:14px">Erase Liquidfi from this phone: PIN, keys, bot list and settings. Funds stay on Stellar.</div><button class="b-out sm" data-act="resetAsk" style="color:var(--redt)">Erase this phone…</button></div>
-  <div class="mu" style="font-size:13px">Liquidfi v2.48j · auto-locks after 2 min idle</div>
+  <div class="mu" style="font-size:13px">Liquidfi v2.48l · auto-locks after 2 min idle</div>
 </section>
 
 </div>
@@ -13900,7 +13901,7 @@ function l2Trade() {
   if (kName(w.q) === 'USDC') NS().tPair = { b: 'XLM', q: uKey() }; go('trade');
 }
 function paintL2() {
-  const w = L2.sym; if (!w) return;
+  const w = L2.sym; if (!w) return; pxBar();
   const have = VALL.filter((k) => vSym(k, w.b, w.q));
   if (L2.ven !== 'all' && !have.includes(L2.ven)) L2.ven = 'all';
   const ks = L2.ven === 'all' ? have : [L2.ven], multi = L2.ven === 'all' && have.length > 1;
@@ -16178,7 +16179,7 @@ async function drawSol() {
 /* v2.40s (Jeff's phone kept showing an old copy after uploads): when you come back to the app (and every 10 minutes while it's
    open), it asks GitHub for the page with no cache. If the version there is newer than this one, a bar offers "Tap to update".
    Nothing is reloaded on its own, so an open sheet or a half-typed send is never lost. */
-const APP_VER = 'v2.48j';
+const APP_VER = 'v2.48l';
 let UPD_AT = 0;
 async function updCheck(force) {
   if (!force && Date.now() - UPD_AT < 60000) return; UPD_AT = Date.now();
@@ -16982,7 +16983,7 @@ function chPaint() {
   for (let i = s; i < e; i++) { const v = VA[i]; if (v == null) { on = false; continue; } const yy = Math.max(vT, vY(v)); if (on) x.lineTo(X(i), yy); else { x.moveTo(X(i), yy); on = true; } } x.stroke();
   /* v2.44b (Jeff: "The 5 min style is what the weekly should look like. The others need to be candle sticks"): candles on 5m-1D; weekly = high-low bar + close tick */
   x.save(); x.beginPath(); x.rect(0, 0, pW, pH); x.clip();
-  if (CH.sty === 'l') {   /* v2.48j (Jeff: "Line vs candles?"): a close-price line with a soft fill, colored by the move over what's on screen */
+  if (CH.sty === 'l') {   /* v2.48l (Jeff: "Line vs candles?"): a close-price line with a soft fill, colored by the move over what's on screen */
     const c0 = B[s] ? B[s].c : 0, cl = B[e - 1] && B[e - 1].c >= c0 ? CH_UP : CH_DN, g = x.createLinearGradient(0, 0, 0, pH);
     g.addColorStop(0, cl + '55'); g.addColorStop(1, cl + '00'); x.beginPath();
     for (let i = s; i < e; i++) { const yy = Y(B[i].c); if (i === s) x.moveTo(X(i), yy); else x.lineTo(X(i), yy); }
@@ -16998,6 +16999,12 @@ function chPaint() {
   for (const m of MS) { x.strokeStyle = m.c; x.lineWidth = 1.2; x.beginPath(); on = false;
     for (let i = s; i < e; i++) { const v = m.v[i]; if (v == null) { on = false; continue; } if (on) x.lineTo(X(i), Y(v)); else { x.moveTo(X(i), Y(v)); on = true; } } x.stroke(); }
   x.restore();
+  /* v2.48l (Jeff: TradingView-style: the alert sits on the chart): your price targets for this coin as dashed amber lines + axis tags */
+  { const [cb, cq] = String(CH.pid || '').split('-'), T = cq === 'USD' && S.push && S.push.on ? pxCfg().tg.filter((t) => t.c === cb) : [];
+    for (const t of T) { if (t.p > hi || t.p < lo) continue; const y = Math.round(Y(t.p)) + 0.5;
+      x.save(); x.setLineDash([5, 4]); x.strokeStyle = '#F5B544'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(0, y); x.lineTo(pW, y); x.stroke(); x.restore();
+      x.fillStyle = '#F5B544'; x.fillRect(pW + 1, y - 7, AX - 1, 14); x.fillStyle = '#0B0E13'; x.fillText(t.p.toFixed(dp), pW + 4, y + 3.5);
+      x.fillStyle = '#F5B544'; x.fillText(`\u{1F514} ${t.dir}`, 4, y - 4); } }
   /* last close tag */
   { const L = B[B.length - 1], y = Math.min(pH - 6, Math.max(6, Y(L.c))); x.fillStyle = up(B.length - 1) ? CH_UP : CH_DN; x.fillRect(pW + 1, y - 7, AX - 1, 14); x.fillStyle = '#0B0E13'; x.fillText(L.c.toFixed(dp), pW + 4, y + 3.5); }
   /* time labels */
@@ -17059,7 +17066,7 @@ function chShow(k, pid) {
   if (CH.on) { chCalc(); chPaint(); chLoad(true); } chLoop();
 }
 function chInit() {
-  for (const [k, after] of [['trade', '#s-trade > .top'], ['xtrade', '#xtQ'], ['strade', '#stQ'], ['l2', '#lVen']]) { const a = $(after); if (a && !$('#ch-' + k)) a.insertAdjacentHTML('afterend', chHtml(k)); }
+  for (const [k, after] of [['trade', '#s-trade > .top'], ['xtrade', '#xtQ'], ['strade', '#stQ'], ['l2', '#lPx']]) { const a = $(after); if (a && !$('#ch-' + k)) a.insertAdjacentHTML('afterend', chHtml(k)); }
   document.addEventListener('click', (ev) => {
     const t = ev.target.closest && ev.target.closest('[data-chtf],[data-chtog],[data-chend],[data-chsave],[data-chsty]'); if (!t || !t.closest('.chc')) return; ev.preventDefault(); ev.stopPropagation();
     if (t.dataset.chend) { CH.off = 0; CH.sel = -1; return chPaint(); }
@@ -22833,7 +22840,7 @@ async function trCheck() {
 }
 
 
-/* v2.48j: a coin's icon: the network logos for XLM / XRP / SOL (Jeff's files), a colored letter for others */
+/* v2.48l: a coin's icon: the network logos for XLM / XRP / SOL (Jeff's files), a colored letter for others */
 const CIC_C = { USDC: '#2775CA', EURC: '#2775CA', RLUSD: '#0B2E6E', USDT: '#26A17B', PYUSD: '#0070E0', USDG: '#1E3A5F', JitoSOL: '#2EC28E', JupUSD: '#C7F284' };
 function cic(code) { const c = String(code || '').replace(/[^\w$]/g, ''), net = c === 'XLM' ? 'st' : c === 'XRP' ? 'xr' : c === 'SOL' ? 'so' : c === 'USDC' ? 'usdc' : c === 'EURC' ? 'eurc' : c === 'PYUSD' ? 'pyusd' : '';
   return net ? `<span class="wic cic ${net}" aria-hidden="true"></span>` : `<span class="wic cic" aria-hidden="true" style="background:${CIC_C[c] || '#3A4352'};color:#fff;font-size:11px">${esc(c.slice(0, 1) || '?')}</span>`; }
@@ -23107,7 +23114,7 @@ document.addEventListener('click', async (e) => {
     accRcv: phGate(() => { if (!allAccts().length) return toast('Add a wallet first.'); rcvWant = OWN().some((o) => o.addr === homeAddr) ? homeAddr : firstWallet(); go('receive'); }),
     accBuy: phGate(() => onrPickSheet()),
     onrPick: phGate(() => onrBuySheet(t.dataset.chain, t.dataset.addr)),
-    accSwap: () => uSwap('st', homeAddr), uFlip: () => usFlip(), uMax: () => usMax(), uGo: () => usGo(t), nonUsGo: () => { if (!$('#nonUsOk') || !$('#nonUsOk').checked) return toast('Tick the box to confirm.'); S.nonUS = Date.now(); saveS(); closeSheet(); setTimeout(() => usPaint(US.amt || ''), 50); }, solAssets: () => solAssetsSheet(), solAddCheck: () => solAddCheck(), solAddGo: () => solAddGo(), solAddDel: () => solAddDel(t.dataset.mint), xrAddCheck: () => xrAddCheck(), xrAddGo: () => xrAddGo(t.dataset.xc, t.dataset.xi, t.dataset.xn), wPnl: () => wPnlSheet(t.dataset.addr || homeAddr), pxSheet: () => { const c = t.dataset.c; pxSheet(c === 'l2' ? (L2.sym || {}).b : c === 'trade' ? kName(TP().b) : c); }, pxAdd: () => pxAdd(), pxDel: () => pxDel(t.dataset.id), pxPct: () => pxPct(t.dataset.v), uHist: () => { closeSheet(); XSW.get = 'x'; go('xswap'); },
+    accSwap: () => uSwap('st', homeAddr), uFlip: () => usFlip(), uMax: () => usMax(), uGo: () => usGo(t), nonUsGo: () => { if (!$('#nonUsOk') || !$('#nonUsOk').checked) return toast('Tick the box to confirm.'); S.nonUS = Date.now(); saveS(); closeSheet(); setTimeout(() => usPaint(US.amt || ''), 50); }, solAssets: () => solAssetsSheet(), solAddCheck: () => solAddCheck(), solAddGo: () => solAddGo(), solAddDel: () => solAddDel(t.dataset.mint), xrAddCheck: () => xrAddCheck(), xrAddGo: () => xrAddGo(t.dataset.xc, t.dataset.xi, t.dataset.xn), wPnl: () => wPnlSheet(t.dataset.addr || homeAddr), pxSheet: () => { const c = t.dataset.c; pxSheet(c === 'l2' ? (L2.sym || {}).b : c === 'trade' ? kName(TP().b) : c); }, pxAdd: () => pxAdd(), pxDel: () => pxDel(t.dataset.id), pxEdit: () => pxEdit(t.dataset.id, t.dataset.p), pxSave: () => pxSave(t.dataset.id), pxDelBar: () => pxDelBar(t.dataset.id), pxHitX: () => { L2.pxHit = null; pxBar(); }, pxPct: () => pxPct(t.dataset.v), uHist: () => { closeSheet(); XSW.get = 'x'; go('xswap'); },
     xsOpen: () => { if (cur === 'xrp') return uSwap('xr', xrSel); XSW.get = 'x'; XSW.from = cur === 'xrp' ? xrSel : (XS.from.XLM ? homeAddr : null); XSW.to = cur === 'xrp' || XS.from.XLM ? null : homeAddr; if ($('#xsAmt')) $('#xsAmt').value = ''; go('xswap'); },
     xsMax: () => { if (XSW.av > 0) { const w = xsW(XSW.from), same = XSW.get && XSW.get !== 'x';
       const v = same ? Math.floor(((XSW.av - 0.0001) / (1 + XR_FEE.bps / 10000)) * 1e6) / 1e6 : (() => { const dp = w ? XS.coins[w.ck].dp : 6; return Math.floor(XSW.av * 10 ** dp + 1e-6) / 10 ** dp; })();   /* a market sell adds its fee on top · v2.42w: rounds down, never up */
@@ -23431,7 +23438,7 @@ function noteGo(tag) {
   if (!K) { NOTE_GO = tag; return; }
   NOTE_GO = null; closeSheet();
   if (tag === 'pxoff') { const P = pxCfg(); P.on = false; saveS(); pxSync().catch(() => {}); go('mkt'); return toast('Big-move alerts off. Turn them back on with the bell in Markets.', 7000); }
-  if (tag.startsWith('px-')) { const c = tag.slice(3), w = watch().find((x) => x.b === c); if (w) { L2.sym = w; L2.ven = 'all'; return go('l2'); } go('mkt'); return setTimeout(() => pxSheet(c), 300); }   /* v2.48a: a price alert opens that coin */
+  if (tag.startsWith('px-')) { const c = tag.slice(3), w = watch().find((x) => x.b === c); if (w) { L2.sym = w; L2.ven = 'all'; L2.pxHit = { c, at: Date.now() }; go('l2'); pxBar(); pxSync().then(pxBar); return; } go('mkt'); return setTimeout(() => pxSheet(c), 300); }   /* v2.48a: a price alert opens that coin */
   const i = tag.indexOf('-'), kind = tag.slice(0, i), id = tag.slice(i + 1);
   const act = (tab) => { ACT.tab = tab; go('act'); };
   try {
@@ -23544,7 +23551,7 @@ async function pxSheet(coin) {
     <label class="fld"><span id="pxNow">Price in US dollars</span><input id="pxP" inputmode="decimal" placeholder="0.00" autocomplete="off"></label>
     <button class="b-light" data-act="pxAdd">Add price alert</button>
     ${PXS.hist.length ? `<span class="lbl">Recent alerts</span><div class="card csum">${PXS.hist.slice().reverse().slice(0, 8).map((h) => `<div><span style="display:flex;align-items:flex-start">${cic(h.c)}<span>${esc(h.title)}<small class="mu" style="display:block;font-size:12px">${esc(h.body)}</small></span></span><span class="mu" style="font-size:12.5px">${pxAgo(h.t)}</span></div>`).join('')}</div>` : ''}
-    <div class="mu" style="font-size:12.5px">Prices from Coinbase, checked every minute. Alerts only state the price; they aren't advice to buy or sell.</div>
+    <div class="mu" style="font-size:12.5px">Prices from Coinbase. Price targets use the live price and fire once it has stayed past your price for 5 seconds; big moves are checked every minute. Alerts only state the price; they aren't advice to buy or sell.</div>
     <button class="b-out" data-act="closeSheet">Done</button>`);
   const now = () => { const n = PXS.px[$('#pxC').value]; $('#pxNow').textContent = n ? `Price in US dollars · now ${pxFmt(n.last)}` : 'Price in US dollars'; };
   $('#pxC').onchange = now; now();
@@ -23557,9 +23564,49 @@ async function pxAdd() {
   if (!(p > 0)) return toast('Enter a price.'); if (P.tg.length >= 20) return toast('At most 20 price alerts.');
   const n = PXS.px[c]; if (n && ((dir === 'above' && n.last >= p) || (dir === 'below' && n.last <= p))) return toast(`${c} is already ${dir} ${pxFmt(p)} (now ${pxFmt(n.last)}).`, 6000);
   P.tg.push({ id: Math.random().toString(36).slice(2, 10), c, dir, p, at: Date.now() }); saveS();
-  const ok = await pxSync(); toast(!ok ? 'Saved. It starts once the server is reachable (needs stop server 3.7).' : PXS.bad.includes(c) ? `There's no Coinbase price for ${c}, so this alert can't fire.` : `✓ You'll get an alert when ${c} goes ${dir} ${pxFmt(p)}.`, 6000); pxSheet(c);
+  const ok = await pxSync(); toast(!ok ? 'Saved. It starts once the server is reachable (needs stop server 3.7).' : PXS.bad.includes(c) ? `There's no Coinbase price for ${c}, so this alert can't fire.` : `✓ You'll get an alert when ${c} goes ${dir} ${pxFmt(p)}.`, 6000); pxSheet(c); pxBar(); chPaint();
 }
-async function pxDel(id) { const P = pxCfg(); P.tg = P.tg.filter((t) => t.id !== id); saveS(); await pxSync(); pxSheet(); }
+
+/* v2.48l (Jeff: "when the alert hits, it goes to the chart but also, the alert is on top of the chart so the user can delete or re-edit it"):
+   on Level 2, a card above the chart: the alert that just fired (from the notification) and this coin's price targets, each with Edit and Delete. */
+function pxBar() {
+  const el = $('#lPx'), w = L2.sym; if (!el || !w) return;
+  const c = w.b, P = pxCfg(), on = S.push && S.push.on, T = on ? P.tg.filter((t) => t.c === c) : [];
+  const hit = L2.pxHit && L2.pxHit.c === c && Date.now() - L2.pxHit.at < 3600000 ? PXS.hist.slice().reverse().find((h) => h.c === c) : null;
+  const bell = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5B544" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>';
+  const btn = (act, id, txt, extra = '') => `<button class="b-out sm" style="width:auto;min-height:30px;padding:0 10px;font-size:13px" data-act="${act}" data-id="${esc(id)}"${extra}>${txt}</button>`;
+  let h = '';
+  if (hit) {
+    const tm = new Date(hit.t * 1000).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
+    const m = hit.k === 'target' && /^(\w+) (above|below) \$?([\d.,]+)/.exec(hit.title);
+    h += `<div class="card" style="padding:10px 12px;gap:8px;border-color:#F5B54488"><div style="display:flex;align-items:center;gap:8px">${bell}<span style="flex:1"><b>${esc(hit.title)}</b><small class="mu" style="display:block;font-size:12.5px">${esc(hit.body)} · ${esc(tm)}${hit.k === 'target' ? ' · this alert is now off' : ''}</small></span></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">${m ? btn('pxEdit', '', 'Set again', ` data-p="${esc(m[3].replace(/,/g, ''))}"`) : ''}${btn('pxHitX', '', 'Dismiss')}</div></div>`;
+  }
+  if (T.length) h += `<div class="card csum" style="padding:6px 12px">${T.map((t) => `<div style="align-items:center"><span style="display:flex;align-items:center;gap:8px">${bell}<span>${esc(t.c)} ${t.dir} ${pxFmt(t.p)}</span></span><span style="display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;flex:none">${btn('pxEdit', t.id, 'Edit')}${btn('pxDelBar', t.id, 'Delete')}</span></div>`).join('')}</div>`;
+  if (el.dataset.h !== h) { el.innerHTML = h; el.dataset.h = h; }
+  el.style.display = h ? 'flex' : 'none';
+}
+function pxEdit(id, p0) {
+  const P = pxCfg(), t = id ? P.tg.find((x) => x.id === id) : null, c = t ? t.c : (L2.sym || {}).b; if (!c) return;
+  const n = PXS.px[c], p = t ? t.p : +p0 || '', dir = t ? t.dir : n && p ? (p >= n.last ? 'above' : 'below') : 'above';
+  sheet(`<h2>${t ? 'Edit price alert' : 'Set the alert again'}</h2>
+    <div class="g2"><label>Coin<select id="pxC" disabled><option>${esc(c)}</option></select></label><label>When it goes<select id="pxD"><option value="above"${dir === 'above' ? ' selected' : ''}>above</option><option value="below"${dir === 'below' ? ' selected' : ''}>below</option></select></label></div>
+    <label class="fld"><span id="pxNow">Price in US dollars${n ? ` · now ${pxFmt(n.last)}` : ''}</span><input id="pxP" inputmode="decimal" placeholder="0.00" autocomplete="off" value="${esc(String(p))}"></label>
+    <button class="b-light" data-act="pxSave" data-id="${esc(id || '')}">Save</button>
+    ${t ? `<button class="b-out" data-act="pxDelBar" data-id="${esc(t.id)}" style="color:var(--redt)">Delete alert</button>` : ''}<button class="b-out" data-act="closeSheet">Cancel</button>`);
+  $('#pxP').oninput = () => { const v = +$('#pxP').value; if (n && v > 0) $('#pxD').value = v >= n.last ? 'above' : 'below'; };
+}
+async function pxSave(id) {
+  const P = pxCfg(), old = id ? P.tg.find((x) => x.id === id) : null, c = old ? old.c : (L2.sym || {}).b, dir = $('#pxD').value, p = +String($('#pxP').value).replace(/[$,\s]/g, '');
+  if (!(p > 0)) return toast('Enter a price.'); if (!old && P.tg.length >= 20) return toast('At most 20 price alerts.');
+  const n = PXS.px[c]; if (n && ((dir === 'above' && n.last >= p) || (dir === 'below' && n.last <= p))) return toast(`${c} is already ${dir} ${pxFmt(p)} (now ${pxFmt(n.last)}).`, 6000);
+  P.tg = P.tg.filter((x) => x.id !== id); P.tg.push({ id: Math.random().toString(36).slice(2, 10), c, dir, p, at: Date.now() });   /* a new id: the server never brings back an id that fired */
+  if (!old) L2.pxHit = null;
+  saveS(); closeSheet(); pxBar(); chPaint();
+  const ok = await pxSync(); pxBar(); toast(!ok ? 'Saved. It starts once the server is reachable.' : `✓ You'll get an alert when ${c} goes ${dir} ${pxFmt(p)}.`, 5000);
+}
+async function pxDelBar(id) { const P = pxCfg(), t = P.tg.find((x) => x.id === id); P.tg = P.tg.filter((x) => x.id !== id); saveS(); closeSheet(); pxBar(); chPaint(); await pxSync(); pxBar(); if (t) toast(`Deleted: ${t.c} ${t.dir} ${pxFmt(t.p)}.`); }
+async function pxDel(id) { const P = pxCfg(); P.tg = P.tg.filter((t) => t.id !== id); saveS(); await pxSync(); pxSheet(); pxBar(); chPaint(); }
 async function pxPct(v) { const P = pxCfg(); P.pct = +v; saveS(); await pxSync(); pxSheet(); }
 function pushPaint() {
   const P = S.push || {}; if (!$('#setPushOn')) return;
